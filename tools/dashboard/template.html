@@ -1,0 +1,503 @@
+<title>مراحل عِيَار</title>
+<meta name="description" content="مراحل التصميم والتطوير لتطبيق عِيَار AYAR وحالاتها، مولّدة من ملفات المستودع.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Cairo:wght@500;600;700;800&display=swap">
+<style>
+/* التخطيط: عمود قراءة واحد. الرأس بالأعداد، ثم «ابدأ من هنا» و«ينتظر قرارك»، ثم مسار التصميم شريطًا، ثم مسار التطوير مجموعات بحسب مرحلته.
+   الهوية أحادية بحبر عِيَار وورقه، والألوان للدلالة فقط كما في التطبيق نفسه (D-16). */
+:root {
+  --paper: #F7F4EC;
+  --surface: #FFFDF8;
+  --sunken: #EEEADF;
+  --ink: #141B20;
+  --ink-2: #39434A;
+  --muted: #59676C;
+  --line: #DFD9CC;
+  --line-strong: #B4AD9E;
+  --ok: #1E7A4C;
+  --ok-bg: #E2F0E7;
+  --run: #2563EB;
+  --run-bg: #E4ECFC;
+  --review: #6D3FC8;
+  --review-bg: #EEE7FA;
+  --warn: #A15C00;
+  --warn-bg: #F7EBD7;
+  --focus: #141B20;
+  --font-display: "Cairo", "Geeza Pro", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Almarai", "Geeza Pro", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "SF Mono", SFMono-Regular, Menlo, monospace;
+  --radius-control: 6px;
+  --radius-card: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111417;
+    --surface: #181C20;
+    --sunken: #0C0F11;
+    --ink: #F3F1EC;
+    --ink-2: #CDD1D5;
+    --muted: #9AA3AE;
+    --line: #2A3036;
+    --line-strong: #4A535C;
+    --ok: #4CC38A;
+    --ok-bg: #12291D;
+    --run: #6EA2FF;
+    --run-bg: #152139;
+    --review: #B49AF5;
+    --review-bg: #231B37;
+    --warn: #F2B347;
+    --warn-bg: #30230C;
+    --focus: #F3F1EC;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111417;
+  --surface: #181C20;
+  --sunken: #0C0F11;
+  --ink: #F3F1EC;
+  --ink-2: #CDD1D5;
+  --muted: #9AA3AE;
+  --line: #2A3036;
+  --line-strong: #4A535C;
+  --ok: #4CC38A;
+  --ok-bg: #12291D;
+  --run: #6EA2FF;
+  --run-bg: #152139;
+  --review: #B49AF5;
+  --review-bg: #231B37;
+  --warn: #F2B347;
+  --warn-bg: #30230C;
+  --focus: #F3F1EC;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.75;
+}
+.page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-inline: 20px;
+  padding-block: 40px 64px;
+  display: grid;
+  gap: 48px;
+}
+h1, h2, h3, .label, .num, button, .chip, .pid {
+  font-family: var(--font-display);
+}
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+p { margin: 0; }
+a { color: inherit; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
+a:hover { text-decoration-color: var(--ink); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: var(--radius-control); }
+.ltr { direction: ltr; unicode-bidi: isolate; font-family: var(--font-mono); font-size: 0.86em; }
+
+/* الرأس */
+.masthead { display: grid; gap: 20px; }
+.brand { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.brand .name { font-family: var(--font-display); font-weight: 800; font-size: 40px; line-height: 1.2; }
+.brand .latin { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.12em; font-size: 15px; color: var(--muted); }
+.masthead h1 { font-size: 24px; font-weight: 700; line-height: 1.4; }
+.lede { color: var(--ink-2); max-width: 68ch; }
+.meta { color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
+
+/* الأعداد */
+.tally {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  border-block: 1px solid var(--line);
+}
+.tally > div { padding-block: 16px; padding-inline: 16px; display: grid; gap: 2px; border-inline-start: 1px solid var(--line); }
+.tally > div:first-child { border-inline-start: 0; padding-inline-start: 0; }
+.num { font-weight: 700; font-size: 32px; line-height: 1.2; }
+.tally .label { font-size: 13px; font-weight: 600; color: var(--muted); }
+.tally .sub { font-size: 12.5px; color: var(--muted); }
+
+/* العناوين */
+.section { display: grid; gap: 18px; }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.section-head h2 { font-size: 19px; font-weight: 700; }
+.section-head p { color: var(--muted); font-size: 13px; }
+
+/* الشارات */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 24px; padding-inline: 10px; border-radius: 999px;
+  font-size: 12.5px; font-weight: 600; white-space: nowrap;
+  border: 1px solid transparent;
+}
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
+.state-available { border-color: var(--ink); color: var(--ink); }
+.state-available::before { background: transparent; border: 1.5px solid currentColor; width: 6px; height: 6px; }
+.state-in-progress { background: var(--run-bg); color: var(--run); }
+.state-awaiting-owner, .state-needs-decision { background: var(--review-bg); color: var(--review); }
+.state-blocked { background: var(--warn-bg); color: var(--warn); }
+.state-closed { background: var(--ok-bg); color: var(--ok); }
+.state-closed::before { content: "✓"; background: none; width: auto; height: auto; font-size: 12px; }
+.state-needs-design, .state-waiting { background: var(--sunken); color: var(--muted); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 10px; }
+
+/* الفلاتر */
+.filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.filters button {
+  font-size: 13px; font-weight: 600; min-height: 32px; padding-inline: 14px;
+  border-radius: 999px; border: 1px solid var(--line-strong); background: transparent; color: var(--ink-2); cursor: pointer;
+}
+.filters button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.filters .count { font-weight: 500; opacity: 0.75; margin-inline-start: 4px; }
+
+/* البطاقات */
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); align-items: start; }
+.grid.design { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.phase {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  scroll-margin-top: 24px;
+}
+.phase[data-state="available"] { border-color: var(--ink); }
+.phase:target { box-shadow: 0 0 0 2px var(--focus); }
+.phase-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.pid { font-weight: 700; font-size: 13px; color: var(--muted); direction: ltr; unicode-bidi: isolate; }
+.phase h3 { font-size: 16px; font-weight: 600; line-height: 1.55; }
+.goal { color: var(--ink-2); font-size: 14px; }
+.needs { display: grid; gap: 4px; font-size: 13px; color: var(--ink-2); margin: 0; }
+.needs div { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: baseline; }
+.needs dt { font-family: var(--font-display); font-weight: 600; color: var(--muted); }
+.needs dd { margin: 0; display: flex; flex-wrap: wrap; gap: 4px; }
+.ref {
+  font-family: var(--font-display); font-weight: 600; font-size: 12.5px;
+  direction: ltr; unicode-bidi: isolate; text-decoration: none;
+  padding-inline: 6px; border-radius: 4px; background: var(--sunken); color: var(--ink-2);
+}
+.ref.done { color: var(--ok); }
+.ref.open-decision { background: var(--review-bg); color: var(--review); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding-top: 4px; }
+.btn {
+  min-height: 32px; padding-inline: 12px; border-radius: var(--radius-control);
+  font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-primary { background: var(--ink); color: var(--paper); border: 1px solid var(--ink); }
+.btn-primary:hover { opacity: 0.88; }
+.btn-quiet { background: transparent; color: var(--ink-2); border: 1px solid var(--line-strong); }
+.btn-quiet:hover { border-color: var(--ink); color: var(--ink); }
+.cmd { font-family: var(--font-body); font-weight: 400; opacity: 0.8; font-size: 12.5px; }
+.details { border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 12px; font-size: 13.5px; }
+.details h4 { margin: 0 0 4px; font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--muted); }
+.details ul { margin: 0; padding-inline-start: 18px; display: grid; gap: 2px; }
+.details .path { color: var(--muted); font-size: 12.5px; }
+.warn-note { color: var(--warn); font-size: 13px; }
+
+/* المجموعات */
+.stage { display: grid; gap: 12px; }
+.stage-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.stage-head h3 { font-size: 15px; font-weight: 700; }
+.stage-head span { color: var(--muted); font-size: 13px; }
+
+/* القرارات */
+.decisions { display: grid; gap: 10px; }
+.decision {
+  display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: baseline;
+  padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card);
+}
+.decision .ref { grid-row: span 3; align-self: start; }
+.decision .q { font-weight: 700; }
+.decision .rec, .decision .where { font-size: 13.5px; color: var(--ink-2); min-width: 0; }
+.decision .where { color: var(--muted); }
+.empty { color: var(--muted); font-size: 14px; }
+
+/* التذييل */
+.howto { display: grid; gap: 10px; background: var(--sunken); border-radius: var(--radius-card); padding: 18px 20px; font-size: 14px; }
+.howto h2 { font-size: 16px; }
+.howto ol { margin: 0; padding-inline-start: 20px; display: grid; gap: 4px; }
+.links { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--muted); }
+
+/* رسالة النسخ */
+.toast {
+  position: fixed; inset-inline: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  margin-inline: auto; max-width: 420px;
+  background: var(--ink); color: var(--paper); border-radius: var(--radius-card);
+  padding: 12px 16px; font-size: 14px; display: grid; gap: 8px;
+}
+.toast input { font: inherit; padding: 6px 8px; border-radius: var(--radius-control); border: 1px solid var(--line-strong); background: var(--paper); color: var(--ink); width: 100%; }
+
+@media (max-width: 560px) {
+  .page { padding-block: 28px 56px; gap: 40px; }
+  .brand .name { font-size: 32px; }
+  .tally > div { border-inline-start: 0; padding-inline: 0; }
+  .grid, .grid.design { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .phase { transition: border-color 160ms ease-out; }
+}
+</style>
+
+<main class="page" dir="rtl" lang="ar">
+  <header class="masthead">
+    <div class="brand"><span class="name">عِيَار</span><span class="latin">AYAR</span></div>
+    <h1>مراحل التنفيذ: التصميم والتطوير</h1>
+    <p class="lede">كل بطاقة مرحلة لها ملف في المستودع يحدد هدفها وقراءاتها ومهامها وفحوصها ومعايير إغلاقها. زر «انسخ الأمر» ينسخ أمر البدء فقط، والتنفيذ يبدأ حين ترسله في جلسة العمل.</p>
+    <div class="meta" id="meta"></div>
+  </header>
+
+  <section class="tally" id="tally" aria-label="ملخص الحالة"></section>
+
+  <section class="section" aria-labelledby="now-h">
+    <div class="section-head">
+      <h2 id="now-h">ابدأ من هنا</h2>
+      <p>المراحل التي اكتملت تبعياتها وقراراتها، ويمكن بدؤها الآن</p>
+    </div>
+    <div class="grid" id="available"></div>
+  </section>
+
+  <section class="section" aria-labelledby="dec-h">
+    <div class="section-head">
+      <h2 id="dec-h">قرارات تنتظرك</h2>
+      <p>كل قرار بالمرحلة التي يلزم فيها، وتوصية الخطة أو ما اعتمدته مؤقتًا</p>
+    </div>
+    <div class="decisions" id="decisions"></div>
+  </section>
+
+  <section class="section" aria-labelledby="all-h">
+    <div class="section-head">
+      <h2 id="all-h">كل المراحل</h2>
+      <div class="filters" id="filters" role="group" aria-label="تصفية المراحل"></div>
+    </div>
+    <div class="legend" id="legend" aria-label="معاني الحالات"></div>
+    <div id="tracks" class="section"></div>
+  </section>
+
+  <section class="howto" aria-labelledby="how-h">
+    <h2 id="how-h">كيف تُحدَّث هذه الصفحة</h2>
+    <p>الصفحة لا تُحرَّر يدويًا. كل حالة فيها مأخوذة من ملفات المستودع في الـcommit المذكور أعلاه، فلا تظهر مرحلة مغلقة دون ملفها ووسم إغلاقها في Git.</p>
+    <ol>
+      <li>عند إغلاق مرحلة، يحدّث المنفّذ واجهة ملفها (الحالة وتاريخها والـcommit) وسجل التقدم.</li>
+      <li>يشغّل المولّد من جذر المستودع: <span class="ltr">/opt/homebrew/bin/node tools/dashboard/build.mjs</span></li>
+      <li>يعيد نشر الصفحة على الرابط نفسه.</li>
+    </ol>
+    <div class="links" id="links"></div>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+const DATA = /*__AYAR_DATA__*/null;
+
+const STATE_LABELS = {
+  'available': 'متاحة للبدء',
+  'in-progress': 'جارية',
+  'awaiting-owner': 'بانتظارك',
+  'needs-decision': 'تنتظر قرارك',
+  'blocked': 'معطّلة',
+  'closed': 'مغلقة',
+  'needs-design': 'تنتظر تصميمًا معتمدًا',
+  'waiting': 'تنتظر مرحلة سابقة',
+};
+const FILTERS = [
+  ['all', 'الكل', () => true],
+  ['available', 'المتاح الآن', (p) => p.state === 'available'],
+  ['active', 'الجاري', (p) => ['in-progress', 'awaiting-owner', 'blocked'].includes(p.state)],
+  ['waiting', 'المنتظر', (p) => ['needs-decision', 'needs-design', 'waiting'].includes(p.state)],
+  ['closed', 'المغلق', (p) => p.state === 'closed'],
+];
+
+function h(tag, attrs, ...children) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v === null || v === undefined || v === false) continue;
+    if (k === 'class') el.className = v;
+    else if (k === 'text') el.textContent = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? '' : v);
+  }
+  for (const c of children.flat(Infinity)) if (c !== null && c !== undefined && c !== false) el.append(c.nodeType ? c : document.createTextNode(String(c)));
+  return el;
+}
+
+const dateFmt = new Intl.DateTimeFormat('ar-u-nu-latn-ca-gregory', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+const fmtDate = (iso) => iso ? dateFmt.format(new Date(iso + 'T00:00:00Z')) : '—';
+const byId = new Map(DATA.phases.map((p) => [p.id, p]));
+const decisionIds = new Set(DATA.openDecisions.map((d) => d.id));
+
+function chip(state) {
+  return h('span', { class: `chip state-${state}`, text: STATE_LABELS[state] });
+}
+
+function phaseRef(id) {
+  const p = byId.get(id);
+  const done = p && p.status === 'closed';
+  return h('a', { class: `ref${done ? ' done' : ''}`, href: `#${id}`, title: p ? `${p.title}${done ? ' · مغلقة' : ''}` : id, text: done ? `${id} ✓` : id });
+}
+function decisionRef(id) {
+  const open = decisionIds.has(id);
+  return h('a', { class: `ref${open ? ' open-decision' : ' done'}`, href: open ? `#decision-${id}` : null, text: open ? id : `${id} ✓` });
+}
+
+let toastTimer;
+function showToast(message, fallbackText) {
+  const t = document.getElementById('toast');
+  t.replaceChildren(h('span', { text: message }));
+  if (fallbackText) {
+    const input = h('input', { id: 'copy-fallback', value: fallbackText, readonly: true, 'aria-label': 'نص الأمر' });
+    t.append(input);
+    t.hidden = false;
+    input.focus();
+    input.select();
+  } else {
+    t.hidden = false;
+  }
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.hidden = true; }, fallbackText ? 8000 : 2600);
+}
+
+function copyCommand(text) {
+  const done = () => showToast(`نُسخ الأمر: ${text}`);
+  const fail = () => showToast('تعذّر النسخ تلقائيًا. انسخ الأمر من الحقل:', text);
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fail);
+    else fail();
+  } catch { fail(); }
+}
+
+function phaseCard(p) {
+  const needs = [];
+  if (p.dependsOn.length) needs.push(h('div', null, h('dt', { text: 'تعتمد على' }), h('dd', null, p.dependsOn.map(phaseRef))));
+  if (p.designGates.length) needs.push(h('div', null, h('dt', { text: 'تصميم معتمد' }), h('dd', null, p.designGates.map(phaseRef))));
+  if (p.ownerGates.length) needs.push(h('div', null, h('dt', { text: 'قرارك قبل البدء' }), h('dd', null, p.ownerGates.map(decisionRef))));
+  if (p.openInputs.length) needs.push(h('div', null, h('dt', { text: 'يُطلب منك أثناءها' }), h('dd', null, p.openInputs.map(decisionRef))));
+  const opens = DATA.phases.filter((x) => x.designGates.includes(p.id)).map((x) => x.id);
+  if (opens.length) needs.push(h('div', null, h('dt', { text: 'تفتح للتطوير' }), h('dd', null, opens.map(phaseRef))));
+
+  const detailsId = `details-${p.id}`;
+  const details = h('div', { class: 'details', id: detailsId, hidden: true },
+    p.start.length ? h('div', null, h('h4', { text: 'متطلبات البدء' }), h('ul', null, p.start.map((s) => h('li', { text: s })))) : null,
+    p.outputs.length ? h('div', null, h('h4', { text: 'المخرجات' }), h('ul', null, p.outputs.map((s) => h('li', { text: s })))) : null,
+    h('div', null,
+      h('h4', { text: 'الحالة' }),
+      h('p', null, `${STATE_LABELS[p.state]} · آخر تغيير ${fmtDate(p.statusDate)}`, p.closingCommit ? ' · commit ' : '', p.closingCommit ? h('span', { class: 'ltr', text: p.closingCommit }) : ''),
+    ),
+    h('p', { class: 'path' }, 'ملف المرحلة: ', h('a', { class: 'ltr', href: `${DATA.links.repo}/blob/main/${p.file}`, target: '_blank', rel: 'noopener', text: p.file })),
+  );
+  const moreBtn = h('button', {
+    class: 'btn btn-quiet', type: 'button', 'aria-expanded': 'false', 'aria-controls': detailsId,
+    onclick: (e) => {
+      const open = details.hidden;
+      details.hidden = !open;
+      e.currentTarget.setAttribute('aria-expanded', String(open));
+      e.currentTarget.firstChild.textContent = open ? 'أخفِ التفاصيل' : 'التفاصيل';
+    },
+  }, 'التفاصيل');
+
+  return h('article', { class: 'phase', id: p.id, 'data-state': p.state, 'data-id': p.id },
+    h('div', { class: 'phase-top' }, h('span', { class: 'pid', text: p.id }), chip(p.state)),
+    h('h3', { text: p.title }),
+    h('p', { class: 'goal', text: p.goal }),
+    p.unverifiedClose ? h('p', { class: 'warn-note', text: `مغلقة في ملفها دون وسم ${p.id}-closed في Git: تحقق قبل الاعتماد عليها.` }) : null,
+    needs.length ? h('dl', { class: 'needs' }, needs) : null,
+    h('div', { class: 'actions' },
+      h('button', { class: 'btn btn-primary', type: 'button', 'aria-label': `انسخ الأمر: ${p.command}`, onclick: () => copyCommand(p.command) },
+        'انسخ الأمر', h('span', { class: 'cmd', text: `«${p.command}»` })),
+      moreBtn,
+    ),
+    details,
+  );
+}
+
+function render() {
+  const phases = DATA.phases;
+  const count = (fn) => phases.filter(fn).length;
+  const dev = count((p) => p.track === 'dev');
+  const design = count((p) => p.track === 'design');
+
+  document.getElementById('meta').replaceChildren(
+    h('span', null, 'آخر تحديث للحالة: ', fmtDate(DATA.updated)),
+    DATA.commit ? h('span', null, 'مولّدة من commit ', h('span', { class: 'ltr', text: DATA.commit }), DATA.dirty ? ' مع تغييرات لم تُلتزم بعد' : '') : null,
+  );
+
+  const tallies = [
+    ['المراحل', phases.length, `${dev} تطوير · ${design} تصميم`],
+    ['مغلقة', count((p) => p.state === 'closed'), 'بمعاييرها ووسمها'],
+    ['جارية', count((p) => ['in-progress', 'awaiting-owner', 'blocked'].includes(p.state)), 'ومنها المعطّل والمنتظر لك'],
+    ['متاحة الآن', count((p) => p.state === 'available'), 'تبعياتها مكتملة'],
+    ['قرارات تنتظرك', DATA.openDecisions.length, 'قبل مراحلها أو أثناءها'],
+  ];
+  document.getElementById('tally').replaceChildren(...tallies.map(([label, n, sub]) =>
+    h('div', null, h('span', { class: 'label', text: label }), h('span', { class: 'num', text: String(n) }), h('span', { class: 'sub', text: sub }))));
+
+  const avail = phases.filter((p) => p.state === 'available');
+  document.getElementById('available').replaceChildren(...(avail.length ? avail.map(phaseCard) : [h('p', { class: 'empty', text: 'لا مرحلة متاحة الآن. انظر ما ينتظر قرارك أو المراحل الجارية.' })]));
+
+  const decs = DATA.openDecisions;
+  document.getElementById('decisions').replaceChildren(...(decs.length ? decs.map((d) =>
+    h('div', { class: 'decision', id: `decision-${d.id}` },
+      h('span', { class: 'ref open-decision', text: d.id }),
+      h('span', { class: 'q', text: d.question }),
+      h('span', { class: 'rec', text: `التوصية: ${d.recommendation}` }),
+      h('span', { class: 'where' }, 'يلزم في: ', d.gates.length
+        ? d.gates.map((g, i) => [i ? '، ' : '', phaseRef(g.id), g.beforeStart ? ' (قبل البدء)' : ' (أثناءها)'])
+        : d.neededIn),
+    )) : [h('p', { class: 'empty', text: 'لا قرارات مفتوحة.' })]));
+
+  const shown = Object.keys(STATE_LABELS).filter((s) => phases.some((p) => p.state === s));
+  document.getElementById('legend').replaceChildren(...shown.map(chip));
+
+  let active = 'all';
+  try { active = localStorage.getItem('ayar-phase-filter') || 'all'; } catch {}
+  if (!FILTERS.some(([k]) => k === active)) active = 'all';
+
+  const tracks = document.getElementById('tracks');
+  const filtersEl = document.getElementById('filters');
+
+  function drawTracks() {
+    const fn = FILTERS.find(([k]) => k === active)[2];
+    const groups = [];
+    for (const [stage, label] of Object.entries(DATA.stages)) {
+      const items = phases.filter((p) => p.stage === stage && fn(p)).sort((a, b) => a.number - b.number);
+      if (!items.length) continue;
+      const total = phases.filter((p) => p.stage === stage).length;
+      const ids = phases.filter((p) => p.stage === stage).map((p) => p.id);
+      groups.push(h('div', { class: 'stage' },
+        h('div', { class: 'stage-head' }, h('h3', { text: label }), h('span', { text: `${total} ${total > 2 && total < 11 ? 'مراحل' : 'مرحلة'} · ${ids[0]}${ids.length > 1 ? ' إلى ' + ids.at(-1) : ''}` })),
+        h('div', { class: `grid${stage === 'design' ? ' design' : ''}` }, items.map(phaseCard)),
+      ));
+    }
+    tracks.replaceChildren(...(groups.length ? groups : [h('p', { class: 'empty', text: 'لا مراحل في هذا التصنيف الآن.' })]));
+    for (const b of filtersEl.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.key === active));
+  }
+
+  filtersEl.replaceChildren(...FILTERS.map(([key, label, fn]) =>
+    h('button', { type: 'button', 'data-key': key, 'aria-pressed': 'false', onclick: () => {
+      active = key;
+      try { localStorage.setItem('ayar-phase-filter', key); } catch {}
+      drawTracks();
+    } }, label, h('span', { class: 'count', text: String(phases.filter(fn).length) }))));
+  drawTracks();
+
+  document.getElementById('links').replaceChildren(
+    h('a', { href: DATA.links.repo, target: '_blank', rel: 'noopener', text: 'المستودع على GitHub' }),
+    h('a', { href: DATA.links.figma, target: '_blank', rel: 'noopener', text: 'ملف التصميم في Figma' }),
+    h('span', null, 'موجّه الأوامر: ', h('span', { class: 'ltr', text: 'docs/phases/README.md' })),
+  );
+
+  if (location.hash) {
+    const target = document.getElementById(location.hash.slice(1));
+    if (target) target.scrollIntoView();
+  }
+}
+
+render();
+</script>
