@@ -141,8 +141,9 @@ closing_commit:
   - التحقق قبل البدء (AGENTS.md 3.1): المستودع نظيف، وبصمات الخطة الخمس OK، ولا تبعيات ولا بوابات، ولا عوائق مفتوحة.
   - موافقة المالك (2026-10-09): قائمة التنزيلات كما عُرضت (better-sqlite3 فقط إن فشل `node:sqlite`)، وجهاز واحد هو هذا الـ M4، ومجلد مؤقت في iCloud Drive لتجربتي E-05 وE-25.
   - المهمة 1، E-02 محسوم: `darwin-arm64` وحده، وأدنى نظام 13.0.
-- **آخر commit:** E-02.
-- **نقطة الاستئناف:** المهمة 2 (E-01). Electron 44.7.0 وForge 8.0.1 مثبتان في `spikes/E-01-electron-forge/`، والملف الثنائي نُزّل بـ `node node_modules/electron/install.js` وبصمته مطابقة.
+  - المهمة 2، E-01 محسوم: Electron 44.7.0 وForge 8.0.1، والتوقيع عبر `osxSign` دائمًا (D-50)، والخط المعروض Menlo، والحجم 302 ميغابايت. وسُجّلت G-48 (البديل العربي للخط ثابت العرض) لـ DES-1. والنقر المزدوج الحرفي في Finder يُعاد في جلسة المالك.
+- **آخر commit:** E-01.
+- **نقطة الاستئناف:** المهمة 3 (G-05): `_electron.launch` من playwright-core 1.64.0 على حزمة E-01 بصماماتها النهائية. البناء الحالي في `spikes/E-01-electron-forge/out/` موقّع بـ `SPIKE_IDENTITY=- SPIKE_DLV=1`.
 - **ملاحظات:**
   - لوحظ أثناء التنظيم أن `node` في صدفة Claude Code دالة nvm معطوبة (AGENTS.md 9). هذه ملاحظة، لا نتيجة E-06.
   - و`npm` كذلك دالة nvm معطوبة في الصدفة نفسها (`type npm` → shell function). استخدم `/opt/homebrew/bin/npm` مع `PATH=/opt/homebrew/bin:$PATH`.

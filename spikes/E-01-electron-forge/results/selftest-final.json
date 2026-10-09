@@ -1,0 +1,132 @@
+{
+  "spike": "E-01",
+  "startedAt": "2026-10-09T20:15:10.648Z",
+  "buildInfo": {
+    "mode": "e01",
+    "bundleId": "com.bysltan.ayar.spike",
+    "productName": "AYAR Spike",
+    "signed": "identity",
+    "buildTag": "",
+    "builtAt": "2026-10-09T20:15:04.305Z"
+  },
+  "bundleId": "com.bysltan.ayar.spike",
+  "isPackaged": true,
+  "execPath": "/Volumes/iSltanXx/Projects/AYAR/spikes/E-01-electron-forge/out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/MacOS/AYAR Spike",
+  "versions": {
+    "electron": "44.7.0",
+    "node": "24.21.0",
+    "chrome": "152.0.7977.130"
+  },
+  "locale": {
+    "app": "ar",
+    "system": "ar-SA@numbers=latn",
+    "preferred": [
+      "ar-SA"
+    ]
+  },
+  "launchedFrom": {
+    "ppid": 1,
+    "argv": [
+      "--auto-quit"
+    ]
+  },
+  "steps": {
+    "engine.spawn": {
+      "ok": true,
+      "ms": 0,
+      "result": {
+        "pid": 70707
+      }
+    },
+    "engine.sqlite": {
+      "ok": true,
+      "ms": 2,
+      "result": {
+        "journal": {
+          "journal_mode": "wal"
+        },
+        "rows": 2,
+        "sqliteVersion": "3.53.4",
+        "warnings": []
+      }
+    },
+    "renderer.sandbox": {
+      "ok": true,
+      "ms": 0,
+      "result": {
+        "processType": "undefined",
+        "requireType": "undefined",
+        "bufferType": "undefined",
+        "origin": "app://spike",
+        "protocol": "app:"
+      }
+    },
+    "renderer.fonts": {
+      "ok": true,
+      "ms": 7,
+      "result": {
+        "#mono-latin": {
+          "declaredFamily": "\"SF Mono\", SFMono-Regular, Menlo, monospace",
+          "rendered": [
+            {
+              "familyName": "Menlo",
+              "glyphCount": 89,
+              "isCustomFont": false,
+              "postScriptName": "Menlo-Regular"
+            }
+          ]
+        },
+        "#mono-arabic": {
+          "declaredFamily": "\"SF Mono\", SFMono-Regular, Menlo, monospace",
+          "rendered": [
+            {
+              "familyName": "Menlo",
+              "glyphCount": 17,
+              "isCustomFont": false,
+              "postScriptName": "Menlo-Regular"
+            },
+            {
+              "familyName": "Courier New",
+              "glyphCount": 15,
+              "isCustomFont": false,
+              "postScriptName": "CourierNewPSMT"
+            }
+          ]
+        },
+        "#ui-text": {
+          "declaredFamily": "-apple-system, system-ui, sans-serif",
+          "rendered": [
+            {
+              "familyName": ".SF NS",
+              "glyphCount": 29,
+              "isCustomFont": false,
+              "postScriptName": ".SFNS-Regular_wdth_opsz110000_GRAD_wght"
+            }
+          ]
+        }
+      }
+    },
+    "renderer.kill": {
+      "ok": true,
+      "ms": 77,
+      "result": {
+        "rendererPid": 70706,
+        "goneReason": "killed",
+        "engineAlive": true,
+        "enginePing": {
+          "pid": 70707,
+          "ppid": 70690,
+          "node": "24.21.0",
+          "uptimeS": 0.085789875,
+          "warnings": []
+        },
+        "dbRowsAfterKill": 2,
+        "newRendererPid": 70709
+      }
+    }
+  },
+  "cspViolations": [],
+  "engineStderr": "",
+  "finishedAt": "2026-10-09T20:15:11.210Z",
+  "ok": true
+}

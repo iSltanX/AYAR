@@ -1,0 +1,20 @@
+{
+  "name": "ayar-spike-e01",
+  "productName": "AYAR Spike",
+  "version": "0.0.1",
+  "private": true,
+  "description": "DEV-0 spike E-01: Electron + Forge packaging, fuses, signing, utilityProcess, node:sqlite, monospace font",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package"
+  },
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@electron-forge/cli": "8.0.1",
+    "@electron-forge/plugin-fuses": "8.0.1",
+    "@electron/fuses": "2.1.3",
+    "electron": "44.7.0"
+  }
+}
