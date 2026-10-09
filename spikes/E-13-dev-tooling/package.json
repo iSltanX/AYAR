@@ -1,0 +1,25 @@
+{
+  "name": "ayar-spike-e13",
+  "version": "0.0.1",
+  "private": true,
+  "description": "DEV-0 spike E-13: TypeScript 7 vs 6 for AYAR tooling (tsc, svelte-check, typescript-eslint), and Vitest vs node:test",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "7.3.1",
+    "@types/node": "24.19.2",
+    "@typescript/native": "npm:typescript@7.0.2",
+    "eslint": "10.12.0",
+    "eslint-plugin-svelte": "3.23.1",
+    "svelte": "5.57.2",
+    "svelte-check": "4.7.6",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.1",
+    "vite": "8.3.4",
+    "vitest": "5.0.3"
+  }
+}

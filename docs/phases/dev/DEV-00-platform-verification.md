@@ -146,9 +146,14 @@ closing_commit:
   - المهمة 4، E-03 محسوم: `node:sqlite` نجح كله في ثلاثة تشغيلات، ولم يُنزَّل better-sqlite3.
   - قاعدة التنزيلات (ORG-09، 2026-10-10): يُنزَّل ما يخص التطبيق دون استئذان، ويُذكر في التسليم. وهي تحل محل شرط الموافقة المسبقة في «متطلبات البدء».
   - المهمة 8، E-06 محسوم (قُدّمت على المهمة 5 حين كانت E-13 تنتظر جواب التنزيلات): الإبقاء على صدفة الدخول، بين 42 و70 ملّي ثانية، وPATH مطابق للطرفية. وسُجّلت G-49 لـ DEV-2 وDEV-4.
-- **آخر commit:** E-06.
-- **نقطة الاستئناف:** المهمة 5 (E-13): هيكل مستودع صغير في `spikes/E-13-dev-tooling/` بـ Svelte 5 وsvelte-check وtypescript-eslint وVitest وnode:test، مع TypeScript 7.0.2 ثم 6.0.3. ملاحظة سابقة للتجربة: svelte-check 4.7.6 يعلن توافقه مع TypeScript `^5 || ^6`، وtypescript-eslint 8.71.1 مع `<6.1.0`. ثم E-25، ثم جلسة المالك (E-04 وE-05 وE-23، والنقر المزدوج في Finder لـ E-01 وE-06).
-- **التنزيلات حتى الآن:** electron 44.7.0 مع ملفه الثنائي، و@electron-forge/cli و@electron-forge/plugin-fuses 8.0.1، و@electron/fuses 2.1.3 (في `spikes/E-01-electron-forge/node_modules/`، 373 ميغابايت، ونسخة Electron المضغوطة 124 ميغابايت في `~/Library/Caches/electron/`)، وplaywright-core 1.64.0 (في `spikes/G-05-e2e-fuses/node_modules/`، 13 ميغابايت).
+  - المهمة 5، E-13 محسوم: `typescript` = 6.0.3 للأدوات، و`@typescript/native` = 7.0.2 لفحص أنواع المحرك، وVitest للاختبارات. svelte-check وtypescript-eslint يرفضان TS 7 وحده.
+- **آخر commit:** E-13.
+- **نقطة الاستئناف:** المهمة 10 (E-25): `touch -r` ثم التحقق من تغير `ctime` على القرص الداخلي، وiCloud Drive (موافَق عليه)، والقرص الخارجي APFS، وصورة قرص exFAT، ثم قياس اللقطة الكاملة مقابل المختصرة على 50 ألف ملف. ثم جلسة المالك (E-04 وE-05 وE-23، والنقر المزدوج في Finder لـ E-01 وE-06)، ثم أجوبة A-03 وA-11 وA-13 وA-14.
+- **التنزيلات حتى الآن:**
+  - electron 44.7.0 مع ملفه الثنائي، و@electron-forge/cli و@electron-forge/plugin-fuses 8.0.1، و@electron/fuses 2.1.3: في `spikes/E-01-electron-forge/node_modules/`، 373 ميغابايت. ونسخة Electron المضغوطة 124 ميغابايت في `~/Library/Caches/electron/`.
+  - playwright-core 1.64.0: في `spikes/G-05-e2e-fuses/node_modules/`، 13 ميغابايت.
+  - svelte 5.57.2، وvite 8.3.4، و@sveltejs/vite-plugin-svelte 7.3.1، وsvelte-check 4.7.6، وtypescript 6.0.3 و7.0.2، وtypescript-eslint 8.71.1، وeslint 10.12.0، وeslint-plugin-svelte 3.23.1، وvitest 5.0.3، و@types/node 24.19.2: في `spikes/E-13-dev-tooling/node_modules/`، نحو 100 ميغابايت.
+  - كلها من سجل npm الرسمي، وملف Electron من إصدارات GitHub الرسمية ببصمة مطابقة.
 - **ملاحظات:**
   - لوحظ أثناء التنظيم أن `node` في صدفة Claude Code دالة nvm معطوبة (AGENTS.md 9). هذه ملاحظة، لا نتيجة E-06.
   - و`npm` كذلك دالة nvm معطوبة في الصدفة نفسها (`type npm` → shell function). استخدم `/opt/homebrew/bin/npm` مع `PATH=/opt/homebrew/bin:$PATH`.

@@ -1,0 +1,11 @@
+check	expect	exit	verdict	seconds
+tsc-engine	0	0	ok	0.35
+tsc-engine-negative	fail	2	ok	0.28
+svelte-check	0	0	ok	0.79
+svelte-check-negative	fail	1	ok	0.44
+eslint	0	0	ok	1.42
+eslint-negative	fail	1	ok	0.48
+vitest	0	0	ok	0.67
+vitest-negative	fail	1	ok	0.34
+node-test	0	0	ok	0.17
+node-test-negative	fail	1	ok	0.16

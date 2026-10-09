@@ -1,0 +1,178 @@
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: ayar-spike-e13@0.0.1
+npm warn Found: typescript@6.0.3
+npm warn node_modules/typescript
+npm warn   peer typescript@"^5.0.0 || ^6.0.0" from svelte-check@4.7.6
+npm warn   node_modules/svelte-check
+npm warn     dev svelte-check@"4.7.6" from the root project
+npm warn   10 more (ts-api-utils, typescript-eslint, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer typescript@"^5.0.0 || ^6.0.0" from svelte-check@4.7.6
+npm warn node_modules/svelte-check
+npm warn   dev svelte-check@"4.7.6" from the root project
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: ayar-spike-e13@0.0.1
+npm warn Found: typescript@6.0.3
+npm warn node_modules/typescript
+npm warn   peer typescript@"^5.0.0 || ^6.0.0" from svelte-check@4.7.6
+npm warn   node_modules/svelte-check
+npm warn     dev svelte-check@"4.7.6" from the root project
+npm warn   10 more (ts-api-utils, typescript-eslint, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer typescript@">=4.8.4 <6.1.0" from typescript-eslint@8.71.1
+npm warn node_modules/typescript-eslint
+npm warn   dev typescript-eslint@"8.71.1" from the root project
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: @typescript-eslint/eslint-plugin@8.71.1
+npm warn Found: typescript@7.0.2
+npm warn node_modules/typescript
+npm warn   dev typescript@"7.0.2" from the root project
+npm warn   1 more (ts-api-utils)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer typescript@">=4.8.4 <6.1.0" from @typescript-eslint/eslint-plugin@8.71.1
+npm warn node_modules/typescript-eslint/node_modules/@typescript-eslint/eslint-plugin
+npm warn   @typescript-eslint/eslint-plugin@"8.71.1" from typescript-eslint@8.71.1
+npm warn   node_modules/typescript-eslint
+npm warn
+npm warn Conflicting peer dependency: typescript@6.0.3
+npm warn node_modules/typescript
+npm warn   peer typescript@">=4.8.4 <6.1.0" from @typescript-eslint/eslint-plugin@8.71.1
+npm warn   node_modules/typescript-eslint/node_modules/@typescript-eslint/eslint-plugin
+npm warn     @typescript-eslint/eslint-plugin@"8.71.1" from typescript-eslint@8.71.1
+npm warn     node_modules/typescript-eslint
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: @typescript-eslint/parser@8.71.1
+npm warn Found: typescript@7.0.2
+npm warn node_modules/typescript
+npm warn   dev typescript@"7.0.2" from the root project
+npm warn   1 more (ts-api-utils)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer typescript@">=4.8.4 <6.1.0" from @typescript-eslint/parser@8.71.1
+npm warn node_modules/typescript-eslint/node_modules/@typescript-eslint/parser
+npm warn   @typescript-eslint/parser@"8.71.1" from typescript-eslint@8.71.1
+npm warn   node_modules/typescript-eslint
+npm warn   1 more (@typescript-eslint/eslint-plugin)
+npm warn
+npm warn Conflicting peer dependency: typescript@6.0.3
+npm warn node_modules/typescript
+npm warn   peer typescript@">=4.8.4 <6.1.0" from @typescript-eslint/parser@8.71.1
+npm warn   node_modules/typescript-eslint/node_modules/@typescript-eslint/parser
+npm warn     @typescript-eslint/parser@"8.71.1" from typescript-eslint@8.71.1
+npm warn     node_modules/typescript-eslint
+npm warn     1 more (@typescript-eslint/eslint-plugin)
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: @typescript-eslint/typescript-estree@8.71.1
+npm warn Found: typescript@7.0.2
+npm warn node_modules/typescript
+npm warn   dev typescript@"7.0.2" from the root project
+npm warn   1 more (ts-api-utils)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer typescript@">=4.8.4 <6.1.0" from @typescript-eslint/typescript-estree@8.71.1
+npm warn node_modules/typescript-eslint/node_modules/@typescript-eslint/typescript-estree
+npm warn   @typescript-eslint/typescript-estree@"8.71.1" from typescript-eslint@8.71.1
+npm warn   node_modules/typescript-eslint
+npm warn   3 more (@typescript-eslint/type-utils, ...)
+npm warn
+npm warn Conflicting peer dependency: typescript@6.0.3
+npm warn node_modules/typescript
+npm warn   peer typescript@">=4.8.4 <6.1.0" from @typescript-eslint/typescript-estree@8.71.1
+npm warn   node_modules/typescript-eslint/node_modules/@typescript-eslint/typescript-estree
+npm warn     @typescript-eslint/typescript-estree@"8.71.1" from typescript-eslint@8.71.1
+npm warn     node_modules/typescript-eslint
+npm warn     3 more (@typescript-eslint/type-utils, ...)
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: @typescript-eslint/utils@8.71.1
+npm warn Found: typescript@7.0.2
+npm warn node_modules/typescript
+npm warn   dev typescript@"7.0.2" from the root project
+npm warn   1 more (ts-api-utils)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer typescript@">=4.8.4 <6.1.0" from @typescript-eslint/utils@8.71.1
+npm warn node_modules/typescript-eslint/node_modules/@typescript-eslint/utils
+npm warn   @typescript-eslint/utils@"8.71.1" from typescript-eslint@8.71.1
+npm warn   node_modules/typescript-eslint
+npm warn   2 more (@typescript-eslint/eslint-plugin, @typescript-eslint/type-utils)
+npm warn
+npm warn Conflicting peer dependency: typescript@6.0.3
+npm warn node_modules/typescript
+npm warn   peer typescript@">=4.8.4 <6.1.0" from @typescript-eslint/utils@8.71.1
+npm warn   node_modules/typescript-eslint/node_modules/@typescript-eslint/utils
+npm warn     @typescript-eslint/utils@"8.71.1" from typescript-eslint@8.71.1
+npm warn     node_modules/typescript-eslint
+npm warn     2 more (@typescript-eslint/eslint-plugin, @typescript-eslint/type-utils)
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: @typescript-eslint/type-utils@8.71.1
+npm warn Found: typescript@7.0.2
+npm warn node_modules/typescript
+npm warn   dev typescript@"7.0.2" from the root project
+npm warn   1 more (ts-api-utils)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer typescript@">=4.8.4 <6.1.0" from @typescript-eslint/type-utils@8.71.1
+npm warn node_modules/typescript-eslint/node_modules/@typescript-eslint/eslint-plugin/node_modules/@typescript-eslint/type-utils
+npm warn   @typescript-eslint/type-utils@"8.71.1" from @typescript-eslint/eslint-plugin@8.71.1
+npm warn   node_modules/typescript-eslint/node_modules/@typescript-eslint/eslint-plugin
+npm warn
+npm warn Conflicting peer dependency: typescript@6.0.3
+npm warn node_modules/typescript
+npm warn   peer typescript@">=4.8.4 <6.1.0" from @typescript-eslint/type-utils@8.71.1
+npm warn   node_modules/typescript-eslint/node_modules/@typescript-eslint/eslint-plugin/node_modules/@typescript-eslint/type-utils
+npm warn     @typescript-eslint/type-utils@"8.71.1" from @typescript-eslint/eslint-plugin@8.71.1
+npm warn     node_modules/typescript-eslint/node_modules/@typescript-eslint/eslint-plugin
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: @typescript-eslint/project-service@8.71.1
+npm warn Found: typescript@7.0.2
+npm warn node_modules/typescript
+npm warn   dev typescript@"7.0.2" from the root project
+npm warn   1 more (ts-api-utils)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer typescript@">=4.8.4 <6.1.0" from @typescript-eslint/project-service@8.71.1
+npm warn node_modules/typescript-eslint/node_modules/@typescript-eslint/typescript-estree/node_modules/@typescript-eslint/project-service
+npm warn   @typescript-eslint/project-service@"8.71.1" from @typescript-eslint/typescript-estree@8.71.1
+npm warn   node_modules/typescript-eslint/node_modules/@typescript-eslint/typescript-estree
+npm warn
+npm warn Conflicting peer dependency: typescript@6.0.3
+npm warn node_modules/typescript
+npm warn   peer typescript@">=4.8.4 <6.1.0" from @typescript-eslint/project-service@8.71.1
+npm warn   node_modules/typescript-eslint/node_modules/@typescript-eslint/typescript-estree/node_modules/@typescript-eslint/project-service
+npm warn     @typescript-eslint/project-service@"8.71.1" from @typescript-eslint/typescript-estree@8.71.1
+npm warn     node_modules/typescript-eslint/node_modules/@typescript-eslint/typescript-estree
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: @typescript-eslint/tsconfig-utils@8.71.1
+npm warn Found: typescript@7.0.2
+npm warn node_modules/typescript
+npm warn   dev typescript@"7.0.2" from the root project
+npm warn   1 more (ts-api-utils)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer typescript@">=4.8.4 <6.1.0" from @typescript-eslint/tsconfig-utils@8.71.1
+npm warn node_modules/typescript-eslint/node_modules/@typescript-eslint/typescript-estree/node_modules/@typescript-eslint/tsconfig-utils
+npm warn   @typescript-eslint/tsconfig-utils@"8.71.1" from @typescript-eslint/typescript-estree@8.71.1
+npm warn   node_modules/typescript-eslint/node_modules/@typescript-eslint/typescript-estree
+npm warn   1 more (@typescript-eslint/project-service)
+npm warn
+npm warn Conflicting peer dependency: typescript@6.0.3
+npm warn node_modules/typescript
+npm warn   peer typescript@">=4.8.4 <6.1.0" from @typescript-eslint/tsconfig-utils@8.71.1
+npm warn   node_modules/typescript-eslint/node_modules/@typescript-eslint/typescript-estree/node_modules/@typescript-eslint/tsconfig-utils
+npm warn     @typescript-eslint/tsconfig-utils@"8.71.1" from @typescript-eslint/typescript-estree@8.71.1
+npm warn     node_modules/typescript-eslint/node_modules/@typescript-eslint/typescript-estree
+npm warn     1 more (@typescript-eslint/project-service)
+
+added 1 package, changed 1 package, and audited 173 packages in 694ms
+
+50 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+npm warn allow-scripts 1 package has install scripts not yet covered by allowScripts:
+npm warn allow-scripts   fsevents@2.3.3 (install: (install scripts present))
+npm warn allow-scripts
+npm warn allow-scripts Run `npm approve-scripts --allow-scripts-pending` to review, or `npm approve-scripts <pkg>` to allow.

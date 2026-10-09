@@ -1,0 +1,9 @@
+
+ RUN  v5.0.3 /Volumes/iSltanXx/Projects/AYAR/spikes/E-13-dev-tooling
+
+
+ Test Files  2 passed (2)
+      Tests  4 passed (4)
+   Start at  00:20:20
+   Duration  237ms (transform 77%, import 19%, tests 2%, worker 2%)
+
