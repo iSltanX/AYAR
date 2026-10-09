@@ -1,0 +1,503 @@
+<title>مراحل عِيَار</title>
+<meta name="description" content="مراحل التصميم والتطوير لتطبيق عِيَار AYAR وحالاتها، مولّدة من ملفات المستودع.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Cairo:wght@500;600;700;800&display=swap">
+<style>
+/* التخطيط: عمود قراءة واحد. الرأس بالأعداد، ثم «ابدأ من هنا» و«ينتظر قرارك»، ثم مسار التصميم شريطًا، ثم مسار التطوير مجموعات بحسب مرحلته.
+   الهوية أحادية بحبر عِيَار وورقه، والألوان للدلالة فقط كما في التطبيق نفسه (D-16). */
+:root {
+  --paper: #F7F4EC;
+  --surface: #FFFDF8;
+  --sunken: #EEEADF;
+  --ink: #141B20;
+  --ink-2: #39434A;
+  --muted: #59676C;
+  --line: #DFD9CC;
+  --line-strong: #B4AD9E;
+  --ok: #1E7A4C;
+  --ok-bg: #E2F0E7;
+  --run: #2563EB;
+  --run-bg: #E4ECFC;
+  --review: #6D3FC8;
+  --review-bg: #EEE7FA;
+  --warn: #A15C00;
+  --warn-bg: #F7EBD7;
+  --focus: #141B20;
+  --font-display: "Cairo", "Geeza Pro", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Almarai", "Geeza Pro", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "SF Mono", SFMono-Regular, Menlo, monospace;
+  --radius-control: 6px;
+  --radius-card: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111417;
+    --surface: #181C20;
+    --sunken: #0C0F11;
+    --ink: #F3F1EC;
+    --ink-2: #CDD1D5;
+    --muted: #9AA3AE;
+    --line: #2A3036;
+    --line-strong: #4A535C;
+    --ok: #4CC38A;
+    --ok-bg: #12291D;
+    --run: #6EA2FF;
+    --run-bg: #152139;
+    --review: #B49AF5;
+    --review-bg: #231B37;
+    --warn: #F2B347;
+    --warn-bg: #30230C;
+    --focus: #F3F1EC;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111417;
+  --surface: #181C20;
+  --sunken: #0C0F11;
+  --ink: #F3F1EC;
+  --ink-2: #CDD1D5;
+  --muted: #9AA3AE;
+  --line: #2A3036;
+  --line-strong: #4A535C;
+  --ok: #4CC38A;
+  --ok-bg: #12291D;
+  --run: #6EA2FF;
+  --run-bg: #152139;
+  --review: #B49AF5;
+  --review-bg: #231B37;
+  --warn: #F2B347;
+  --warn-bg: #30230C;
+  --focus: #F3F1EC;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.75;
+}
+.page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-inline: 20px;
+  padding-block: 40px 64px;
+  display: grid;
+  gap: 48px;
+}
+h1, h2, h3, .label, .num, button, .chip, .pid {
+  font-family: var(--font-display);
+}
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+p { margin: 0; }
+a { color: inherit; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
+a:hover { text-decoration-color: var(--ink); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: var(--radius-control); }
+.ltr { direction: ltr; unicode-bidi: isolate; font-family: var(--font-mono); font-size: 0.86em; }
+
+/* الرأس */
+.masthead { display: grid; gap: 20px; }
+.brand { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.brand .name { font-family: var(--font-display); font-weight: 800; font-size: 40px; line-height: 1.2; }
+.brand .latin { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.12em; font-size: 15px; color: var(--muted); }
+.masthead h1 { font-size: 24px; font-weight: 700; line-height: 1.4; }
+.lede { color: var(--ink-2); max-width: 68ch; }
+.meta { color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
+
+/* الأعداد */
+.tally {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  border-block: 1px solid var(--line);
+}
+.tally > div { padding-block: 16px; padding-inline: 16px; display: grid; gap: 2px; border-inline-start: 1px solid var(--line); }
+.tally > div:first-child { border-inline-start: 0; padding-inline-start: 0; }
+.num { font-weight: 700; font-size: 32px; line-height: 1.2; }
+.tally .label { font-size: 13px; font-weight: 600; color: var(--muted); }
+.tally .sub { font-size: 12.5px; color: var(--muted); }
+
+/* العناوين */
+.section { display: grid; gap: 18px; }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.section-head h2 { font-size: 19px; font-weight: 700; }
+.section-head p { color: var(--muted); font-size: 13px; }
+
+/* الشارات */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 24px; padding-inline: 10px; border-radius: 999px;
+  font-size: 12.5px; font-weight: 600; white-space: nowrap;
+  border: 1px solid transparent;
+}
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
+.state-available { border-color: var(--ink); color: var(--ink); }
+.state-available::before { background: transparent; border: 1.5px solid currentColor; width: 6px; height: 6px; }
+.state-in-progress { background: var(--run-bg); color: var(--run); }
+.state-awaiting-owner, .state-needs-decision { background: var(--review-bg); color: var(--review); }
+.state-blocked { background: var(--warn-bg); color: var(--warn); }
+.state-closed { background: var(--ok-bg); color: var(--ok); }
+.state-closed::before { content: "✓"; background: none; width: auto; height: auto; font-size: 12px; }
+.state-needs-design, .state-waiting { background: var(--sunken); color: var(--muted); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 10px; }
+
+/* الفلاتر */
+.filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.filters button {
+  font-size: 13px; font-weight: 600; min-height: 32px; padding-inline: 14px;
+  border-radius: 999px; border: 1px solid var(--line-strong); background: transparent; color: var(--ink-2); cursor: pointer;
+}
+.filters button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.filters .count { font-weight: 500; opacity: 0.75; margin-inline-start: 4px; }
+
+/* البطاقات */
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); align-items: start; }
+.grid.design { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.phase {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  scroll-margin-top: 24px;
+}
+.phase[data-state="available"] { border-color: var(--ink); }
+.phase:target { box-shadow: 0 0 0 2px var(--focus); }
+.phase-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.pid { font-weight: 700; font-size: 13px; color: var(--muted); direction: ltr; unicode-bidi: isolate; }
+.phase h3 { font-size: 16px; font-weight: 600; line-height: 1.55; }
+.goal { color: var(--ink-2); font-size: 14px; }
+.needs { display: grid; gap: 4px; font-size: 13px; color: var(--ink-2); margin: 0; }
+.needs div { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: baseline; }
+.needs dt { font-family: var(--font-display); font-weight: 600; color: var(--muted); }
+.needs dd { margin: 0; display: flex; flex-wrap: wrap; gap: 4px; }
+.ref {
+  font-family: var(--font-display); font-weight: 600; font-size: 12.5px;
+  direction: ltr; unicode-bidi: isolate; text-decoration: none;
+  padding-inline: 6px; border-radius: 4px; background: var(--sunken); color: var(--ink-2);
+}
+.ref.done { color: var(--ok); }
+.ref.open-decision { background: var(--review-bg); color: var(--review); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding-top: 4px; }
+.btn {
+  min-height: 32px; padding-inline: 12px; border-radius: var(--radius-control);
+  font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-primary { background: var(--ink); color: var(--paper); border: 1px solid var(--ink); }
+.btn-primary:hover { opacity: 0.88; }
+.btn-quiet { background: transparent; color: var(--ink-2); border: 1px solid var(--line-strong); }
+.btn-quiet:hover { border-color: var(--ink); color: var(--ink); }
+.cmd { font-family: var(--font-body); font-weight: 400; opacity: 0.8; font-size: 12.5px; }
+.details { border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 12px; font-size: 13.5px; }
+.details h4 { margin: 0 0 4px; font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--muted); }
+.details ul { margin: 0; padding-inline-start: 18px; display: grid; gap: 2px; }
+.details .path { color: var(--muted); font-size: 12.5px; }
+.warn-note { color: var(--warn); font-size: 13px; }
+
+/* المجموعات */
+.stage { display: grid; gap: 12px; }
+.stage-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.stage-head h3 { font-size: 15px; font-weight: 700; }
+.stage-head span { color: var(--muted); font-size: 13px; }
+
+/* القرارات */
+.decisions { display: grid; gap: 10px; }
+.decision {
+  display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: baseline;
+  padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card);
+}
+.decision .ref { grid-row: span 3; align-self: start; }
+.decision .q { font-weight: 700; }
+.decision .rec, .decision .where { font-size: 13.5px; color: var(--ink-2); min-width: 0; }
+.decision .where { color: var(--muted); }
+.empty { color: var(--muted); font-size: 14px; }
+
+/* التذييل */
+.howto { display: grid; gap: 10px; background: var(--sunken); border-radius: var(--radius-card); padding: 18px 20px; font-size: 14px; }
+.howto h2 { font-size: 16px; }
+.howto ol { margin: 0; padding-inline-start: 20px; display: grid; gap: 4px; }
+.links { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--muted); }
+
+/* رسالة النسخ */
+.toast {
+  position: fixed; inset-inline: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  margin-inline: auto; max-width: 420px;
+  background: var(--ink); color: var(--paper); border-radius: var(--radius-card);
+  padding: 12px 16px; font-size: 14px; display: grid; gap: 8px;
+}
+.toast input { font: inherit; padding: 6px 8px; border-radius: var(--radius-control); border: 1px solid var(--line-strong); background: var(--paper); color: var(--ink); width: 100%; }
+
+@media (max-width: 560px) {
+  .page { padding-block: 28px 56px; gap: 40px; }
+  .brand .name { font-size: 32px; }
+  .tally > div { border-inline-start: 0; padding-inline: 0; }
+  .grid, .grid.design { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .phase { transition: border-color 160ms ease-out; }
+}
+</style>
+
+<main class="page" dir="rtl" lang="ar">
+  <header class="masthead">
+    <div class="brand"><span class="name">عِيَار</span><span class="latin">AYAR</span></div>
+    <h1>مراحل التنفيذ: التصميم والتطوير</h1>
+    <p class="lede">كل بطاقة مرحلة لها ملف في المستودع يحدد هدفها وقراءاتها ومهامها وفحوصها ومعايير إغلاقها. زر «انسخ الأمر» ينسخ أمر البدء فقط، والتنفيذ يبدأ حين ترسله في جلسة العمل.</p>
+    <div class="meta" id="meta"></div>
+  </header>
+
+  <section class="tally" id="tally" aria-label="ملخص الحالة"></section>
+
+  <section class="section" aria-labelledby="now-h">
+    <div class="section-head">
+      <h2 id="now-h">ابدأ من هنا</h2>
+      <p>المراحل التي اكتملت تبعياتها وقراراتها، ويمكن بدؤها الآن</p>
+    </div>
+    <div class="grid" id="available"></div>
+  </section>
+
+  <section class="section" aria-labelledby="dec-h">
+    <div class="section-head">
+      <h2 id="dec-h">قرارات تنتظرك</h2>
+      <p>كل قرار بالمرحلة التي يلزم فيها، وتوصية الخطة أو ما اعتمدته مؤقتًا</p>
+    </div>
+    <div class="decisions" id="decisions"></div>
+  </section>
+
+  <section class="section" aria-labelledby="all-h">
+    <div class="section-head">
+      <h2 id="all-h">كل المراحل</h2>
+      <div class="filters" id="filters" role="group" aria-label="تصفية المراحل"></div>
+    </div>
+    <div class="legend" id="legend" aria-label="معاني الحالات"></div>
+    <div id="tracks" class="section"></div>
+  </section>
+
+  <section class="howto" aria-labelledby="how-h">
+    <h2 id="how-h">كيف تُحدَّث هذه الصفحة</h2>
+    <p>الصفحة لا تُحرَّر يدويًا. كل حالة فيها مأخوذة من ملفات المستودع في الـcommit المذكور أعلاه، فلا تظهر مرحلة مغلقة دون ملفها ووسم إغلاقها في Git.</p>
+    <ol>
+      <li>عند إغلاق مرحلة، يحدّث المنفّذ واجهة ملفها (الحالة وتاريخها والـcommit) وسجل التقدم.</li>
+      <li>يشغّل المولّد من جذر المستودع: <span class="ltr">/opt/homebrew/bin/node tools/dashboard/build.mjs</span></li>
+      <li>يعيد نشر الصفحة على الرابط نفسه.</li>
+    </ol>
+    <div class="links" id="links"></div>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+const DATA = {"updated":"2026-10-09","commit":"05bb4ae","dirty":false,"stages":{"design":"مسار التصميم","verification":"التحقق السابق للبناء ومشاريع الاختبار","engine":"المحرك دون واجهة","interface":"الواجهة من التصميم المعتمد","release":"الإصدار"},"phases":[{"id":"DES-1","track":"design","number":1,"stage":"design","title":"تنظيم الملف وإكمال الهوية والأسس","goal":"تنظيم ملف Figma بصفحاته المطلوبة دون المساس بالموجود، وإكمال صفحة الهوية المعتمدة (الاستخدام الصحيح والخاطئ ونطاق لون العُرف ونبرة النص)، وبناء الأسس — مجموعات المتغيرات الأربع بوضعيها وجدول التباين، وأنماط النص الأحد عشر، والشبكة والزوايا والظلال والحركة — ثم اعتمادها من المالك.","start":["الهوية معتمدة (D-48) ونطاق لون العُرف محسوم (D-49)","وصول إلى ملف Figma بصلاحية تحرير"],"outputs":["صفحات الملف وفق البرومبت §1 مع بقاء الأرشيف والهوية كما هما","صفحة Identity مكتملة","صفحة Foundations بالمتغيرات الأربع وجدول تباين موثق وأنماط النص والأسس","اعتماد المالك مسجل في docs/design/README.md"],"status":"not-started","statusDate":"2026-10-09","state":"available","dependsOn":[],"designGates":[],"ownerGates":[],"ownerInputs":[],"waitingDeps":[],"waitingDesign":[],"waitingOwner":[],"openInputs":[],"command":"ابدأ مرحلة التصميم 1","file":"docs/phases/design/DES-1-foundations.md","closingCommit":"","unverifiedClose":false},{"id":"DES-2","track":"design","number":2,"stage":"design","title":"نظام الحالات ورموزه ودائرة العيار","goal":"تصميم أهم صفحة في الملف — العائلات الخمس بأشكالها، والنتائج الاثنتا عشرة، وحالات الدورة، والجاهزية، والوسوم، وبطاقة النقاء ودائرة التدريج بحالاتها — ورموز الحالات الخمسة عشر المخصصة بأحجامها الثلاثة، وقواعد الأيقونات العامة والانعكاس.","start":["DES-1 مغلقة ومعتمدة (المتغيرات وأنماط النص)"],"outputs":["صفحة Status System مكتملة","صفحة Icons برموز الحالات الخمسة عشر بالأحجام 12 و16 و20 وقواعد Lucide والانعكاس","اعتماد المالك مسجل"],"status":"not-started","statusDate":"2026-10-09","state":"waiting","dependsOn":["DES-1"],"designGates":[],"ownerGates":[],"ownerInputs":[],"waitingDeps":["DES-1"],"waitingDesign":[],"waitingOwner":[],"openInputs":[],"command":"ابدأ مرحلة التصميم 2","file":"docs/phases/design/DES-2-status-icons.md","closingCommit":"","unverifiedClose":false},{"id":"DES-3","track":"design","number":3,"stage":"design","title":"المكونات التسعة والعشرون بالعربية والإنجليزية","goal":"تصميم مكتبة المكونات كاملة — من إطار النافذة بموضعي أزرار النظام إلى صف ادعاء النموذج — بنسختي RTL وLTR وحالاتها ومتغيراتها وخصائص واضحة التسمية، لتكون المصدر الوحيد لكل شاشة ولكل مكوّن في الشيفرة.","start":["DES-2 مغلقة ومعتمدة"],"outputs":["صفحة Components بالمكونات التسعة والعشرين بنسختيها وحالاتها","اعتماد المالك مسجل"],"status":"not-started","statusDate":"2026-10-09","state":"waiting","dependsOn":["DES-2"],"designGates":[],"ownerGates":[],"ownerInputs":[],"waitingDeps":["DES-2"],"waitingDesign":[],"waitingOwner":[],"openInputs":[],"command":"ابدأ مرحلة التصميم 3","file":"docs/phases/design/DES-3-components.md","closingCommit":"","unverifiedClose":false},{"id":"DES-4","track":"design","number":4,"stage":"design","title":"شاشات الرحلة الأساسية","goal":"تصميم الشاشات الثماني الأساسية بحالاتها ومتغيراتها — المشاريع، والاكتشاف، واعتماد الملف، ونظرة عامة، وخطة الفحص الكامل، ومتابعة التشغيل، ونتائج التشغيل، وتقرير «للنموذج» — بالعربية فاتحًا، والشاشات 4 و6 و7 داكنًا، والشاشات 1 و6 و7 و8 بالإنجليزية.","start":["DES-3 مغلقة ومعتمدة"],"outputs":["الشاشات 1 إلى 8 في صفحات Screens الثلاث بمتغيراتها","اعتماد المالك مسجل"],"status":"not-started","statusDate":"2026-10-09","state":"waiting","dependsOn":["DES-3"],"designGates":[],"ownerGates":[],"ownerInputs":[],"waitingDeps":["DES-3"],"waitingDesign":[],"waitingOwner":[],"openInputs":[],"command":"ابدأ مرحلة التصميم 4","file":"docs/phases/design/DES-4-core-screens.md","closingCommit":"","unverifiedClose":false},{"id":"DES-5","track":"design","number":5,"stage":"design","title":"بقية الشاشات والرحلات العشر وإرشادات المطور","goal":"إكمال الملف — الشاشات 9 إلى 22 بحالاتها (و10 و16 داكنًا)، ونماذج التنقل التفاعلية للرحلات العشر، وصفحة Guidelines للمطور — واستيفاء قائمة التسليم في البرومبت §14 كاملة، ثم الاعتماد النهائي.","start":["DES-4 مغلقة ومعتمدة"],"outputs":["الشاشات 9 إلى 22 ونسختا 10 و16 الداكنتان","صفحة Flows بالرحلات العشر تفاعلية","صفحة Guidelines وCover النهائي","قائمة §14 مستوفاة واعتماد المالك النهائي"],"status":"not-started","statusDate":"2026-10-09","state":"waiting","dependsOn":["DES-4"],"designGates":[],"ownerGates":[],"ownerInputs":[],"waitingDeps":["DES-4"],"waitingDesign":[],"waitingOwner":[],"openInputs":[],"command":"ابدأ مرحلة التصميم 5","file":"docs/phases/design/DES-5-remaining-screens-flows.md","closingCommit":"","unverifiedClose":false},{"id":"DEV-0","track":"dev","number":0,"stage":"verification","title":"التحقق السابق للبناء — المنصة والغلاف والتخزين","goal":"حسم القرارات المعلقة التي يتوقف عليها شكل الغلاف والتخزين وأدوات البناء، بتجارب صغيرة على جهاز المالك قبل كتابة أي شيفرة للتطبيق.","start":["المستودع نظيف وبصمات الخطة سليمة","وصول إلى جهاز المالك (macOS) ويده لأذونات الخصوصية ولغة النظام عند الحاجة","موافقة المالك على قائمة التنزيلات (Electron وForge وأدوات البناء) قبل تنزيلها"],"outputs":["مجلد spikes/ بتجارب قابلة للإعادة لكل قرار","قيود E-01 وE-02 وE-03 وE-04 وE-05 وE-06 وE-13 وE-23 وE-25 في سجل قرارات البيئة بنتيجتها ودليلها","قرار تشغيل اختبارات الواجهة الشاملة مع الصمامات (G-05)","جواب المالك عن A-03 وA-11 وA-13 وA-14"],"status":"not-started","statusDate":"2026-10-09","state":"available","dependsOn":[],"designGates":[],"ownerGates":[],"ownerInputs":["A-03","A-11","A-13","A-14"],"waitingDeps":[],"waitingDesign":[],"waitingOwner":[],"openInputs":["A-03","A-11","A-13","A-14"],"command":"ابدأ مرحلة التطوير 0","file":"docs/phases/dev/DEV-00-platform-verification.md","closingCommit":"","unverifiedClose":false},{"id":"DEV-1","track":"dev","number":1,"stage":"verification","title":"مشاريع الاختبار ذات العيوب المزروعة","goal":"بناء مشاريع الاختبار التسعة في الخطة 20، وما تحتاجه اختبارات القبول منها ولم يُفصَّل هناك، بنسخ سليمة ومعيبة موثقة وملفات نتائج متوقعة، لتخدم تجارب DEV-2 ثم كل المحولات والمحللات.","start":["المستودع نظيف","أدوات المشاريع المحلية المتاحة على الجهاز (Node وpnpm وPython وuv) أو موافقة المالك على تنزيل الناقص"],"outputs":["مجلد fixtures/ بالمشاريع التسعة ونسخها المعيبة وملف توقعات لكل نسخة","مولّد FX-MALICIOUS خارج المستودع","مشاريع المحولات ومساعدات AT-26 وAT-35 وAT-36","مخطط fixture-expect/1 ومدقق له"],"status":"not-started","statusDate":"2026-10-09","state":"available","dependsOn":[],"designGates":[],"ownerGates":[],"ownerInputs":[],"waitingDeps":[],"waitingDesign":[],"waitingOwner":[],"openInputs":[],"command":"ابدأ مرحلة التطوير 1","file":"docs/phases/dev/DEV-01-fixtures.md","closingCommit":"","unverifiedClose":false},{"id":"DEV-2","track":"dev","number":2,"stage":"verification","title":"التحقق السابق للبناء — الأدوات والعمليات والمستودعات","goal":"حسم القرارات المعلقة التي يتوقف عليها شكل المحولات ومدير الأدوات والمنفّذ والمسبار، بتشغيل الأدوات الحقيقية على مشاريع الاختبار وعلى جهاز المالك.","start":["DEV-0 مغلقة (نسخة Electron لتجربة المسبار E-11)","DEV-1 مغلقة (المشاريع التي تحتاجها التجارب)","موافقة المالك على قائمة الأدوات التي ستُنزَّل بإصداراتها وبصماتها"],"outputs":["قيود E-07 وE-08 وE-09 وE-10 وE-11 وE-12 وE-15 وE-16 وE-17 وE-20 وE-21 وE-22 وE-24 محسومة بالدليل","قاعدة OSV المصغرة وإكمال عيوب الثغرات في المشاريع","spikes/ للأدوات والعمليات"],"status":"not-started","statusDate":"2026-10-09","state":"waiting","dependsOn":["DEV-0","DEV-1"],"designGates":[],"ownerGates":[],"ownerInputs":["E-15","E-17"],"waitingDeps":["DEV-0","DEV-1"],"waitingDesign":[],"waitingOwner":[],"openInputs":["E-15","E-17"],"command":"ابدأ مرحلة التطوير 2","file":"docs/phases/dev/DEV-02-tools-verification.md","closingCommit":"","unverifiedClose":false},{"id":"DEV-3","track":"dev","number":3,"stage":"engine","title":"الهيكل والبروتوكول والغلاف الآمن والتخزين","goal":"إقامة هيكل عِيَار العامل من طرفه إلى طرفه دون واجهة مرئية — مستودع متعدد الحزم، وبروتوكول منمّط، وغلاف Electron بإعداده الأمني الإلزامي، ومضيف المحرك، وطبقة التخزين، وآلية التعريب، وأداة تشغيل المحرك دون واجهة.","start":["DEV-0 مغلقة (نسخ Electron وForge وTypeScript ومشغّل الاختبار والتخزين)","قرار المالك في معرّف الحزمة Q-04"],"outputs":["apps/desktop (main وpreload ونقطة تركيب واجهة فارغة)","packages/protocol وpackages/engine (المضيف وطبقة التخزين) وpackages/i18n","tools/cli","مخطط القاعدة الأول (الخطة 14.1) بترحيل ونسخ احتياطي","بنية الاختبارات (وحدة وخصائص وتكامل) وقاعدة منع استيراد electron في المحرك"],"status":"not-started","statusDate":"2026-10-09","state":"waiting","dependsOn":["DEV-0"],"designGates":[],"ownerGates":["Q-04"],"ownerInputs":[],"waitingDeps":["DEV-0"],"waitingDesign":[],"waitingOwner":["Q-04"],"openInputs":[],"command":"ابدأ مرحلة التطوير 3","file":"docs/phases/dev/DEV-03-skeleton.md","closingCommit":"","unverifiedClose":false},{"id":"DEV-4","track":"dev","number":4,"stage":"engine","title":"الكتالوج والإخفاء والمشاريع والاكتشاف والبيئة وملف المعايير","goal":"من اختيار المجلد إلى ملف معايير معتمد — تعريفات الفحوص، وإخفاء الأسرار، وسجل المشاريع، والاكتشاف دون تنفيذ، وحل البيئة، واقتراح الملف واعتماده — كلها في المحرك ومختبرة عبر tools/cli.","start":["DEV-3 مغلقة (البروتوكول والتخزين والمضيف)","DEV-2 مغلقة (E-07 وE-15 وE-16 تحدد الكاشفات والبيئة)"],"outputs":["packages/catalog بتعريفات الفحوص (10.3) والمعايير (11.6) ومخططاتها","C-18 الإخفاء، وC-05 السجل، وC-06 المكتشف، وC-07 البيئة، وC-09 الملف","عقود DiscoverySnapshot وResolvedEnv والملف في packages/protocol"],"status":"not-started","statusDate":"2026-10-09","state":"waiting","dependsOn":["DEV-2","DEV-3"],"designGates":[],"ownerGates":[],"ownerInputs":[],"waitingDeps":["DEV-2","DEV-3"],"waitingDesign":[],"waitingOwner":[],"openInputs":[],"command":"ابدأ مرحلة التطوير 4","file":"docs/phases/dev/DEV-04-discovery-profile.md","closingCommit":"","unverifiedClose":false},{"id":"DEV-5","track":"dev","number":5,"stage":"engine","title":"المخطِّط ومدير الأدوات والمنفّذ والأدلة","goal":"من ملف معتمد إلى نتائج خام محفوظة — الجاهزية والتجهيز الصريح، والخطة دون تكرار، وتشغيل كل فحص في مجموعة عمليات معزولة مع الإلغاء والمهل والتعافي، ولقطات الحالة والأدلة والاحتفاظ.","start":["DEV-4 مغلقة","قرارات E-08 وE-09 وE-10 وE-20 وE-22 وE-25 محسومة (من DEV-0 وDEV-2)"],"outputs":["C-10 المخطِّط، وC-11 مدير الأدوات وإجراءات التجهيز، وC-12 المنفذ والدفتر والخدمات المرافقة","C-17 مخزن الأدلة ولقطات الحالة والاحتفاظ","عقود RunPlan وRawCheckResult"],"status":"not-started","statusDate":"2026-10-09","state":"waiting","dependsOn":["DEV-4"],"designGates":[],"ownerGates":[],"ownerInputs":[],"waitingDeps":["DEV-4"],"waitingDesign":[],"waitingOwner":[],"openInputs":[],"command":"ابدأ مرحلة التطوير 5","file":"docs/phases/dev/DEV-05-planner-executor.md","closingCommit":"","unverifiedClose":false},{"id":"DEV-6","track":"dev","number":6,"stage":"engine","title":"المحوّلات والمحلّلات والمصنّف ومؤشر النقاء","goal":"تحويل النتائج الخام إلى أحكام صادقة — محولات الأدوات العشرون، والمحللات الداخلية، وقواعد اشتقاق النتيجة، والبصمات عبر التشغيلات، ومؤشر النقاء purity/1 — مع إثبات كشف كل عيب مزروع خارج المسبار.","start":["DEV-5 مغلقة","جدول رموز الخروج الفعلية من DEV-2، وقرارات E-07 وE-08 وE-09 وE-10 وE-12 وE-24"],"outputs":["packages/adapters وpackages/analyzers","C-16 المصنّف وC-19 حاسب النقاء","حزمة قواعد Semgrep الخاصة بعِيَار","إكمال معرّفات القواعد في ملفات توقع المشاريع"],"status":"not-started","statusDate":"2026-10-09","state":"waiting","dependsOn":["DEV-5"],"designGates":[],"ownerGates":[],"ownerInputs":["Q-05"],"waitingDeps":["DEV-5"],"waitingDesign":[],"waitingOwner":[],"openInputs":["Q-05"],"command":"ابدأ مرحلة التطوير 6","file":"docs/phases/dev/DEV-06-adapters-classifier.md","closingCommit":"","unverifiedClose":false},{"id":"DEV-7","track":"dev","number":7,"stage":"engine","title":"مسبار الويب وفحوص العرض الحي","goal":"فحوص التصميم والإتاحة والاتجاه والحالات والإضافات والأداء على صفحات تُعرض فعلًا في Chromium الخاص بـ Playwright، بمراجع معلنة وصور مرجعية لا تُعتمد إلا صراحة.","start":["DEV-6 مغلقة","قرارا E-11 (استضافة المسبار والوضع الخفي) وE-21 (قياس أداء الويب) محسومان"],"outputs":["packages/probe (C-14) وعقد مواصفة المسبار وأحداثه","فحوص design.*.render وdesign.a11y وdesign.states وdesign.visual وbeh.ext.host وperf.web","اعتماد الصور المرجعية ومقارنتها"],"status":"not-started","statusDate":"2026-10-09","state":"waiting","dependsOn":["DEV-6"],"designGates":[],"ownerGates":[],"ownerInputs":[],"waitingDeps":["DEV-6"],"waitingDesign":[],"waitingOwner":[],"openInputs":[],"command":"ابدأ مرحلة التطوير 7","file":"docs/phases/dev/DEV-07-web-probe.md","closingCommit":"","unverifiedClose":false},{"id":"DEV-8","track":"dev","number":8,"stage":"engine","title":"قاعدة المعرفة kb/1 والمستشار وقوالب البطاقات","goal":"تحويل المعرفة العربية المنقولة في الخطة 28 إلى ملفات بيانات بمخطط وإصدار، وبناء المستشار المصحح الذي يوصي ولا يحكم، وقوالب بطاقات المهام، مع اختبارات التحقق المنقولة كاملة.","start":["DEV-4 مغلقة (حزمة الكتالوج ومخططاتها)"],"outputs":["ملفات kb/1 في packages/catalog (المدخلات، والقواعد، والبنود، والمناهج، والمراحل، والأعماق، والمواقف، والمنظومات، والأدوات، والمصادر، والمصطلحات)","C-20 المستشار (advisor.suggest) ومولّد البطاقات (tasks.generate)","اختبارات 28.12 و28.13 و28.14 بعد تكييفها"],"status":"not-started","statusDate":"2026-10-09","state":"waiting","dependsOn":["DEV-4"],"designGates":[],"ownerGates":[],"ownerInputs":[],"waitingDeps":["DEV-4"],"waitingDesign":[],"waitingOwner":[],"openInputs":[],"command":"ابدأ مرحلة التطوير 8","file":"docs/phases/dev/DEV-08-knowledge-advisor.md","closingCommit":"","unverifiedClose":false},{"id":"DEV-9","track":"dev","number":9,"stage":"engine","title":"التقارير بصيغتيها والنزاهة وفحوص النموذج والتصدير","goal":"إكمال الدورة في المحرك — تقرير report/1 بصيغتي «لك» و«للنموذج» مع تحقق التطابق، وتوجيه الإصلاح، وحارس النزاهة وإعادة الفحص واستكمال الجولة والمقارنة، وتحقق البطاقات، وفحوص النموذج بملفات تعليماتها وادعاءاتها، والتصدير دون أسرار.","start":["DEV-6 وDEV-7 وDEV-8 مغلقة","قرار المالك Q-03 (عدد قوالب فحوص النموذج في الإصدار الأول)"],"outputs":["C-21 باني التقارير وقالبا model-report/1 بالعربية والإنجليزية","C-22 حارس النزاهة وثبات الحالة والمراجعات والمقارنة واستكمال الجولة","C-25 فحوص النموذج (ai-check/1 وai-result/1)","C-23 المصدّر، وتحقق البطاقات (tasks.verify)"],"status":"not-started","statusDate":"2026-10-09","state":"waiting","dependsOn":["DEV-6","DEV-7","DEV-8"],"designGates":[],"ownerGates":["Q-03"],"ownerInputs":["Q-06"],"waitingDeps":["DEV-6","DEV-7","DEV-8"],"waitingDesign":[],"waitingOwner":["Q-03"],"openInputs":["Q-06"],"command":"ابدأ مرحلة التطوير 9","file":"docs/phases/dev/DEV-09-reports-integrity.md","closingCommit":"","unverifiedClose":false},{"id":"DEV-10","track":"dev","number":10,"stage":"interface","title":"نظام التصميم في الشيفرة — الرموز والخطوط والحالات والمكونات","goal":"تحويل نظام التصميم المعتمد في Figma إلى شيفرة واجهة — المتغيرات بوضعيها، والخطان المضمنان، وأنماط النص، ورموز الحالات الخمسة عشر، والمكونات التسعة والعشرون بالعربية والإنجليزية وحالاتها — في معرض مكونات يُطابَق بالتصميم قبل بناء أي شاشة.","start":["DEV-3 مغلقة (نقطة التركيب والجسر والتعريب)","مراحل التصميم DES-1 وDES-2 وDES-3 مغلقة ومعتمدة من المالك"],"outputs":["رموز التصميم متغيرات CSS بوضعي فاتح وداكن، مولّدة من متغيرات Figma","الخطان Cairo وAlmarai مضمنان بترخيصهما","رموز الحالات ومكونات Svelte التسعة والعشرون","معرض مكونات للتطوير ومقارنة بصرية بالتصميم"],"status":"not-started","statusDate":"2026-10-09","state":"waiting","dependsOn":["DEV-3"],"designGates":["DES-1","DES-2","DES-3"],"ownerGates":[],"ownerInputs":[],"waitingDeps":["DEV-3"],"waitingDesign":["DES-1","DES-2","DES-3"],"waitingOwner":[],"openInputs":[],"command":"ابدأ مرحلة التطوير 10","file":"docs/phases/dev/DEV-10-design-system-code.md","closingCommit":"","unverifiedClose":false},{"id":"DEV-11","track":"dev","number":11,"stage":"interface","title":"واجهة الرحلة الأساسية — من أول مشروع إلى النسخ للنموذج","goal":"بناء الشاشات الثماني الأساسية من التصميم المعتمد وربطها بالمحرك — المشاريع، والاكتشاف، واعتماد الملف، ونظرة عامة، وخطة الفحص الكامل، والمتابعة الحية، والنتائج، وتقرير «للنموذج» — حتى تكتمل الرحلة J1 وJ10 داخل التطبيق.","start":["DEV-9 مغلقة (المحرك كامل)","DEV-10 مغلقة (نظام التصميم في الشيفرة)","DES-4 مغلقة ومعتمدة (شاشات الرحلة الأساسية)"],"outputs":["الشاشات 1 إلى 8 بحالاتها ومتغيراتها في اللغتين والوضعين","الإطار والتنقل والمفتش وشريط التشغيل والاختصارات","ربط كل شاشة بأوامر البروتوكول وأحداثه"],"status":"not-started","statusDate":"2026-10-09","state":"waiting","dependsOn":["DEV-9","DEV-10"],"designGates":["DES-4"],"ownerGates":[],"ownerInputs":[],"waitingDeps":["DEV-9","DEV-10"],"waitingDesign":["DES-4"],"waitingOwner":[],"openInputs":[],"command":"ابدأ مرحلة التطوير 11","file":"docs/phases/dev/DEV-11-core-journey-ui.md","closingCommit":"","unverifiedClose":false},{"id":"DEV-12","track":"dev","number":12,"stage":"interface","title":"بقية الواجهة — الأقسام والنزاهة وفحوص النموذج والمهام والإعدادات","goal":"إكمال الواجهة من التصميم المعتمد — صفحات الأقسام السبعة وفحوصها الخاصة، والنزاهة، وفحوص النموذج، والمهام والمستشار، والتشغيلات والمقارنة، وإعداد المشروع، والأدوات، والإعدادات، وحالات الخطأ والنقص — حتى تعمل الرحلات العشر كلها.","start":["DEV-11 مغلقة","DES-5 مغلقة ومعتمدة (بقية الشاشات والرحلات والإرشادات)"],"outputs":["الشاشات 9 إلى 22 بحالاتها ومتغيراتها في اللغتين والوضعين","الرحلات العشر كاملة داخل التطبيق","تغطية تعريب 100%"],"status":"not-started","statusDate":"2026-10-09","state":"waiting","dependsOn":["DEV-11"],"designGates":["DES-5"],"ownerGates":[],"ownerInputs":[],"waitingDeps":["DEV-11"],"waitingDesign":["DES-5"],"waitingOwner":[],"openInputs":[],"command":"ابدأ مرحلة التطوير 12","file":"docs/phases/dev/DEV-12-remaining-ui.md","closingCommit":"","unverifiedClose":false},{"id":"DEV-13","track":"dev","number":13,"stage":"release","title":"التغليف والتوقيع والمعايرة والقبول النهائي","goal":"تحقيق تعريف اكتمال الإصدار الأول (الخطة 25) — حزمة .app موقعة محليًا قابلة لإعادة البناء، ومعايرة الأداء والتوازي والتخزين، ونجاح اختبارات القبول الثمانية والأربعين كلها ومنها اختبارات جهاز المالك والقارئ البشري، وفحص عِيَار لمستودعه نفسه.","start":["DEV-12 مغلقة (التطبيق كامل وظيفيًا)","وقت المالك ويده لاختبارات الأذونات واللغة والنوم وVoiceOver، وقارئ غير متخصص (Q-07)"],"outputs":["حزمة AYAR.app موقعة بالهوية الثابتة، بصمامات 15.2، وبناء قابل للتكرار من مستودع نظيف","قرارات E-14 وE-18 وE-19 بقيمها النهائية","تقرير القبول: AT-01 إلى AT-48 بنتائجها وأدلتها","دليل استخدام مختصر بالعربية والإنجليزية، وتراخيص الخطوط والمكتبات داخل التطبيق"],"status":"not-started","statusDate":"2026-10-09","state":"waiting","dependsOn":["DEV-12"],"designGates":[],"ownerGates":[],"ownerInputs":["Q-07"],"waitingDeps":["DEV-12"],"waitingDesign":[],"waitingOwner":[],"openInputs":["Q-07"],"command":"ابدأ مرحلة التطوير 13","file":"docs/phases/dev/DEV-13-packaging-acceptance.md","closingCommit":"","unverifiedClose":false}],"openDecisions":[{"id":"Q-03","question":"قوالب فحوص النموذج في الإصدار الأول: الستة في 10.3 فقط، أم قوالب أخرى من بنود 28.4","recommendation":"الستة، والبقية تُضاف بالآلية نفسها لاحقًا","neededIn":"DEV-9 (قبل البدء)","resolved":false,"answer":"—","gates":[{"id":"DEV-9","beforeStart":true}]},{"id":"Q-04","question":"معرّف الحزمة النهائي","recommendation":"`com.bysltan.ayar` (الخطة 16.1 [توصية]). يُثبَّت قبل أول توقيع للتطبيق","neededIn":"DEV-3 (قبل البدء)","resolved":false,"answer":"—","gates":[{"id":"DEV-3","beforeStart":true}]},{"id":"Q-05","question":"عتبة اختبار الطفرات لمكونات عِيَار نفسه (المصنّف، والنقاء، والإخفاء، والمخطِّط)","recommendation":"الخطة 19: «يحددها المشروع». تُعرض بعد أول قياس في DEV-6","neededIn":"DEV-6 (قبل الإغلاق)","resolved":false,"answer":"—","gates":[{"id":"DEV-6","beforeStart":false}]},{"id":"Q-06","question":"مراجعة نصوص «لك» في الكتالوج واعتمادها","recommendation":"تخفيف الخطر R-20 يشترط مراجعة بشرية","neededIn":"DEV-9 (قبل الإغلاق)","resolved":false,"answer":"—","gates":[{"id":"DEV-9","beforeStart":false}]},{"id":"Q-07","question":"القارئ غير المتخصص لاختبار AT-43 والرحلة J10، ومن يوقّع قائمة VoiceOver في AT-40","recommendation":"يحدده المالك","neededIn":"DEV-13","resolved":false,"answer":"—","gates":[{"id":"DEV-13","beforeStart":false}]},{"id":"A-03","question":"قبول حجم تطبيق بمئات الميغابايتات","recommendation":"يُحسم بعد رؤية حجم تجربة E-01","neededIn":"DEV-0 (قبل الإغلاق)","resolved":false,"answer":"—","gates":[{"id":"DEV-0","beforeStart":false}]},{"id":"A-11","question":"قبول إيقاع ترقية Electron مرة كل ستة أشهر على الأقل","recommendation":"شرط البقاء في الدعم (3.2)","neededIn":"DEV-0 (قبل الإغلاق)","resolved":false,"answer":"—","gates":[{"id":"DEV-0","beforeStart":false}]},{"id":"A-13","question":"كفاية حماية البيانات المحلية بحساب المستخدم وتشفير القرص، دون تشفير القاعدة","recommendation":"الخطة تفترض الكفاية","neededIn":"DEV-0 (قبل الإغلاق)","resolved":false,"answer":"—","gates":[{"id":"DEV-0","beforeStart":false}]},{"id":"A-14","question":"قبول أن أوامر المشروع قد تصل إلى الشبكة دون عزل في الإصدار الأول","recommendation":"الخطة تفترض القبول (15.3)","neededIn":"DEV-0 (قبل الإغلاق)","resolved":false,"answer":"—","gates":[{"id":"DEV-0","beforeStart":false}]},{"id":"E-15","question":"مشروعان حقيقيان على الأقل للاكتشاف للقراءة فقط، وإذن المالك","recommendation":"Rasd مثال","neededIn":"DEV-2","resolved":false,"answer":"—","gates":[{"id":"DEV-2","beforeStart":false}]},{"id":"E-17","question":"المحرر المفضل لـ «افتح في المحرر»","recommendation":"قوالب VS Code وCursor وZed وXcode، والافتراضي `open`","neededIn":"DEV-2","resolved":false,"answer":"—","gates":[{"id":"DEV-2","beforeStart":false}]}],"links":{"repo":"https://github.com/iSltanX/AYAR","figma":"https://www.figma.com/design/UXkPakdqRuHDVTs78DO4uC/AYAR"}};
+
+const STATE_LABELS = {
+  'available': 'متاحة للبدء',
+  'in-progress': 'جارية',
+  'awaiting-owner': 'بانتظارك',
+  'needs-decision': 'تنتظر قرارك',
+  'blocked': 'معطّلة',
+  'closed': 'مغلقة',
+  'needs-design': 'تنتظر تصميمًا معتمدًا',
+  'waiting': 'تنتظر مرحلة سابقة',
+};
+const FILTERS = [
+  ['all', 'الكل', () => true],
+  ['available', 'المتاح الآن', (p) => p.state === 'available'],
+  ['active', 'الجاري', (p) => ['in-progress', 'awaiting-owner', 'blocked'].includes(p.state)],
+  ['waiting', 'المنتظر', (p) => ['needs-decision', 'needs-design', 'waiting'].includes(p.state)],
+  ['closed', 'المغلق', (p) => p.state === 'closed'],
+];
+
+function h(tag, attrs, ...children) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v === null || v === undefined || v === false) continue;
+    if (k === 'class') el.className = v;
+    else if (k === 'text') el.textContent = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? '' : v);
+  }
+  for (const c of children.flat(Infinity)) if (c !== null && c !== undefined && c !== false) el.append(c.nodeType ? c : document.createTextNode(String(c)));
+  return el;
+}
+
+const dateFmt = new Intl.DateTimeFormat('ar-u-nu-latn-ca-gregory', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+const fmtDate = (iso) => iso ? dateFmt.format(new Date(iso + 'T00:00:00Z')) : '—';
+const byId = new Map(DATA.phases.map((p) => [p.id, p]));
+const decisionIds = new Set(DATA.openDecisions.map((d) => d.id));
+
+function chip(state) {
+  return h('span', { class: `chip state-${state}`, text: STATE_LABELS[state] });
+}
+
+function phaseRef(id) {
+  const p = byId.get(id);
+  const done = p && p.status === 'closed';
+  return h('a', { class: `ref${done ? ' done' : ''}`, href: `#${id}`, title: p ? `${p.title}${done ? ' · مغلقة' : ''}` : id, text: done ? `${id} ✓` : id });
+}
+function decisionRef(id) {
+  const open = decisionIds.has(id);
+  return h('a', { class: `ref${open ? ' open-decision' : ' done'}`, href: open ? `#decision-${id}` : null, text: open ? id : `${id} ✓` });
+}
+
+let toastTimer;
+function showToast(message, fallbackText) {
+  const t = document.getElementById('toast');
+  t.replaceChildren(h('span', { text: message }));
+  if (fallbackText) {
+    const input = h('input', { id: 'copy-fallback', value: fallbackText, readonly: true, 'aria-label': 'نص الأمر' });
+    t.append(input);
+    t.hidden = false;
+    input.focus();
+    input.select();
+  } else {
+    t.hidden = false;
+  }
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.hidden = true; }, fallbackText ? 8000 : 2600);
+}
+
+function copyCommand(text) {
+  const done = () => showToast(`نُسخ الأمر: ${text}`);
+  const fail = () => showToast('تعذّر النسخ تلقائيًا. انسخ الأمر من الحقل:', text);
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fail);
+    else fail();
+  } catch { fail(); }
+}
+
+function phaseCard(p) {
+  const needs = [];
+  if (p.dependsOn.length) needs.push(h('div', null, h('dt', { text: 'تعتمد على' }), h('dd', null, p.dependsOn.map(phaseRef))));
+  if (p.designGates.length) needs.push(h('div', null, h('dt', { text: 'تصميم معتمد' }), h('dd', null, p.designGates.map(phaseRef))));
+  if (p.ownerGates.length) needs.push(h('div', null, h('dt', { text: 'قرارك قبل البدء' }), h('dd', null, p.ownerGates.map(decisionRef))));
+  if (p.openInputs.length) needs.push(h('div', null, h('dt', { text: 'يُطلب منك أثناءها' }), h('dd', null, p.openInputs.map(decisionRef))));
+  const opens = DATA.phases.filter((x) => x.designGates.includes(p.id)).map((x) => x.id);
+  if (opens.length) needs.push(h('div', null, h('dt', { text: 'تفتح للتطوير' }), h('dd', null, opens.map(phaseRef))));
+
+  const detailsId = `details-${p.id}`;
+  const details = h('div', { class: 'details', id: detailsId, hidden: true },
+    p.start.length ? h('div', null, h('h4', { text: 'متطلبات البدء' }), h('ul', null, p.start.map((s) => h('li', { text: s })))) : null,
+    p.outputs.length ? h('div', null, h('h4', { text: 'المخرجات' }), h('ul', null, p.outputs.map((s) => h('li', { text: s })))) : null,
+    h('div', null,
+      h('h4', { text: 'الحالة' }),
+      h('p', null, `${STATE_LABELS[p.state]} · آخر تغيير ${fmtDate(p.statusDate)}`, p.closingCommit ? ' · commit ' : '', p.closingCommit ? h('span', { class: 'ltr', text: p.closingCommit }) : ''),
+    ),
+    h('p', { class: 'path' }, 'ملف المرحلة: ', h('a', { class: 'ltr', href: `${DATA.links.repo}/blob/main/${p.file}`, target: '_blank', rel: 'noopener', text: p.file })),
+  );
+  const moreBtn = h('button', {
+    class: 'btn btn-quiet', type: 'button', 'aria-expanded': 'false', 'aria-controls': detailsId,
+    onclick: (e) => {
+      const open = details.hidden;
+      details.hidden = !open;
+      e.currentTarget.setAttribute('aria-expanded', String(open));
+      e.currentTarget.firstChild.textContent = open ? 'أخفِ التفاصيل' : 'التفاصيل';
+    },
+  }, 'التفاصيل');
+
+  return h('article', { class: 'phase', id: p.id, 'data-state': p.state, 'data-id': p.id },
+    h('div', { class: 'phase-top' }, h('span', { class: 'pid', text: p.id }), chip(p.state)),
+    h('h3', { text: p.title }),
+    h('p', { class: 'goal', text: p.goal }),
+    p.unverifiedClose ? h('p', { class: 'warn-note', text: `مغلقة في ملفها دون وسم ${p.id}-closed في Git: تحقق قبل الاعتماد عليها.` }) : null,
+    needs.length ? h('dl', { class: 'needs' }, needs) : null,
+    h('div', { class: 'actions' },
+      h('button', { class: 'btn btn-primary', type: 'button', 'aria-label': `انسخ الأمر: ${p.command}`, onclick: () => copyCommand(p.command) },
+        'انسخ الأمر', h('span', { class: 'cmd', text: `«${p.command}»` })),
+      moreBtn,
+    ),
+    details,
+  );
+}
+
+function render() {
+  const phases = DATA.phases;
+  const count = (fn) => phases.filter(fn).length;
+  const dev = count((p) => p.track === 'dev');
+  const design = count((p) => p.track === 'design');
+
+  document.getElementById('meta').replaceChildren(
+    h('span', null, 'آخر تحديث للحالة: ', fmtDate(DATA.updated)),
+    DATA.commit ? h('span', null, 'مولّدة من commit ', h('span', { class: 'ltr', text: DATA.commit }), DATA.dirty ? ' مع تغييرات لم تُلتزم بعد' : '') : null,
+  );
+
+  const tallies = [
+    ['المراحل', phases.length, `${dev} تطوير · ${design} تصميم`],
+    ['مغلقة', count((p) => p.state === 'closed'), 'بمعاييرها ووسمها'],
+    ['جارية', count((p) => ['in-progress', 'awaiting-owner', 'blocked'].includes(p.state)), 'ومنها المعطّل والمنتظر لك'],
+    ['متاحة الآن', count((p) => p.state === 'available'), 'تبعياتها مكتملة'],
+    ['قرارات تنتظرك', DATA.openDecisions.length, 'قبل مراحلها أو أثناءها'],
+  ];
+  document.getElementById('tally').replaceChildren(...tallies.map(([label, n, sub]) =>
+    h('div', null, h('span', { class: 'label', text: label }), h('span', { class: 'num', text: String(n) }), h('span', { class: 'sub', text: sub }))));
+
+  const avail = phases.filter((p) => p.state === 'available');
+  document.getElementById('available').replaceChildren(...(avail.length ? avail.map(phaseCard) : [h('p', { class: 'empty', text: 'لا مرحلة متاحة الآن. انظر ما ينتظر قرارك أو المراحل الجارية.' })]));
+
+  const decs = DATA.openDecisions;
+  document.getElementById('decisions').replaceChildren(...(decs.length ? decs.map((d) =>
+    h('div', { class: 'decision', id: `decision-${d.id}` },
+      h('span', { class: 'ref open-decision', text: d.id }),
+      h('span', { class: 'q', text: d.question }),
+      h('span', { class: 'rec', text: `التوصية: ${d.recommendation}` }),
+      h('span', { class: 'where' }, 'يلزم في: ', d.gates.length
+        ? d.gates.map((g, i) => [i ? '، ' : '', phaseRef(g.id), g.beforeStart ? ' (قبل البدء)' : ' (أثناءها)'])
+        : d.neededIn),
+    )) : [h('p', { class: 'empty', text: 'لا قرارات مفتوحة.' })]));
+
+  const shown = Object.keys(STATE_LABELS).filter((s) => phases.some((p) => p.state === s));
+  document.getElementById('legend').replaceChildren(...shown.map(chip));
+
+  let active = 'all';
+  try { active = localStorage.getItem('ayar-phase-filter') || 'all'; } catch {}
+  if (!FILTERS.some(([k]) => k === active)) active = 'all';
+
+  const tracks = document.getElementById('tracks');
+  const filtersEl = document.getElementById('filters');
+
+  function drawTracks() {
+    const fn = FILTERS.find(([k]) => k === active)[2];
+    const groups = [];
+    for (const [stage, label] of Object.entries(DATA.stages)) {
+      const items = phases.filter((p) => p.stage === stage && fn(p)).sort((a, b) => a.number - b.number);
+      if (!items.length) continue;
+      const total = phases.filter((p) => p.stage === stage).length;
+      const ids = phases.filter((p) => p.stage === stage).map((p) => p.id);
+      groups.push(h('div', { class: 'stage' },
+        h('div', { class: 'stage-head' }, h('h3', { text: label }), h('span', { text: `${total} ${total > 2 && total < 11 ? 'مراحل' : 'مرحلة'} · ${ids[0]}${ids.length > 1 ? ' إلى ' + ids.at(-1) : ''}` })),
+        h('div', { class: `grid${stage === 'design' ? ' design' : ''}` }, items.map(phaseCard)),
+      ));
+    }
+    tracks.replaceChildren(...(groups.length ? groups : [h('p', { class: 'empty', text: 'لا مراحل في هذا التصنيف الآن.' })]));
+    for (const b of filtersEl.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.key === active));
+  }
+
+  filtersEl.replaceChildren(...FILTERS.map(([key, label, fn]) =>
+    h('button', { type: 'button', 'data-key': key, 'aria-pressed': 'false', onclick: () => {
+      active = key;
+      try { localStorage.setItem('ayar-phase-filter', key); } catch {}
+      drawTracks();
+    } }, label, h('span', { class: 'count', text: String(phases.filter(fn).length) }))));
+  drawTracks();
+
+  document.getElementById('links').replaceChildren(
+    h('a', { href: DATA.links.repo, target: '_blank', rel: 'noopener', text: 'المستودع على GitHub' }),
+    h('a', { href: DATA.links.figma, target: '_blank', rel: 'noopener', text: 'ملف التصميم في Figma' }),
+    h('span', null, 'موجّه الأوامر: ', h('span', { class: 'ltr', text: 'docs/phases/README.md' })),
+  );
+
+  if (location.hash) {
+    const target = document.getElementById(location.hash.slice(1));
+    if (target) target.scrollIntoView();
+  }
+}
+
+render();
+</script>
