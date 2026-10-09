@@ -9,6 +9,7 @@
 ## ما في التطبيق
 
 - `src/main.js`: نافذة بإعداد 15.2 (`contextIsolation` و`sandbox` و`nodeIntegration: false` و`webSecurity`)، ومحتوى من بروتوكول `app://` لا من `file://`، وسياسة CSP الحرفية من 15.2 (دون `ayar-evidence:`)، ومنع التنقل والنوافذ، ورفض كل طلب إذن.
+- حارس التصحيح عن بعد في أعلى `src/main.js` (أُضيف في G-05، D-52): يخرج برمز 78 إن طُلب منفذ Chromium للتصحيح دون مفتش Node نشط.
 - `src/engine.mjs`: المحرك في `utilityProcess`، يفتح `node:sqlite` بسجل WAL. لا يستورد `electron`.
 - الفحص الذاتي عند الإقلاع، ويكتب `~/Library/Application Support/AYAR Spike/selftest.json`:
   1. إنشاء المحرك، ثم فتح القاعدة وإدراج صف.

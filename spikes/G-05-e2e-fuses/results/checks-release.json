@@ -1,0 +1,45 @@
+{
+  "label": "release",
+  "app": "AYAR Spike.app",
+  "at": "2026-10-09T20:27:31.997Z",
+  "checks": {
+    "inspect": {
+      "code": null,
+      "signal": "SIGKILL",
+      "killedAfterMs": 6000,
+      "output": [],
+      "nodeInspectorOpened": false
+    },
+    "remoteDebuggingPort": {
+      "code": 78,
+      "signal": null,
+      "killedAfterMs": null,
+      "output": [
+        "AYAR Spike: refusing remote debugging switches without the inspector fuse"
+      ],
+      "devtoolsOpened": false
+    },
+    "remoteDebuggingPipe": {
+      "code": 78,
+      "signal": null,
+      "killedAfterMs": null,
+      "output": [
+        "AYAR Spike: refusing remote debugging switches without the inspector fuse"
+      ]
+    },
+    "runAsNode": {
+      "code": null,
+      "signal": "SIGKILL",
+      "killedAfterMs": 6000,
+      "output": [],
+      "actedAsNode": false
+    },
+    "nodeOptions": {
+      "code": null,
+      "signal": "SIGKILL",
+      "killedAfterMs": 6000,
+      "output": [],
+      "requireRan": false
+    }
+  }
+}

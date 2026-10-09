@@ -4,9 +4,18 @@
 //   --auto-quit      quit after writing the report
 //   --no-selftest    skip the E-01 self-test (modes use it)
 import { app, BrowserWindow, protocol, net, session, utilityProcess, ipcMain } from 'electron';
+import inspector from 'node:inspector';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+
+// G-05: Chromium's remote debugging is not covered by any fuse. Refuse it unless the Node
+// inspector is active, which only happens on a test package with EnableNodeCliInspectArguments on.
+const DEBUG_SWITCHES = ['remote-debugging-port', 'remote-debugging-pipe', 'remote-debugging-address'];
+if (DEBUG_SWITCHES.some((s) => app.commandLine.hasSwitch(s)) && !inspector.url()) {
+  process.stderr.write('AYAR Spike: refusing remote debugging switches without the inspector fuse\n');
+  app.exit(78);
+}
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const appRoot = path.resolve(here, '..');

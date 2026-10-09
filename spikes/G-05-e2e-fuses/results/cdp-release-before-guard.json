@@ -1,0 +1,27 @@
+{
+  "label": "release-before-guard",
+  "appPath": "AYAR Spike.app",
+  "startedAt": "2026-10-09T20:20:19.829Z",
+  "devtools": "ws://127.0.0.1:52145/devtools/browser/96865136-9337-4404-993e-b960ab5a8849",
+  "pages": [
+    {
+      "url": "app://spike/index.html",
+      "title": "AYAR Spike — E-01"
+    }
+  ],
+  "canReadUi": "/Users/me/Projects/ayar/packages/engine/src/index.ts:42 — npm run test -- --reporter=json",
+  "preloadApiVisible": [
+    "ready",
+    "onReport",
+    "send",
+    "invoke",
+    "on"
+  ],
+  "exit": {
+    "code": null,
+    "signal": "SIGKILL"
+  },
+  "stderr": [
+    "DevTools listening on ws://127.0.0.1:52145/devtools/browser/96865136-9337-4404-993e-b960ab5a8849"
+  ]
+}

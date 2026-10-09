@@ -1,0 +1,49 @@
+{
+  "releaseApp": "AYAR Spike.app",
+  "filesCompared": 265,
+  "differingFiles": [
+    "Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework",
+    "Contents/MacOS/AYAR Spike",
+    "Contents/_CodeSignature/CodeResources"
+  ],
+  "afterStrippingSignatures": {
+    "Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework": {
+      "sizeA": 201109944,
+      "sizeB": 201109944,
+      "differingBytes": 1,
+      "offsets": [
+        157950241
+      ]
+    },
+    "Contents/MacOS/AYAR Spike": {
+      "sizeA": 33540,
+      "sizeB": 33540,
+      "differingBytes": 0,
+      "offsets": []
+    }
+  },
+  "fuses": {
+    "release": {
+      "RunAsNode": "DISABLE",
+      "EnableCookieEncryption": "DISABLE",
+      "EnableNodeOptionsEnvironmentVariable": "DISABLE",
+      "EnableNodeCliInspectArguments": "DISABLE",
+      "EnableEmbeddedAsarIntegrityValidation": "ENABLE",
+      "OnlyLoadAppFromAsar": "ENABLE",
+      "LoadBrowserProcessSpecificV8Snapshot": "DISABLE",
+      "GrantFileProtocolExtraPrivileges": "DISABLE",
+      "WasmTrapHandlers": "ENABLE"
+    },
+    "test": {
+      "RunAsNode": "DISABLE",
+      "EnableCookieEncryption": "DISABLE",
+      "EnableNodeOptionsEnvironmentVariable": "DISABLE",
+      "EnableNodeCliInspectArguments": "ENABLE",
+      "EnableEmbeddedAsarIntegrityValidation": "ENABLE",
+      "OnlyLoadAppFromAsar": "ENABLE",
+      "LoadBrowserProcessSpecificV8Snapshot": "DISABLE",
+      "GrantFileProtocolExtraPrivileges": "DISABLE",
+      "WasmTrapHandlers": "ENABLE"
+    }
+  }
+}
