@@ -201,8 +201,10 @@ async function selfTest(win, engine, rendererState) {
 app.whenReady().then(async () => {
   protocol.handle('app', async (req) => {
     const { pathname } = new URL(req.url);
-    const file = path.normalize(path.join(rendererRoot, decodeURIComponent(pathname)));
-    if (!file.startsWith(rendererRoot)) return new Response('not found', { status: 404 });
+    // /mode/... is served from the experiment mode copied into the app (inside asar).
+    const root = pathname.startsWith('/mode/') ? appRoot : rendererRoot;
+    const file = path.normalize(path.join(root, decodeURIComponent(pathname)));
+    if (!file.startsWith(root + path.sep)) return new Response('not found', { status: 404 });
     const res = await net.fetch(pathToFileURL(file).toString());
     const headers = new Headers(res.headers);
     headers.set('Content-Security-Policy', CSP);
@@ -215,12 +217,8 @@ app.whenReady().then(async () => {
   ipcMain.on('spike:csp-violation', (_e, v) => { rendererState.cspViolations.push(v); });
 
   const info = readBuildInfo();
-  let modeModule = null;
-  try {
-    modeModule = await import(pathToFileURL(path.join(appRoot, 'mode', 'index.mjs')).toString());
-  } catch {
-    modeModule = null;
-  }
+  const modeEntry = path.join(appRoot, 'mode', 'index.mjs');
+  const modeModule = fs.existsSync(modeEntry) ? await import(pathToFileURL(modeEntry).toString()) : null;
   if (modeModule) {
     await modeModule.run({ app, createWindow, Engine, ipcMain, args, info, readBundleId });
     return;

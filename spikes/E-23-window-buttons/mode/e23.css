@@ -1,0 +1,11 @@
+body { margin: 0; font-family: -apple-system, system-ui, sans-serif; background: #fff; color: #111; }
+/* The header occupies only the free titlebar area reported by Window Controls Overlay. */
+#titlebar {
+  position: fixed; top: 0;
+  left: env(titlebar-area-x, 0); width: env(titlebar-area-width, 100%); height: env(titlebar-area-height, 28px);
+  display: flex; align-items: center; justify-content: center;
+  background: #e8eef0; -webkit-app-region: drag; font-size: 13px;
+}
+main { padding: 48px 20px 20px; }
+#probe { position: absolute; visibility: hidden; padding-left: env(titlebar-area-x, -1px); width: env(titlebar-area-width, -1px); }
+pre { font-family: Menlo, monospace; font-size: 11px; direction: ltr; text-align: left; }

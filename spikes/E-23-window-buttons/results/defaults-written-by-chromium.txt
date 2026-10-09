@@ -1,0 +1,11 @@
+# E-23, 2026-10-10: the spike app's own defaults domain after launches (nothing written by the test,
+# except the AppleLanguages per-app preference used for the pref-en run, deleted afterwards).
+$ defaults read com.bysltan.ayar.spike.e23      # after a launch resolved to Arabic
+AppleTextDirection = 1;
+NSForceRightToLeftWritingDirection = 1;
+$ defaults read com.bysltan.ayar.spike.e23      # after a launch with -AppleLanguages "(en)"
+AppleTextDirection = 1;
+NSForceRightToLeftWritingDirection = 0;
+$ defaults delete com.bysltan.ayar.spike.e23; <launch with -AppleLanguages "(en)">; defaults read ...
+AppleTextDirection = 1;
+NSForceRightToLeftWritingDirection = 0;

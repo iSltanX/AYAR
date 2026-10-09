@@ -1,0 +1,100 @@
+{
+  "spike": "E-23",
+  "label": "clean-en",
+  "at": "2026-10-09T21:36:03.536Z",
+  "buildInfo": {
+    "mode": "e23",
+    "bundleId": "com.bysltan.ayar.spike.e23",
+    "productName": "AYAR Spike E23",
+    "signed": "identity",
+    "buildTag": "",
+    "builtAt": "2026-10-09T21:32:16.021Z"
+  },
+  "argv": [
+    "--label",
+    "clean-en",
+    "--auto-quit",
+    "-AppleLanguages",
+    "(en)"
+  ],
+  "style": "hidden",
+  "overlay": "true",
+  "locale": {
+    "app": "en-US",
+    "system": "en-SA",
+    "preferred": [
+      "en"
+    ]
+  },
+  "window": {
+    "contentSize": [
+      900,
+      560
+    ],
+    "buttonPosition": null
+  },
+  "measurements": [
+    {
+      "step": "launch",
+      "uiLang": "en",
+      "wcoSupported": true,
+      "wcoVisible": false,
+      "rect": null,
+      "cssEnv": {
+        "x": "0px",
+        "width": "0px"
+      },
+      "innerWidth": 900,
+      "docDir": "ltr",
+      "docLang": "en",
+      "buttonsSide": "unknown"
+    },
+    {
+      "step": "launch+1.5s",
+      "uiLang": "en",
+      "wcoSupported": true,
+      "wcoVisible": false,
+      "rect": null,
+      "cssEnv": {
+        "x": "0px",
+        "width": "0px"
+      },
+      "innerWidth": 900,
+      "docDir": "ltr",
+      "docLang": "en",
+      "geometryEvents": [],
+      "buttonsSide": "unknown"
+    },
+    {
+      "step": "switched-in-app",
+      "uiLang": "ar",
+      "wcoSupported": true,
+      "wcoVisible": false,
+      "rect": null,
+      "cssEnv": {
+        "x": "0px",
+        "width": "0px"
+      },
+      "innerWidth": 900,
+      "docDir": "rtl",
+      "docLang": "ar",
+      "buttonsSide": "unknown"
+    },
+    {
+      "step": "switched+1.5s",
+      "uiLang": "ar",
+      "wcoSupported": true,
+      "wcoVisible": false,
+      "rect": null,
+      "cssEnv": {
+        "x": "0px",
+        "width": "0px"
+      },
+      "innerWidth": 900,
+      "docDir": "rtl",
+      "docLang": "ar",
+      "geometryEvents": [],
+      "buttonsSide": "unknown"
+    }
+  ]
+}

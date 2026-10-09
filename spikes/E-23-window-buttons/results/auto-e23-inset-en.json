@@ -1,0 +1,122 @@
+{
+  "spike": "E-23",
+  "label": "inset-en",
+  "at": "2026-10-09T21:32:28.266Z",
+  "buildInfo": {
+    "mode": "e23",
+    "bundleId": "com.bysltan.ayar.spike.e23",
+    "productName": "AYAR Spike E23",
+    "signed": "identity",
+    "buildTag": "",
+    "builtAt": "2026-10-09T21:32:16.021Z"
+  },
+  "argv": [
+    "--label",
+    "inset-en",
+    "--auto-quit",
+    "--style",
+    "hiddenInset",
+    "-AppleLanguages",
+    "(en)"
+  ],
+  "style": "hiddenInset",
+  "overlay": "true",
+  "locale": {
+    "app": "en-US",
+    "system": "en-SA",
+    "preferred": [
+      "en"
+    ]
+  },
+  "window": {
+    "contentSize": [
+      900,
+      560
+    ],
+    "buttonPosition": null
+  },
+  "measurements": [
+    {
+      "step": "launch",
+      "uiLang": "en",
+      "wcoSupported": true,
+      "wcoVisible": true,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 900,
+        "height": 36
+      },
+      "cssEnv": {
+        "x": "0px",
+        "width": "900px"
+      },
+      "innerWidth": 900,
+      "docDir": "ltr",
+      "docLang": "en",
+      "buttonsSide": "none"
+    },
+    {
+      "step": "launch+1.5s",
+      "uiLang": "en",
+      "wcoSupported": true,
+      "wcoVisible": true,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 900,
+        "height": 36
+      },
+      "cssEnv": {
+        "x": "0px",
+        "width": "900px"
+      },
+      "innerWidth": 900,
+      "docDir": "ltr",
+      "docLang": "en",
+      "geometryEvents": [],
+      "buttonsSide": "none"
+    },
+    {
+      "step": "switched-in-app",
+      "uiLang": "ar",
+      "wcoSupported": true,
+      "wcoVisible": true,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 900,
+        "height": 36
+      },
+      "cssEnv": {
+        "x": "0px",
+        "width": "900px"
+      },
+      "innerWidth": 900,
+      "docDir": "rtl",
+      "docLang": "ar",
+      "buttonsSide": "none"
+    },
+    {
+      "step": "switched+1.5s",
+      "uiLang": "ar",
+      "wcoSupported": true,
+      "wcoVisible": true,
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 900,
+        "height": 36
+      },
+      "cssEnv": {
+        "x": "0px",
+        "width": "900px"
+      },
+      "innerWidth": 900,
+      "docDir": "rtl",
+      "docLang": "ar",
+      "geometryEvents": [],
+      "buttonsSide": "none"
+    }
+  ]
+}

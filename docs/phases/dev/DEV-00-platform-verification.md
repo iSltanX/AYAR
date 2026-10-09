@@ -148,8 +148,15 @@ closing_commit:
   - المهمة 8، E-06 محسوم (قُدّمت على المهمة 5 حين كانت E-13 تنتظر جواب التنزيلات): الإبقاء على صدفة الدخول، بين 42 و70 ملّي ثانية، وPATH مطابق للطرفية. وسُجّلت G-49 لـ DEV-2 وDEV-4.
   - المهمة 5، E-13 محسوم: `typescript` = 6.0.3 للأدوات، و`@typescript/native` = 7.0.2 لفحص أنواع المحرك، وVitest للاختبارات. svelte-check وtypescript-eslint يرفضان TS 7 وحده.
   - المهمة 10، E-25 محسوم: الاختصار على APFS وHFS+ فقط، ومعطل على exFAT وFAT32 وما لم يثبت. وأُزيلت مجلدات التجربة من iCloud والقرص الخارجي.
-- **آخر commit:** E-25.
-- **نقطة الاستئناف:** جلسة المالك، بعد أن يؤكد تفعيل «Enable computer use»: E-04 (يشغّل المالك أمر إنشاء الشهادة الذاتية ويُدخل كلمة سره)، ثم E-05 وE-23، والنقر المزدوج في Finder لـ E-01 وE-06. ثم أجوبة A-03 وA-11 وA-13 وA-14، ثم الإغلاق.
+  - تجهيز جلسة المالك: وضعا E-04 وE-05، وسكربت الشهادة `spikes/E-04-signing-identity/create-identity.sh` (يشغّله المالك)، ومشاريع الاختبار في المواقع الخمسة (`spikes/E-05-privacy-scope/make-probes.sh`)، وقارئ سجل الخصوصية `tcc-log.mjs`.
+  - E-23، الجزء الآلي: في العربية الأزرار يمينًا وواجهة WCO تحجز 78 بكسل، والتبديل داخل التطبيق لا يحركها. وفي الإنجليزية تقول WCO إن الغطاء غير ظاهر أو لا تحجز شيئًا. وChromium يكتب `NSForceRightToLeftWritingDirection` عند كل إقلاع بحسب اللغة المحلولة. والتأكيد البصري ينتظر الجلسة.
+- **آخر commit:** تجهيز جلسة المالك.
+- **نقطة الاستئناف:** جلسة المالك، بعد أن يؤكد تفعيل «Enable computer use»:
+  1. المالك يشغّل `spikes/E-04-signing-identity/create-identity.sh` ويُدخل كلمة سره، فيخرج `E04_IDENTITY_OK`.
+  2. E-04: بناء A ثم B بـ `SPIKE_MODE=e04 SPIKE_BUNDLE_ID=com.bysltan.ayar.spike.e04 SPIKE_IDENTITY="AYAR Local Code Signing" SPIKE_DLV=1 SPIKE_COOKIE_ENC=1 SPIKE_BUILD_TAG=A|B`، وفتح كل منهما بالنقر المزدوج في Finder، وعدّ الطلبات بـ `tcc-log.mjs`.
+  3. E-05: بناء `SPIKE_MODE=e05 SPIKE_BUNDLE_ID=com.bysltan.ayar.spike.e05` بالهوية نفسها، ثم الاختيار من نافذة الفتح للمواقع الخمسة، ثم إعادة الفتح بـ `--replay`.
+  4. E-23: لقطات شاشة للتركيبات، والنقر المزدوج في Finder لـ E-01 وE-06.
+  5. أجوبة A-03 وA-11 وA-13 وA-14، ثم إزالة مشاريع الاختبار (`make-probes.sh --remove`)، ثم الإغلاق.
 - **التنزيلات حتى الآن:**
   - electron 44.7.0 مع ملفه الثنائي، و@electron-forge/cli و@electron-forge/plugin-fuses 8.0.1، و@electron/fuses 2.1.3: في `spikes/E-01-electron-forge/node_modules/`، 373 ميغابايت. ونسخة Electron المضغوطة 124 ميغابايت في `~/Library/Caches/electron/`.
   - playwright-core 1.64.0: في `spikes/G-05-e2e-fuses/node_modules/`، 13 ميغابايت.
