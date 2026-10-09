@@ -1,6 +1,6 @@
 // DEV-0 spike harness. One packaged app shared by E-01, G-05, E-04, E-05 and E-23.
 // Each experiment selects its build through environment variables (see README.md):
-//   SPIKE_MODE        e01 (default) | e04 | e05 | e23  -> copies ../<dir>/mode/ into the app (inside asar)
+//   SPIKE_MODE        e01 (default) | e04 | e05 | e06 | e23  -> copies ../<dir>/mode/ into the app (inside asar)
 //   SPIKE_BUNDLE_ID   default com.bysltan.ayar.spike (never the final id, see Q-04)
 //   SPIKE_NAME        product name, default "AYAR Spike"
 //   SPIKE_IDENTITY    codesign identity (SHA-1 or name). Unset -> ad-hoc signature reset by the fuses plugin.
@@ -16,6 +16,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const MODE_DIRS = {
   e04: '../E-04-signing-identity/mode',
   e05: '../E-05-privacy-scope/mode',
+  e06: '../E-06-shell-env/mode',
   e23: '../E-23-window-buttons/mode',
 };
 

@@ -144,8 +144,11 @@ closing_commit:
   - المهمة 2، E-01 محسوم: Electron 44.7.0 وForge 8.0.1، والتوقيع عبر `osxSign` دائمًا (D-50)، والخط المعروض Menlo، والحجم 302 ميغابايت. وسُجّلت G-48 (البديل العربي للخط ثابت العرض) لـ DES-1. والنقر المزدوج الحرفي في Finder يُعاد في جلسة المالك.
   - المهمة 3، G-05 محسوم (D-51 وD-52): Playwright يفشل على حزمة الإصدار وينجح على حزمة مشتقة منها تختلف ببايت الصمام وحده، وAT-30 يبقى على حزمة الإصدار. واكتُشف أن منفذ Chromium للتصحيح مفتوح على حزمة بصمامات 15.2 كاملة، فأُضيف حارس يخرج برمز 78.
   - المهمة 4، E-03 محسوم: `node:sqlite` نجح كله في ثلاثة تشغيلات، ولم يُنزَّل better-sqlite3.
-- **آخر commit:** E-03.
-- **نقطة الاستئناف:** المهمة 5 (E-13): هيكل مستودع صغير في `spikes/E-13-dev-tooling/` بـ Svelte 5 وsvelte-check وtypescript-eslint وVitest وnode:test، مع TypeScript 7.0.2 ثم 6.0.2.
+  - قاعدة التنزيلات (ORG-09، 2026-10-10): يُنزَّل ما يخص التطبيق دون استئذان، ويُذكر في التسليم. وهي تحل محل شرط الموافقة المسبقة في «متطلبات البدء».
+  - المهمة 8، E-06 محسوم (قُدّمت على المهمة 5 حين كانت E-13 تنتظر جواب التنزيلات): الإبقاء على صدفة الدخول، بين 42 و70 ملّي ثانية، وPATH مطابق للطرفية. وسُجّلت G-49 لـ DEV-2 وDEV-4.
+- **آخر commit:** E-06.
+- **نقطة الاستئناف:** المهمة 5 (E-13): هيكل مستودع صغير في `spikes/E-13-dev-tooling/` بـ Svelte 5 وsvelte-check وtypescript-eslint وVitest وnode:test، مع TypeScript 7.0.2 ثم 6.0.3. ملاحظة سابقة للتجربة: svelte-check 4.7.6 يعلن توافقه مع TypeScript `^5 || ^6`، وtypescript-eslint 8.71.1 مع `<6.1.0`. ثم E-25، ثم جلسة المالك (E-04 وE-05 وE-23، والنقر المزدوج في Finder لـ E-01 وE-06).
+- **التنزيلات حتى الآن:** electron 44.7.0 مع ملفه الثنائي، و@electron-forge/cli و@electron-forge/plugin-fuses 8.0.1، و@electron/fuses 2.1.3 (في `spikes/E-01-electron-forge/node_modules/`، 373 ميغابايت، ونسخة Electron المضغوطة 124 ميغابايت في `~/Library/Caches/electron/`)، وplaywright-core 1.64.0 (في `spikes/G-05-e2e-fuses/node_modules/`، 13 ميغابايت).
 - **ملاحظات:**
   - لوحظ أثناء التنظيم أن `node` في صدفة Claude Code دالة nvm معطوبة (AGENTS.md 9). هذه ملاحظة، لا نتيجة E-06.
   - و`npm` كذلك دالة nvm معطوبة في الصدفة نفسها (`type npm` → shell function). استخدم `/opt/homebrew/bin/npm` مع `PATH=/opt/homebrew/bin:$PATH`.

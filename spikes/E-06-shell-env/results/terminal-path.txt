@@ -1,0 +1,5 @@
+~/.kimi-code/bin:~/.fly/bin:~/.fly/bin:/usr/local/bin:~/.bun/bin:~/.local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/Applications/Little Snitch.app/Contents/Components:/opt/homebrew/bin:~/.cargo/bin
+v24.16.0
+node is ~/.nvm/versions/node/v24.16.0/bin/node
+npm is ~/.nvm/versions/node/v24.16.0/bin/npm
+TERM_PROGRAM=claude-desktop SHELL=/bin/zsh
