@@ -1,0 +1,44 @@
+{
+  "label": "internal-apfs",
+  "dir": "/private/tmp/claude-501/-Volumes-iSltanXx-Projects-AYAR/5325b37f-5df0-4226-8a37-d85230946040/scratchpad/e25-internal",
+  "fs": {
+    "personality": "APFS",
+    "location": "Internal",
+    "protocol": "Apple Fabric"
+  },
+  "at": "2026-10-09T21:28:04.981Z",
+  "n": 50000,
+  "generate": {
+    "ms": 3275,
+    "bytes": 497921391
+  },
+  "timingsMs": {
+    "fullFirst": 962,
+    "fullSecond": 865,
+    "shortcutFirst": 290,
+    "shortcutSecond": 286
+  },
+  "shortcutHashed": [
+    0,
+    0
+  ],
+  "mutation": {
+    "mutatedFiles": 240,
+    "contentChanged": 180,
+    "shortcutRehashed": 240,
+    "missedByShortcut": 0,
+    "missedByMethod": {
+      "write+touch-r": 0,
+      "cp-p": 0,
+      "ditto": 0,
+      "atomic-rename": 0,
+      "utimes-api": 0,
+      "inplace-pwrite+touch-r": 0,
+      "chmod-only": 0,
+      "xattr-only": 0
+    },
+    "shortcutMs": 261,
+    "fullMs": 822
+  },
+  "cleanupMs": 1952
+}
