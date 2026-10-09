@@ -43,3 +43,4 @@
 
 - التصميم: [Figma — AYAR](https://www.figma.com/design/UXkPakdqRuHDVTs78DO4uC/AYAR)
 - المستودع: [github.com/iSltanX/AYAR](https://github.com/iSltanX/AYAR) (خاص)
+- صفحة المراحل: https://claude.ai/artifact/H148UTA7G6ETD1fWGKN3qE

@@ -4,7 +4,7 @@
 
 | البند | القيمة |
 |---|---|
-| الرابط المنشور | يُسجَّل هنا بعد أول نشر |
+| الرابط المنشور | https://claude.ai/artifact/H148UTA7G6ETD1fWGKN3qE (خاص بحساب المالك، ويُشارَك من قائمة Share في الصفحة) |
 | الملف المولَّد | [ayar-phases.html](ayar-phases.html) (لا يُحرَّر يدويًا) |
 | المولّد | [tools/dashboard/build.mjs](../../tools/dashboard/build.mjs) |
 | القالب | [tools/dashboard/template.html](../../tools/dashboard/template.html) |
