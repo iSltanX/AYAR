@@ -1,0 +1,9 @@
+{
+  "name": "ayar-spike-e03",
+  "version": "0.0.1",
+  "private": true,
+  "description": "DEV-0 spike E-03: node:sqlite inside Electron utilityProcess (WAL, 100k inserts, concurrent reads, SIGKILL recovery, VACUUM INTO)",
+  "type": "module",
+  "main": "main.mjs",
+  "license": "UNLICENSED"
+}
