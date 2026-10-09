@@ -1,0 +1,87 @@
+# ── نظام macOS ──
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+
+# ── المحررات والأدوات المحلية ──
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*~
+.claude/settings.local.json
+.claude/worktrees/
+
+# ── الأسرار والبيئة (لا تُرفع أبدًا) ──
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.cer
+*.certSigningRequest
+*.mobileprovision
+*.provisionprofile
+*.keychain
+*.keychain-db
+secrets/
+**/signing/**/*.p12
+
+# ── تبعيات ومخرجات البناء ──
+node_modules/
+.pnpm-store/
+dist/
+out/
+build/
+.vite/
+.svelte-kit/
+coverage/
+.nyc_output/
+.vitest/
+*.tsbuildinfo
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# ── مخرجات Electron والتغليف ──
+*.app
+*.dmg
+*.zip
+release/
+
+# ── Python ──
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# ── Playwright والمسبار ──
+test-results/
+playwright-report/
+.playwright/
+
+# ── بيانات عِيَار التشغيلية المحلية (أدلة، قواعد ثغرات، أدوات مُدارة) ──
+.ayar-data/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.db
+
+# ── تجارب التحقق السابق للبناء: الشيفرة تُحفظ، والمخرجات الثقيلة لا ──
+spikes/**/node_modules/
+spikes/**/out/
+spikes/**/dist/
+spikes/**/*.app
+spikes/**/artifacts/
+
+# ── ملفات مؤقتة ──
+tmp/
+.tmp/
+*.tmp
