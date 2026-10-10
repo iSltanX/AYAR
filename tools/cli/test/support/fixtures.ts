@@ -1,9 +1,10 @@
 // Shared helpers of the acceptance tests run through tools/cli (plan 19 «تكامل المحرك»): fixture projects are
 // materialized in a fresh temp folder (G-09, never run in fixtures/), the engine runs over the protocol with a
 // temp data folder, and snapshots and proposals are reduced to the comparable views of the AT-02 files.
-import type { CheckSpec, DiscoverySnapshot, Fact, InvokeResult, ProfileView } from '@ayar/protocol';
+import type { CheckSpec, DiscoverySnapshot, Fact, InvokeResult, ProfileView, RunDetail, RunPlan, RunSelection, RunView } from '@ayar/protocol';
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, statSync } from 'node:fs';
+import { chmodSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { DatabaseSync } from 'node:sqlite';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { connectEngine, type EngineConnection } from '../../src/engine-client.ts';
@@ -112,4 +113,85 @@ export function filesUnder(dir: string): string[] {
 export function filesContaining(dir: string, needle: string): string[] {
   const n = Buffer.from(needle);
   return filesUnder(dir).filter((f) => statSync(f).size > 0 && readFileSync(f).includes(n));
+}
+
+// ── DEV-5: runs ──────────────────────────────────────────────────────────────────────────────────────────
+
+/** Approves every pending change one by one (a dangerous one is approved alone, FR-56). */
+export async function approveAll(engine: EngineConnection, projectId: string): Promise<ProfileView> {
+  for (;;) {
+    const p = ok<ProfileView>(await engine.invoke('profile.get', { projectId }));
+    const items = p.pending.items.filter((i) => i.approvable);
+    if (!items.length) return p;
+    const alone = items.find((i) => i.approveAlone);
+    ok(await engine.invoke('profile.approve', { projectId, changeSetId: p.pending.id, ...(alone ? { instances: [alone.instance] } : {}) }));
+  }
+}
+
+export async function plan(engine: EngineConnection, projectId: string, selection: RunSelection): Promise<RunPlan> {
+  return ok<RunPlan>(await engine.invoke('run.plan', { projectId, selection }));
+}
+
+/** Waits for a run to reach a terminal state, then returns its detail. */
+export async function waitRun(engine: EngineConnection, runId: string, timeoutMs = 120_000): Promise<RunDetail> {
+  await engine.waitForEvent('run.state', (e) => e.payload.runId === runId && (e.payload.state === 'finished' || e.payload.state === 'interrupted'), timeoutMs);
+  return ok<RunDetail>(await engine.invoke('run.get', { runId }));
+}
+
+export async function startRun(engine: EngineConnection, planId: string): Promise<RunView> {
+  return ok<RunView>(await engine.invoke('run.start', { planId }));
+}
+
+export const check = (d: RunDetail, instance: string): RunDetail['checks'][number] => {
+  const c = d.checks.find((x) => x.instance === instance);
+  if (!c) throw new Error(`no execution of ${instance}`);
+  return c;
+};
+
+/** A login shell for the engine to read (tools/cli's AYAR_TEST_LOGIN_SHELL hook): a chosen PATH and exports. */
+export function loginShell(dir: string, o: { path: string; exports?: Record<string, string> }): string {
+  const file = join(dir, `login-shell-${Math.random().toString(36).slice(2)}`);
+  const lines = ['#!/bin/sh', ...Object.entries(o.exports ?? {}).map(([k, v]) => `export ${k}='${v}'`), `export PATH='${o.path}'`, 'exec /bin/sh -c "$2"', ''];
+  writeFileSync(file, lines.join('\n'));
+  chmodSync(file, 0o755);
+  return file;
+}
+
+/** The check tokens the ledger of a data folder recorded (read after the engine closed). */
+export function ledgerTokens(dataDir: string): string[] {
+  const db = new DatabaseSync(join(dataDir, 'ayar.db'), { readOnly: true });
+  try {
+    return (db.prepare('SELECT check_token FROM process_ledger').all() as { check_token: string }[]).map((r) => r.check_token);
+  } finally {
+    db.close();
+  }
+}
+
+/** Processes of this user whose environment carries one of these tokens (E-22's sweep, seen from outside). */
+export function processesWithTokens(tokens: readonly string[]): { pid: number; line: string }[] {
+  const out = execFileSync('/bin/ps', ['-E', '-ww', '-o', 'pid=,command=', '-U', String(process.getuid!())], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  return out
+    .split('\n')
+    .map((l) => /^\s*(\d+) (.*)$/.exec(l))
+    .filter((m): m is RegExpExecArray => m !== null)
+    .filter((m) => tokens.some((t) => m[2]!.includes(`AYAR_CHECK_TOKEN=${t}`)))
+    .map((m) => ({ pid: Number(m[1]), line: m[2]!.slice(0, 200) }));
+}
+
+export function alive(pid: number): boolean {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function until(cond: () => boolean, timeoutMs: number, stepMs = 50): Promise<boolean> {
+  const end = Date.now() + timeoutMs;
+  while (Date.now() < end) {
+    if (cond()) return true;
+    await new Promise((r) => setTimeout(r, stepMs));
+  }
+  return cond();
 }

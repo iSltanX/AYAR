@@ -7,6 +7,7 @@
 //     [--source <path>]       attach a source grant to sourceToken (profile.import)
 //     [--destination <path>]  attach a destination grant to destinationToken (profile.export)
 //     [--confirm <target>]    attach a confirmation grant for this command and target (project.remove)
+//     [--digest <digest>]     bind that confirmation to a preview's digest (setup.execute, tools.install)
 //     [--wait <topic>]        after the command, wait for this event (discovery.done) and print it
 import { realpathSync } from 'node:fs';
 import { homedir } from 'node:os';
@@ -15,7 +16,7 @@ import { isCommandName, isEventTopic } from '@ayar/protocol';
 import { connectEngine } from './engine-client.ts';
 import { confirmationGrant, pathGrant } from './grants.ts';
 
-const USAGE = 'usage: ayar-cli --data-dir <dir> [--allow-app-data] (boot | invoke <command> [json] [--select|--source|--destination <path>] [--confirm <target>] [--wait <topic>])';
+const USAGE = 'usage: ayar-cli --data-dir <dir> [--allow-app-data] (boot | invoke <command> [json] [--select|--source|--destination <path>] [--confirm <target> [--digest <digest>]] [--wait <topic>])';
 
 function fail(message: string, code = 2): never {
   process.stderr.write(`${message}\n${USAGE}\n`);
@@ -39,6 +40,7 @@ const select = option('--select');
 const source = option('--source');
 const destination = option('--destination');
 const confirmTarget = option('--confirm');
+const confirmDigest = option('--digest');
 const waitTopic = option('--wait');
 const allowAppData = args.includes('--allow-app-data');
 const rest = args.filter((a) => a !== '--allow-app-data');
@@ -87,7 +89,7 @@ if (verb === 'boot') {
     grants = { ...grants, ...g.grants };
   }
   if (confirmTarget) {
-    const g = confirmationGrant(command!, confirmTarget);
+    const g = confirmationGrant(command!, confirmTarget, confirmDigest ?? null);
     payload.confirmationToken = g.token;
     grants = { ...grants, ...g.grants };
   }

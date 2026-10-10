@@ -13,7 +13,10 @@ export function pathGrant(kind: 'selection' | 'source' | 'destination', path: st
   return { token: placeholderToken(kind), grants: { [field]: { kind, path } } };
 }
 
-/** A confirmation token bound to a command and its target, as confirm.issue would mint it. */
-export function confirmationGrant(command: string, target: string): { token: string; grants: Grants } {
-  return { token: placeholderToken('confirmation'), grants: { confirmationToken: { kind: 'confirmation', command, target, digest: null } } };
+/**
+ * A confirmation token bound to a command and its target, as confirm.issue would mint it — or, with the digest of
+ * a preview (setup.preview, tools.preview), as the main process mints it for exactly what was shown.
+ */
+export function confirmationGrant(command: string, target: string, digest: string | null = null): { token: string; grants: Grants } {
+  return { token: placeholderToken('confirmation'), grants: { confirmationToken: { kind: 'confirmation', command, target, digest } } };
 }

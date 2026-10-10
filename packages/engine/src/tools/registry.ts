@@ -222,7 +222,8 @@ export function loadToolRegistry(extra: readonly unknown[] = []): Map<string, Ma
       issues.push(r.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', '));
       continue;
     }
-    if (out.has(r.data.key)) issues.push(`duplicate tool ${r.data.key}`);
+    // A host's test entry may stand in for a shipped one (AT-06 without the network); never two shipped ones.
+    if (out.has(r.data.key) && !r.data.test) issues.push(`duplicate tool ${r.data.key}`);
     // An http URL is a test entry's alone (the host's loopback server); a shipped entry is https.
     if (!r.data.test && r.data.files.some((f) => !f.url.startsWith('https://'))) issues.push(`${r.data.key}: not https`);
     out.set(r.data.key, r.data);
