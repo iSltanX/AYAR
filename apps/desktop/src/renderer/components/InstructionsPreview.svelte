@@ -37,7 +37,7 @@
     <span class="key">{t('results.instructions.suggestedPath')}</span>
     <PathPill {path} oncopy={onpathcopy} />
   </p>
-  <pre class="content" dir="ltr" aria-label={t('results.instructions.content')}>{text}</pre>
+  <pre class="content" dir="ltr" role="region" aria-label={t('results.instructions.content')}>{text}</pre>
 </section>
 
 <style>

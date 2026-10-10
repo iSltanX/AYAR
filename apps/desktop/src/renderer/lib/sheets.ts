@@ -207,3 +207,31 @@ export interface ReviewRecord {
   decision: ReviewDecision;
   note: string;
 }
+
+// Resetting a sheet's working state (Sheet.svelte contract): each time `open` goes from false to true (including
+// mounting open), and whenever the data the state was derived from changes while mounted. Plain functions, so the
+// sheets call them from a $effect.pre.
+
+/** A stable key for the data a sheet's state is derived from. */
+export function sheetResetKey(...parts: unknown[]): string {
+  return JSON.stringify(parts);
+}
+
+/** Returns a decider: true when the sheet should reset now (it is opening, or its data key changed). */
+export function sheetResetter(): (open: boolean | undefined, key: string) => boolean {
+  let wasOpen = false;
+  let lastKey: string | undefined;
+  return (open, key) => {
+    const opening = open === true && !wasOpen;
+    const changed = lastKey !== undefined && key !== lastKey;
+    wasOpen = open === true;
+    lastKey = key;
+    return opening || changed;
+  };
+}
+
+/** A decision that is valid for the variant: the given one, or the variant's first. */
+export function validDecision(variant: ReviewVariant, decision: ReviewDecision | undefined): ReviewDecision {
+  const options: readonly (readonly [ReviewDecision, MessageKey])[] = REVIEW_DECISIONS[variant];
+  return options.find(([d]) => d === decision)?.[0] ?? options[0]![0];
+}

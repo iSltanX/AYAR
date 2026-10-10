@@ -1,6 +1,6 @@
 <script lang="ts">
   // Log viewer (Figma 108:6245, C-13; plan 9.13, C-24): bg/surface, border/subtle, radius/card. The toolbar
-  // (padding 8 12, gap 12, a bottom border) follows the language: the search field fills, then the line count,
+  // (padding 8 12, gap 12, a bottom border) follows the language: the search field (320), then the line count,
   // then "follow last line". The log itself is always left to right, mono, 20 px lines with right-aligned line
   // numbers (32 wide, text/tertiary, gap 12). A redacted secret is a neutral tag "Redacted: <kind>" (never the
   // verdict word), each invisible bidi control is drawn as a visible mark ⟦U+202E⟧ (bg/sunken + border/strong)
@@ -8,12 +8,12 @@
   // line number; the caller passes the window of lines to show (`totalLines` counts the whole log), so a
   // virtualised list can feed it later without an API change.
   import { formatNumber } from '@ayar/i18n';
-  import { codePointLabel, logPieces, type LogLine } from '../lib/evidence.ts';
+  import type { LogLine } from '../lib/evidence.ts';
   import { useLocale } from '../lib/locale.ts';
   import Checkbox from './Checkbox.svelte';
   import Icon from './Icon.svelte';
+  import LogLineText from './LogLineText.svelte';
   import SearchField from './SearchField.svelte';
-  import Tag from './Tag.svelte';
 
   interface Props {
     lines: readonly LogLine[];
@@ -37,7 +37,7 @@
     onfollowchange,
     onquerychange,
   }: Props = $props();
-  const { t, lang, dir } = useLocale();
+  const { t, lang } = useLocale();
   let body: HTMLElement | undefined = $state();
 
   $effect(() => {
@@ -70,17 +70,7 @@
     {#each lines as line (line.number)}
       <div class="line" class:muted={line.muted}>
         <span class="number">{line.number}</span>
-        <span class="content">
-          {#each logPieces(line.segments, query) as piece, i (i)}
-            {#if piece.kind === 'text'}
-              <span class="text">{#each piece.parts as part, j (j)}{#if part.match}<mark>{part.text}</mark>{:else}{part.text}{/if}{/each}</span>
-            {:else if piece.kind === 'control'}
-              <span class="control" title={piece.name}>⟦{codePointLabel(piece.codePoint)}⟧</span>
-            {:else}
-              <span class="redaction" {dir}><Tag kind="neutral">{t('results.log.redacted', { what: piece.what })}</Tag></span>
-            {/if}
-          {/each}
-        </span>
+        <LogLineText segments={line.segments} {query} />
       </div>
     {/each}
   </div>
@@ -112,7 +102,7 @@
   .search {
     position: relative;
     display: flex;
-    flex: 1 1 320px;
+    flex: 0 1 320px; /* Figma 108:6245: a fixed 320; the count and Follow pack after it at the start */
     min-width: 0;
   }
   .count {
@@ -151,33 +141,6 @@
     width: 32px;
     text-align: right;
     color: var(--text-tertiary);
-  }
-  .content {
-    display: flex;
-    align-items: center;
-    gap: var(--space-12);
-  }
-  .text {
-    white-space: pre;
-  }
-  mark {
-    background: var(--selection);
-    color: inherit;
-  }
-  .control {
-    display: inline-flex;
-    align-items: center;
-    flex: none;
-    padding-inline: var(--space-4);
-    border: 1px solid var(--border-strong);
-    border-radius: 4px;
-    background: var(--bg-sunken);
-    color: var(--text-primary);
-    white-space: pre;
-  }
-  .redaction {
-    display: inline-flex;
-    flex: none;
   }
   .truncated {
     display: flex;

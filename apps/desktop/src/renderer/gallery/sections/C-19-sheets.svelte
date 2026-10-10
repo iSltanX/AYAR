@@ -43,6 +43,7 @@
       claim: 'دالة التوحيد لا تعالج الهمزة على الواو.',
       project: 'مكتبة النصوص',
       openModal: 'افتح تأكيد الإلغاء في نافذة حقيقية',
+      openReview: 'افتح المراجعة في نافذة حقيقية (تتبدل بين فحص وادعاء)',
     },
     en: {
       action: 'install dependencies',
@@ -62,6 +63,7 @@
       claim: 'The normalise function does not handle hamza on waw.',
       project: 'Texts library',
       openModal: 'Open the cancel confirmation (modal)',
+      openReview: 'Open the review (modal; alternates check and claim)',
     },
   }[lang];
 
@@ -122,6 +124,13 @@
   const alertHeights = { ar: [246, 246, 290, 266], en: [290, 266, 290, 286] }[lang];
 
   let modalOpen = $state(false);
+  // The review modal alternates its variant on each opening, to show its state reset on new data.
+  let reviewOpen = $state(false);
+  let reviewVariant = $state<'check' | 'model-claim'>('model-claim');
+  function openReview() {
+    reviewVariant = reviewVariant === 'check' ? 'model-claim' : 'check';
+    reviewOpen = true;
+  }
 </script>
 
 {#snippet mockCapture()}
@@ -142,9 +151,9 @@
 </Row>
 
 <Row title="Sheet/Export report (114:9070) · default / evidence-bundle">
-  <Demo name="Sheet/Export report/default" figma="114:9070" h={326} w={560}><SheetExportReport inline /></Demo>
+  <Demo name="Sheet/Export report/default" figma="114:9070" h={326} w={560}><SheetExportReport inline language="ar" /></Demo>
   <Demo name="Sheet/Export report/evidence-bundle" figma="114:9070" h={406} w={560}>
-    <SheetExportReport inline format="evidence-bundle" includeScreenshots />
+    <SheetExportReport inline format="evidence-bundle" language="ar" includeScreenshots />
   </Demo>
 </Row>
 
@@ -197,6 +206,18 @@
   <Demo name="Sheet/Cancel confirmation/modal" figma="116:9269">
     <Button onclick={() => (modalOpen = true)}>{S.openModal}</Button>
     <SheetCancelConfirmation open={modalOpen} oncancel={() => (modalOpen = false)} oncancelrun={() => (modalOpen = false)} />
+  </Demo>
+  <Demo name="Sheet/Human review/modal" figma="116:9241">
+    <Button onclick={openReview}>{S.openReview}</Button>
+    <SheetHumanReview
+      open={reviewOpen}
+      variant={reviewVariant}
+      subject={S.subject}
+      scope="src/settings/*"
+      claim={{ id: 'AI-LOGIC-001.3', text: S.claim }}
+      oncancel={() => (reviewOpen = false)}
+      onrecord={() => (reviewOpen = false)}
+    />
   </Demo>
 </Row>
 

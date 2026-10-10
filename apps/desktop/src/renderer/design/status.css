@@ -1,6 +1,6 @@
 /* The one place where a status family meets its colours (D-16, D-49, plan 16.3). Components never name a
    status colour: they set class="status-<id>" from a typed status and read --status-fg/-bg/-border/-icon.
-   Green is only passed and pure; red only failed and blocked (checked by test/design/semantic-colour.test.ts). */
+   Green is only passed and pure; red only failed and blocked (checked by test/design/source-rules.test.ts). */
 .status-passed { --status-fg: var(--result-passed-fg); --status-bg: var(--result-passed-bg); --status-border: var(--result-passed-border); --status-icon: var(--result-passed-icon); }
 .status-failed { --status-fg: var(--result-failed-fg); --status-bg: var(--result-failed-bg); --status-border: var(--result-failed-border); --status-icon: var(--result-failed-icon); }
 .status-warning { --status-fg: var(--result-warning-fg); --status-bg: var(--result-warning-bg); --status-border: var(--result-warning-border); --status-icon: var(--result-warning-icon); }

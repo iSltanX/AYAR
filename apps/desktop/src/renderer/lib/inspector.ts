@@ -15,12 +15,15 @@ export interface InspectorLogLines {
   readonly truncatedAtMb?: number;
 }
 
-/** The two outcomes of a human review (the review sheet): accept → passed (reviewed), reject → failed (reviewed). */
-export type ReviewDecision = 'accept' | 'reject';
+/**
+ * How a human review that decided a check's last result came out: accept → passed (reviewed), reject → failed
+ * (reviewed). Not the review sheet's choice (lib/sheets.ts ReviewDecision, five values): this is its outcome.
+ */
+export type ReviewOutcome = 'accept' | 'reject';
 
 /** A human review that decided the last result of a check («بمراجعة», plan 6.1). */
 export interface InspectorReview {
-  readonly decision: ReviewDecision;
+  readonly decision: ReviewOutcome;
   /** The scope the review covers, a path or glob (shown left to right, mono). */
   readonly scope: string;
   /** The review date, ISO (2026-10-09). */

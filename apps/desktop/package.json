@@ -8,11 +8,11 @@
   "license": "UNLICENSED",
   "main": "dist/main/entry.js",
   "scripts": {
-    "build": "vite build -c vite.renderer.config.ts && vite build -c vite.preload.config.ts && vite build -c vite.main.config.ts && vite build -c vite.engine.config.ts",
+    "build": "AYAR_GALLERY= vite build -c vite.renderer.config.ts && vite build -c vite.preload.config.ts && vite build -c vite.main.config.ts && vite build -c vite.engine.config.ts",
     "typecheck": "node ../../node_modules/typescript/bin/tsc -p src/main/tsconfig.json && node ../../node_modules/typescript/bin/tsc -p src/preload/tsconfig.json && node ../../node_modules/typescript/bin/tsc -p test/tsconfig.json && svelte-check --tsconfig ./src/renderer/tsconfig.json --fail-on-warnings",
     "start": "electron .",
     "package": "npm run build && electron-forge package",
-    "test:e2e": "npm run build && npm run build:gallery && vitest run -c vitest.e2e.config.ts",
+    "test:e2e": "npm run build && npm run build:gallery && (vitest run -c vitest.e2e.config.ts; status=$?; AYAR_GALLERY= vite build -c vite.renderer.config.ts --logLevel warn; exit $status)",
     "build:gallery": "AYAR_GALLERY=1 vite build -c vite.renderer.config.ts",
     "gallery": "npm run build && npm run build:gallery && node test/gallery/open.ts",
     "design:generate": "node test/design/generate.ts"

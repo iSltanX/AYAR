@@ -6,10 +6,22 @@
   // and the leftmost in Arabic, as Figma's RTL and LTR variants show.
   //
   // In the app a sheet is a modal attached to the window: a native <dialog> opened with showModal() while `open`
-  // is true. The browser traps the focus and makes the rest of the page inert; Escape calls `oncancel` (the
-  // caller closes the sheet by setting `open` back to false); on opening, the focus goes to the element marked
-  // `data-initial-focus` (the safe button). `inline` renders the same box in place, not modal (the gallery), as a labelled group.
-  import type { Snippet } from 'svelte';
+  // is true, and closed by setting `open` back to false (the caller owns `open`). The browser traps the focus,
+  // makes the rest of the page inert and gives the focus back to the opener on close; on opening, the focus goes
+  // to the element marked `data-initial-focus` (the safe button). `inline` renders the same box in place, not
+  // modal (the gallery), as a labelled group.
+  //
+  // Contract with the caller and with the sheets built on this box:
+  // - Escape fires `cancel`, which is prevented and reported through `oncancel`. Chromium makes a second Escape
+  //   without user activation non-cancelable, so the dialog may also close natively: that `close` is reported
+  //   through `oncancel` too. If `open` is still true after the caller had its turn, the dialog is shown again,
+  //   so it is never closed while `open` is true.
+  // - The body and footer are mounted only while `open` is true, so their own DOM state is fresh on every
+  //   opening. The working state a sheet keeps in its own props (a selection, a decision, a note, a name…) is
+  //   reset by that sheet to its defaults each time `open` goes from false to true, and whenever the data it was
+  //   derived from changes (lib/sheets.ts `sheetResetKey`). bind: from the caller keeps working: the caller sees
+  //   the reset value. A value a caller wants preset must be set after opening, or passed while inline.
+  import { tick, type Snippet } from 'svelte';
   import type { SheetWidth } from '../lib/sheets.ts';
 
   interface Props {
@@ -18,7 +30,7 @@
     width?: SheetWidth;
     open?: boolean;
     inline?: boolean;
-    /** Escape (modal), or the caller's own cancel button. */
+    /** Escape or a native close (modal), or the caller's own cancel button. The caller sets `open` to false. */
     oncancel?: () => void;
     children: Snippet;
     /** The buttons, in reading order: secondary first, primary last. */
@@ -28,20 +40,29 @@
   const uid = $props.id();
   let dialog = $state<HTMLDialogElement>();
 
+  function show(d: HTMLDialogElement) {
+    d.showModal();
+    d.querySelector<HTMLElement>('[data-initial-focus]')?.focus();
+  }
+
   $effect(() => {
     const d = dialog;
     if (!d) return;
-    if (open && !d.open) {
-      d.showModal();
-      d.querySelector<HTMLElement>('[data-initial-focus]')?.focus();
-    } else if (!open && d.open) {
-      d.close();
-    }
+    if (open && !d.open) show(d);
+    else if (!open && d.open) d.close();
   });
 
   function cancel(e: Event) {
     e.preventDefault();
     oncancel?.();
+  }
+
+  /** A close we did not ask for (a non-cancelable Escape): report it, then keep the dialog in step with `open`. */
+  async function closed() {
+    if (!open) return;
+    oncancel?.();
+    await tick();
+    if (open && dialog && !dialog.open) show(dialog);
   }
 </script>
 
@@ -54,7 +75,7 @@
 {#if inline}
   <div class="sheet {width}" role="group" aria-labelledby="{uid}-title">{@render box()}</div>
 {:else}
-  <dialog bind:this={dialog} class="sheet {width}" aria-labelledby="{uid}-title" oncancel={cancel}>
+  <dialog bind:this={dialog} class="sheet {width}" aria-labelledby="{uid}-title" oncancel={cancel} onclose={closed}>
     {#if open}{@render box()}{/if}
   </dialog>
 {/if}

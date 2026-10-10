@@ -5,21 +5,30 @@
   // text/secondary) then the line (mono, text/primary). Removed lines sit on bg/sunken with «−», added lines on
   // border/subtle with «+»: neutral shading, never red or green (D-16). Footer: «ألغِ» · «اعتمد المحدد» ·
   // «اعتمد الكل». The focus opens on «ألغِ».
+  import { untrack } from 'svelte';
   import { useLocale } from '../lib/locale.ts';
-  import { DIFF_SIGNS, type CommandChange, type SheetMode } from '../lib/sheets.ts';
+  import { DIFF_SIGNS, sheetResetKey, sheetResetter, type CommandChange, type SheetMode } from '../lib/sheets.ts';
   import Button from './Button.svelte';
   import Checkbox from './Checkbox.svelte';
   import Sheet from './Sheet.svelte';
 
   interface Props extends SheetMode {
     changes: readonly CommandChange[];
-    /** The ids of the selected checks (all by default). */
+    /** The ids of the selected checks: all of them on every opening and whenever `changes` changes. */
     selected?: string[];
     onapproveselected?: (ids: string[]) => void;
     onapproveall?: () => void;
   }
   let { changes, selected = $bindable(changes.map((c) => c.id)), onapproveselected, onapproveall, open, inline, oncancel }: Props = $props();
   const { t } = useLocale();
+
+  // Reset on every opening and when the diff changes (Sheet.svelte contract).
+  const shouldReset = sheetResetter();
+  $effect.pre(() => {
+    if (shouldReset(open, sheetResetKey(changes))) untrack(() => (selected = changes.map((c) => c.id)));
+  });
+  /** Only ids that are in the diff shown now. */
+  const current = $derived(changes.map((c) => c.id).filter((id) => selected.includes(id)));
 
   function toggle(id: string, on: boolean) {
     selected = on ? [...selected.filter((s) => s !== id), id] : selected.filter((s) => s !== id);
@@ -49,7 +58,7 @@
   {/each}
   {#snippet footer()}
     <Button data-initial-focus onclick={oncancel}>{t('ui.action.cancel')}</Button>
-    <Button disabled={selected.length === 0} onclick={() => onapproveselected?.([...selected])}>{t('ui.action.approveSelected')}</Button>
+    <Button disabled={current.length === 0} onclick={() => onapproveselected?.([...current])}>{t('ui.action.approveSelected')}</Button>
     <Button kind="primary" onclick={onapproveall}>{t('ui.action.approveAll')}</Button>
   {/snippet}
 </Sheet>

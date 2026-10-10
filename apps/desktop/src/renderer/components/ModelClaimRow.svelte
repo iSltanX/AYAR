@@ -8,7 +8,8 @@
   // وقرّر». After the decision its text replaces both. Hover = bg/sunken; the row takes keyboard focus. A claim
   // is never a result: no pass or fail badge, ever.
   import { useLocale } from '../lib/locale.ts';
-  import { claimVariant, isolate, type ClaimDecision, type Location } from '../lib/results.ts';
+  import { claimVariant, type ClaimDecision, type Location } from '../lib/results.ts';
+  import { SLOT, splitAround } from '../lib/shell.ts';
   import Button from './Button.svelte';
   import LtrText from './LtrText.svelte';
   import PathText from './PathText.svelte';
@@ -31,12 +32,13 @@
   let { note, claimId, location, localCheck, decision, onprove, onreview }: Props = $props();
   const { t } = useLocale();
   const variant = $derived(claimVariant(localCheck, decision));
-  const decisionText = $derived(
+  // The decision sentence around its id or date, which is drawn isolated left to right (LtrText, D-DES3-04).
+  const decided = $derived(
     decision === undefined
       ? undefined
       : decision.kind === 'card'
-        ? t('results.claim.decidedCard', { card: isolate(decision.card) })
-        : t('results.claim.decidedNotIssue', { date: isolate(decision.date) }),
+        ? { parts: splitAround(t('results.claim.decidedCard', { card: SLOT }), SLOT), value: decision.card }
+        : { parts: splitAround(t('results.claim.decidedNotIssue', { date: SLOT }), SLOT), value: decision.date },
   );
 </script>
 
@@ -56,8 +58,8 @@
     </span>
   </div>
   <div class="next">
-    {#if decisionText}
-      <span class="small">{decisionText}</span>
+    {#if decided}
+      <span class="small">{decided.parts[0]}<LtrText text={decided.value} />{decided.parts[1]}</span>
     {:else if localCheck}
       <span class="small">{t('ui.nextStep.handleDirectly')}</span>
       <Button kind="secondary" onclick={onprove}>{t('ui.action.proveByRecheck')}</Button>

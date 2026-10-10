@@ -14,7 +14,7 @@
   }
   let { name, path, type = 'button', ...rest }: Props = $props();
   const uid = $props.id();
-  const segments = $derived(path ? pathSegments(path) : []);
+  const display = $derived(path ? pathSegments(path) : { absolute: false, segments: [] });
 </script>
 
 <button class="project-switcher" {type} aria-haspopup="menu" aria-describedby={path ? `${uid}-path` : undefined} {...rest}>
@@ -24,7 +24,7 @@
     {#if path}
       <span class="path-line" id="{uid}-path"
         ><span class="path" dir="ltr"
-          >{#each segments as segment, i (i)}{#if i > 0}/{/if}<bdi>{segment}</bdi>{/each}</span
+          >{#if display.absolute}/{/if}{#each display.segments as segment, i (i)}{#if i > 0}/{/if}<bdi>{segment.text}</bdi>{/each}</span
         ></span
       >
     {/if}

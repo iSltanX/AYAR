@@ -33,7 +33,7 @@
   {#each specimens as s (s.name)}
     <div class="scroll">
       <Demo name="Finding row/{s.name}" figma="103:4015" h={32} w={720}>
-        <div class="frame" role="table" aria-label={t('ui.tab.findings')}>
+        <div class="frame findings-grid" role="grid" aria-label={t('ui.tab.findings')}>
           <FindingRow finding={s.finding} selected={s.selected} />
         </div>
       </Demo>

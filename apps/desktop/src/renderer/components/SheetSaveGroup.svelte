@@ -2,8 +2,9 @@
   // Sheet/Save group (Figma 115:8941): the name (Text field, full width) and the selected checks (name in body
   // text/primary, gap 8, id in mono text/tertiary; rows gap 4). Footer: «ألغِ» · «احفظ». Saved groups appear at
   // the end of the Run menu (lib/menus.ts). The focus opens on the name field.
+  import { untrack } from 'svelte';
   import { useLocale } from '../lib/locale.ts';
-  import type { CheckRef, SheetMode } from '../lib/sheets.ts';
+  import { sheetResetKey, sheetResetter, type CheckRef, type SheetMode } from '../lib/sheets.ts';
   import Button from './Button.svelte';
   import Sheet from './Sheet.svelte';
   import SheetField from './SheetField.svelte';
@@ -11,12 +12,19 @@
 
   interface Props extends SheetMode {
     checks: readonly CheckRef[];
+    /** Empty on every opening and whenever the checks change. */
     name?: string;
     onsave?: (name: string) => void;
   }
   let { checks, name = $bindable(''), onsave, open, inline, oncancel }: Props = $props();
   const { t } = useLocale();
   const uid = $props.id();
+
+  // Reset on every opening and when the selection changes (Sheet.svelte contract).
+  const shouldReset = sheetResetter();
+  $effect.pre(() => {
+    if (shouldReset(open, sheetResetKey(checks.map((c) => c.id)))) untrack(() => (name = ''));
+  });
 </script>
 
 <Sheet title={t('sheets.saveGroup.title')} {open} {inline} {oncancel}>

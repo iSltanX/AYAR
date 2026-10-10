@@ -51,8 +51,10 @@
     args = args.filter((_, k) => k !== i);
     keys = keys.filter((_, k) => k !== i);
     changed();
-    if (args.length) void focusIn('.remove', Math.min(i, args.length - 1));
-    else void focusIn('.add', 0);
+    // Focus the remove button of the row that took this one's place (or the new last row); with no rows left,
+    // the add button.
+    if (args.length) void focusIn('.remove button', Math.min(i, args.length - 1));
+    else void focusIn('.add button', 0);
   }
   function move(from: number, to: number) {
     if (to < 0 || to >= args.length || from === to) return;

@@ -16,18 +16,28 @@ export function controlWidth(width: ControlWidth | undefined): Attachment<HTMLEl
 }
 
 /**
- * The index an arrow key moves to in a one-row group (segmented control, tab list, radio group), or null for
- * any other key. "Next" is the inline-end side: ArrowLeft in Arabic, ArrowRight in English. ArrowDown/ArrowUp
- * are next/previous too. Home and End go to the first and last enabled item. Disabled items are skipped and
- * the movement wraps.
+ * Which arrow keys move inside a one-row or one-column group (WAI-ARIA): a horizontal tab list uses Left/Right
+ * only, a vertical list Up/Down only, and a radio group (segmented control) all four.
  */
-export function arrowTarget(event: KeyboardEvent, current: number, enabled: readonly boolean[]): number | null {
-  const el = event.currentTarget instanceof Element ? event.currentTarget : null;
-  const rtl = el ? getComputedStyle(el).direction === 'rtl' : false;
-  const next = rtl ? 'ArrowLeft' : 'ArrowRight';
-  const prev = rtl ? 'ArrowRight' : 'ArrowLeft';
+export type ArrowOrientation = 'horizontal' | 'vertical' | 'both';
+
+/**
+ * The index an arrow key moves to, or null for any other key (pure: no DOM). "Next" on the horizontal axis is
+ * the inline-end side: ArrowLeft in right-to-left text, ArrowRight in left-to-right text; on the vertical axis
+ * ArrowDown. Home and End go to the first and last enabled item. Disabled items are skipped and the movement
+ * wraps. Returns null when no item is enabled.
+ */
+export function arrowIndex(
+  key: string,
+  dir: 'rtl' | 'ltr',
+  orientation: ArrowOrientation,
+  current: number,
+  enabled: readonly boolean[],
+): number | null {
   const n = enabled.length;
   if (!n || !enabled.some(Boolean)) return null;
+  const horizontal = orientation !== 'vertical';
+  const vertical = orientation !== 'horizontal';
   const step = (from: number, by: 1 | -1) => {
     let i = from;
     for (let k = 0; k < n; k++) {
@@ -36,20 +46,28 @@ export function arrowTarget(event: KeyboardEvent, current: number, enabled: read
     }
     return from;
   };
-  switch (event.key) {
-    case next:
-    case 'ArrowDown':
-      return step(current, 1);
-    case prev:
-    case 'ArrowUp':
-      return step(current, -1);
-    case 'Home':
-      return step(n - 1, 1);
-    case 'End':
-      return step(0, -1);
-    default:
-      return null;
-  }
+  if (horizontal && key === (dir === 'rtl' ? 'ArrowLeft' : 'ArrowRight')) return step(current, 1);
+  if (horizontal && key === (dir === 'rtl' ? 'ArrowRight' : 'ArrowLeft')) return step(current, -1);
+  if (vertical && key === 'ArrowDown') return step(current, 1);
+  if (vertical && key === 'ArrowUp') return step(current, -1);
+  if (key === 'Home') return step(n - 1, 1);
+  if (key === 'End') return step(0, -1);
+  return null;
+}
+
+/**
+ * arrowIndex for a keyboard event, the reading direction taken from the element that has the handler. The
+ * orientation defaults to 'both' (the behaviour of the first version of this function).
+ */
+export function arrowTarget(
+  event: KeyboardEvent,
+  current: number,
+  enabled: readonly boolean[],
+  orientation: ArrowOrientation = 'both',
+): number | null {
+  const el = event.currentTarget instanceof Element ? event.currentTarget : null;
+  const dir = el && getComputedStyle(el).direction === 'rtl' ? 'rtl' : 'ltr';
+  return arrowIndex(event.key, dir, orientation, current, enabled);
 }
 
 /** One tab or segment: a stable id and its visible label (already translated, or content). */

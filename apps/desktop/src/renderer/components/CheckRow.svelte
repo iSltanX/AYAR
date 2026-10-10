@@ -3,21 +3,22 @@
   // radius/control, padding 0 8. The line: padding 6 0, gap 12, at least 40 high; from the start side the select
   // checkbox (28), the status (Cycle indicator sm while queued or running, Result badge sm once final), the name
   // (body) with the check id (mono, text/tertiary), then the cost tag, «N مبدئي», the duration (numeric/live)
-  // and the quiet buttons «ألغِ» (running only) and «السجل» (once started). A running row adds a second line:
+  // and the quiet buttons «ألغِ» (running only) and «السجل» (once the check ran: not when queued, skipped, not applicable, missing or unavailable). A running row adds a second line:
   // the step and count, the process activity dot and "last activity 3 s ago" (body/small, text/secondary), and
   // may add the silence note «لا خرج منذ 2:10، والمعالج نشط»: information, never a warning. Expanded (running)
   // shows the log tail (mono, left to right, bg/sunken) and the provisional findings under the name column.
   // Hover = bg/sunken; selected (the checkbox) = selection fill plus a 2 px border/strong bar on the inline-start
   // edge (D-DES1-03); the row itself takes keyboard focus (Space selects, Enter opens it in the inspector).
-  import { logPieces, codePointLabel } from '../lib/evidence.ts';
+  import type { LogLine } from '../lib/evidence.ts';
   import { useLocale } from '../lib/locale.ts';
-  import { isCycle, type CheckRowStatus, type LogTailLine } from '../lib/results.ts';
+  import { checkRan, isCycle, type CheckRowStatus } from '../lib/results.ts';
   import type { BadgeResult } from '../lib/status.ts';
   import type { Cost } from '../lib/tags.ts';
   import Button from './Button.svelte';
   import Checkbox from './Checkbox.svelte';
   import CostTag from './CostTag.svelte';
   import CycleIndicator from './CycleIndicator.svelte';
+  import LogLineText from './LogLineText.svelte';
   import LtrText from './LtrText.svelte';
   import ResultBadge from './ResultBadge.svelte';
   import Tag from './Tag.svelte';
@@ -41,13 +42,17 @@
     silentFor?: string;
     /** Provisional findings so far («2 مبدئي»). */
     provisionalCount?: number;
-    /** Elapsed or final duration, already formatted (e.g. "1:42"). */
+    /** Elapsed or final duration, already formatted (e.g. "1:42"); shown only when the check ran. */
     duration?: string;
+    /** Whether the check ran its command (duration and «السجل»). Defaults from the status (lib/results.ts checkRan):
+     *  queued and the not-run results (skipped, not applicable, missing, unavailable…) did not. */
+    ran?: boolean;
     /** The checkbox: adds the check to the selection. */
     selected?: boolean;
     /** Running only: shows the log tail and the provisional findings. */
     expanded?: boolean;
-    logTail?: readonly LogTailLine[];
+    /** The last lines of the log (redactions and bidi controls drawn as in Log viewer). */
+    logTail?: readonly LogLine[];
     provisionalFindings?: readonly string[];
     onselectchange?: (selected: boolean) => void;
     /** Enter on the row: show it in the inspector. */
@@ -68,6 +73,7 @@
     silentFor,
     provisionalCount = 0,
     duration,
+    ran,
     selected = $bindable(false),
     expanded = false,
     logTail = [],
@@ -81,7 +87,7 @@
 
   const cycle = $derived(isCycle(status) ? status : undefined);
   const running = $derived(status === 'running' || status === 'cancelling');
-  const started = $derived(status !== 'queued');
+  const started = $derived(ran ?? checkRan(status));
   const stepText = $derived(
     step === undefined
       ? undefined
@@ -148,12 +154,8 @@
       {#if logTail.length}
         <p class="label">{t('results.checkRow.logTail')}</p>
         <div class="log-tail" dir="ltr">
-          {#each logTail as line, i (i)}
-            <span class="log-line" class:muted={line.muted}>
-              {#each logPieces([{ kind: 'text', text: line.text }], '') as piece, j (j)}
-                {#if piece.kind === 'text'}{piece.parts.map((p) => p.text).join('')}{:else if piece.kind === 'control'}<span class="control" title={piece.name}>⟦{codePointLabel(piece.codePoint)}⟧</span>{/if}
-              {/each}
-            </span>
+          {#each logTail as line (line.number)}
+            <span class="log-line" class:muted={line.muted}><LogLineText segments={line.segments} /></span>
           {/each}
         </div>
       {/if}
@@ -280,19 +282,13 @@
     color: var(--text-primary);
   }
   .log-line {
+    display: flex;
+    align-items: center;
     height: 20px;
-    white-space: pre;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
   .log-line.muted {
     color: var(--text-secondary);
-  }
-  .control {
-    padding-inline: var(--space-4);
-    border: 1px solid var(--border-strong);
-    border-radius: 4px;
-    background: var(--bg-surface);
   }
   .finding {
     display: flex;

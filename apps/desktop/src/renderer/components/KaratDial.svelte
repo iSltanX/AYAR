@@ -39,22 +39,24 @@
   }
 
   const geometry = $derived(GEOMETRY[size]);
-  const filled = $derived(value === null ? 0 : Math.max(0, Math.min(TOTAL, Math.floor(value))));
+  // A value that is not a finite number is treated as no scope, never as zero (D-DES2-07).
+  const scoped = $derived(value !== null && Number.isFinite(value));
+  const filled = $derived(scoped ? Math.max(0, Math.min(TOTAL, Math.floor(value as number))) : 0);
   const segments = $derived(
     Array.from({ length: TOTAL }, (_, i) => ({ d: segment(i, geometry.box, geometry.ring, geometry.gap), on: i < filled })),
   );
   const name = $derived(
-    alone ? (value === null ? t('status.purity.noMeasurableScope') : t('status.karat.value', { value: filled, total: TOTAL })) : undefined,
+    alone ? (!scoped ? t('status.purity.noMeasurableScope') : t('status.karat.value', { value: filled, total: TOTAL })) : undefined,
   );
 </script>
 
 <span
   class="dial {size} {tone}"
-  class:none={value === null}
+  class:none={!scoped}
   role={alone ? 'img' : undefined}
   aria-label={name}
   aria-hidden={alone ? undefined : 'true'}
-  data-value={value ?? 'none'}
+  data-value={scoped ? filled : 'none'}
 >
   <svg xmlns="http://www.w3.org/2000/svg" width={geometry.box} height={geometry.box} viewBox="0 0 {geometry.box} {geometry.box}" focusable="false" aria-hidden="true">
     {#each segments as s, i (i)}<path class:on={s.on} d={s.d} />{/each}

@@ -121,7 +121,7 @@
   {/each}
 </Row>
 
-<Row title="Inspector · interaction states (not Figma variants): the Log tab of a check, «للنموذج» of a finding, a needs-review finding (no «سجّل مراجعة»)">
+<Row title="Inspector · interaction states (not Figma variants): the Log tab of a check, For the model view of a finding, a needs-review finding (no Record review)">
   <Demo name="Inspector/check/log-tab" figma="111:7922" w={380}>
     <Inspector content={check} tab="log" />
   </Demo>

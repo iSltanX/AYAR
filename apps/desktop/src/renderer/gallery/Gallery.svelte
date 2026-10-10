@@ -42,7 +42,7 @@
     </label>
   </header>
 
-  <div class="sections">
+  <main class="sections">
     {#each shown as s (s.id)}
       <section class="section" data-section={s.id} aria-labelledby="h-{s.id}">
         <h2 id="h-{s.id}">{s.id} · {s.title} <code>{s.figma}</code></h2>
@@ -61,7 +61,7 @@
         </div>
       </section>
     {/each}
-  </div>
+  </main>
 </div>
 
 <style>

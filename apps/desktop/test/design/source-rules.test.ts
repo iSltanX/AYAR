@@ -36,6 +36,30 @@ function styles(svelte: string): string {
 }
 const stripCssComments = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, '');
 
+/** A template with every {…} expression (nested braces and string literals included) replaced by a space. */
+function withoutExpressions(tpl: string): string {
+  let out = '';
+  let depth = 0;
+  let quote = '';
+  for (let i = 0; i < tpl.length; i++) {
+    const c = tpl[i]!;
+    if (depth === 0) {
+      if (c === '{') depth = 1;
+      else out += c;
+      continue;
+    }
+    if (quote) {
+      if (c === '\\') i++;
+      else if (c === quote) quote = '';
+      continue;
+    }
+    if (c === "'" || c === '"' || c === '`') quote = c;
+    else if (c === '{') depth++;
+    else if (c === '}' && --depth === 0) out += ' ';
+  }
+  return out;
+}
+
 describe('semantic colour (D-16, D-49)', () => {
   it('names the green and red primitives nowhere outside the generated tokens', () => {
     const hits = sources.filter((f) => /--(green|red)-\d/.test(read(f))).map(rel);
@@ -85,6 +109,25 @@ describe('CSP and safe rendering (15.2, C-03)', () => {
     expect(offenders).toEqual([]);
   });
 
+  it('writes no inline style, HTML or code from strings in scripts (CSSOM setProperty only)', () => {
+    const forbidden = [
+      /setAttribute\(\s*['"]style['"]/,
+      /\.cssText\b/,
+      /\.(inner|outer)HTML\b/,
+      /insertAdjacentHTML/,
+      /document\.write/,
+      /\beval\s*\(/,
+      /new\s+Function\b/,
+      /createContextualFragment/,
+    ];
+    const offenders: string[] = [];
+    for (const f of sources.filter((x) => /\.(svelte|ts)$/.test(x))) {
+      const text = f.endsWith('.svelte') ? [...read(f).matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]).join('\n') + template(read(f)) : read(f);
+      for (const re of forbidden) if (re.test(text)) offenders.push(`${rel(f)}: ${re}`);
+    }
+    expect(offenders).toEqual([]);
+  });
+
   it('has no inline <style> or inline script in the HTML entries', () => {
     for (const f of sources.filter((x) => x.endsWith('.html'))) {
       const html = read(f);
@@ -104,12 +147,18 @@ describe('no hard-coded text in components (C-24)', () => {
     expect(components.filter((f) => /[؀-ۿ]/.test(template(read(f)))).map(rel)).toEqual([]);
   });
 
-  it('writes no English words as markup text in component templates', () => {
+  it('writes no English words as markup text or literal labels in component templates', () => {
     const offenders: string[] = [];
     for (const f of components) {
-      // Text between tags that is not an expression: >Some words<
-      for (const m of template(read(f)).matchAll(/>([^<>{}]*)</g)) {
-        if (/[A-Za-z]{2,}/.test(m[1]!)) offenders.push(`${rel(f)}: ${m[1]!.trim()}`);
+      const tpl = withoutExpressions(template(read(f)));
+      // Text between tags, with expressions and block tags removed: ">Copy {x}<" still counts as "Copy".
+      for (const m of tpl.matchAll(/>([^<>]*)</g)) {
+        const text = m[1]!.replace(/&#?\w+;/g, ' ');
+        if (/[A-Za-z]{2,}/.test(text)) offenders.push(`${rel(f)}: ${text.trim()}`);
+      }
+      // User-visible attributes written as literals.
+      for (const m of tpl.matchAll(/\s(aria-label|aria-description|aria-valuetext|aria-roledescription|title|placeholder|alt)="([^"{]*)"/g)) {
+        if (/[A-Za-z\u0600-\u06FF]{2,}/.test(m[2]!)) offenders.push(`${rel(f)}: ${m[1]}="${m[2]}"`);
       }
     }
     expect(offenders).toEqual([]);

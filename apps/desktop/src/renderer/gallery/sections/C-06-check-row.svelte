@@ -5,7 +5,7 @@
 <script lang="ts">
   import CheckRow from '../../components/CheckRow.svelte';
   import { useLocale } from '../../lib/locale.ts';
-  import type { LogTailLine } from '../../lib/results.ts';
+  import type { LogLine } from '../../lib/evidence.ts';
   import Demo from '../Demo.svelte';
   import Row from '../Row.svelte';
 
@@ -14,10 +14,15 @@
     ar: { name: 'اختبارات الوحدة', step: 'يشغّل vitest', findings: ['يختلف ناتج توحيد الألف عن المتوقع', 'اختبار ينتظر ملفًا غير موجود'] },
     en: { name: 'Unit tests', step: 'Running vitest', findings: ['Alef normalisation differs from expected', 'A test waits for a missing file'] },
   }[lang];
-  const logTail: LogTailLine[] = [
-    { text: '✓ normalize › trims spaces (4 ms)', muted: true },
-    { text: '✓ normalize › keeps diacritics (2 ms)', muted: true },
-    { text: '✗ normalize › folds alef forms' },
+  const logTail: LogLine[] = [
+    { number: 12, muted: true, segments: [{ kind: 'text', text: '✓ normalize › trims spaces (4 ms)' }] },
+    { number: 13, muted: true, segments: [{ kind: 'text', text: '✓ normalize › keeps diacritics (2 ms)' }] },
+    { number: 14, segments: [{ kind: 'text', text: '✗ normalize › folds alef forms' }] },
+  ];
+  // A secret in the tail is drawn as the redaction tag, never as its value (shared LogLineText, C-13).
+  const redactedTail: LogLine[] = [
+    ...logTail.slice(0, 2),
+    { number: 14, segments: [{ kind: 'text', text: 'GITHUB_TOKEN=' }, { kind: 'redacted', what: { ar: 'رمز GitHub', en: 'GitHub token' }[lang] }] },
   ];
   const running = { step: S.step, stepDone: 12, stepTotal: 40, lastActivitySeconds: 3, provisionalCount: 2, duration: '1:42' };
   const states = [false, true] as const;
@@ -57,6 +62,11 @@
     </div>
   {/each}
   <div class="w720">
+    <Demo name="Check row/final/skipped (never ran: no duration, no Log)" figma="104:4196" h={40} w={720}>
+      <div class="frame"><CheckRow status="skipped" name={S.name} id="beh.unit" duration="0:00" /></div>
+    </Demo>
+  </div>
+  <div class="w720">
     <Demo name="Check row/final/passed-reviewed" figma="104:4196" h={40} w={720}>
       <div class="frame"><CheckRow status="passed-reviewed" name={S.name} id="beh.unit" duration="2:05" /></div>
     </Demo>
@@ -68,6 +78,13 @@
     <Demo name="Check row/running-expanded" figma="104:4196" h={256} w={720}>
       <div class="frame">
         <CheckRow status="running" name={S.name} id="beh.unit" {...running} expanded {logTail} provisionalFindings={S.findings} />
+      </div>
+    </Demo>
+  </div>
+  <div class="w720">
+    <Demo name="Check row/running-expanded/redacted tail" figma="104:4196" h={256} w={720}>
+      <div class="frame">
+        <CheckRow status="running" name={S.name} id="beh.unit" {...running} expanded logTail={redactedTail} provisionalFindings={S.findings} />
       </div>
     </Demo>
   </div>

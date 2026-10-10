@@ -49,7 +49,7 @@
   {#each [true, false] as expanded (expanded)}
     <div class="scroll">
       <Demo name="Table group row/{expanded ? 'expanded' : 'collapsed'}" figma="112:7977" h={32} w={720}>
-        <div class="frame" role="table" aria-label={t('ui.tab.findings')}>
+        <div class="frame" role="grid" aria-label={t('ui.tab.findings')}>
           <TableGroupRow title={t('ui.section.security')} count={3} {expanded} />
         </div>
       </Demo>

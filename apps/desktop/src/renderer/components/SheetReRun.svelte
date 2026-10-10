@@ -5,8 +5,18 @@
   // end (numeric/live, text/secondary); a status with no checks is disabled and unchecked. Then the dependency
   // line (body/small) and the primary «أعد (N)», N = the selected checks plus the ones the re-run needs first.
   // The focus opens on «ألغِ».
+  import { untrack } from 'svelte';
   import { useLocale } from '../lib/locale.ts';
-  import { RERUN_PRESETS, rerunDefaults, rerunTotal, type RerunStatus, type RerunVariant, type SheetMode } from '../lib/sheets.ts';
+  import {
+    RERUN_PRESETS,
+    rerunDefaults,
+    rerunTotal,
+    sheetResetKey,
+    sheetResetter,
+    type RerunStatus,
+    type RerunVariant,
+    type SheetMode,
+  } from '../lib/sheets.ts';
   import Button from './Button.svelte';
   import Checkbox from './Checkbox.svelte';
   import Sheet from './Sheet.svelte';
@@ -17,14 +27,22 @@
     counts: Partial<Record<RerunStatus, number>>;
     /** Names of the checks the re-run adds first (e.g. «البناء»), already localised. */
     dependencies?: readonly string[];
-    /** The selected statuses; the variant's preset by default. */
+    /** The selected statuses: the variant's preset on every opening and whenever the variant or counts change. */
     selected?: RerunStatus[];
     onrerun?: (statuses: RerunStatus[]) => void;
   }
   let { variant, counts, dependencies = [], selected = $bindable(rerunDefaults(variant, counts)), onrerun, open, inline, oncancel }: Props = $props();
   const { t, lang } = useLocale();
 
-  const total = $derived(rerunTotal(selected, counts, dependencies.length));
+  // Reset on every opening and when the variant or the counts change (Sheet.svelte contract).
+  const shouldReset = sheetResetter();
+  $effect.pre(() => {
+    if (shouldReset(open, sheetResetKey(variant, counts))) untrack(() => (selected = rerunDefaults(variant, counts)));
+  });
+  /** Only statuses this variant offers and that have checks. */
+  const current = $derived(RERUN_PRESETS[variant].map(([s]) => s).filter((s) => selected.includes(s) && (counts[s] ?? 0) > 0));
+
+  const total = $derived(rerunTotal(current, counts, dependencies.length));
   const list = $derived(new Intl.ListFormat(lang, { type: 'conjunction' }).format(dependencies));
 
   function toggle(status: RerunStatus, on: boolean) {
@@ -52,7 +70,7 @@
   {/if}
   {#snippet footer()}
     <Button data-initial-focus onclick={oncancel}>{t('ui.action.cancel')}</Button>
-    <Button kind="primary" disabled={total === 0} onclick={() => onrerun?.([...selected])}>{t('sheets.rerun.submit', { count: total })}</Button>
+    <Button kind="primary" disabled={total === 0} onclick={() => onrerun?.([...current])}>{t('sheets.rerun.submit', { count: total })}</Button>
   {/snippet}
 </Sheet>
 

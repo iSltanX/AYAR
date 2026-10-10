@@ -31,6 +31,7 @@ beforeAll(async () => {
   await run.page.evaluate(() => {
     const w = window as unknown as { __csp: string[] };
     w.__csp = [];
+    performance.setResourceTimingBufferSize(10_000);
     document.addEventListener('securitypolicyviolation', (e) => w.__csp.push(`${e.violatedDirective} ${e.blockedURI}`));
   });
 });
@@ -77,6 +78,7 @@ describe('geometry against Figma (task 6, measurable part)', () => {
   it('gives every specimen the height and width Figma gives it (±1 px), in both languages', async () => {
     for (const lang of ['ar', 'en'] as const) {
       await showGallery(run.page, { lang, theme: 'light' });
+      expect(await run.page.$$eval('[data-expect-h], [data-expect-w]', (els) => els.length)).toBeGreaterThan(300);
       const off = await run.page.$$eval('[data-expect-h], [data-expect-w]', (els) =>
         els.flatMap((el) => {
           const target = el.firstElementChild ?? el;
@@ -180,10 +182,16 @@ describe('accessibility (AT-40 part, NFR-04)', () => {
       await run.page.keyboard.press('Shift'); // a key press makes the focus keyboard focus (:focus-visible)
       const ring = await h.evaluate((el: HTMLElement) => {
         const s = getComputedStyle(el);
-        return { visible: el.matches(':focus-visible'), style: s.outlineStyle, width: s.outlineWidth, offset: s.outlineOffset, html: el.outerHTML.slice(0, 80) };
+        // The ring colour is the ink: the resolved --focus-ring of the element's theme.
+        const probe = document.createElement('span');
+        probe.style.setProperty('color', 'var(--focus-ring)');
+        el.parentElement!.appendChild(probe);
+        const ink = getComputedStyle(probe).color;
+        probe.remove();
+        return { visible: el.matches(':focus-visible'), style: s.outlineStyle, width: s.outlineWidth, offset: s.outlineOffset, colour: s.outlineColor === ink, html: el.outerHTML.slice(0, 80) };
       });
       checked++;
-      if (!ring.visible || ring.style !== 'solid' || ring.width !== '2px' || ring.offset !== '2px') missing.push(`${ring.html} ${ring.style} ${ring.width} ${ring.offset}`);
+      if (!ring.visible || ring.style !== 'solid' || ring.width !== '2px' || ring.offset !== '2px' || !ring.colour) missing.push(`${ring.html} ${ring.style} ${ring.width} ${ring.offset} ink=${ring.colour}`);
     }
     expect(missing).toEqual([]);
     expect(checked).toBeGreaterThan(10);
@@ -265,6 +273,7 @@ describe('reduced motion (16.6, D-DES2-11)', () => {
           animation: getComputedStyle(e.querySelector('.spin')!).animationName,
         })),
       );
+    expect((await state()).length).toBeGreaterThan(0);
     expect((await state()).every((s) => s.moving && !s.still && /spin/.test(s.animation))).toBe(true);
     await run.page.emulateMedia({ reducedMotion: 'reduce' });
     expect((await state()).every((s) => !s.moving && s.still)).toBe(true);

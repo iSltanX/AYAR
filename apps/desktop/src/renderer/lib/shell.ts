@@ -2,6 +2,7 @@
 // C-20 banners and toasts, C-22 selection bar). Presentational only: no bridge or engine calls.
 import type { MessageKey } from '@ayar/i18n';
 import type { LucideName } from '../design/icons.generated.ts';
+import { splitPath, type PathPiece } from './evidence.ts';
 import type { Result } from './status.ts';
 
 /** Where macOS draws the window buttons (D-54): decided by the main process from the system language. */
@@ -67,13 +68,16 @@ export function isoDuration(seconds: number): string {
 }
 
 /**
- * A path split for display (D-DES3-04): one segment per entry (each rendered in its own <bdi>), the middle
- * collapsed to "…" when there are more than `keep` segments (the project switcher's middle truncation).
+ * The project path for display (D-DES3-04): its segments from splitPath (each one rendered in its own <bdi>),
+ * the middle collapsed to "…" when there are more than `keep` segments (the project switcher's middle
+ * truncation). `absolute` says whether a leading slash comes first.
  */
-export function pathSegments(path: string, keep = 3): string[] {
-  const parts = path.split('/').filter((p, i) => p !== '' || i === 0);
-  if (parts.length <= keep) return parts;
-  return [parts[0]!, '…', ...parts.slice(parts.length - (keep - 1))];
+export function pathSegments(path: string, keep = 3): { absolute: boolean; segments: PathPiece[] } {
+  const { head, tail } = splitPath(path);
+  const parts = [...head, ...tail].filter((p) => p.text !== '/');
+  const segments =
+    parts.length <= keep ? parts : [parts[0]!, { text: '…', rtl: false }, ...parts.slice(parts.length - (keep - 1))];
+  return { absolute: path.startsWith('/'), segments };
 }
 
 /**
@@ -88,3 +92,21 @@ export function splitAround(text: string, marker: string): [string, string] {
 
 /** A marker that never occurs in a message, used with splitAround. */
 export const SLOT = '\u{E000}';
+
+/** A fraction in [0, 1]; anything not finite (NaN, ±Infinity from a bad input) counts as 0. */
+export function clampFraction(value: number): number {
+  return Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
+}
+
+/**
+ * A count for a progress bar, made valid: whole numbers, total ≥ 0, done within [0, total]. `fraction` is 0 when
+ * the total is 0 (nothing to do yet), never NaN.
+ */
+export function countProgress(done: number, total: number): { done: number; total: number; fraction: number } {
+  const t = Number.isFinite(total) ? Math.max(0, Math.floor(total)) : 0;
+  const d = Number.isFinite(done) ? Math.min(t, Math.max(0, Math.floor(done))) : 0;
+  return { done: d, total: t, fraction: t > 0 ? d / t : 0 };
+}
+
+/** What a toast says was copied (Toast 117:9781: Kind report | card | instructions). */
+export type ToastMessage = { kind: 'report'; count: number } | { kind: 'card' | 'instructions'; id: string };

@@ -16,6 +16,7 @@
   import Row from '../Row.svelte';
 
   const { t, lang } = useLocale();
+  const uid = $props.id();
   const S = {
     ar: {
       project: 'مكتبة «النصوص»',
@@ -88,7 +89,7 @@
 {/snippet}
 
 <Row title="Window frame (102:2570) · Controls left / right · Run bar · Inspector · 1360×860 (minimum 1100×720)">
-  {#each frames as f (f.name)}
+  {#each frames as f, i (f.name)}
     <div class="scroll">
       <div class="frame">
         <Demo name="Window frame/{f.name}" figma="102:2570" h={860} w={1360} width="fill">
@@ -99,6 +100,7 @@
               breadcrumb={crumbs}
               primary={{ label: t('ui.action.startFullScan') }}
               inspectorOpen={f.inspector !== 'none'}
+              inspectorId={f.inspector === 'real' ? `inspector-${uid}-${i}` : undefined}
               runbar={f.runbar ? runBar : undefined}
             >
               {#snippet search()}<SearchField width={200} />{/snippet}
@@ -112,7 +114,7 @@
               {#snippet content()}<p class="placeholder">{S.content}</p>{/snippet}
               {#snippet inspector()}
                 {#if f.inspector === 'real'}
-                  <Inspector content={check} />
+                  <Inspector content={check} id={`inspector-${uid}-${i}`} />
                 {:else}
                   <p class="placeholder slot">{S.inspector}</p>
                 {/if}

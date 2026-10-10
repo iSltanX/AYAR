@@ -23,8 +23,8 @@
     variant?: SectionCardVariant;
     /** The section name in the UI language. */
     name: string;
-    /** default: the section karat 0..24 and its number of required criteria. */
-    karat?: number;
+    /** default: the section karat 0..24 (null: no measurable scope, never shown as 0) and its required criteria. */
+    karat?: number | null;
     criteria?: number;
     /** default: the latest result counts; zero counts are left out. */
     counts?: SectionCounts;
@@ -40,7 +40,7 @@
   let {
     variant = 'default',
     name,
-    karat = 0,
+    karat = null,
     criteria = 0,
     counts = {},
     readiness,

@@ -4,8 +4,9 @@
   // «عطّل سكربتات التثبيت». Footer: «ألغِ» · «نفّذ…» (primary; the engine executes with a token bound to this
   // preview). The focus opens on «ألغِ».
   import { formatNumber } from '@ayar/i18n';
+  import { untrack } from 'svelte';
   import { useLocale } from '../lib/locale.ts';
-  import type { SetupPreviewData, SheetMode } from '../lib/sheets.ts';
+  import { sheetResetKey, sheetResetter, type SetupPreviewData, type SheetMode } from '../lib/sheets.ts';
   import Button from './Button.svelte';
   import Checkbox from './Checkbox.svelte';
   import CommandBlock from './CommandBlock.svelte';
@@ -24,6 +25,12 @@
   }
   let { data, disableInstallScripts = $bindable(false), onapply, oncopy, open, inline, oncancel }: Props = $props();
   const { t, lang } = useLocale();
+
+  // Reset on every opening and when the preview changes (Sheet.svelte contract).
+  const shouldReset = sheetResetter();
+  $effect.pre(() => {
+    if (shouldReset(open, sheetResetKey(data))) untrack(() => (disableInstallScripts = false));
+  });
 </script>
 
 <Sheet title={t('sheets.setupPreview.title', { action: data.action })} {open} {inline} {oncancel}>

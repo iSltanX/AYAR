@@ -2,8 +2,8 @@
   // Tabs bar (Figma 100:607, C-18): Tab items in reading order from the start side, gap 4, over a 1 px
   // border/subtle baseline (decorative); it fills its container (380 in the inspector, 720 in the results).
   // Kind inspector: التفاصيل | السجل. Kind results: الاكتشافات | الفحوص | الأدلة | الآثار الجانبية (TAB_SETS).
-  // A tablist with one tab stop on the selected tab; the arrow keys (following the reading direction), Home and
-  // End move and select (automatic activation). `panelId` wires aria-controls to the caller's tab panels.
+  // A horizontal tablist with one tab stop on the selected tab; Left/Right (following the reading direction),
+  // Home and End move and select (automatic activation). `panelId` wires aria-controls to the caller's tab panels.
   import { arrowTarget, TAB_SETS, type ControlOption, type TabsKind } from '../lib/controls.ts';
   import { useLocale } from '../lib/locale.ts';
   import Tab from './Tab.svelte';
@@ -40,7 +40,7 @@
     }
   }
   function keydown(e: KeyboardEvent) {
-    const to = arrowTarget(e, current, enabled);
+    const to = arrowTarget(e, current, enabled, 'horizontal');
     if (to === null) return;
     e.preventDefault();
     select(to);

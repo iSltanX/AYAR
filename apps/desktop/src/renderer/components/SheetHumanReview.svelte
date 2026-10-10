@@ -6,8 +6,19 @@
   // model-claim: the claim (bg/sunken box, radius/card, padding 12, gap 8: the purple model-claim Tag, its id in
   // mono text/tertiary, the claim in body) and only two decisions: «حوّل إلى بطاقة» · «ليس مشكلة». Footer:
   // «ألغِ» · «سجّل المراجعة». The focus opens on «ألغِ».
+  import { untrack } from 'svelte';
   import { useLocale } from '../lib/locale.ts';
-  import { REVIEW_DECISIONS, type ModelClaim, type ReviewDecision, type ReviewRecord, type ReviewVariant, type SheetMode } from '../lib/sheets.ts';
+  import {
+    REVIEW_DECISIONS,
+    sheetResetKey,
+    sheetResetter,
+    validDecision,
+    type ModelClaim,
+    type ReviewDecision,
+    type ReviewRecord,
+    type ReviewVariant,
+    type SheetMode,
+  } from '../lib/sheets.ts';
   import Button from './Button.svelte';
   import PathPill from './PathPill.svelte';
   import RadioGroup from './RadioGroup.svelte';
@@ -24,6 +35,7 @@
     scope?: string;
     /** model-claim: the claim under review. */
     claim?: ModelClaim;
+    /** The variant's first decision and an empty note on every opening and whenever the subject changes. */
     decision?: ReviewDecision;
     note?: string;
     onrecord?: (record: ReviewRecord) => void;
@@ -47,6 +59,19 @@
   const { t } = useLocale();
   const uid = $props.id();
 
+  // Reset on every opening and when what is reviewed changes (Sheet.svelte contract).
+  const shouldReset = sheetResetter();
+  $effect.pre(() => {
+    if (shouldReset(open, sheetResetKey(variant, subject, scope, claim))) {
+      untrack(() => {
+        decision = REVIEW_DECISIONS[variant][0][0];
+        note = '';
+      });
+    }
+  });
+  /** Never a decision the variant does not offer. */
+  const current = $derived(validDecision(variant, decision));
+
   const options = $derived(REVIEW_DECISIONS[variant].map(([value, key]) => ({ value, label: t(key) })));
   const title = $derived(variant === 'check' ? t('sheets.review.titleCheck', { subject }) : t('sheets.review.titleClaim'));
 </script>
@@ -62,7 +87,7 @@
     </div>
   {/if}
   <SheetField label={t('sheets.review.decision')}>
-    <RadioGroup bind:value={decision} {options} label={t('sheets.review.decision')} />
+    <RadioGroup value={current} onchange={(v: ReviewDecision) => (decision = v)} {options} label={t('sheets.review.decision')} />
   </SheetField>
   {#if variant === 'check' && scope !== undefined}
     <SheetField label={t('ui.scope.review')}>
@@ -80,7 +105,7 @@
   {/if}
   {#snippet footer()}
     <Button data-initial-focus onclick={oncancel}>{t('ui.action.cancel')}</Button>
-    <Button kind="primary" onclick={() => onrecord?.({ decision, note: note.trim() })}>{t('sheets.review.submit')}</Button>
+    <Button kind="primary" onclick={() => onrecord?.({ decision: current, note: note.trim() })}>{t('sheets.review.submit')}</Button>
   {/snippet}
 </Sheet>
 

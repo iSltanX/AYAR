@@ -1,19 +1,10 @@
 // Types and pure helpers of the results components (C-06, C-07, C-09, C-17, C-24 bar, C-27, C-28, C-29 of the
 // Figma Components page). Nothing here touches the engine; the components stay presentational.
 import type { MessageKey } from '@ayar/i18n';
-import type { Attachment } from 'svelte/attachments';
+import { hasRtl } from './evidence.ts';
 import type { BadgeResult, Cycle, Result } from './status.ts';
 import { CYCLES } from './status.ts';
 import type { CrossRun, Proof, Severity } from './tags.ts';
-
-/** Left-to-Right Isolate … Pop Directional Isolate: keeps an id or a date in its own order inside a sentence. */
-const LRI = '⁦';
-const PDI = '⁩';
-
-/** Wraps a left-to-right value (an id, a date, a version) for an ICU placeholder inside a translated sentence. */
-export function isolate(value: string): string {
-  return `${LRI}${value}${PDI}`;
-}
 
 /* ---------------------------------------------------------------- C-06 Check row (104:4196) */
 
@@ -24,10 +15,16 @@ export function isCycle(status: CheckRowStatus): status is Cycle {
   return (CYCLES as readonly string[]).includes(status);
 }
 
-/** A line of the log tail in an expanded running row. `muted` lines are text/secondary (runner chatter). */
-export interface LogTailLine {
-  readonly text: string;
-  readonly muted?: boolean;
+/** Final results that mean the check never ran its command: no duration and no log («السجل») on the row. */
+export const NOT_RUN_RESULTS = ['skipped', 'not-applicable', 'missing', 'missing-configuration', 'unavailable'] as const satisfies readonly BadgeResult[];
+
+/**
+ * Whether a check row's check ran (and so has a duration and a log): running or cancelling, or a final result
+ * other than the not-run ones. A check cancelled before it started passes `ran: false` to the row explicitly.
+ */
+export function checkRan(status: CheckRowStatus): boolean {
+  if (isCycle(status)) return status !== 'queued';
+  return !(NOT_RUN_RESULTS as readonly string[]).includes(status);
 }
 
 /* ---------------------------------------------------------------- C-07 Finding row, C-17 Table */
@@ -52,24 +49,45 @@ export interface Finding {
   readonly provisional?: boolean;
 }
 
-/** The columns of Table Kind=findings (112:8213), from the start side after the select column. */
+/**
+ * The columns of Table Kind=findings (112:8213), from the start side after the select column. Their widths
+ * (28 · 64 · 112 · title · 196 · 80 · 64) are ONE CSS definition, --finding-columns on .findings-grid in
+ * FindingRow.svelte, shared by the header row and every finding row.
+ */
 export const FINDING_COLUMNS = [
-  { id: 'severity', key: 'glossary.severity', width: 64 },
-  { id: 'proof', key: 'results.table.column.proof', width: 112 },
-  { id: 'title', key: 'results.table.column.title', width: 'grow' },
-  { id: 'location', key: 'results.table.column.location', width: 196 },
-  { id: 'check', key: 'results.table.column.check', width: 80 },
-  { id: 'crossRun', key: 'results.table.column.crossRun', width: 64 },
-] as const satisfies readonly { id: string; key: MessageKey; width: number | 'grow' }[];
+  { id: 'severity', key: 'glossary.severity' },
+  { id: 'proof', key: 'results.table.column.proof' },
+  { id: 'title', key: 'results.table.column.title' },
+  { id: 'location', key: 'results.table.column.location' },
+  { id: 'check', key: 'results.table.column.check' },
+  { id: 'crossRun', key: 'results.table.column.crossRun' },
+] as const satisfies readonly { id: string; key: MessageKey }[];
 export type FindingColumn = (typeof FINDING_COLUMNS)[number]['id'];
 
-/** The grid columns shared by the header row and every finding row: the select column (28), then the above. */
-export const FINDING_GRID = ['28px', ...FINDING_COLUMNS.map((c) => (c.width === 'grow' ? 'minmax(0, 1fr)' : `${c.width}px`))].join(' ');
+/** A run of a title: `ltr` runs are Latin words inside a right-to-left title. */
+export interface TextRun {
+  readonly text: string;
+  readonly ltr: boolean;
+}
 
-/** Sets --finding-columns from script (no inline style, CSP 15.2), so the header and the rows share one grid. */
-export const findingGrid: Attachment<HTMLElement> = (el) => {
-  el.style.setProperty('--finding-columns', FINDING_GRID);
-};
+/**
+ * Splits a right-to-left title around its Latin runs ("GitHub", "vitest run"), so each run can be drawn as one
+ * isolated unit: an end-truncated line then hides a run whole instead of cutting its first letters off (in an
+ * Arabic line the visual end of a Latin run is its start). A title with no right-to-left letter is one run.
+ */
+export function textRuns(text: string): TextRun[] {
+  if (!hasRtl(text)) return [{ text, ltr: false }];
+  const out: TextRun[] = [];
+  const latin = /[A-Za-z][\w.\-/:()]*(?:\s+[A-Za-z][\w.\-/:()]*)*/g;
+  let at = 0;
+  for (const m of text.matchAll(latin)) {
+    if (m.index > at) out.push({ text: text.slice(at, m.index), ltr: false });
+    out.push({ text: m[0], ltr: true });
+    at = m.index + m[0].length;
+  }
+  if (at < text.length) out.push({ text: text.slice(at), ltr: false });
+  return out;
+}
 
 export type SortDirection = 'asc' | 'desc';
 export interface TableSort<C extends string = string> {

@@ -85,5 +85,6 @@
   "results.inspector.rule": "Rule and source",
   "results.inspector.firstSeen": "First seen",
   "results.inspector.logTitle": "Log line {line} · {check}",
-  "results.inspector.actions": "Finding actions"
+  "results.inspector.actions": "Finding actions",
+  "results.inspector.tabs": "Check details and log"
 }

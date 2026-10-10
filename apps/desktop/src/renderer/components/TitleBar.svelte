@@ -29,9 +29,11 @@
     /** The search field (C-18 Search field, 200 wide). */
     search?: Snippet;
     inspectorOpen?: boolean;
+    /** The id of the inspector the toggle shows and hides (aria-controls). */
+    inspectorId?: string;
     oninspectortoggle?: () => void;
   }
-  let { controls, title, breadcrumb = [], primary, search, inspectorOpen = true, oninspectortoggle }: Props = $props();
+  let { controls, title, breadcrumb = [], primary, search, inspectorOpen = true, inspectorId, oninspectortoggle }: Props = $props();
   const { t, dir } = useLocale();
   const chevron = $derived(dir === 'rtl' ? 'chevron-left' : 'chevron-right');
 </script>
@@ -56,6 +58,7 @@
         icon={dir === 'rtl' ? 'panel-left' : 'panel-right'}
         label={t('controls.inspectorToggle')}
         aria-pressed={inspectorOpen}
+        aria-controls={inspectorId}
         onclick={() => oninspectortoggle?.()}
       />
     </div>

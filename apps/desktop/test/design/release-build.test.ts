@@ -14,8 +14,12 @@ describe('release build without the gallery', () => {
   it('packages only after a fresh build, and the e2e tests build the gallery separately', () => {
     const pkg = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')) as { scripts: Record<string, string> };
     expect(pkg.scripts['package']).toMatch(/^npm run build && electron-forge package$/);
-    expect(pkg.scripts['build']).not.toContain('AYAR_GALLERY');
+    // The release build clears an inherited AYAR_GALLERY, and the e2e run restores the release renderer
+    // after its tests, whatever their outcome, so dist/ never keeps the gallery.
+    expect(pkg.scripts['build']).toMatch(/^AYAR_GALLERY= vite build -c vite\.renderer\.config\.ts && /);
+    expect(pkg.scripts['build']).not.toContain('AYAR_GALLERY=1');
     expect(pkg.scripts['build:gallery']).toContain('AYAR_GALLERY=1');
+    expect(pkg.scripts['test:e2e']).toMatch(/status=\$\?; AYAR_GALLERY= vite build -c vite\.renderer\.config\.ts[^;]*; exit \$status\)$/);
   });
 
   it('keeps the app entry free of the gallery', () => {

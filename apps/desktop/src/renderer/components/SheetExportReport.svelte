@@ -4,11 +4,13 @@
   // them). The evidence bundle adds «ضمّن اللقطات»; when it is checked the note «قد تظهر في اللقطات بيانات من
   // واجهتك» appears. «صدّر…» hands the choice to the caller, which opens the native save panel. The focus opens
   // on «ألغِ».
+  import { untrack } from 'svelte';
   import { useLocale } from '../lib/locale.ts';
   import {
     EXPORT_CONTENTS,
     EXPORT_FORMATS,
     EXPORT_LANGUAGES,
+    sheetResetter,
     type ExportChoice,
     type ExportContent,
     type ExportFormat,
@@ -22,6 +24,8 @@
   import SheetField from './SheetField.svelte';
   import SheetNote from './SheetNote.svelte';
 
+  // On every opening the choice goes back to its defaults (Sheet.svelte contract): Markdown, the UI language,
+  // both reports, screenshots not included.
   interface Props extends SheetMode {
     format?: ExportFormat;
     language?: ExportLanguage;
@@ -29,9 +33,10 @@
     includeScreenshots?: boolean;
     onexport?: (choice: ExportChoice) => void;
   }
+  const { t, lang } = useLocale();
   let {
     format = $bindable('markdown'),
-    language = $bindable('ar'),
+    language = $bindable(lang),
     content = $bindable('both'),
     includeScreenshots = $bindable(false),
     onexport,
@@ -39,7 +44,18 @@
     inline,
     oncancel,
   }: Props = $props();
-  const { t } = useLocale();
+
+  const shouldReset = sheetResetter();
+  $effect.pre(() => {
+    if (shouldReset(open, '')) {
+      untrack(() => {
+        format = 'markdown';
+        language = lang;
+        content = 'both';
+        includeScreenshots = false;
+      });
+    }
+  });
   const uid = $props.id();
 
   const options = <T extends string>(table: Record<T, Parameters<typeof t>[0]>) =>

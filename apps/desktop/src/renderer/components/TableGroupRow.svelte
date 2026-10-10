@@ -3,7 +3,8 @@
   // line under it. The disclosure chevron (16, text/secondary), the group title (body/strong) and its count
   // (numeric/live, text/secondary). Expanded = chevron-down; collapsed = chevron-left in Arabic and
   // chevron-right in English (it follows the reading direction). Hover = bg/sunken. The whole row is one toggle
-  // button with aria-expanded, so the focus ring surrounds the row. A role=row: it lives inside Table.
+  // button with aria-expanded, so the focus ring surrounds the row. A grid row: it lives inside Table (or a
+  // role=grid), which makes the button one item of its roving tab stop.
   import { useLocale } from '../lib/locale.ts';
   import Icon from './Icon.svelte';
 
@@ -13,9 +14,13 @@
     expanded?: boolean;
     /** The id of the rows this group shows or hides (aria-controls). */
     controls?: string;
+    /** Table's roving tab stop: -1 on every item but the active one. */
+    tabindex?: 0 | -1;
+    /** The item key Table uses for keyboard movement. */
+    navKey?: string;
     ontoggle?: (expanded: boolean) => void;
   }
-  let { title, count, expanded = $bindable(true), controls, ontoggle }: Props = $props();
+  let { title, count, expanded = $bindable(true), controls, tabindex = 0, navKey, ontoggle }: Props = $props();
   const { dir } = useLocale();
   const chevron = $derived(expanded ? 'chevron-down' : dir === 'rtl' ? 'chevron-left' : 'chevron-right');
 
@@ -26,8 +31,8 @@
 </script>
 
 <div class="group-row" role="row">
-  <span class="cell" role="cell">
-    <button type="button" class="toggle" aria-expanded={expanded} aria-controls={controls} data-nav onclick={toggle}>
+  <span class="cell" role="gridcell">
+    <button type="button" class="toggle" aria-expanded={expanded} aria-controls={controls} {tabindex} data-nav={navKey} onclick={toggle}>
       <span class="disclosure"><Icon name={chevron} size={16} /></span>
       <span class="title">{title}</span>
       <span class="count">{count}</span>

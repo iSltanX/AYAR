@@ -2,7 +2,8 @@
   // Image diff viewer (Figma 109:6265, C-14; plan 9.14, D-DES3-15): bg/surface, border/subtle, radius/card,
   // padding 12, gap 12. Toolbar: the mode control (side by side / overlay / slider) at the start, the result
   // badge at the end (the only coloured element). The capture key as neutral tags. Changed regions are an overlay
-  // fill with a 1.5 px solid text/primary frame, never red or green. Images are never mirrored; the panes follow
+  // fill with a 1.5 px solid text/primary frame, never red or green; the frame, the divider and the handle carry a
+  // halo of the opposite token so they read on light and dark captures. Images are never mirrored; the panes follow
   // the reading order, baseline first. The slider is a native range input (keyboard: arrows, Home, End) over the
   // image, with a 2 px divider and a 28×28 handle.
   import type { Attachment } from 'svelte/attachments';
@@ -244,6 +245,11 @@
     height: calc(var(--h) * 100%);
     background: color-mix(in srgb, var(--overlay) 30%, transparent);
     outline: 1.5px solid var(--text-primary);
+    /* A halo of the opposite token on both sides of the ink frame, so it reads on light and dark captures alike
+       (a capture follows the captured app's theme, not AYAR's). */
+    box-shadow:
+      0 0 0 2.5px var(--bg-surface),
+      inset 0 0 0 1px var(--bg-surface);
   }
   .current-layer {
     position: absolute;
@@ -260,6 +266,7 @@
     width: 2px;
     margin-inline-start: -1px;
     background: var(--text-primary);
+    box-shadow: 0 0 0 1px var(--bg-surface); /* two-tone: reads on any pixels */
   }
   .handle {
     position: absolute;
@@ -276,6 +283,7 @@
     border-radius: 14px;
     background: var(--bg-surface);
     color: var(--text-primary);
+    box-shadow: 0 0 0 1px var(--text-primary); /* two-tone: the ink ring outside the border/strong edge */
   }
   .range {
     position: absolute;

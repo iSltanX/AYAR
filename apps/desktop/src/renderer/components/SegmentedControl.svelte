@@ -1,8 +1,8 @@
 <script lang="ts" generics="T extends string">
   // Segmented control (Figma 100:483, C-18): a bg/sunken track, radius/control, padding 2, gap 2, holding
   // Segment items in reading order (the first option at the start side). Used for «لك | للنموذج» (component 24)
-  // and the image-diff modes (component 14). A radio group: one tab stop on the selected segment, the arrow keys
-  // (following the reading direction), Home and End move and select.
+  // and the image-diff modes (component 14). A radio group: one tab stop on the selected segment; all four
+  // arrow keys (WAI-ARIA radio group; Left/Right follow the reading direction), Home and End move and select.
   import { arrowTarget, type ControlOption } from '../lib/controls.ts';
   import Segment from './Segment.svelte';
 
@@ -29,7 +29,7 @@
     }
   }
   function keydown(e: KeyboardEvent) {
-    const to = arrowTarget(e, current, enabled);
+    const to = arrowTarget(e, current, enabled, 'both');
     if (to === null) return;
     e.preventDefault();
     select(to);

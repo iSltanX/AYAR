@@ -28,6 +28,9 @@
       />
     </div>
   </Demo>
+  <Demo name="Section card/default/no measurable scope (never 0 of 24, D-DES2-07)" figma="106:3951" h={202} w={344}>
+    <div class="w344"><SectionCard name={t('ui.section.performance')} karat={null} counts={{ 'not-applicable': 4 }} {readiness} /></div>
+  </Demo>
   <Demo name="Section card/integrity" figma="106:3951" h={198} w={344}>
     <div class="w344"><SectionCard variant="integrity" name={t('ui.section.integrity')} blocksPure={2} {openItems} {readiness} /></div>
   </Demo>

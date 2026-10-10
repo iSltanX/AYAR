@@ -85,5 +85,6 @@
   "results.inspector.rule": "القاعدة ومصدرها",
   "results.inspector.firstSeen": "أول ظهور",
   "results.inspector.logTitle": "سطر السجل {line} · {check}",
-  "results.inspector.actions": "إجراءات الاكتشاف"
+  "results.inspector.actions": "إجراءات الاكتشاف",
+  "results.inspector.tabs": "تفاصيل الفحص وسجله"
 }

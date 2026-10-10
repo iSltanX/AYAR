@@ -57,17 +57,20 @@ export function codePointLabel(codePoint: number): string {
   return `U+${codePoint.toString(16).toUpperCase().padStart(4, '0')}`;
 }
 
-/** Splits text around the (case-insensitive) occurrences of a query. */
+/**
+ * Splits text around the case-insensitive occurrences of a query. Matches are found on the original string (a
+ * RegExp with the u and i flags), never on a lower-cased copy: lower-casing can change the length ("İ" becomes
+ * two code units), which would shift every later index.
+ */
 export function splitMatches(text: string, query: string): { text: string; match: boolean }[] {
   if (!query) return [{ text, match: false }];
+  const pattern = new RegExp(query.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&'), 'giu');
   const out: { text: string; match: boolean }[] = [];
-  const hay = text.toLowerCase();
-  const needle = query.toLowerCase();
   let at = 0;
-  for (let i = hay.indexOf(needle); i !== -1; i = hay.indexOf(needle, i + needle.length)) {
-    if (i > at) out.push({ text: text.slice(at, i), match: false });
-    out.push({ text: text.slice(i, i + needle.length), match: true });
-    at = i + needle.length;
+  for (const m of text.matchAll(pattern)) {
+    if (m.index > at) out.push({ text: text.slice(at, m.index), match: false });
+    out.push({ text: m[0], match: true });
+    at = m.index + m[0].length;
   }
   if (at < text.length) out.push({ text: text.slice(at), match: false });
   return out;

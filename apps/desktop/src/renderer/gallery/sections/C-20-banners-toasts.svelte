@@ -4,9 +4,22 @@
 
 <script lang="ts">
   import Banner from '../../components/Banner.svelte';
+  import Button from '../../components/Button.svelte';
   import Toast from '../../components/Toast.svelte';
+  import ToastRegion from '../../components/ToastRegion.svelte';
+  import type { ToastMessage } from '../../lib/shell.ts';
   import Demo from '../Demo.svelte';
   import Row from '../Row.svelte';
+
+  // The live region stays mounted; the button replaces its toast (report → card → instructions → none).
+  const cycle: (ToastMessage | null)[] = [
+    { kind: 'report', count: 12430 },
+    { kind: 'card', id: 'TASK-0012' },
+    { kind: 'instructions', id: 'AI-LOGIC-001' },
+    null,
+  ];
+  let step = $state(0);
+  const current = $derived(cycle[step % cycle.length]);
 </script>
 
 <Row title="Banner (117:9737) · Kind needs-approval / engine-restarting">
@@ -24,6 +37,16 @@
   <Demo name="Toast/instructions" figma="117:9781" h={36}><Toast kind="instructions" id="AI-LOGIC-001" /></Demo>
 </Row>
 
+<Row title="Toast region (live, role=status, polite): mounted before any message">
+  <Demo name="Toast region/with toast" figma="117:9781" h={36}><ToastRegion toast={cycle[0]} /></Demo>
+  <Demo name="Toast region/cycling">
+    <div class="live">
+      <Button onclick={() => step++}>Next toast (demo)</Button>
+      <ToastRegion toast={current} />
+    </div>
+  </Demo>
+</Row>
+
 <style>
   .scroll {
     width: 100%;
@@ -34,5 +57,11 @@
     flex-direction: column;
     gap: var(--space-16);
     width: 1120px;
+  }
+  .live {
+    display: flex;
+    align-items: center;
+    gap: var(--space-16);
+    min-height: 36px;
   }
 </style>

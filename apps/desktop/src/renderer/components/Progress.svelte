@@ -8,7 +8,7 @@
   // when a previous run is on record.
   import { formatNumber } from '@ayar/i18n';
   import { useLocale } from '../lib/locale.ts';
-  import { clock, isoDuration } from '../lib/shell.ts';
+  import { clampFraction, clock, countProgress, isoDuration } from '../lib/shell.ts';
   import Tag from './Tag.svelte';
 
   type Props = { estimate?: string } & (
@@ -20,11 +20,11 @@
   const { t, lang } = useLocale();
   const uid = $props.id();
 
-  const fraction = $derived.by(() => {
-    if (props.kind === 'count') return props.total > 0 ? Math.min(1, Math.max(0, props.done / props.total)) : 0;
-    if (props.kind === 'percent') return Math.min(1, Math.max(0, props.value));
-    return 0;
-  });
+  // Inputs are made valid before they reach ARIA or the bar: done within [0, total], value within [0, 1].
+  const count = $derived(props.kind === 'count' ? countProgress(props.done, props.total) : undefined);
+  const fraction = $derived(count ? count.fraction : props.kind === 'percent' ? clampFraction(props.value) : 0);
+  /** A count with no total yet has no range: it is announced by its text only. */
+  const ranged = $derived(!count || count.total > 0);
   const percentText = $derived(formatNumber(fraction, lang, { style: 'percent', maximumFractionDigits: 0 }));
 
   // Re-runs whenever fraction changes (attachments are effects).
@@ -44,18 +44,18 @@
     <p class="note">{t('shell.progress.noTotal')}</p>
   </div>
 {:else}
-  {@const label = props.kind === 'count' ? t('shell.progress.complete', { done: props.done, total: props.total }) : props.label}
+  {@const label = count ? t('shell.progress.complete', { done: count.done, total: count.total }) : props.kind === 'percent' ? props.label : ''}
   <div
     class="progress {props.kind}"
     role="progressbar"
     aria-labelledby="{uid}-label"
-    aria-valuemin={0}
-    aria-valuemax={props.kind === 'count' ? props.total : 100}
-    aria-valuenow={props.kind === 'count' ? props.done : Math.round(fraction * 100)}
-    aria-valuetext={props.kind === 'count' ? label : `${label} · ${percentText}`}
+    aria-valuemin={ranged ? 0 : undefined}
+    aria-valuemax={ranged ? (count ? count.total : 100) : undefined}
+    aria-valuenow={ranged ? (count ? count.done : Math.round(fraction * 100)) : undefined}
+    aria-valuetext={count ? label : `${label} · ${percentText}`}
   >
     <div class="header">
-      <span class={props.kind === 'count' ? 'numeric' : 'label'} id="{uid}-label">{label}</span>
+      <span class={count ? 'numeric' : 'label'} id="{uid}-label">{label}</span>
       <span class="spacer"></span>
       {#if props.estimate}<Tag>{props.estimate}</Tag>{/if}
       {#if props.kind === 'percent'}<span class="numeric" aria-hidden="true">{percentText}</span>{/if}

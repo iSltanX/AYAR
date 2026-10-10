@@ -27,6 +27,8 @@
     /** The inspector is shown (Figma property Inspector); the title bar's toggle calls oninspectortoggle. */
     inspectorOpen?: boolean;
     oninspectortoggle?: (open: boolean) => void;
+    /** The id given to the Inspector, so the title bar's toggle names what it controls (aria-controls). */
+    inspectorId?: string;
     /** The sidebar (C-02). */
     sidebar: Snippet;
     /** The run bar (C-03), only while a run is active (Figma property Run bar). */
@@ -43,6 +45,7 @@
     primary,
     search,
     inspectorOpen = $bindable(true),
+    inspectorId,
     oninspectortoggle,
     sidebar,
     runbar,
@@ -57,7 +60,7 @@
 </script>
 
 <div class="window" data-controls={controls}>
-  <TitleBar {controls} {title} {breadcrumb} {primary} {search} {inspectorOpen} oninspectortoggle={toggle} />
+  <TitleBar {controls} {title} {breadcrumb} {primary} {search} {inspectorOpen} {inspectorId} oninspectortoggle={toggle} />
   <div class="body">
     <div class="sidebar">{@render sidebar()}</div>
     <div class="main">

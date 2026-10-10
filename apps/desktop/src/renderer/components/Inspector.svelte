@@ -121,7 +121,7 @@
         </div>
         {@render idRow(c.id)}
       </header>
-      <Tabs bind:value={tab} kind="inspector" label={t('results.inspector.label')} {panelId} {tabId} onchange={(v) => ontabchange?.(v as InspectorTab)} />
+      <Tabs bind:value={tab} kind="inspector" label={t('results.inspector.tabs')} {panelId} {tabId} onchange={(v) => ontabchange?.(v as InspectorTab)} />
       {#if tab === 'log'}
         <div class="panel" role="tabpanel" id={panelId('log')} aria-labelledby={tabId('log')}>
           {#if c.log}
