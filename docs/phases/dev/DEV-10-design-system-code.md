@@ -4,7 +4,7 @@ track: dev
 number: 10
 stage: interface
 title: نظام التصميم في الشيفرة — الرموز والخطوط والحالات والمكونات
-status: delivered
+status: closed
 status_date: 2026-10-10
 depends_on: [DEV-3]
 design_gates: [DES-1, DES-2, DES-3]
@@ -23,7 +23,7 @@ outputs:
   - الخطان Cairo وAlmarai مضمنان بترخيصهما
   - رموز الحالات ومكونات Svelte التسعة والعشرون
   - معرض مكونات للتطوير ومقارنة بصرية بالتصميم
-closing_commit:
+closing_commit: 6392230
 ---
 
 # DEV-10 — نظام التصميم في الشيفرة

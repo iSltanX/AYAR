@@ -22,6 +22,9 @@
 | yaml | 2.9.1 | ISC | تحليل YAML في الاكتشاف (`pnpm-workspace.yaml` وworkflows) بالمخطط الأساسي دون وسوم مخصصة، وبحد للأسماء المستعارة. أضافته DEV-4 | `packages/engine` |
 | smol-toml | 1.9.0 | BSD-3-Clause | تحليل TOML في الاكتشاف (`pyproject.toml` و`uv.toml`). أضافته DEV-4 | `packages/engine` |
 | ignore | 7.0.12 | MIT | قواعد `.gitignore` المتداخلة في الاكتشاف (وفي الشجرة نسخة 5.3.2 أخرى تبعية لـ ESLint). أضافته DEV-4 | `packages/engine` |
+| خط Cairo (متغير، `Cairo-Variable.ttf`) | google/fonts عند `a2c83dae` | OFL-1.1 | خط العناوين، مضمّن في الواجهة، وترخيصه في `public/licenses/`. أضافته DEV-10 | `apps/desktop` (الواجهة) |
+| خط Almarai (Regular وBold) | google/fonts عند `3d8d20e8` | OFL-1.1 | خط النص، مضمّن في الواجهة، وترخيصه في `public/licenses/`. أضافته DEV-10 | `apps/desktop` (الواجهة) |
+| أيقونات Lucide (المستخدمة وحدها، مولّدة في `icons.generated.ts` من lucide-static) | 1.48.0 | ISC | أيقونات الواجهة (A-12، D-DES2-03). أضافتها DEV-10 | `apps/desktop` (الواجهة) |
 
 و`node:sqlite` (طبقة التخزين، E-03) مضمّن في Node داخل Electron، فلا حزمة له.
 
@@ -49,6 +52,8 @@
 | vitest | 5.0.3 | MIT | مشغّل اختبارات عِيَار للوحدة والخصائص والتكامل (E-13) |
 | fast-check | 4.10.2 | MIT | اختبارات الخصائص (الخطة 19) |
 | playwright-core | 1.64.0 | Apache-2.0 | قيادة Electron في اختبارات الأمان (G-05)؛ ويستخدمه المسبار لاحقًا (C-14) |
+| lucide-static | 1.48.0 | ISC | مصدر عقد الأيقونات لمولّد `icons.generated.ts` وقت التطوير؛ لا تُشحن الحزمة نفسها. أضافتها DEV-10 |
+| axe-core | 4.13.0 | MPL-2.0 | فحص الإتاحة في اختبارات Electron للواجهة (AT-40). أضافته DEV-10 |
 
 ## 4. من قائمة 6.6 ولم يُضف بعد
 
@@ -59,10 +64,8 @@
 | fast-xml-parser | 5.11.2 | MIT | DEV-6 (JUnit) |
 | picomatch | 4.0.7 | MIT | لم تحتجه DEV-4 (الاكتشاف بـ `ignore`)؛ يُضاف حين تحتاجه مرحلة |
 | pixelmatch | 8.0.0 | ISC | DEV-7 |
-| axe-core و@axe-core/playwright | 4.14.0 و4.13.0 | MPL-2.0 | DEV-7، يُضمَّن دون تعديل |
-| lucide | 1.54.0 | ISC | DEV-10 |
+| @axe-core/playwright | 4.13.0 | MPL-2.0 | DEV-7. وأضافت DEV-10 axe-core 4.13.0 للاختبار (القسم 3)، ويُتحقق من إصداره عند تضمينه في المسبار |
 | better-sqlite3 | 13.0.3 | MIT | لا يُضاف: E-03 حسمت `node:sqlite` |
-| خطا Almarai وCairo | — | OFL 1.1 | DEV-10 |
 | **G-26:** @babel/parser | — | — | DEV-6 (المحللات، C-13) |
 | **G-26:** postcss | — | — | DEV-6 (`design.tokens.static`) |
 | **G-26:** مكتبة الضغط | — | — | DEV-5 (المحتوى المعنون، C-17)؛ وقد يكفي `node:zlib` المضمّن |
