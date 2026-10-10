@@ -33,7 +33,7 @@ function sh(cmd, cwd, { env = {}, timeout = 180 } = {}) {
     cwd, encoding: 'utf8', timeout: timeout * 1000, maxBuffer: 64 * 1024 * 1024, killSignal: 'SIGKILL',
     env: { ...process.env, PATH: toolPath(), CI: '1', NO_COLOR: '1', FORCE_COLOR: '0', AYAR_FX_HOME: TC_HOME, FX_TOOLS: path.join(FIXTURES_ROOT, 'tools'), ...env },
   });
-  const out = `${r.stdout ?? ''}${r.stderr ?? ''}`;
+  const out = `${r.stdout ?? ''}${r.stderr ?? ''}`.replace(/\u001b\[[0-9;]*m/g, '');
   return { code: r.status ?? (r.signal ? `signal:${r.signal}` : null), out, ms: Date.now() - t0, timedOut: r.error?.code === 'ETIMEDOUT' };
 }
 
@@ -60,10 +60,10 @@ async function runProject(id, only) {
   for (const [variant, runs] of Object.entries(spec.variants)) {
     if (only.length && !only.includes(variant)) continue;
     const base = fs.mkdtempSync(path.join(os.tmpdir(), `ayar-fx-sanity-${id}-`));
-    const dir = path.join(base, 'p');
     const rec = [];
+    let dir;
     try {
-      materialize(id, variant, dir);
+      dir = materialize(id, variant, path.join(base, 'p'));
       const needSetup = runs.some((r) => !r.pending);
       if (needSetup && spec.setup) {
         const s = sh(spec.setup, dir, { timeout: 600 });

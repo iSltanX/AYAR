@@ -1,0 +1,7 @@
+{
+  "name": "vuln-dep",
+  "description": "تبعية على الحزمة المصطنعة ayar-vuln-fake@1.0.0 (محلية في vendor/) التي ستُعرَّف لها ثغرة تجريبية في قاعدة OSV المصغرة (E-09).",
+  "defects": [
+    "sec.deps: ayar-vuln-fake@1.0.0 عليها ثغرة تجريبية (تنتظر E-09)"
+  ]
+}

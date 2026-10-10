@@ -3,7 +3,8 @@
 //
 // الاستخدام:
 //   node fixtures/tools/materialize.mjs <FX-X> <النسخة> <المجلد-الهدف>
-// الهدف يجب أن يكون غير موجود أو فارغًا. النسخة «good» هي الأساس نفسه.
+// الهدف يجب أن يكون غير موجود أو فارغًا. النسخة «good» هي الأساس نفسه. ويطبع جذر المشروع الفعلي
+// (قد يكون مجلدًا فرعيًّا من الهدف إن أعلن المشروع install_path).
 //
 // مشاريع «overlay»: تُنسخ base/ ثم يُركَّب فوقها variants/<النسخة>/overlay/ ثم تُحذف ملفات delete.
 // مشاريع «generated» (FX-MALICIOUS): يُشغَّل مولّدها المعلن في project.json بدل النسخ.
@@ -60,6 +61,16 @@ export function resolveFiles(id, variant, seen = new Set()) {
   return files;
 }
 
+/** مسار التركيب النسبي لنسخة (مشاريع مثل FX-PY تُركَّب في مسار عربي بمسافات). الأقرب اشتقاقًا يغلب. */
+export function installPath(id, variant, seen = new Set()) {
+  const { dir, meta } = loadProject(id);
+  if (meta.kind !== 'overlay' || variant === 'good' || seen.has(variant)) return meta.install_path ?? '';
+  seen.add(variant);
+  const vmeta = readJson(path.join(dir, 'variants', variant, 'variant.json'));
+  return vmeta.install_path ?? installPath(id, vmeta.derived_from ?? 'good', seen);
+}
+
+/** يركّب النسخة تحت dest ويعيد جذر المشروع الفعلي (dest، أو dest/<install_path>). */
 export function materialize(id, variant, dest) {
   const { dir, meta } = loadProject(id);
   if (fs.existsSync(dest) && fs.readdirSync(dest).length > 0) {
@@ -70,15 +81,17 @@ export function materialize(id, variant, dest) {
     const gen = path.join(FIXTURES_ROOT, meta.generator.script);
     const r = spawnSync(process.execPath, [gen, ...(meta.generator.args ?? []), '--out', dest], { stdio: 'inherit' });
     if (r.status !== 0) throw new Error(`فشل المولّد ${meta.generator.script}`);
-    return;
+    return dest;
   }
+  const root = path.join(dest, installPath(id, variant));
   for (const [rel, src] of resolveFiles(id, variant)) {
-    const to = path.join(dest, rel);
+    const to = path.join(root, rel);
     fs.mkdirSync(path.dirname(to), { recursive: true });
     fs.copyFileSync(src, to);
     fs.chmodSync(to, fs.statSync(src).mode & 0o777);
   }
   void dir;
+  return root;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
@@ -88,7 +101,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exit(2);
   }
   try {
-    materialize(id, variant, path.resolve(dest));
+    console.log(materialize(id, variant, path.resolve(dest)));
   } catch (e) {
     console.error(e.message);
     process.exit(1);

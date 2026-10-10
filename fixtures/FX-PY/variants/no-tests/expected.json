@@ -1,0 +1,25 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-PY",
+  "variant": "no-tests",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "ناقص",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "exit_code": 5,
+      "reason": "pytest برمز 5: لم يُجمع أي اختبار (AT-14: ناقص)"
+    },
+    {
+      "check": "code.lint",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    }
+  ]
+}

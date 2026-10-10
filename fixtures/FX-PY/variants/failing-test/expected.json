@@ -1,0 +1,37 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-PY",
+  "variant": "failing-test",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "tests/test_text.py",
+        "line": 45,
+        "anchor": "def test_normalize_taa_marbuta"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "exit_code": 1
+    },
+    {
+      "check": "code.lint",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "code.types",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    }
+  ]
+}
