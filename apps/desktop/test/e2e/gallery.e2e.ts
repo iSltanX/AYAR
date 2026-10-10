@@ -140,13 +140,17 @@ describe('accessibility (AT-40 part, NFR-04)', () => {
       for (const { panel, count } of panels) {
         total += count;
         await run.page.focus(`[data-panel="${panel}"] [data-tab-order="0"]`);
-        let prev = await run.page.evaluate(() => (document.activeElement as HTMLElement).getBoundingClientRect().toJSON() as DOMRect);
+        // Page coordinates: Tab scrolls the focused element into view, so viewport rectangles are not comparable.
+        let prev = await run.page.evaluate(() => {
+          const r = (document.activeElement as HTMLElement).getBoundingClientRect();
+          return { top: r.top + scrollY, left: r.left + scrollX };
+        });
         for (let i = 1; i < count; i++) {
           await run.page.keyboard.press('Tab');
           const at = await run.page.evaluate(() => {
             const el = document.activeElement as HTMLElement;
             const demo = (e: Element | null) => e?.closest('[data-demo]')?.getAttribute('data-demo') ?? '';
-            return { order: el.getAttribute('data-tab-order'), panel: el.closest('[data-panel]')?.getAttribute('data-panel'), rect: el.getBoundingClientRect().toJSON() as DOMRect, demo: demo(el), html: el.outerHTML.slice(0, 90) };
+            return { order: el.getAttribute('data-tab-order'), panel: el.closest('[data-panel]')?.getAttribute('data-panel'), rect: { top: el.getBoundingClientRect().top + scrollY, left: el.getBoundingClientRect().left + scrollX }, demo: demo(el), html: el.outerHTML.slice(0, 90) };
           });
           if (at.panel !== panel || at.order !== String(i)) {
             problems.push(`${panel}: Tab ${i} landed on ${at.html}`);
@@ -202,6 +206,51 @@ describe('mirroring (AT-28 part, 16.5, D-DES2-02)', () => {
       expect(en[s], s).toBe('none');
     }
     expect(en['skipped']).toBe('none');
+  });
+});
+
+describe('mirroring of arrows, progress and the check mark (AT-28 part, 16.5)', () => {
+  it('chooses the arrow glyphs per language and never mirrors icons by transform', async () => {
+    await showGallery(run.page, { lang: 'both', theme: 'light', section: 'S-04' });
+    const icons = (lang: 'ar' | 'en') =>
+      run.page.$$eval(`[data-panel="S-04/${lang}/light"] [data-icon]`, (els) => ({
+        names: [...new Set(els.map((e) => e.getAttribute('data-icon')))],
+        transformed: els.filter((e) => getComputedStyle(e).transform !== 'none').map((e) => e.getAttribute('data-icon')),
+      }));
+    const ar = await icons('ar');
+    const en = await icons('en');
+    // Persisting and reappeared (D-DES2-02): arrow-left / redo-2 in Arabic, arrow-right / undo-2 in English.
+    expect(ar.names).toEqual(expect.arrayContaining(['arrow-left', 'redo-2']));
+    expect(ar.names).not.toContain('arrow-right');
+    expect(en.names).toEqual(expect.arrayContaining(['arrow-right', 'undo-2']));
+    expect(en.names).not.toContain('arrow-left');
+    expect([...ar.transformed, ...en.transformed]).toEqual([]);
+  });
+
+  it('fills progress bars from the right in Arabic and from the left in English', async () => {
+    await showGallery(run.page, { lang: 'both', theme: 'light', section: 'C-10' });
+    const edges = (lang: 'ar' | 'en') =>
+      run.page.$$eval(`[data-panel="C-10/${lang}/light"] [data-demo="Progress/count"] .track`, (els) =>
+        els.map((track) => {
+          const t = track.getBoundingClientRect();
+          const f = track.firstElementChild!.getBoundingClientRect();
+          return { start: Math.round(f.left - t.left), end: Math.round(t.right - f.right), partial: f.width < t.width - 1 };
+        }),
+      );
+    const [ar] = await edges('ar');
+    const [en] = await edges('en');
+    expect(ar!.partial && en!.partial).toBe(true);
+    expect(ar!.end).toBe(0);
+    expect(ar!.start).toBeGreaterThan(0);
+    expect(en!.start).toBe(0);
+    expect(en!.end).toBeGreaterThan(0);
+  });
+
+  it('keeps the check mark of a checkbox unmirrored in Arabic', async () => {
+    await showGallery(run.page, { lang: 'ar', theme: 'light', section: 'C-18' });
+    const transforms = await run.page.$$eval('[data-panel="C-18/ar/light"] [data-icon="check"]', (els) => els.map((e) => getComputedStyle(e).transform));
+    expect(transforms.length).toBeGreaterThan(0);
+    expect(transforms.every((t) => t === 'none')).toBe(true);
   });
 });
 
