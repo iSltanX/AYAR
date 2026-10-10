@@ -1,0 +1,38 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-EXT",
+  "variant": "integrity-snapshot-update",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "يحتاج مراجعة",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "src/lib/__snapshots__/count.test.ts.snap",
+        "line": 3,
+        "anchor": "| الحروف"
+      },
+      "confidence": "اشتباه",
+      "reason": "ملف لقطة تغيّر منذ الأساس",
+      "requires": [
+        "baseline:integrity-baseline"
+      ]
+    },
+    {
+      "check": "integ.guard",
+      "result": "يحتاج مراجعة",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "src/lib/__snapshots__/count.test.ts.snap",
+        "line": 3,
+        "anchor": "| الحروف"
+      },
+      "confidence": "اشتباه",
+      "requires": [
+        "baseline:integrity-baseline"
+      ]
+    }
+  ]
+}

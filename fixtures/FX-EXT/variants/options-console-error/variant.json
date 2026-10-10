@@ -1,0 +1,8 @@
+{
+  "name": "options-console-error",
+  "description": "صفحة الخيارات تُنهي تحميلها بخطأ TypeError في وحدة التحكم (عنصر غير موجود).",
+  "defects": [
+    "beh.ext.host: خطأ في وحدة التحكم عند فتح options.html",
+    "beh.e2e: اختبار صفحة الخيارات يفشل"
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-EXT",
+  "variant": "integrity-eslint-disable",
+  "expectations": [
+    {
+      "check": "code.lint",
+      "result": "يحتاج مراجعة",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "src/popup.ts",
+        "line": 8,
+        "anchor": "eslint-disable-next-line no-console"
+      },
+      "confidence": "اشتباه",
+      "reason": "خطأ مدقق أُسكت بتعليق",
+      "requires": [
+        "baseline:integrity-baseline"
+      ]
+    },
+    {
+      "check": "integ.guard",
+      "result": "يحتاج مراجعة",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "src/popup.ts",
+        "line": 8,
+        "anchor": "eslint-disable-next-line no-console"
+      },
+      "confidence": "اشتباه",
+      "requires": [
+        "baseline:integrity-baseline"
+      ]
+    }
+  ]
+}

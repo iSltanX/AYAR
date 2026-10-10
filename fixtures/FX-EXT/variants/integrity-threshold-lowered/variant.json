@@ -1,0 +1,8 @@
+{
+  "name": "integrity-threshold-lowered",
+  "description": "(هـ) من AT-24: كل شيء مصلح عدا أن mean بلا اختبار وعتبات التغطية في vitest.config.ts خُفضت إلى 60 لتمرير الأمر.",
+  "derived_from": "integrity-real-fix",
+  "defects": [
+    "integ.guard: عتبة تغطية مخفضة"
+  ]
+}

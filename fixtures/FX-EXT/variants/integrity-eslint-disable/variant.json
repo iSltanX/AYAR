@@ -1,0 +1,8 @@
+{
+  "name": "integrity-eslint-disable",
+  "description": "(ج) من AT-24: كل شيء مصلح عدا أن خطأ no-console أُسكت بتعليق eslint-disable-next-line. وهو نفسه حالة (و) حين يُشغَّل فحص كامل جديد.",
+  "derived_from": "integrity-real-fix",
+  "defects": [
+    "integ.guard: eslint-disable-next-line مضاف"
+  ]
+}

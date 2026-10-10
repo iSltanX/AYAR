@@ -1,0 +1,21 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-EXT",
+  "variant": "missing-dir",
+  "expectations": [
+    {
+      "check": "design.rtl.static",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "popup.html",
+        "line": 2,
+        "anchor": "<html lang=\"ar\">"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "صفحة دخول بلغة من اليمين بلا dir"
+    }
+  ]
+}

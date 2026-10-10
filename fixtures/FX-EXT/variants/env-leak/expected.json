@@ -1,0 +1,33 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-EXT",
+  "variant": "env-leak",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "src/lib/env.test.ts",
+        "line": 6,
+        "anchor": "يطبع بيئته ويكتب السر"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "رسالة الإخفاق تحمل القيمة ayr_envleak_5d2e… في تقرير JSON الخام"
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "AT-48-env-not-forwarded",
+      "statement": "متغيرا MY_API_TOKEN وNPM_TOKEN (القيم المصطنعة من صدفة الدخول) لا يصلان إلى العملية الفرعية: الخرج المطبوع يعرض «<unset>»",
+      "acceptance": "AT-48"
+    },
+    {
+      "id": "AT-48-secret-absent",
+      "statement": "قيمة ayr_envleak_… الواردة في التقرير الخام غائبة من مجلد بيانات عِيَار كله بعد الفحص",
+      "acceptance": "AT-48"
+    }
+  ]
+}

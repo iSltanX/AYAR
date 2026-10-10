@@ -1,0 +1,43 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-EXT",
+  "variant": "missing-icon",
+  "expectations": [
+    {
+      "check": "sec.ext.manifest",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "public/manifest.json",
+        "line": 10,
+        "anchor": "icons/icon128.png"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "ملف أيقونة مشار إليه غير موجود"
+    },
+    {
+      "check": "beh.ext.host",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "public/manifest.json",
+        "line": 10,
+        "anchor": "icons/icon128.png"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "Chromium يرفض التحميل: Could not load icon 'icons/icon128.png' (D-DEV1-01)"
+    },
+    {
+      "check": "sec.ext.permissions",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    }
+  ]
+}

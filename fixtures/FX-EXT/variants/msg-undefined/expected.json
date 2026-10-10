@@ -1,0 +1,35 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-EXT",
+  "variant": "msg-undefined",
+  "expectations": [
+    {
+      "check": "sec.ext.manifest",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "public/manifest.json",
+        "line": 4,
+        "anchor": "__MSG_extTagline__"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "مفتاح رسالة غير معرّف في _locales/ar/messages.json"
+    },
+    {
+      "check": "beh.ext.host",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "public/manifest.json",
+        "line": 4,
+        "anchor": "__MSG_extTagline__"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "Chromium يرفض التحميل: Variable __MSG_extTagline__ used but not defined (D-DEV1-01)"
+    }
+  ]
+}

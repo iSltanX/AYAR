@@ -1,0 +1,21 @@
+:root {
+  --fg: #1a1a1a;
+  --bg: #ffffff;
+  --border: #5f6368;
+}
+body {
+  min-width: 320px;
+  margin: 0;
+  color: var(--fg);
+  background: var(--bg);
+  font-family: system-ui, sans-serif;
+}
+main {
+  padding: 16px;
+}
+textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+}

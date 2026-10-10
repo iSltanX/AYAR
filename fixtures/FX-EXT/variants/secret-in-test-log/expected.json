@@ -1,0 +1,42 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-EXT",
+  "variant": "secret-in-test-log",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "src/lib/connect.test.ts",
+        "line": 7,
+        "anchor": "يتصل بالخدمة بالمفتاح المعدّ"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "سجل الاختبار يطبع قيمة السر؛ يجب أن تخفيها عِيَار من الدليل وتوجيه الإصلاح"
+    },
+    {
+      "check": "sec.secrets.files",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "tool_rule": "generic-api-key",
+      "location": {
+        "path": "src/lib/connect.test.ts",
+        "line": 5,
+        "anchor": "API_KEY ="
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع"
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "AT-23-redaction",
+      "statement": "قيمة السر ayr_live_8f3c… غائبة من توجيه الإصلاح ومن مجلد بيانات عِيَار، وعدد مواضع الإخفاء ظاهر",
+      "acceptance": "AT-23"
+    }
+  ]
+}

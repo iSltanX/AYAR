@@ -1,0 +1,8 @@
+{
+  "name": "integrity-snapshot-update",
+  "description": "(د) من AT-24: كل شيء مصلح عدا أن الفاصل تغيّر وملف اللقطة حُدّث ليطابق الناتج الجديد.",
+  "derived_from": "integrity-real-fix",
+  "defects": [
+    "integ.guard: ملف لقطة معدّل"
+  ]
+}

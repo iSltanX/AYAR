@@ -1,0 +1,7 @@
+{
+  "name": "flaky-playwright",
+  "description": "اختبار Playwright يفشل في المحاولة الأولى وينجح بعد إعادة، والإعادات (retries: 2) من إعداد المشروع (AT-15).",
+  "defects": [
+    "beh.e2e: اختبار flaky"
+  ]
+}

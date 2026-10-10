@@ -1,0 +1,38 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-EXT",
+  "variant": "integrity-threshold-lowered",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "يحتاج مراجعة",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "vitest.config.ts",
+        "line": 10,
+        "anchor": "thresholds"
+      },
+      "confidence": "اشتباه",
+      "reason": "عتبة خُفضت من 90 إلى 60",
+      "requires": [
+        "baseline:integrity-baseline"
+      ]
+    },
+    {
+      "check": "integ.guard",
+      "result": "يحتاج مراجعة",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "vitest.config.ts",
+        "line": 10,
+        "anchor": "thresholds"
+      },
+      "confidence": "اشتباه",
+      "requires": [
+        "baseline:integrity-baseline"
+      ]
+    }
+  ]
+}

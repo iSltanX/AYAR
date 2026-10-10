@@ -1,0 +1,58 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-EXT",
+  "variant": "options-console-error",
+  "expectations": [
+    {
+      "check": "beh.ext.host",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "src/options.ts",
+        "line": 17,
+        "anchor": "getElementById('experimental-panel')"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "خطأ غير ملتقط في وحدة التحكم عند فتح صفحة معلنة"
+    },
+    {
+      "check": "beh.e2e",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "e2e/extension.spec.ts",
+        "line": 35,
+        "anchor": "صفحة الخيارات تُفتح دون أخطاء"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع"
+    },
+    {
+      "check": "code.build",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "code.types",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "code.lint",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    }
+  ]
+}

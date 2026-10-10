@@ -1,0 +1,10 @@
+{
+  "name": "missing-icon",
+  "description": "أيقونة 128 مشار إليها في Manifest وملفها محذوف.",
+  "defects": [
+    "sec.ext.manifest: icons/icon128.png مفقودة"
+  ],
+  "delete": [
+    "public/icons/icon128.png"
+  ]
+}

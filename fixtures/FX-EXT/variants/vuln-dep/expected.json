@@ -1,0 +1,31 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-EXT",
+  "variant": "vuln-dep",
+  "expectations": [
+    {
+      "check": "sec.deps",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "package.json",
+        "line": 17,
+        "anchor": "ayar-vuln-fake"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "ثغرة تجريبية في ayar-vuln-fake@1.0.0 تُعرَّف في DEV-2",
+      "requires": [
+        "osv-mini-db"
+      ]
+    }
+  ],
+  "pending": [
+    {
+      "waits_for": "E-09",
+      "check": "sec.deps",
+      "reason": "يحتاج قاعدة OSV المصغرة؛ ولم يُتحقق بعد من أن OSV-Scanner يقرأ تبعية file: من pnpm-lock.yaml. إن لم يقرأها يُستبدل بمدخل قفل بسجل وهمي في DEV-2"
+    }
+  ]
+}

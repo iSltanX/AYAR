@@ -1,0 +1,21 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-EXT",
+  "variant": "unresolved-cause",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "src/lib/remote.test.ts",
+        "line": 4,
+        "anchor": "يحمّل عنوان إعدادات الخدمة"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "الإخفاق ثابت لكن سببه غير محسوم بالدليل: متغير FX_REMOTE_CONFIG_URL غير معرّف، ولا دليل على أن الاختبار أو البيئة هو الخطأ (صيغة التشخيص في AT-23)"
+    }
+  ]
+}

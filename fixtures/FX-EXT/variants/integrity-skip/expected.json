@@ -1,0 +1,39 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-EXT",
+  "variant": "integrity-skip",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "يحتاج مراجعة",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "src/lib/stats.test.ts",
+        "line": 11,
+        "anchor": "it.skip"
+      },
+      "confidence": "اشتباه",
+      "reason": "اختبار فاشل في الأساس صار متخطًّى",
+      "requires": [
+        "baseline:integrity-baseline"
+      ]
+    },
+    {
+      "check": "integ.guard",
+      "result": "يحتاج مراجعة",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "src/lib/stats.test.ts",
+        "line": 11,
+        "anchor": "it.skip"
+      },
+      "confidence": "اشتباه",
+      "reason": "نمط التخطي",
+      "requires": [
+        "baseline:integrity-baseline"
+      ]
+    }
+  ]
+}
