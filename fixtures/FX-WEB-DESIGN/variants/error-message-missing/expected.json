@@ -1,0 +1,21 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-WEB-DESIGN",
+  "variant": "error-message-missing",
+  "expectations": [
+    {
+      "check": "design.states",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "src/i18n.js",
+        "line": 9,
+        "anchor": "error: 'حدث خطأ ما'"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "الحالة error: النص المتوقع «تعذّر تحميل العناصر» لا يظهر"
+    }
+  ]
+}

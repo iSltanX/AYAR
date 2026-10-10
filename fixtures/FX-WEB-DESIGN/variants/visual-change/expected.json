@@ -1,0 +1,31 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-WEB-DESIGN",
+  "variant": "visual-change",
+  "expectations": [
+    {
+      "check": "design.visual",
+      "result": "يحتاج مراجعة",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "design/tokens.json",
+        "line": 26,
+        "anchor": "\"md\": { \"$value\": \"16px\" }"
+      },
+      "confidence": "اشتباه",
+      "reason": "فرق بصري عن الصورة المرجعية المعتمدة من النسخة السليمة (AT-17)",
+      "requires": [
+        "references:approved-from-good"
+      ]
+    },
+    {
+      "check": "design.tokens.static",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    }
+  ]
+}

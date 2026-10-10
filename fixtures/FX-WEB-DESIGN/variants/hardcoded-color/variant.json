@@ -1,0 +1,8 @@
+{
+  "name": "hardcoded-color",
+  "description": "لون حرفي #1a73e8 خارج الرموز في شارة الحالة.",
+  "defects": [
+    "design.tokens.static: لون حرفي",
+    "design.tokens.render: لون محسوب خارج الرموز"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "$comment": "إعداد التصميم لـ FX-WEB-DESIGN (مدخل ملف المعايير). الصيغة مؤقتة حتى تعتمدها DEV-6.",
+  "tokens": "design/tokens.json",
+  "tokens_css": "styles/tokens.css",
+  "themes": ["light", "dark"],
+  "theme_activation": "?theme=<light|dark> يضبط html[data-theme]",
+  "languages": ["ar", "en"],
+  "language_activation": "?lang=<ar|en> يضبط html[lang] وhtml[dir]",
+  "viewports": [{ "name": "mobile", "width": 375, "height": 812 }, { "name": "desktop", "width": 1280, "height": 800 }],
+  "spacing_scale_px": [0, 4, 8, 12, 16, 24, 32],
+  "approved_fonts": ["Cairo"],
+  "static_scope": ["styles/app.css", "index.html", "src/*.js"],
+  "render_target": { "start": "node server.mjs 4173", "url": "http://127.0.0.1:4173" },
+  "references_dir": "design/references",
+  "references": "لا صور مرجعية معتمدة في البداية؛ تُعتمد أثناء AT-17 من النسخة السليمة"
+}

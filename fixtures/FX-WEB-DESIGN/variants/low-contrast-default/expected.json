@@ -1,0 +1,22 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-WEB-DESIGN",
+  "variant": "low-contrast-default",
+  "expectations": [
+    {
+      "check": "design.a11y",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "tool_rule": "color-contrast",
+      "location": {
+        "path": "design/tokens.json",
+        "line": 8,
+        "anchor": "#9aa3af"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "axe color-contrast على .item-meta في الثيم الفاتح"
+    }
+  ]
+}

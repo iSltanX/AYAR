@@ -1,0 +1,43 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-WEB-DESIGN",
+  "variant": "hardcoded-color",
+  "expectations": [
+    {
+      "check": "design.tokens.static",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "styles/app.css",
+        "line": 101,
+        "anchor": "#1a73e8"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "لون حرفي خارج الرموز"
+    },
+    {
+      "check": "design.tokens.render",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "styles/app.css",
+        "line": 101,
+        "anchor": "#1a73e8"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "القيمة المحسوبة rgb(26, 115, 232) ليست من رموز الألوان"
+    },
+    {
+      "check": "design.states",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    }
+  ]
+}

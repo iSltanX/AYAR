@@ -1,0 +1,8 @@
+{
+  "name": "off-scale-spacing",
+  "description": "حشوة 15px في بطاقة العنصر خارج سلم المسافات (4/8/12/16/24/32).",
+  "defects": [
+    "design.tokens.static: مسافة خارج السلم",
+    "design.tokens.render: حشوة محسوبة خارج السلم"
+  ]
+}

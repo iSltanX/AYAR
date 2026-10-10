@@ -1,0 +1,27 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-WEB-DESIGN",
+  "variant": "external-font-host",
+  "expectations": [
+    {
+      "check": "design.fonts.static",
+      "result": "تحذير",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "index.html",
+        "line": 8,
+        "anchor": "fonts.googleapis.com/css2"
+      },
+      "confidence": "مخالفة مثبتة",
+      "reason": "خط يُحمَّل من مضيف خارجي؛ وعِيَار لا يتصل بالشبكة أثناء الفحص"
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "AT-31-blocked-request",
+      "statement": "طلب fonts.googleapis.com لا يُرسل: يُسجَّل الطلب الممنوع في الأدلة ويظهر في «لك» نص C-14: «لم تُحمَّل موارد خارجية تطلبها الصفحة لأن عِيَار لا يتصل بالشبكة أثناء الفحص، فقد تبدو عند زوارها مختلفة قليلًا»",
+      "acceptance": "AT-31"
+    }
+  ]
+}

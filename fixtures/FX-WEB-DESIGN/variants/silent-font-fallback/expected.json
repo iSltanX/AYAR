@@ -1,0 +1,35 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-WEB-DESIGN",
+  "variant": "silent-font-fallback",
+  "expectations": [
+    {
+      "check": "design.fonts.static",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "styles/app.css",
+        "line": 7,
+        "anchor": "cairo-arabic-wght-normal-missing.woff2"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "ملف @font-face مفقود"
+    },
+    {
+      "check": "design.fonts.render",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "styles/app.css",
+        "line": 7,
+        "anchor": "cairo-arabic-wght-normal-missing.woff2"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "document.fonts: الوجه العربي لم يُحمَّل فيُعرض الخط البديل"
+    }
+  ]
+}
