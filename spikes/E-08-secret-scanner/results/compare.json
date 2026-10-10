@@ -1,0 +1,601 @@
+{
+  "at": "2026-10-10T09:17:56.340Z",
+  "versions": {
+    "gitleaks": "8.30.1",
+    "betterleaks": "1.9.0"
+  },
+  "help": {
+    "gitleaks": {
+      "v_flag": [
+        "-v, --verbose                       show verbose output from scan",
+        "-v, --verbose                       show verbose output from scan"
+      ],
+      "dirFlags": [
+        "--follow-symlinks   scan files that are symlinks to other files",
+        "-b, --baseline-path string          path to baseline with issues that can be ignored",
+        "-c, --config string                 config file path",
+        "1. --config/-c",
+        "--diagnostics string            enable diagnostics (http OR comma-separated list: cpu,mem,trace). cpu=CPU prof",
+        "--diagnostics-dir string        directory to store diagnostics output files when not using http mode (defaults",
+        "--enable-rule strings           only enable specific rules by id",
+        "--exit-code int                 exit code when leaks have been encountered (default 1)",
+        "-i, --gitleaks-ignore-path string   path to .gitleaksignore file or folder containing one (default \".\")",
+        "--max-archive-depth int         allow scanning into nested archives up to this depth (default \"0\", no archive ",
+        "--max-decode-depth int          allow recursive decoding up to this depth (default 5)",
+        "--max-target-megabytes int      files larger than this will be skipped",
+        "--no-banner                     suppress banner",
+        "--no-color                      turn off color for verbose output",
+        "--redact uint[=100]             redact secrets from logs and stdout. To redact only parts of the secret just a",
+        "-f, --report-format string          output format (json, csv, junit, sarif, template)",
+        "-r, --report-path string            report file (use \"-\" for stdout)",
+        "--report-template string        template file used to generate the report (implies --report-format=template)"
+      ]
+    },
+    "betterleaks": {
+      "v_flag": [
+        "--legacy-print                  use legacy key/value verbose finding format (requires --verbose)",
+        "-v, --verbose                       show verbose output from scan",
+        "--legacy-print                  use legacy key/value verbose finding format (requires --verbose)",
+        "-v, --verbose                       show verbose output from scan"
+      ],
+      "dirFlags": [
+        "--follow-symlinks   scan files that are symlinks to other files",
+        "-b, --baseline-path string          path to baseline with issues that can be ignored",
+        "-c, --config string                 config file path",
+        "1. --config/-c",
+        "--diagnostics string            enable diagnostics (http OR comma-separated list: cpu,mem,trace,rules,rules-cs",
+        "--diagnostics-dir string        directory to store diagnostics output files when not using http mode (defaults",
+        "--enable-rule strings           only enable specific rules by id",
+        "--exit-code int                 exit code when leaks have been encountered (default 1)",
+        "-i, --gitleaks-ignore-path string   path to .betterleaksignore or .gitleaksignore file or folder containing on",
+        "--max-archive-depth int         allow scanning into nested archives up to this depth (default 8)",
+        "--max-decode-depth int          allow recursive decoding up to this depth (default 5)",
+        "--max-target-megabytes int      files larger than this will be skipped",
+        "--no-banner                     suppress banner",
+        "--no-color                      turn off color in terminal output",
+        "--redact uint[=100]             redact secrets from logs and stdout. To redact only parts of the secret just a",
+        "-f, --report-format string          output format (json, csv, junit, sarif, template; validate supports pretty",
+        "-r, --report-path string            report file (use \"-\" for stdout)",
+        "--report-template string        template file used to generate the report (implies --report-format=template)"
+      ]
+    }
+  },
+  "cases": [
+    {
+      "name": "FX-EXT/secret (مزروع 1)",
+      "note": "",
+      "expectRules": [
+        "generic-api-key"
+      ],
+      "scanners": {
+        "gitleaks": {
+          "exit": 42,
+          "ms": 38,
+          "report": {
+            "count": 1,
+            "findings": [
+              {
+                "rule": "generic-api-key",
+                "file": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-FX-EXT-secret-d7Bt0E/p/src/config.ts",
+                "line": 2,
+                "secretRedacted": "REDACTED",
+                "fingerprintLike": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-FX-EXT-secret-d7Bt0E/p/src/config.ts:generic-api-key:2"
+              }
+            ],
+            "keys": [
+              "RuleID",
+              "Description",
+              "StartLine",
+              "EndLine",
+              "StartColumn",
+              "EndColumn",
+              "Match",
+              "Secret",
+              "File",
+              "SymlinkFile",
+              "Commit",
+              "Entropy",
+              "Author",
+              "Email",
+              "Date",
+              "Message",
+              "Tags",
+              "Fingerprint"
+            ]
+          },
+          "gitCalls": 0,
+          "repoWrites": [],
+          "stderrTail": "12:17PM INF scanned ~13618 bytes (13.62 KB) in 11ms\n12:17PM WRN leaks found: 1\n"
+        },
+        "betterleaks": {
+          "exit": 42,
+          "ms": 246,
+          "report": {
+            "count": 1,
+            "findings": [
+              {
+                "rule": "generic-api-key",
+                "file": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-FX-EXT-secret-d7Bt0E/p/src/config.ts",
+                "line": 2,
+                "secretRedacted": "REDACTED",
+                "fingerprintLike": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-FX-EXT-secret-d7Bt0E/p/src/config.ts:generic-api-key:2"
+              }
+            ],
+            "keys": [
+              "RuleID",
+              "Description",
+              "StartLine",
+              "EndLine",
+              "StartColumn",
+              "EndColumn",
+              "Match",
+              "Secret",
+              "Attributes",
+              "Tags",
+              "Fingerprint",
+              "File",
+              "SymlinkFile",
+              "Commit",
+              "Entropy",
+              "Author",
+              "Email",
+              "Date",
+              "Message"
+            ]
+          },
+          "gitCalls": 0,
+          "repoWrites": [],
+          "stderrTail": "12:17PM INF scanned ~13618 bytes (13.62 KB) in 236ms\n12:17PM WRN leaks found: 1\n"
+        }
+      }
+    },
+    {
+      "name": "FX-EXT/secret بالقواعد الافتراضية (بلا إعداد)",
+      "note": "",
+      "expectRules": [
+        "generic-api-key"
+      ],
+      "scanners": {
+        "gitleaks": {
+          "exit": 42,
+          "ms": 20,
+          "report": {
+            "count": 1,
+            "findings": [
+              {
+                "rule": "generic-api-key",
+                "file": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-FX-EXT-secret-d7Bt0E/p/src/config.ts",
+                "line": 2,
+                "secretRedacted": "REDACTED",
+                "fingerprintLike": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-FX-EXT-secret-d7Bt0E/p/src/config.ts:generic-api-key:2"
+              }
+            ],
+            "keys": [
+              "RuleID",
+              "Description",
+              "StartLine",
+              "EndLine",
+              "StartColumn",
+              "EndColumn",
+              "Match",
+              "Secret",
+              "File",
+              "SymlinkFile",
+              "Commit",
+              "Entropy",
+              "Author",
+              "Email",
+              "Date",
+              "Message",
+              "Tags",
+              "Fingerprint"
+            ]
+          },
+          "gitCalls": 0,
+          "repoWrites": [],
+          "stderrTail": "12:17PM INF scanned ~13618 bytes (13.62 KB) in 2.93ms\n12:17PM WRN leaks found: 1\n"
+        },
+        "betterleaks": {
+          "exit": 42,
+          "ms": 82,
+          "report": {
+            "count": 1,
+            "findings": [
+              {
+                "rule": "generic-api-key",
+                "file": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-FX-EXT-secret-d7Bt0E/p/src/config.ts",
+                "line": 2,
+                "secretRedacted": "REDACTED",
+                "fingerprintLike": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-FX-EXT-secret-d7Bt0E/p/src/config.ts:generic-api-key:2"
+              }
+            ],
+            "keys": [
+              "RuleID",
+              "Description",
+              "StartLine",
+              "EndLine",
+              "StartColumn",
+              "EndColumn",
+              "Match",
+              "Secret",
+              "Attributes",
+              "Tags",
+              "Fingerprint",
+              "File",
+              "SymlinkFile",
+              "Commit",
+              "Entropy",
+              "Author",
+              "Email",
+              "Date",
+              "Message"
+            ]
+          },
+          "gitCalls": 0,
+          "repoWrites": [],
+          "stderrTail": "12:17PM INF scanned ~13618 bytes (13.62 KB) in 74.1ms\n12:17PM WRN leaks found: 1\n"
+        }
+      }
+    },
+    {
+      "name": "FX-EXT/secret-in-test-log (الملفات نظيفة حرفيًّا)",
+      "note": "",
+      "expectRules": [],
+      "scanners": {
+        "gitleaks": {
+          "exit": 42,
+          "ms": 20,
+          "report": {
+            "count": 1,
+            "findings": [
+              {
+                "rule": "generic-api-key",
+                "file": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-FX-EXT-secret-in-test-log-JUFfy7/p/src/lib/connect.test.ts",
+                "line": 5,
+                "secretRedacted": "REDACTED",
+                "fingerprintLike": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-FX-EXT-secret-in-test-log-JUFfy7/p/src/lib/connect.test.ts:generic-api-key:5"
+              }
+            ],
+            "keys": [
+              "RuleID",
+              "Description",
+              "StartLine",
+              "EndLine",
+              "StartColumn",
+              "EndColumn",
+              "Match",
+              "Secret",
+              "File",
+              "SymlinkFile",
+              "Commit",
+              "Entropy",
+              "Author",
+              "Email",
+              "Date",
+              "Message",
+              "Tags",
+              "Fingerprint"
+            ]
+          },
+          "gitCalls": 0,
+          "repoWrites": [],
+          "stderrTail": "12:17PM INF scanned ~14021 bytes (14.02 KB) in 3.17ms\n12:17PM WRN leaks found: 1\n"
+        },
+        "betterleaks": {
+          "exit": 42,
+          "ms": 82,
+          "report": {
+            "count": 1,
+            "findings": [
+              {
+                "rule": "generic-api-key",
+                "file": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-FX-EXT-secret-in-test-log-JUFfy7/p/src/lib/connect.test.ts",
+                "line": 5,
+                "secretRedacted": "REDACTED",
+                "fingerprintLike": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-FX-EXT-secret-in-test-log-JUFfy7/p/src/lib/connect.test.ts:generic-api-key:5"
+              }
+            ],
+            "keys": [
+              "RuleID",
+              "Description",
+              "StartLine",
+              "EndLine",
+              "StartColumn",
+              "EndColumn",
+              "Match",
+              "Secret",
+              "Attributes",
+              "Tags",
+              "Fingerprint",
+              "File",
+              "SymlinkFile",
+              "Commit",
+              "Entropy",
+              "Author",
+              "Email",
+              "Date",
+              "Message"
+            ]
+          },
+          "gitCalls": 0,
+          "repoWrites": [],
+          "stderrTail": "12:17PM INF scanned ~14021 bytes (14.02 KB) in 74.2ms\n12:17PM WRN leaks found: 1\n"
+        }
+      }
+    },
+    {
+      "name": "FX-ADAPTERS/gitleaks--bad (مزروع 1، بإعداد المشروع)",
+      "note": "",
+      "expectRules": [
+        "generic-api-key"
+      ],
+      "scanners": {
+        "gitleaks": {
+          "exit": 42,
+          "ms": 18,
+          "report": {
+            "count": 1,
+            "findings": [
+              {
+                "rule": "generic-api-key",
+                "file": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-FX-ADAPTERS-gitleaks--bad-w4mREf/p/gitleaks/src/a.js",
+                "line": 2,
+                "secretRedacted": "REDACTED",
+                "fingerprintLike": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-FX-ADAPTERS-gitleaks--bad-w4mREf/p/gitleaks/src/a.js:generic-api-key:2"
+              }
+            ],
+            "keys": [
+              "RuleID",
+              "Description",
+              "StartLine",
+              "EndLine",
+              "StartColumn",
+              "EndColumn",
+              "Match",
+              "Secret",
+              "File",
+              "SymlinkFile",
+              "Commit",
+              "Entropy",
+              "Author",
+              "Email",
+              "Date",
+              "Message",
+              "Tags",
+              "Fingerprint"
+            ]
+          },
+          "gitCalls": 0,
+          "repoWrites": [],
+          "stderrTail": "12:17PM INF scanned ~174 bytes (174 bytes) in 1.5ms\n12:17PM WRN leaks found: 1\n"
+        },
+        "betterleaks": {
+          "exit": 42,
+          "ms": 81,
+          "report": {
+            "count": 1,
+            "findings": [
+              {
+                "rule": "generic-api-key",
+                "file": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-FX-ADAPTERS-gitleaks--bad-w4mREf/p/gitleaks/src/a.js",
+                "line": 2,
+                "secretRedacted": "REDACTED",
+                "fingerprintLike": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-FX-ADAPTERS-gitleaks--bad-w4mREf/p/gitleaks/src/a.js:generic-api-key:2"
+              }
+            ],
+            "keys": [
+              "RuleID",
+              "Description",
+              "StartLine",
+              "EndLine",
+              "StartColumn",
+              "EndColumn",
+              "Match",
+              "Secret",
+              "Attributes",
+              "Tags",
+              "Fingerprint",
+              "File",
+              "SymlinkFile",
+              "Commit",
+              "Entropy",
+              "Author",
+              "Email",
+              "Date",
+              "Message"
+            ]
+          },
+          "gitCalls": 0,
+          "repoWrites": [],
+          "stderrTail": "12:17PM INF scanned ~174 bytes (174 bytes) in 72.3ms\n12:17PM WRN leaks found: 1\n"
+        }
+      }
+    },
+    {
+      "name": "FX-MALICIOUS/repo (dir: .env مزروع، رابط رمزي خارج الجذر لا يُتبع)",
+      "note": "markers=0",
+      "expectRules": [
+        "generic-api-key"
+      ],
+      "scanners": {
+        "gitleaks": {
+          "exit": 0,
+          "ms": 18,
+          "report": {
+            "count": 0,
+            "findings": [],
+            "keys": []
+          },
+          "gitCalls": 0,
+          "repoWrites": [],
+          "stderrTail": "12:17PM INF scanned ~704 bytes (704 bytes) in 1.38ms\n12:17PM INF no leaks found\n"
+        },
+        "betterleaks": {
+          "exit": 0,
+          "ms": 80,
+          "report": {
+            "count": 0,
+            "findings": [],
+            "keys": []
+          },
+          "gitCalls": 0,
+          "repoWrites": [],
+          "stderrTail": "12:17PM INF scanned ~704 bytes (704 bytes) in 71ms\n12:17PM INF no leaks found\n"
+        }
+      },
+      "markersAfter": 0
+    },
+    {
+      "name": "مدونة عربية نظيفة (60 تدوينة) بالقواعد الافتراضية",
+      "note": "",
+      "expectRules": [],
+      "scanners": {
+        "gitleaks": {
+          "exit": 0,
+          "ms": 25,
+          "report": {
+            "count": 0,
+            "findings": [],
+            "keys": []
+          },
+          "gitCalls": 0,
+          "repoWrites": [],
+          "stderrTail": "12:17PM INF scanned ~207727 bytes (207.73 KB) in 8.44ms\n12:17PM INF no leaks found\n"
+        },
+        "betterleaks": {
+          "exit": 42,
+          "ms": 94,
+          "report": {
+            "count": 1,
+            "findings": [
+              {
+                "rule": "generic-credential-uri",
+                "file": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-blog-J2TGFu/.env.example",
+                "line": 2,
+                "secretRedacted": "REDACTED",
+                "fingerprintLike": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-blog-J2TGFu/.env.example:generic-credential-uri:2"
+              }
+            ],
+            "keys": [
+              "RuleID",
+              "Description",
+              "StartLine",
+              "EndLine",
+              "StartColumn",
+              "EndColumn",
+              "Match",
+              "Secret",
+              "CaptureGroups",
+              "Attributes",
+              "Tags",
+              "Fingerprint",
+              "File",
+              "SymlinkFile",
+              "Commit",
+              "Entropy",
+              "Author",
+              "Email",
+              "Date",
+              "Message"
+            ]
+          },
+          "gitCalls": 0,
+          "repoWrites": [],
+          "stderrTail": "12:17PM INF scanned ~207727 bytes (207.73 KB) in 86.4ms\n12:17PM WRN leaks found: 1\n"
+        }
+      }
+    },
+    {
+      "name": "المدونة نفسها بإعداد fixtures (استثناء القفل)",
+      "note": "",
+      "expectRules": [],
+      "scanners": {
+        "gitleaks": {
+          "exit": 0,
+          "ms": 26,
+          "report": {
+            "count": 0,
+            "findings": [],
+            "keys": []
+          },
+          "gitCalls": 0,
+          "repoWrites": [],
+          "stderrTail": "12:17PM INF scanned ~207727 bytes (207.73 KB) in 8.74ms\n12:17PM INF no leaks found\n"
+        },
+        "betterleaks": {
+          "exit": 42,
+          "ms": 98,
+          "report": {
+            "count": 1,
+            "findings": [
+              {
+                "rule": "generic-credential-uri",
+                "file": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-blog-J2TGFu/.env.example",
+                "line": 2,
+                "secretRedacted": "REDACTED",
+                "fingerprintLike": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e08-blog-J2TGFu/.env.example:generic-credential-uri:2"
+              }
+            ],
+            "keys": [
+              "RuleID",
+              "Description",
+              "StartLine",
+              "EndLine",
+              "StartColumn",
+              "EndColumn",
+              "Match",
+              "Secret",
+              "CaptureGroups",
+              "Attributes",
+              "Tags",
+              "Fingerprint",
+              "File",
+              "SymlinkFile",
+              "Commit",
+              "Entropy",
+              "Author",
+              "Email",
+              "Date",
+              "Message"
+            ]
+          },
+          "gitCalls": 0,
+          "repoWrites": [],
+          "stderrTail": "12:17PM INF scanned ~207727 bytes (207.73 KB) in 89.6ms\n12:17PM WRN leaks found: 1\n"
+        }
+      }
+    },
+    {
+      "name": "مستودع اصطناعي 50 ألف ملف (الزمن)",
+      "note": "",
+      "expectRules": [],
+      "scanners": {
+        "gitleaks": {
+          "exit": 0,
+          "ms": 3623,
+          "report": {
+            "count": 0,
+            "findings": [],
+            "keys": []
+          },
+          "gitCalls": 0,
+          "repoWrites": [],
+          "stderrTail": "12:18PM INF scanned ~6718729 bytes (6.72 MB) in 3.6s\n12:18PM INF no leaks found\n"
+        },
+        "betterleaks": {
+          "exit": 0,
+          "ms": 1534,
+          "report": {
+            "count": 0,
+            "findings": [],
+            "keys": []
+          },
+          "gitCalls": 0,
+          "repoWrites": [],
+          "stderrTail": "12:18PM INF scanned ~6718729 bytes (6.72 MB) in 1.47s\n12:18PM INF no leaks found\n"
+        }
+      }
+    }
+  ],
+  "synth": "{\"files\":50000,\"bytes\":6718729,\"seed\":1,\"ms\":3857}"
+}

@@ -1,0 +1,48 @@
+# E-08 downloads — 2026-10-10T09:07:23Z
+## cosign 3.1.3
+cosign-darwin-arm64: OK
+cosign sha256: 5cf948c2f4dfe59687bdd0b8523709067383e03982cc543475c8a7dc70e92a76
+com.apple.provenance: 
+xattr(cosign) listed above (فارغ = لا سمة حجر)
+Identifier=a.out
+CodeDirectory v=20400 size=1082430 flags=0x20002(adhoc,linker-signed) hashes=33823+0 location=embedded
+Signature=adhoc
+  ______   ______        _______. __    _______ .__   __.
+ /      | /  __  \      /       ||  |  /  _____||  \ |  |
+|  ,----'|  |  |  |    |   (----`|  | |  |  __  |   \|  |
+|  |     |  |  |  |     \   \    |  | |  | |_ | |  . `  |
+## betterleaks 1.9.0
+betterleaks_1.9.0_darwin_arm64.tar.gz: OK
+betterleaks tarball sha256: 83dd7eaab13d44a1e8e347a17064cdef153a1478db473276d41b38d55613d3f2
+### cosign verify-blob (sigstore bundle, keyless: GitHub Actions OIDC)
+Verified OK
+verify-blob exit=0
+### cosign verify-blob بهوية خاطئة (ضابط سلبي: يجب أن يفشل)
+Error: failed to verify certificate identity: no matching CertificateIdentity found, last error: expected SAN value to match regex "^https://github.com/gitleaks/gitleaks/", got "https://github.com/betterleaks/betterleaks/.github/workflows/release.yml@refs/tags/v1.9.0"
+error during command execution: failed to verify certificate identity: no matching CertificateIdentity found, last error: expected SAN value to match regex "^https://github.com/gitleaks/gitleaks/", got "https://github.com/betterleaks/betterleaks/.github/workflows/release.yml@refs/tags/v1.9.0"
+verify-blob(wrong identity) exit=0
+total 45360
+drwxr-xr-x@ 5 abutalal  staff       160 Oct 10 12:08 .
+drwxr-xr-x@ 4 abutalal  staff       128 Oct 10 12:08 ..
+-rw-r--r--@ 1 abutalal  staff      1069 Sep 29 23:04 LICENSE
+-rw-r--r--@ 1 abutalal  staff      7827 Sep 29 23:04 README.md
+-rwxr-xr-x@ 1 abutalal  staff  23209410 Sep 29 23:06 betterleaks
+com.apple.provenance: 
+xattr(betterleaks) listed above
+Identifier=a.out
+CodeDirectory v=20400 size=180030 flags=0x20002(adhoc,linker-signed) hashes=5623+0 location=embedded
+Signature=adhoc
+1.9.0
+## gitleaks 8.30.1 (نسخة مُدارة لتجربة E-20؛ نسخة النظام من Homebrew تبقى كما هي)
+gitleaks_8.30.1_darwin_arm64.tar.gz: OK
+gitleaks tarball sha256: b40ab0ae55c505963e365f271a8d3846efbc170aa17f2607f13df610a9aeb6a5
+0
+gitleaks: لا ملف توقيع sigstore في الإصدار (checksums فقط)
+8.30.1
+Identifier=a.out
+CodeDirectory v=20400 size=165406 flags=0x20002(adhoc,linker-signed) hashes=5166+0 location=embedded
+Signature=adhoc
+## sizes
+278M	~/.cache/ayar-dev2/cosign
+ 31M	~/.cache/ayar-dev2/betterleaks
+ 28M	~/.cache/ayar-dev2/gitleaks
