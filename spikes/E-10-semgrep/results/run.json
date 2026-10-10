@@ -1,0 +1,154 @@
+{
+  "at": "2026-10-10T09:20:46.356Z",
+  "homebrew": {
+    "stable": "1.176.0",
+    "installed": [],
+    "pinnedWanted": "1.180.0",
+    "deps": 12
+  },
+  "managed": {
+    "compileMs": 5424,
+    "compileExit": 0,
+    "venvExit": 0,
+    "installMs": 9234,
+    "installExit": 0,
+    "version": "1.180.0",
+    "sizeKB": 258100,
+    "hashesPinned": 915,
+    "requirementsFile": "~/.cache/ayar-dev2/semgrep-requirements.txt",
+    "installTail": " + wrapt==1.17.3\n + zipp==4.1.1\n"
+  },
+  "timing": [
+    {
+      "project": "FX-EXT/good",
+      "exit": 0,
+      "ms": 1442,
+      "findings": 0,
+      "scanned": 8,
+      "errors": 0,
+      "byRule": []
+    },
+    {
+      "project": "FX-PY/good",
+      "exit": 0,
+      "ms": 1128,
+      "findings": 0,
+      "scanned": 4,
+      "errors": 0,
+      "byRule": []
+    },
+    {
+      "project": "synth-repo medium (10k)",
+      "exit": 0,
+      "ms": 2345,
+      "findings": 0,
+      "scanned": 7464,
+      "errors": 0,
+      "byRule": []
+    }
+  ],
+  "targets": [
+    {
+      "name": "قائمة ملفات صريحة كاملة (مسارات مطلقة)",
+      "files": 7996,
+      "argBytes": 909879,
+      "argMax": 1048576
+    },
+    {
+      "name": "الجذر + --exclude node_modules/dist",
+      "exit": 0,
+      "ms": 2529,
+      "scanned": 7464,
+      "findings": 0
+    },
+    {
+      "name": "القائمة كاملة في أمر واحد (7996 ملف، 909879 بايت)",
+      "exit": 0,
+      "ms": 3309,
+      "scanned": 7996,
+      "findings": 0,
+      "err": ""
+    },
+    {
+      "name": "القائمة مقسمة (5 دفعة ≤ 200 كيلوبايت)",
+      "exits": [
+        0
+      ],
+      "ms": 7071,
+      "scanned": 7996,
+      "findings": 0
+    },
+    {
+      "name": "الجذر + --include *.ts *.py",
+      "exit": 0,
+      "ms": 2577,
+      "scanned": 7464,
+      "findings": 0
+    }
+  ],
+  "git": [
+    {
+      "name": "من داخل المستودع (الأهداف نسبية)",
+      "cwd": "repo",
+      "exit": 0,
+      "ms": 1218,
+      "findings": 2,
+      "gitCalls": [
+        "cwd=~/.cache/ayar-fixtures-toolchain/py/lib/python3.12/site-packages/semgrep/app args=remote get-url origin",
+        "cwd=/private<repo> args=ls-remote --get-url"
+      ],
+      "gitCallsInRepo": 1,
+      "markers": 0,
+      "repoWrites": [],
+      "homeWrites": [
+        ".semgrep/semgrep.log",
+        ".semgrep/settings.yml"
+      ]
+    },
+    {
+      "name": "من مجلد محايد بهدف مطلق",
+      "cwd": "neutral",
+      "exit": 0,
+      "ms": 1280,
+      "findings": 2,
+      "gitCalls": [
+        "cwd=~/.cache/ayar-fixtures-toolchain/py/lib/python3.12/site-packages/semgrep/app args=remote get-url origin",
+        "cwd=/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e10-neutral-hb0LM9 args=ls-remote --get-url"
+      ],
+      "gitCallsInRepo": 0,
+      "markers": 0,
+      "repoWrites": [],
+      "homeWrites": []
+    },
+    {
+      "name": "من مجلد محايد بقائمة ملفات مطلقة",
+      "cwd": "neutral",
+      "exit": 0,
+      "ms": 1303,
+      "findings": 2,
+      "gitCalls": [
+        "cwd=~/.cache/ayar-fixtures-toolchain/py/lib/python3.12/site-packages/semgrep/app args=remote get-url origin",
+        "cwd=/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e10-neutral-hb0LM9 args=ls-remote --get-url"
+      ],
+      "gitCallsInRepo": 0,
+      "markers": 0,
+      "repoWrites": [],
+      "homeWrites": []
+    },
+    {
+      "name": "من داخل المستودع مع git مزيف يفشل برمز 99 (هل يكمل Semgrep؟)",
+      "cwd": "repo",
+      "exit": 0,
+      "ms": 1228,
+      "findings": 2,
+      "gitCalls": [
+        "cwd=~/.cache/ayar-fixtures-toolchain/py/lib/python3.12/site-packages/semgrep/app args=remote get-url origin",
+        "cwd=/private<repo> args=ls-remote --get-url"
+      ],
+      "gitCallsInRepo": 1,
+      "markers": 0,
+      "repoWrites": [],
+      "homeWrites": []
+    }
+  ]
+}
