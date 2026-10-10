@@ -136,7 +136,8 @@ function readOwnerDecisions(text) {
     const cells = line.split('|').slice(1, -1).map((c) => c.trim());
     if (cells.length !== 6 || !/^[A-Z]{1,3}-\d+$/.test(cells[0])) continue;
     const [id, question, recommendation, neededIn, status, answer] = cells;
-    decisions[id] = { id, question, recommendation, neededIn, resolved: status === 'محسوم', answer };
+    // «مفوَّض»: تحسمه الجلسة الرئيسية حين يلزم بتفويض المالك (ORG-13)، فلا يُعرض على المالك ولا يوقف المرحلة
+    decisions[id] = { id, question, recommendation, neededIn, resolved: status === 'محسوم', delegated: status === 'مفوَّض', answer };
   }
   return decisions;
 }
@@ -227,7 +228,8 @@ const view = phases.map((p) => {
   const l = live(p);
   const waitingDeps = p.depends_on.filter((id) => !isClosed(id));
   const waitingDesign = p.design_gates.filter((id) => !isClosed(id));
-  const waitingOwner = p.owner_gates.filter((id) => !decisions[id]?.resolved);
+  const ownerPending = (id) => !decisions[id]?.resolved && !decisions[id]?.delegated;
+  const waitingOwner = p.owner_gates.filter(ownerPending);
   // مجلد جُهّز ولم يبدأ فيه عمل، ثم تقدم main: تحدّثه الجلسة الرئيسية قبل تكليف وكيله
   const stale = l.exists && l.ahead === 0 && !l.dirty && (l.status ?? 'not-started') === 'not-started' && l.behind > 0;
   let state;
@@ -266,7 +268,8 @@ const view = phases.map((p) => {
     waitingDeps,
     waitingDesign,
     waitingOwner,
-    openInputs: p.owner_inputs.filter((id) => !decisions[id]?.resolved),
+    openInputs: p.owner_inputs.filter(ownerPending),
+    delegated: [...p.owner_gates, ...p.owner_inputs].filter((id) => decisions[id]?.delegated),
     branch: l.branch,
     folder: l.worktree ?? `${wtBase}/${p.id}`,
     folderExists: Boolean(l.worktree),
@@ -347,7 +350,7 @@ if (cur) {
 
 // قرارات مفتوحة تخص موجات لاحقة، بأقرب موجة تحتاجها
 const laterDecisions = Object.values(decisions)
-  .filter((d) => !d.resolved)
+  .filter((d) => !d.resolved && !d.delegated)
   .map((d) => {
     const gates = view
       .filter((v) => v.state !== 'closed' && (v.ownerGates.includes(d.id) || v.ownerInputs.includes(d.id)))
@@ -391,8 +394,9 @@ const data = {
 
 for (const w of warnings) console.error(`تنبيه: ${w}`);
 if (checkOnly) {
-  const openCount = Object.values(decisions).filter((d) => !d.resolved).length;
-  console.log(`المصادر سليمة: ${countAr(view.length, 'مرحلة واحدة', 'مرحلتان', 'مراحل', 'مرحلة')} في ${countAr(waves.length, 'موجة واحدة', 'موجتين', 'موجات', 'موجة')}، و${countAr(openCount, 'قرار واحد', 'قراران', 'قرارات', 'قرارًا')} تنتظر المالك.`);
+  const openCount = Object.values(decisions).filter((d) => !d.resolved && !d.delegated).length;
+  const delegatedCount = Object.values(decisions).filter((d) => d.delegated).length;
+  console.log(`المصادر سليمة: ${countAr(view.length, 'مرحلة واحدة', 'مرحلتان', 'مراحل', 'مرحلة')} في ${countAr(waves.length, 'موجة واحدة', 'موجتين', 'موجات', 'موجة')}، و${countAr(openCount, 'قرار واحد', 'قراران', 'قرارات', 'قرارًا')} تنتظر المالك${delegatedCount ? `، و${countAr(delegatedCount, 'قرار واحد مفوَّض', 'قراران مفوَّضان', 'قرارات مفوَّضة', 'قرارًا مفوَّضًا')} للجلسة الرئيسية` : ''}.`);
   if (current) {
     console.log(`الموجة الحالية: ${current.number} (${current.state})، وأمرها «${current.command}». المراحل: ${current.phaseIds.map((id) => `${id} ${viewById.get(id).state}`).join('، ')}.`);
     if (current.now.length) console.log(`يحتاج المالك الآن: ${current.now.map((x) => x.id ?? x.phase).join('، ')}.`);

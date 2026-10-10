@@ -271,7 +271,7 @@ a.ref:hover { color: var(--ink); }
     <h2 id="how-h">كيف تعمل الموجة</h2>
     <ol>
       <li>ترسل أمر الموجة في الجلسة الرئيسية.</li>
-      <li>تسألك الجلسة دفعة واحدة عن أي قرار يلزم قبل البدء، ثم تكلّف وكيلًا بكل مرحلة جاهزة، كل وكيل في مجلد عمل مستقل.</li>
+      <li>تحسم الجلسة قرارات البدء بتفويضك، وتسألك دفعة واحدة عمّا بقي لك منها، ثم تكلّف وكيلًا بكل مرحلة جاهزة، كل وكيل في مجلد عمل مستقل.</li>
       <li>تتوقف لتسألك حين يلزم اعتمادك أو إذنك، أو حين يثبت عائق. والوكلاء الآخرون يواصلون عملهم.</li>
       <li>كل مرحلة تُسلَّم تتحقق منها الجلسة آليًا، وتدمجها، وتفحص التكامل، وتغلقها، وتدفعها إلى GitHub، دون أمر منك.</li>
       <li>في النهاية تسلّمك خلاصة الموجة، وتتوقف قبل الموجة التالية.</li>
@@ -400,8 +400,12 @@ function techDetails(p) {
   if (p.modelReason) add('سببه', p.modelReason);
   if (p.dependsOn.length) add('تعتمد على', list(p.dependsOn.map(phaseRef)));
   if (p.designGates.length) add('تصميم معتمد', list(p.designGates.map(phaseRef)));
-  if (p.ownerGates.length) add('قرارك قبلها', list(p.ownerGates.map((id) => h('span', { class: `ref${p.waitingOwner.includes(id) ? ' open' : ' done'}`, text: p.waitingOwner.includes(id) ? id : `${id} ✓` }))));
-  if (p.ownerInputs.length) add('قرارك أثناءها', list(p.ownerInputs.map((id) => h('span', { class: `ref${p.openInputs.includes(id) ? ' open' : ' done'}`, text: p.openInputs.includes(id) ? id : `${id} ✓` }))));
+  // المفوَّض تحسمه الجلسة الرئيسية حين يلزم (ORG-13)، فلا يُعرض قرارًا عليك
+  const decisionChip = (id, pending) => p.delegated.includes(id)
+    ? h('span', { class: 'ref', text: `${id} · مفوَّض` })
+    : h('span', { class: `ref${pending.includes(id) ? ' open' : ' done'}`, text: pending.includes(id) ? id : `${id} ✓` });
+  if (p.ownerGates.length) add('قرار قبلها', list(p.ownerGates.map((id) => decisionChip(id, p.waitingOwner))));
+  if (p.ownerInputs.length) add('قرار أثناءها', list(p.ownerInputs.map((id) => decisionChip(id, p.openInputs))));
   const opens = DATA.phases.filter((x) => x.designGates.includes(p.id)).map((x) => x.id);
   if (opens.length) add('تفتح للتطوير', list(opens.map(phaseRef)));
   add('الملف', h('a', { class: 'ltr', href: `${DATA.links.repo}/blob/main/${p.file}`, target: '_blank', rel: 'noopener', text: p.file }));
