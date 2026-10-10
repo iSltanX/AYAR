@@ -17,9 +17,9 @@
 
 | # | الصفحة | المعرّف | المحتوى | الحالة |
 |---|---|---|---|---|
-| 1 | `Cover` | `49:1052` | الإطار `58:2`: الاسم والرمز الملون (مادة تعريفية، D-49)، والإصدار والتاريخ، وفهرس الصفحات بحالاتها | DES-1، بانتظار الاعتماد |
-| 2 | `Identity` (كانت `AYAR — Final Identity`) | `13:2` | الأصل دون تغيير: قسم `30:1052` (الغلاف `30:1053` وإطار الهوية `30:1066`) وقسم المكونات `29:1052` (`AYAR / Symbol` `29:1077`). والإضافة: قسم `57:66` بإطار `57:67` «الاستخدام والنبرة»: الاستخدام الصحيح والخاطئ، ونطاق لون العُرف (D-49)، والنبرة، وإحالة D-48 | الأصل **معتمد (D-48)**، والإضافة بانتظار الاعتماد |
-| 3 | `Foundations` | `49:1053` | `51:2` المقدمة، و`51:10` Primitives، و`52:2` Semantic، و`52:177` Status، و`53:2` جدول التباين، و`54:2` توفيق G-03، و`55:2` الطباعة، و`56:2` التخطيط والحركة | DES-1، بانتظار الاعتماد |
+| 1 | `Cover` | `49:1052` | الإطار `58:2`: الاسم والرمز الملون (مادة تعريفية، D-49)، والإصدار والتاريخ، وفهرس الصفحات بحالاتها | معتمدة (DES-1، 2026-10-10) |
+| 2 | `Identity` (كانت `AYAR — Final Identity`) | `13:2` | الأصل دون تغيير: قسم `30:1052` (الغلاف `30:1053` وإطار الهوية `30:1066`) وقسم المكونات `29:1052` (`AYAR / Symbol` `29:1077`). والإضافة: قسم `57:66` بإطار `57:67` «الاستخدام والنبرة»: الاستخدام الصحيح والخاطئ، ونطاق لون العُرف (D-49)، والنبرة، وإحالة D-48 | الأصل **معتمد (D-48)**، والإضافة معتمدة (DES-1، 2026-10-10) |
+| 3 | `Foundations` | `49:1053` | `51:2` المقدمة، و`51:10` Primitives، و`52:2` Semantic، و`52:177` Status، و`53:2` جدول التباين، و`54:2` توفيق G-03، و`55:2` الطباعة، و`56:2` التخطيط والحركة | معتمدة (DES-1، 2026-10-10) |
 | 4 | `Status System` | `49:1054` | فارغة | DES-2 |
 | 5 | `Icons` | `49:1055` | فارغة | DES-2 |
 | 6 | `Components` | `49:1056` | فارغة | DES-3 |
@@ -46,14 +46,14 @@
 | قاعدة الأوضاع | الإطار يُضبط على وضع واحد في `Primitives` و`Semantic` و`Status` معًا، لأن مرادفات الأخيرتين تُقرأ من درجات `Primitives` في الوضع نفسه |
 | الأنماط | 11 نمط نص بأسماء البرومبت، وظل واحد `shadow/overlay`، وشبكة `grid/4` |
 | مصدر القيم | [DES-1/tokens.mjs](DES-1/tokens.mjs) يشتق القيم ويفحص التباين وقرب لون العُرف، ويكتب [tokens.json](DES-1/tokens.json) و[contrast.md](DES-1/contrast.md) |
-| لقطات العرض | [DES-1/review/](DES-1/review/) (قبل الاعتماد). وبعده تُنسخ إلى `approved/DES-1/` |
+| اللقطات المعتمدة | [approved/DES-1/](approved/DES-1/) (اعتمدها المالك 2026-10-10) |
 
 ## 3. المراحل والاعتمادات
 
 | المرحلة | ما تنتجه | تفتح للتطوير | الحالة | تاريخ الاعتماد | ملاحظات المالك |
 |---|---|---|---|---|---|
 | (قبل التنظيم) | الهوية: الرمز، والأيقونة، والتراكيب | — | معتمدة (D-48) | 2026-10-09 | «معتمد نقار الخشب» |
-| [DES-1](../phases/design/DES-1-foundations.md) | تنظيم الملف، وإكمال الهوية، والأسس | DEV-10 (مع DES-2 وDES-3) | بانتظار اعتماد المالك (عُرضت 2026-10-10) | — | — |
+| [DES-1](../phases/design/DES-1-foundations.md) | تنظيم الملف، وإكمال الهوية، والأسس | DEV-10 (مع DES-2 وDES-3) | معتمدة | 2026-10-10 | «معتمد، بجواب المالك للجلسة الرئيسية». دون تعديلات، بعد عرض اللقطات العشر النهائية ورابط Figma. وقرارات G-03 وmono والتباين حسمتها الجلسة الرئيسية بتفويض المالك (ORG-13) |
 | [DES-2](../phases/design/DES-2-status-icons.md) | نظام الحالات والرموز ودائرة العيار | DEV-10 (مع DES-1 وDES-3) | لم تبدأ | — | — |
 | [DES-3](../phases/design/DES-3-components.md) | المكونات التسعة والعشرون | DEV-10 | لم تبدأ | — | — |
 | [DES-4](../phases/design/DES-4-core-screens.md) | الشاشات 1–8 | DEV-11 | لم تبدأ | — | — |
@@ -90,13 +90,13 @@
 |---|---|---|---|---|
 | — | `Identity` | الهوية النهائية | `30:1052` | — |
 | — | `Identity` | `AYAR / Symbol` | `29:1077` | — |
-| DES-1 (بانتظار الاعتماد) | `Cover` | الغلاف والفهرس | `58:2` | `DES-1/review/Cover.png` |
-| DES-1 (بانتظار الاعتماد) | `Identity` | الاستخدام والنبرة | `57:67` | `DES-1/review/Identity-usage-and-voice.png` |
-| DES-1 (بانتظار الاعتماد) | `Foundations` | المقدمة | `51:2` | `DES-1/review/F-00-foundations.png` |
-| DES-1 (بانتظار الاعتماد) | `Foundations` | Primitives | `51:10` | `DES-1/review/F-01-primitives.png` |
-| DES-1 (بانتظار الاعتماد) | `Foundations` | Semantic | `52:2` | `DES-1/review/F-02-semantic.png` |
-| DES-1 (بانتظار الاعتماد) | `Foundations` | Status | `52:177` | `DES-1/review/F-03-status.png` |
-| DES-1 (بانتظار الاعتماد) | `Foundations` | جدول التباين | `53:2` | `DES-1/review/F-04-contrast.png` |
-| DES-1 (بانتظار الاعتماد) | `Foundations` | توفيق G-03 | `54:2` | `DES-1/review/F-05-g03-reconciliation.png` |
-| DES-1 (بانتظار الاعتماد) | `Foundations` | الطباعة | `55:2` | `DES-1/review/F-06-typography.png` |
-| DES-1 (بانتظار الاعتماد) | `Foundations` | التخطيط والحركة | `56:2` | `DES-1/review/F-07-layout-motion.png` |
+| DES-1 | `Cover` | الغلاف والفهرس | `58:2` | `approved/DES-1/Cover.png` |
+| DES-1 | `Identity` | الاستخدام والنبرة | `57:67` | `approved/DES-1/Identity-usage-and-voice.png` |
+| DES-1 | `Foundations` | المقدمة | `51:2` | `approved/DES-1/F-00-foundations.png` |
+| DES-1 | `Foundations` | Primitives | `51:10` | `approved/DES-1/F-01-primitives.png` |
+| DES-1 | `Foundations` | Semantic | `52:2` | `approved/DES-1/F-02-semantic.png` |
+| DES-1 | `Foundations` | Status | `52:177` | `approved/DES-1/F-03-status.png` |
+| DES-1 | `Foundations` | جدول التباين | `53:2` | `approved/DES-1/F-04-contrast.png` |
+| DES-1 | `Foundations` | توفيق G-03 | `54:2` | `approved/DES-1/F-05-g03-reconciliation.png` |
+| DES-1 | `Foundations` | الطباعة | `55:2` | `approved/DES-1/F-06-typography.png` |
+| DES-1 | `Foundations` | التخطيط والحركة | `56:2` | `approved/DES-1/F-07-layout-motion.png` |
