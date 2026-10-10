@@ -64,6 +64,7 @@
   "profile.invalid.consistency": "A required check cannot be left out of the full scan ({instance}).",
   "profile.invalid.sudo": "The command uses sudo, so it was refused ({instance}).",
   "profile.invalid.explicit_sensitive": "The variable “{name}” is sensitive; its value is never written in the profile. Allow it by name instead.",
+  "profile.invalid.explicit_internal": "The variable “{name}” is internal to AYAR or Electron, and is never passed to a check.",
   "profile.invalid.unknown_check": "A check the catalog does not know ({instance}).",
   "profile.invalid.approve_alone": "A dangerous command is approved on its own ({instance}).",
   "profile.invalid.not_pending": "This check is not awaiting approval ({instance}).",

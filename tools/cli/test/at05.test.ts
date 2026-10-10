@@ -9,7 +9,7 @@ import { appendFileSync, chmodSync, existsSync, mkdirSync, readFileSync, symlink
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { pathGrant } from '../src/grants.ts';
-import { addProject, connectEngine, materialize, ok, rescan, tempDir } from './support/fixtures.ts';
+import { addProject, connectEngine, filesContaining, materialize, ok, rescan, tempDir } from './support/fixtures.ts';
 
 let root: string;
 let cleanup: () => void;
@@ -140,6 +140,26 @@ describe('AT-05: approval, its persistence, effective changes, and dangerous com
       const src = pathGrant('source', bad);
       expect(await engine.invoke('profile.import', { projectId, sourceToken: src.token }, src.grants)).toMatchObject({ ok: false, error: { code: 'profile_invalid', details: { rule: 'schema' } } });
       expect(ok<ProfileView>(await engine.invoke('profile.get', { projectId })).version).toBe(p.version);
+
+      // Valid ayar-profile/1 files that carry what an edit may not (review m10): each is refused by its own rule.
+      const exported = JSON.parse(ok<{ text: string }>(await engine.invoke('profile.exportPreview', { projectId })).text) as { checks: Record<string, object> };
+      const importWith = async (name: string, check: object) => {
+        const file = join(root, `${name}.json`);
+        writeFileSync(file, JSON.stringify({ ...exported, checks: { ...exported.checks, 'beh.unit@.': check } }));
+        const g = pathGrant('source', file);
+        return engine.invoke('profile.import', { projectId, sourceToken: g.token }, g.grants);
+      };
+      expect(await importWith('sudo', { argv: ['sudo', 'npm', 'test'] })).toMatchObject({ ok: false, error: { code: 'profile_invalid', details: { rule: 'sudo' } } });
+      expect(await importWith('sudo-path', { argv: ['/usr/bin/sudo', 'npm', 'test'] })).toMatchObject({ ok: false, error: { code: 'profile_invalid', details: { rule: 'sudo' } } });
+      expect(await importWith('token', { explicitEnv: { NPM_TOKEN: 'x' } })).toMatchObject({ ok: false, error: { code: 'profile_invalid', details: { rule: 'explicit_sensitive', name: 'NPM_TOKEN' } } });
+      expect(await importWith('camel', { explicitEnv: { npmAuthToken: 'x' } })).toMatchObject({ ok: false, error: { code: 'profile_invalid', details: { rule: 'explicit_sensitive', name: 'npmAuthToken' } } });
+      expect(await importWith('internal', { explicitEnv: { ELECTRON_RUN_AS_NODE: '1' } })).toMatchObject({ ok: false, error: { code: 'profile_invalid', details: { rule: 'explicit_internal', name: 'ELECTRON_RUN_AS_NODE' } } });
+      expect(ok<ProfileView>(await engine.invoke('profile.get', { projectId })).version).toBe(p.version);
+      // A sensitive variable allowed by name is accepted, but nothing imported runs before it is approved again.
+      const allowed = ok<ProfileView>(await importWith('allow', { allowSensitive: ['NPM_TOKEN'] }));
+      expect(allowed).toMatchObject({ source: 'imported', approvals: [] });
+      expect(allowed.pending.items.find((i) => i.instance === 'beh.unit@.')).toMatchObject({ approvable: true });
+      expect(spec(allowed, 'beh.unit@.')).toMatchObject({ env: { allowSensitive: ['NPM_TOKEN'] } });
     } finally {
       await engine.close();
     }
@@ -203,5 +223,26 @@ describe('hostile profiles are refused, not fatal (review M4, M5)', () => {
     } finally {
       await engine.close();
     }
+  }, 60_000);
+});
+
+describe('profile bookkeeping (review m4, m7)', () => {
+  it('keeps an edited profile’s source and names the latest snapshot across rescans; an approval note is redacted', async () => {
+    const dataDir = join(root, 'AYAR');
+    const engine = await connectEngine({ dataDir });
+    try {
+      await engine.waitForEvent('engine.health');
+      const { projectId } = await addProject(engine, materialize('FX-EXT', 'good', join(root, 'FX-EXT')));
+      const edited = ok<ProfileView>(await engine.invoke('profile.update', { projectId, patch: { context: { audience: 'solo' } } }));
+      expect(edited.source).toBe('edited');
+      const snapshot = await rescan(engine, projectId);
+      const after = ok<ProfileView>(await engine.invoke('profile.get', { projectId }));
+      expect(after).toMatchObject({ source: 'edited', version: edited.version, snapshotId: snapshot.id });
+      const token = ['gh', 'p_', 'N'.repeat(36)].join('');
+      ok(await engine.invoke('profile.approve', { projectId, changeSetId: after.pending.id, note: `checked with ${token}` }));
+    } finally {
+      await engine.close();
+    }
+    expect(filesContaining(dataDir, ['gh', 'p_', 'N'.repeat(36)].join(''))).toEqual([]);
   }, 60_000);
 });

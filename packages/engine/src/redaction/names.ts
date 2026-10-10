@@ -43,11 +43,16 @@ export function nameRules(data: RedactionData, user: readonly UserNamePattern[] 
   };
 }
 
-/** The words of a variable name: split on `_` and on digit runs (API_KEY2 → API, KEY). */
+/**
+ * The words of a variable name: split on anything not a letter (`_`, `-`, `.`, digits: API_KEY2 → API, KEY) and
+ * at camelCase boundaries (myApiToken → MY, API, TOKEN; OAuthToken → O, AUTH, TOKEN) (review m5).
+ */
 export function nameWords(name: string): string[] {
   return name
+    .replace(/([a-z])([A-Z])/g, '$1_$2')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
     .toUpperCase()
-    .split(/[_\d]+/)
+    .split(/[^A-Z]+/)
     .filter((w) => w.length > 0);
 }
 
@@ -57,7 +62,7 @@ export function classifyEnvName(name: string, rules: NameRules): EnvNameClass {
   if (rules.exceptions.has(upper)) return 'exception';
   if (rules.names.has(upper)) return 'sensitive';
   if (rules.prefixes.some((p) => upper.startsWith(p))) return 'sensitive';
-  if (nameWords(upper).some((w) => rules.words.has(w))) return 'sensitive';
+  if (nameWords(name).some((w) => rules.words.has(w))) return 'sensitive';
   if (rules.user.some((u) => (u.endsWith('*') ? upper.startsWith(u.slice(0, -1).toUpperCase()) : upper === u.toUpperCase()))) return 'sensitive';
   return 'plain';
 }

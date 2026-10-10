@@ -58,6 +58,22 @@ describe('version requirements', () => {
     expect(satisfies('24.16.0', 'lts/*')).toBeNull();
     expect(best(['20.20.2', '24.14.0', '24.16.0'], '24')).toBe('24.16.0');
     expect(best(['20.20.2'], '24')).toBeNull();
+    // Partial versions (review m8): npm's ranges cover every patch of the named part; PEP 440 pads with zeros.
+    expect(satisfies('24.16.0', '~24')).toBe(true);
+    expect(satisfies('24.16.0', '~24.1')).toBe(false);
+    expect(satisfies('24.1.9', '~24.1')).toBe(true);
+    expect(satisfies('24.1.5', '>24.1')).toBe(false);
+    expect(satisfies('24.2.0', '>24.1')).toBe(true);
+    expect(satisfies('24.1.5', '<=24.1')).toBe(true);
+    expect(satisfies('24.2.0', '<=24.1')).toBe(false);
+    expect(satisfies('0.0.5', '^0.0.3')).toBe(false);
+    expect(satisfies('0.2.5', '^0.2')).toBe(true);
+    expect(satisfies('3.12.1', '>3.12', 'pep440')).toBe(true);
+    expect(satisfies('3.12.1', '<=3.12', 'pep440')).toBe(false);
+    expect(satisfies('3.12.13', '==3.12', 'pep440')).toBe(false);
+    expect(satisfies('3.12.13', '==3.12.*', 'pep440')).toBe(true);
+    expect(satisfies('3.12.13', '>=3.10,!=3.11.*', 'pep440')).toBe(true);
+    expect(satisfies('3.11.2', '>=3.10,!=3.11.*', 'pep440')).toBe(false);
   });
 });
 
@@ -79,6 +95,16 @@ describe('the login shell (C-07 point 1, E-06)', () => {
     expect(parseLoginShellOutput(fake, 'abc')).toBeNull();
     expect(loginShellScript('/bin/zsh', 'n')).toContain('whence -w');
     expect(loginShellScript('/bin/bash', 'n')).toContain('type -t');
+  });
+
+  it('does not wait for a background job that keeps the output open after the shell exits (review m6)', async () => {
+    const shell = script('bin/bg-shell', '/bin/sleep 29.7182 &\necho done-before-exit');
+    const r = await nodeProcessControl.spawn(shell, [], { cwd: root, env: { PATH: '/usr/bin:/bin' }, timeoutMs: 5000, maxOutputBytes: 1024 });
+    expect(r).toMatchObject({ code: 0, timedOut: false });
+    expect(new TextDecoder().decode(r.stdout)).toContain('done-before-exit');
+    expect(r.durationMs).toBeLessThan(2000);
+    await new Promise((res) => setTimeout(res, 300));
+    expect(execFileSync('/bin/ps', ['-axo', 'args=']).toString().split('\n').filter((l) => l.startsWith('/bin/sleep 29.7182'))).toEqual([]);
   });
 
   it('times out, kills the whole group, and the service falls back to a marked PATH (C-07 point 2)', async () => {
@@ -137,6 +163,10 @@ describe('the environment service and the child environment (D-47, AT-48, G-35)'
     });
     expect(c.env).toEqual({ PATH: '/bin', LANG: 'ar_SA.UTF-8', GH_TOKEN: 'y', SSH_AUTH_SOCK: '/s', MODE: 'a', NO_COLOR: '1', FORCE_COLOR: '0', AYAR: '1', TMPDIR: '/tmp/check-1', VITEST_X: '1' });
     expect(c).toMatchObject({ withheld: ['MY_API_TOKEN'], allowedSensitive: ['GH_TOKEN'], removedInternal: ['AYAR_CHECK_TOKEN'] });
+    // An explicit variable never brings back an internal one (review m4).
+    const internal = computeChildEnv({ login: { PATH: '/bin' }, rules: nameRules(catalog.redaction), allowSensitive: [], explicit: { ELECTRON_RUN_AS_NODE: '1', MODE: 'a' } });
+    expect(internal.env).not.toHaveProperty('ELECTRON_RUN_AS_NODE');
+    expect(internal).toMatchObject({ removedInternal: ['ELECTRON_RUN_AS_NODE'], env: { MODE: 'a' } });
   });
 });
 

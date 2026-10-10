@@ -71,11 +71,19 @@ export function profileAt(db: Db, projectId: string, version: number): ProfileRo
   return r ? toRow(r) : null;
 }
 
-/** Saves a new version, unless the content is the same as the latest version's (then nothing is written). */
+/**
+ * Saves a new version, unless the content is the same as the latest version's. Then no version is added, but the
+ * latest one records the snapshot that confirmed it, so the profile names the current discovery (review m7).
+ */
 export function saveProfile(db: Db, o: { id: string; projectId: string; content: ProfileContent; source: ProfileRow['source']; now: Date }): { row: ProfileRow; created: boolean } {
   const hash = contentHash(o.content);
   const latest = latestProfile(db, o.projectId);
-  if (latest && latest.contentHash === hash) return { row: latest, created: false };
+  if (latest && latest.contentHash === hash) {
+    if (latest.content.snapshotId === o.content.snapshotId) return { row: latest, created: false };
+    const content = { ...latest.content, snapshotId: o.content.snapshotId };
+    db.run('UPDATE profiles SET content_json = ? WHERE id = ?', JSON.stringify(content), latest.id);
+    return { row: { ...latest, content }, created: false };
+  }
   const version = (latest?.version ?? 0) + 1;
   const createdAt = o.now.toISOString();
   db.run(

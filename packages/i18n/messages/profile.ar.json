@@ -64,6 +64,7 @@
   "profile.invalid.consistency": "الفحص المطلوب لا يكون غير مضمّن في الفحص الكامل ({instance}).",
   "profile.invalid.sudo": "الأمر يستخدم sudo فرُفض ({instance}).",
   "profile.invalid.explicit_sensitive": "المتغير «{name}» حساس؛ لا تُكتب قيمته في الملف. اسمح بتمريره بالاسم بدل ذلك.",
+  "profile.invalid.explicit_internal": "المتغير «{name}» من متغيرات عِيَار أو Electron الداخلية، ولا يُمرَّر إلى فحص.",
   "profile.invalid.unknown_check": "فحص غير معروف في الكتالوج ({instance}).",
   "profile.invalid.approve_alone": "الأمر الخطر يُعتمد منفردًا ({instance}).",
   "profile.invalid.not_pending": "لا ينتظر هذا الفحص اعتمادًا ({instance}).",

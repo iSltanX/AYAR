@@ -112,12 +112,23 @@ interface Span {
   rule: string;
 }
 
-/** The spans one pattern would redact in `text` (never inside an existing marker). */
-function patternSpans(text: string, p: CompiledPattern): Span[] {
+const MARKER_RE = /⟦redacted:[^⟧\n]*⟧/g;
+
+/** Where the markers of an earlier redaction sit in `text`, in order. */
+function markerRanges(text: string): [number, number][] {
+  if (!text.includes(MARKER_START)) return [];
+  return [...text.matchAll(MARKER_RE)].map((m) => [m.index, m.index + m[0].length]);
+}
+
+/**
+ * The spans one pattern would redact in `text`. A span made only of earlier markers is left alone (redacting
+ * twice changes nothing); a span that touches a marker takes the whole marker, and anything else in it is still
+ * redacted (review m3: `password=<secret>⟧` is not a marker, and is redacted).
+ */
+function patternSpans(text: string, p: CompiledPattern, markers: readonly [number, number][] = markerRanges(text)): Span[] {
   const spans: Span[] = [];
   p.regex.lastIndex = 0;
   for (const m of text.matchAll(p.regex)) {
-    if (m.index === undefined) continue;
     let start = m.index;
     let end = start + m[0].length;
     if (p.group !== undefined) {
@@ -129,8 +140,13 @@ function patternSpans(text: string, p: CompiledPattern): Span[] {
       if (p.minEntropy !== undefined && entropy(g) < p.minEntropy) continue;
     }
     if (end <= start) continue;
-    const slice = text.slice(start, end);
-    if (slice.includes(MARKER_START) || slice.includes('⟧')) continue;
+    for (const [a, b] of markers) {
+      if (a < end && b > start) {
+        start = Math.min(start, a);
+        end = Math.max(end, b);
+      }
+    }
+    if (markers.length && !text.slice(start, end).replace(MARKER_RE, '').length) continue;
     spans.push({ start, end, rule: p.rule });
   }
   return spans;
@@ -186,8 +202,9 @@ export class Redactor {
   /** All spans of layers 1, 2 and 4 in a piece of text (one line, or a whole document). */
   #spans(text: string): Span[] {
     const spans = knownSpans(text, this.rules.known);
-    for (const p of this.rules.highConfidence) spans.push(...patternSpans(text, p));
-    for (const p of this.rules.user) spans.push(...patternSpans(text, p));
+    const markers = markerRanges(text);
+    for (const p of this.rules.highConfidence) spans.push(...patternSpans(text, p, markers));
+    for (const p of this.rules.user) spans.push(...patternSpans(text, p, markers));
     return spans;
   }
 
@@ -203,12 +220,25 @@ export class Redactor {
     return { text: lines.join(''), counts: stream.counts };
   }
 
-  /** Redacts every string inside a JSON value (discovery facts, profile content). */
+  /**
+   * Redacts every string inside a JSON value (discovery facts, profile content): the values and the object keys
+   * (review m4: extensions, group and variable names are keys). Two keys redacted alike stay apart (`#2`).
+   */
   redactJson<T>(value: T, counts: RedactionCounts = {}): T {
     const walk = (v: unknown): unknown => {
       if (typeof v === 'string') return this.#count(this.redactText(v), counts);
       if (Array.isArray(v)) return v.map(walk);
-      if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v as Record<string, unknown>).map(([k, x]) => [k, walk(x)]));
+      if (v && typeof v === 'object') {
+        const used = new Set<string>();
+        const entries = Object.entries(v as Record<string, unknown>).map(([k, x]): [string, unknown] => {
+          const base = this.#count(this.redactText(k), counts);
+          let key = base;
+          for (let i = 2; used.has(key); i++) key = `${base}#${i}`;
+          used.add(key);
+          return [key, walk(x)];
+        });
+        return Object.fromEntries(entries);
+      }
       return v;
     };
     return walk(value) as T;
@@ -231,7 +261,8 @@ export class Redactor {
   secondPass(text: string): { ok: true } | { ok: false; rules: string[] } {
     const rules = new Set<string>();
     for (const s of knownSpans(text, this.rules.known)) rules.add(s.rule);
-    for (const p of this.rules.highConfidence) for (const s of patternSpans(text, p)) rules.add(s.rule);
+    const markers = markerRanges(text);
+    for (const p of this.rules.highConfidence) for (const s of patternSpans(text, p, markers)) rules.add(s.rule);
     for (const b of this.rules.blocks) if (b.begin.test(text)) rules.add(b.rule);
     return rules.size ? { ok: false, rules: [...rules].sort() } : { ok: true };
   }
@@ -277,7 +308,8 @@ export class LineRedactor {
         const cut = this.#safeCut(this.#buffer.slice(0, lineLength));
         const segment = this.#buffer.slice(0, cut);
         this.#buffer = this.#buffer.slice(cut);
-        out.push(...this.#line(segment).map((x) => x + LINE_SPLIT_MARKER + '\n'));
+        // A segment dropped inside a private-key block leaves nothing, not even the split marker (review m3).
+        out.push(...this.#line(segment).filter((x) => x !== '').map((x) => x + LINE_SPLIT_MARKER + '\n'));
         continue;
       }
       if (nl >= 0) {
@@ -290,14 +322,29 @@ export class LineRedactor {
     }
   }
 
-  /** The cut point for an over-long line: at MAX_LINE_CHARS, moved so that no match is cut in two. */
+  /**
+   * The cut point for an over-long line: at MAX_LINE_CHARS, moved so that no match is cut in two. Overlapping
+   * matches are merged first, so moving the cut out of one never lands it inside another (review m3).
+   */
   #safeCut(text: string): number {
-    let cut = MAX_LINE_CHARS;
     const window = text.slice(0, MAX_LINE_CHARS + SPLIT_LOOKAHEAD_CHARS);
     const spans: Span[] = knownSpans(window, this.#r.rules.known);
-    for (const p of [...this.#r.rules.highConfidence, ...this.#r.rules.user]) spans.push(...patternSpans(window, p));
-    for (const s of spans) if (s.start < cut && s.end > cut) cut = s.start > 0 ? s.start : s.end;
-    return Math.max(1, cut);
+    const markers = markerRanges(window);
+    for (const p of [...this.#r.rules.highConfidence, ...this.#r.rules.user]) spans.push(...patternSpans(window, p, markers));
+    spans.sort((a, b) => a.start - b.start);
+    const cut = MAX_LINE_CHARS;
+    let start = -1;
+    let end = -1;
+    for (const s of spans) {
+      if (s.start < end) end = Math.max(end, s.end);
+      else {
+        if (start < cut && end > cut) break;
+        start = s.start;
+        end = s.end;
+      }
+    }
+    if (start < cut && end > cut) return start > 0 ? start : end;
+    return cut;
   }
 
   #line(line: string): string[] {

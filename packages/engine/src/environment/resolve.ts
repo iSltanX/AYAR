@@ -7,7 +7,7 @@ import type { Fact, ToolResolution } from '@ayar/protocol';
 import { posix } from 'node:path';
 import type { FileSystem, ProcessControl } from '../ports/index.ts';
 import type { InstalledVersion } from './managers.ts';
-import { best, parseVersion, satisfies } from './semver.ts';
+import { best, flavorOf, parseVersion, satisfies } from './semver.ts';
 
 /** C-07 point 2: known folders, kept only when they exist, then the system paths. */
 export const FALLBACK_DIRS = ['/opt/homebrew/bin', '/usr/local/bin', '~/.local/share/mise/shims', '~/.asdf/shims', '~/.volta/bin', '~/.local/bin', '~/.cargo/bin', '~/.bun/bin'];
@@ -137,11 +137,12 @@ export async function resolveTools(i: ResolveToolsInput): Promise<ToolResolution
       if (version) versionSource = 'path';
     }
     const installed = t.runtime ? i.installed.filter((x) => x.tool === t.runtime) : [];
-    const sat = version && t.required ? satisfies(version, t.required.spec) : null;
+    const flavor = flavorOf(t.name);
+    const sat = version && t.required ? satisfies(version, t.required.spec, flavor) : null;
     let proposedPath: string | null = null;
     let status: ToolResolution['status'] = !path ? 'missing' : t.required === null ? (version ? 'ok' : 'unknown') : sat === true ? 'ok' : sat === false ? 'mismatch' : 'unknown';
     if (t.required && (sat === false || !path || (sat === null && !version))) {
-      const match = best(installed.map((x) => x.version), t.required.spec);
+      const match = best(installed.map((x) => x.version), t.required.spec, flavor);
       const hit = match ? installed.find((x) => x.version === match) : undefined;
       if (hit && sat !== true) {
         proposedPath = hit.path;
@@ -220,7 +221,7 @@ export async function probeVersions(processes: ProcessControl, tools: ToolResolu
     if (ok && !t.proposedPath) {
       version = probe.version;
       versionSource = 'probe';
-      sat = t.required && version ? satisfies(version, t.required.spec) : null;
+      sat = t.required && version ? satisfies(version, t.required.spec, flavorOf(t.tool)) : null;
       status = t.required ? (sat === true ? 'ok' : sat === false ? 'mismatch' : 'unknown') : 'ok';
       if (t.viaCorepack && t.required && parseVersion(version!)?.join('.') !== parseVersion(t.required.spec)?.join('.')) status = 'mismatch';
     } else if (!ok) status = t.status === 'missing' ? 'missing' : probe.error === 'timeout' ? 'unknown' : 'mismatch';

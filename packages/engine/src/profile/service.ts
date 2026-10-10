@@ -105,11 +105,16 @@ export class ProfileService {
     return proposeChecks({ catalog: this.#o.catalog, components: snapshot.components, facts: snapshot.facts, settings, state: { reviews }, hash: this.hash });
   }
 
-  /** Recomputes the profile from a snapshot and saves a version when it changed (C-09 point 5). */
+  /**
+   * Recomputes the profile from a snapshot and saves a version when it changed (C-09 point 5). A recomputation
+   * ('proposed') keeps the settings of the latest version, so it keeps its source too: settings the user edited
+   * or imported are not relabelled as proposed (review m7).
+   */
   regenerate(projectId: string, snapshot: DiscoverySnapshot, source: ProfileRow['source'], settings = this.settingsOf(projectId)): { row: ProfileRow; specs: CheckSpec[] } {
     const specs = this.specs(snapshot, settings);
     const content: ProfileContent = { ...settings, snapshotId: snapshot.id, checks: specs };
-    const { row } = saveProfile(this.#o.db, { id: newId(this.#o.ports.random, 'prf'), projectId, content, source, now: this.#o.ports.clock.now() });
+    const effective = source === 'proposed' ? (latestProfile(this.#o.db, projectId)?.source ?? 'proposed') : source;
+    const { row } = saveProfile(this.#o.db, { id: newId(this.#o.ports.random, 'prf'), projectId, content, source: effective, now: this.#o.ports.clock.now() });
     return { row, specs };
   }
 
@@ -154,7 +159,12 @@ export class ProfileService {
       const checkId = instance.slice(0, instance.indexOf('@'));
       if (!known.has(checkId) && !(checkId.startsWith('custom.') && settings.custom[checkId.slice('custom.'.length)])) throw invalid('unknown_check', { instance });
       if (o.argv && judgeCommand(policy, [argvText(o.argv), ...o.argv]).refused.length) throw invalid('sudo', { instance });
-      for (const name of Object.keys(o.explicitEnv ?? {})) if (classifyEnvName(name, names) === 'sensitive') throw invalid('explicit_sensitive', { instance, name });
+      for (const name of Object.keys(o.explicitEnv ?? {})) {
+        const cls = classifyEnvName(name, names);
+        if (cls === 'sensitive') throw invalid('explicit_sensitive', { instance, name });
+        // AYAR's and Electron's own variables are always removed from a check (C-07 point 5, review m4).
+        if (cls === 'internal') throw invalid('explicit_internal', { instance, name });
+      }
       if (o.enabled === false && o.required === true) throw invalid('consistency', { instance });
       const spec = specs.find((s) => s.instance === instance);
       if (o.included === false && (o.required === true || (o.required === undefined && spec?.required === true && o.enabled !== false))) throw invalid('consistency', { instance });
@@ -220,7 +230,7 @@ export class ProfileService {
       skipped = approvable.filter((i) => i.approveAlone).map((i) => i.instance);
     }
     this.#o.db.transaction(() => {
-      writeApprovals(this.#o.db, { projectId, items: targets.map((t) => ({ instance: t.instance, specHash: t.specHash! })), profileVersion: row.version, now: this.#o.ports.clock.now(), note: note ?? null, newId: () => newId(this.#o.ports.random, 'apr') });
+      writeApprovals(this.#o.db, { projectId, items: targets.map((t) => ({ instance: t.instance, specHash: t.specHash! })), profileVersion: row.version, now: this.#o.ports.clock.now(), note: note ? this.#o.redaction.redactor().redactText(note).text : null, newId: () => newId(this.#o.ports.random, 'apr') });
       recordAudit(this.#o.db, { id: newId(this.#o.ports.random, 'aud'), at: this.#o.ports.clock.now(), action: 'profile.approved', projectId, details: { profileVersion: row.version, instances: targets.map((t) => t.instance), dangerous: targets.filter((t) => t.approveAlone).map((t) => t.instance) } });
     });
     return { approved: targets.map((t) => t.instance), skipped, profile: this.view(projectId) };

@@ -179,6 +179,43 @@ describe('the line stream (C-18 «التدفق»)', () => {
     expect(out.counts['private-key:unterminated']).toBe(1);
   });
 
+  it('cuts a long line outside overlapping matches, and drops a block’s long lines without split markers (review m3)', () => {
+    const ka = join('q7Wz1Lp0Xr', 'M3nB8vC2kT');
+    const kb = join('M3nB8vC2kT', 'h5Gd9Jf4Ys');
+    const two = redactor({ known: [{ rule: 'env:A', value: ka }, { rule: 'env:B', value: kb }] });
+    // A ends 5 characters before the cut, B straddles it and overlaps A: moving the cut to B's start would land in A.
+    const line = 'x'.repeat(MAX_LINE_CHARS - 25) + ka + 'h5Gd9Jf4Ys' + 'y'.repeat(20) + '\n';
+    const s = two.lineStream();
+    const out = [...s.push(line), ...s.end()].join('');
+    expect(out).not.toContain('q7Wz1Lp0Xr');
+    expect(out).not.toContain('h5Gd9Jf4Ys');
+    const block = ['-----BEGIN ', 'PRIVATE KEY-----'].join('');
+    const end = ['-----END ', 'PRIVATE KEY-----'].join('');
+    const s2 = r.lineStream();
+    const out2 = [...s2.push(`${block}\n${'A'.repeat(MAX_LINE_CHARS * 2 + 10)}\n${end}\nafter\n`), ...s2.end()].join('');
+    expect(out2).toBe(`${REDACTED('private-key')}\nafter\n`);
+  });
+
+  it('redacts a secret next to a marker character, and leaves earlier markers alone (review m3)', () => {
+    const secret = 'Zx9Qw3Er7Ty1Ui5Op2As8Df';
+    const out = r.redactText(`password=${secret}⟧`).text;
+    expect(out).not.toContain(secret);
+    expect(r.secondPass(`password=${secret}⟧`).ok).toBe(false);
+    const again = r.redactText(out).text;
+    expect(again).toBe(out);
+    expect(r.redactText(`password=${REDACTED('env:X')}`).text).toBe(`password=${REDACTED('env:X')}`);
+  });
+
+  it('redacts object keys too, keeping keys that redact alike apart (review m4)', () => {
+    const tokenA = join('gh', 'p_', 'A'.repeat(36));
+    const tokenB = join('gh', 'p_', 'B'.repeat(36));
+    const counts = {};
+    const out = r.redactJson({ byName: { [tokenA]: 1, [tokenB]: 2, plain: 3 } }, counts);
+    expect(JSON.stringify(out)).not.toContain(tokenA);
+    expect(out.byName).toEqual({ [REDACTED('github-token')]: 1, [`${REDACTED('github-token')}#2`]: 2, plain: 3 });
+    expect(counts).toEqual({ 'github-token': 2 });
+  });
+
   it('redacts every string of a JSON value, counting per rule', () => {
     const counts = {};
     const value = { scripts: { deploy: `curl -H ${join('gh', 'p_', 'Q'.repeat(36))}` }, n: 3, list: ['ok'] };
@@ -192,16 +229,18 @@ describe('sensitive names (C-18 layer 1, C-07, G-35)', () => {
   const rules = nameRules(catalog.redaction);
 
   it('withholds names by whole word, by prefix and by the known list', () => {
-    for (const n of ['MY_API_TOKEN', 'NPM_TOKEN', 'GITHUB_TOKEN', 'DB_PASSWORD', 'API_KEY', 'S3_SECRET', 'AWS_REGION', 'GOOGLE_APPLICATION_CREDENTIALS', 'SESSION', 'PGPASSWORD', 'DATABASE_URL', 'client_secret']) {
+    for (const n of ['MY_API_TOKEN', 'NPM_TOKEN', 'GITHUB_TOKEN', 'DB_PASSWORD', 'API_KEY', 'S3_SECRET', 'AWS_REGION', 'GOOGLE_APPLICATION_CREDENTIALS', 'SESSION', 'PGPASSWORD', 'DATABASE_URL', 'client_secret', 'SECRET-KEY', 'MY.TOKEN', 'myApiToken', 'dbPassword', 'OAuthToken']) {
       expect(classifyEnvName(n, rules), n).toBe('sensitive');
     }
   });
 
   it('does not match a word inside another word (G-35)', () => {
-    for (const n of ['KEYBOARD_LAYOUT', 'MONKEY', 'PASSPORT_DIR', 'OAUTH2_SCOPE', 'BYPASS_CACHE', 'SECURITYSESSIONID', 'PATH', 'HOME', 'LANG', 'PWD']) {
+    for (const n of ['KEYBOARD_LAYOUT', 'MONKEY', 'PASSPORT_DIR', 'OAUTH2_SCOPE', 'BYPASS_CACHE', 'SECURITYSESSIONID', 'PATH', 'HOME', 'LANG', 'PWD', 'keyboardLayout', 'passportDir', '__CFBundleIdentifier']) {
       expect(classifyEnvName(n, rules), n).toBe('plain');
     }
     expect(nameWords('API_KEY2')).toEqual(['API', 'KEY']);
+    expect(nameWords('myApiToken')).toEqual(['MY', 'API', 'TOKEN']);
+    expect(nameWords('SECRET-KEY.v2')).toEqual(['SECRET', 'KEY', 'V']);
   });
 
   it('passes the listed exceptions (SSH_AUTH_SOCK, TERM_SESSION_ID) and removes AYAR and Electron internals', () => {

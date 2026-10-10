@@ -39,7 +39,10 @@ export function computeChildEnv(i: ChildEnvInput): ChildEnv {
       if (cls === 'sensitive') allowedSensitive.push(name);
     }
   }
-  const added = { ...i.explicit, NO_COLOR: '1', FORCE_COLOR: '0', AYAR: '1', ...(i.tmpDir ? { TMPDIR: i.tmpDir } : {}), ...(i.adapter ?? {}) };
+  // An explicit variable never brings back an internal one (review m4); the profile validation refuses it too.
+  const explicit = Object.fromEntries(Object.entries(i.explicit).filter(([name]) => classifyEnvName(name, i.rules) !== 'internal'));
+  for (const name of Object.keys(i.explicit)) if (!(name in explicit) && !removedInternal.includes(name)) removedInternal.push(name);
+  const added = { ...explicit, NO_COLOR: '1', FORCE_COLOR: '0', AYAR: '1', ...(i.tmpDir ? { TMPDIR: i.tmpDir } : {}), ...(i.adapter ?? {}) };
   Object.assign(env, added);
   const sort = (a: string[]) => a.sort();
   return { env, passed: sort(Object.keys(env)), withheld: sort(withheld), allowedSensitive: sort(allowedSensitive), added: sort(Object.keys(added)), removedInternal: sort(removedInternal) };
