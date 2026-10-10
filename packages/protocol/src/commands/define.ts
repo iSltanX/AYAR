@@ -28,8 +28,12 @@ export interface CommandDefinition<P extends z.ZodType = z.ZodType, R extends z.
   readonly implementedIn: PhaseId;
 }
 
-export function defineCommand<P extends z.ZodType, R extends z.ZodType>(
-  def: Omit<CommandDefinition<P, R>, 'grants'> & { grants?: readonly GrantRequirement[] },
-): CommandDefinition<P, R> {
-  return { ...def, grants: def.grants ?? [] };
+/**
+ * Declares a command. The `const` type parameter keeps the literal audience, handler and schemas in the
+ * registry's type, so RendererCommandName and RendererResult are computed from them.
+ */
+export function defineCommand<const D extends Omit<CommandDefinition, 'grants'> & { grants?: readonly GrantRequirement[] }>(
+  def: D,
+): D & { readonly grants: readonly GrantRequirement[] } {
+  return { grants: [], ...def };
 }

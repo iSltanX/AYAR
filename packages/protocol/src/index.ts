@@ -12,3 +12,4 @@ export * from './audit.ts';
 export * from './bridge.ts';
 export * from './client.ts';
 export * from './ownership.ts';
+export { z } from './zod.ts';

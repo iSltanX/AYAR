@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   COMMANDS,
   COMMAND_NAMES,
+  commandDefinition,
   DIRECT_CONFIRM_COMMANDS,
   ERROR_CODES,
   EVENT_TOPICS,
@@ -71,7 +72,7 @@ describe('command registry (6.5)', () => {
   });
 
   it('confirmation-bound commands either have a preview that confirms them, or are issued directly', () => {
-    const previews = COMMAND_NAMES.filter((c) => COMMANDS[c].confirms).map((c) => COMMANDS[c].confirms);
+    const previews = COMMAND_NAMES.map((c) => commandDefinition(c).confirms).filter((c): c is string => c !== undefined);
     for (const name of COMMAND_NAMES) {
       if (!COMMANDS[name].grants.some((g) => g.kind === 'confirmation')) continue;
       const direct = (DIRECT_CONFIRM_COMMANDS as readonly string[]).includes(name);
