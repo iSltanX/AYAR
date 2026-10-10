@@ -1,0 +1,22 @@
+{
+  "errors.unknown_command": "أمر غير معروف، فلم يُنفَّذ.",
+  "errors.invalid_message": "وصلت رسالة لا تطابق البروتوكول، فرُفضت.",
+  "errors.invalid_payload": "بيانات الأمر لا تطابق مخططه، فلم يُنفَّذ.",
+  "errors.invalid_result": "ردّ المحرك لا يطابق عقده، فلم يُعتمد.",
+  "errors.untrusted_sender": "رُفضت الرسالة لأنها لم تصل من نافذة عِيَار.",
+  "errors.not_implemented": "هذه الوظيفة لم تُبنَ بعد.",
+  "errors.grant_missing": "ينقص الأمر إذن لم يُمنح له، فلم يُنفَّذ.",
+  "errors.token_invalid": "الرمز غير صالح أو انتهت صلاحيته أو استُخدم من قبل.",
+  "errors.confirmation_mismatch": "التأكيد صدر لإجراء آخر، فلم يُنفَّذ هذا الإجراء.",
+  "errors.engine_starting": "المحرك يبدأ، فأعد المحاولة بعد لحظة.",
+  "errors.engine_unavailable": "المحرك متوقف مؤقتًا، ويُعاد تشغيله.",
+  "errors.engine_failed": "تعذّر تشغيل المحرك بعد ثلاث محاولات. السجل في: {logPath}",
+  "errors.protocol_mismatch": "إصدار المحرك ({received}) لا يوافق إصدار التطبيق ({expected})، فأُوقف الاتصال.",
+  "errors.db_corrupt": "قاعدة بيانات عِيَار تالفة. يمكن استعادة آخر نسخة احتياطية سليمة.",
+  "errors.db_newer_than_app": "قاعدة البيانات أنشأها إصدار أحدث من عِيَار، فلا يفتحها هذا الإصدار. حدّث التطبيق.",
+  "errors.data_dir_unsafe": "مجلد بيانات عِيَار غير آمن (صلاحيات أو مالك أو رابط رمزي)، فلم يُستخدم.",
+  "errors.busy": "يجري تشغيل آخر الآن، فانتظر دوره في الطابور.",
+  "errors.not_found": "غير موجود.",
+  "errors.cancelled": "أُلغي.",
+  "errors.internal": "خطأ داخلي في عِيَار. التفاصيل في السجل."
+}

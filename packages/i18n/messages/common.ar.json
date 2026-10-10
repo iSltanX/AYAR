@@ -1,0 +1,6 @@
+{
+  "common.appName": "عِيَار",
+  "common.count.checks": "{count, plural, zero {لا فحوص} one {فحص واحد} two {فحصان} few {# فحوص} many {# فحصًا} other {# فحص}}",
+  "common.count.findings": "{count, plural, zero {لا اكتشافات} one {اكتشاف واحد} two {اكتشافان} few {# اكتشافات} many {# اكتشافًا} other {# اكتشاف}}",
+  "common.count.runs": "{count, plural, zero {لا تشغيلات} one {تشغيل واحد} two {تشغيلان} few {# تشغيلات} many {# تشغيلًا} other {# تشغيل}}"
+}

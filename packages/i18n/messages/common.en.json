@@ -1,0 +1,6 @@
+{
+  "common.appName": "AYAR",
+  "common.count.checks": "{count, plural, one {# check} other {# checks}}",
+  "common.count.findings": "{count, plural, one {# finding} other {# findings}}",
+  "common.count.runs": "{count, plural, one {# run} other {# runs}}"
+}

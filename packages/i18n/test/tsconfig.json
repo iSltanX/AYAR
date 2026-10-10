@@ -1,5 +1,18 @@
 {
   "extends": "../../../tsconfig.base.json",
-  "compilerOptions": { "types": ["node"] },
-  "include": ["../src/**/*.ts", "../messages/**/*.ts", "../messages/**/*.json", "./**/*.ts"]
+  "compilerOptions": {
+    "types": [
+      "node"
+    ],
+    "lib": [
+      "ES2024",
+      "ES2025.Intl"
+    ]
+  },
+  "include": [
+    "../src/**/*.ts",
+    "../messages/**/*.ts",
+    "../messages/**/*.json",
+    "./**/*.ts"
+  ]
 }
