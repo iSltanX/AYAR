@@ -92,6 +92,7 @@ const LIFECYCLE: Record<string, readonly string[]> = {
   it: [...INSTALL_LIFECYCLE, 'pretest', 'test', 'posttest'],
   pack: ['prepack', 'prepare', 'postpack'],
   publish: ['prepublishOnly', 'prepack', 'prepare', 'postpack', 'publish', 'postpublish'],
+  version: ['preversion', 'version', 'postversion'],
 };
 
 /** The manager of an argument vector (`npm`, `/opt/homebrew/bin/pnpm`…) and its positional arguments. */

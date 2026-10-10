@@ -105,8 +105,15 @@ async function locate(fs: DiscoveryFs, root: string): Promise<{ gitdir: string; 
   } else return null;
   const common = (await readText(fs, posix.join(gitdir, 'commondir')))?.trim();
   const candidate = common ? posix.resolve(gitdir, common) : gitdir;
-  // commondir must be where the linked work tree lives (…/.git for …/.git/worktrees/<n>), nowhere else.
-  const commondir = candidate !== gitdir && gitdir.startsWith(`${candidate}/`) ? candidate : gitdir;
+  // commondir must be where the linked work tree lives (…/.git for …/.git/worktrees/<n>), nowhere else: inside
+  // the root when the git directory is, and exactly that .git folder for an external work tree (re-review N1).
+  let commondir = gitdir;
+  if (candidate !== gitdir && gitdir.startsWith(`${candidate}/`)) {
+    const real = await fs.realpath(candidate).catch(() => null);
+    const inside = (p: string) => p === `${root}/.git` || p.startsWith(`${root}/`);
+    const worktreeHome = /^(.*\/\.git)\/worktrees\/[^/]+$/.exec(gitdir)?.[1];
+    if (real && (inside(gitdir) ? inside(real) : real === worktreeHome)) commondir = real;
+  }
   return { gitdir, commondir, linked: commondir !== gitdir };
 }
 

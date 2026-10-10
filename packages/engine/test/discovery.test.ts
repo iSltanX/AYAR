@@ -322,6 +322,22 @@ describe('Git from files (E-16, T2)', () => {
     expect(await sub()).toEqual([{ path: 'lib', initialized: true, commit: sha('b') }]);
   });
 
+  it('never takes a common git directory above the root (re-review N1)', async () => {
+    const outer = tempRoot('ayar-DEV-4-git-outer-');
+    try {
+      const proj = join(outer.dir, 'proj');
+      mkdirSync(join(proj, 'sub'), { recursive: true });
+      writeFileSync(join(outer.dir, 'config'), '[remote "origin"]\n\turl = https://outside.example/x\n');
+      writeFileSync(join(proj, '.git'), 'gitdir: sub\n');
+      writeFileSync(join(proj, 'sub/HEAD'), `${sha('c')}\n`);
+      writeFileSync(join(proj, 'sub/commondir'), '../..\n');
+      const git = fact(await run(nodeFileSystem, { at: proj }), 'git.repository')[0]?.value;
+      expect(git).toMatchObject({ commit: sha('c'), linkedWorktree: false, remoteHost: null });
+    } finally {
+      outer.cleanup();
+    }
+  });
+
   it('keeps only the host of a remote URL', () => {
     expect(remoteHost('https://user:secret@github.com/a/b.git')).toBe('github.com');
     expect(remoteHost('git@gitlab.example.com:a/b.git')).toBe('gitlab.example.com');
