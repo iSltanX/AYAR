@@ -1,7 +1,8 @@
 // The main process (C-01): one instance, the hardened window and session, the app protocol, the menus, the
 // engine supervisor, and the IPC gateway with its sender check. Loaded by entry.ts after the D-52 guard.
-import { app, ipcMain, Menu, protocol, session, type BrowserWindow, type IpcMainEvent, type IpcMainInvokeEvent } from 'electron';
+import { app, ipcMain, Menu, powerSaveBlocker, protocol, session, type BrowserWindow, type IpcMainEvent, type IpcMainInvokeEvent } from 'electron';
 import { randomBytes } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { IPC, protocolError, z, type DeliveredEvent, type EngineHealth, type ParsedEvent } from '@ayar/protocol';
@@ -9,7 +10,9 @@ import { createFileLogger, ensureDataDir, nodeFileSystem, stderrLogger, systemCl
 import { resolveLanguage } from '@ayar/i18n';
 import { serveAppRequest } from './app-protocol.ts';
 import { spawnUtilityEngine } from './engine-utility.ts';
-import { EngineSupervisor } from './engine-supervisor.ts';
+import { EngineSupervisor, PREPARE_QUIT_WAIT_MS } from './engine-supervisor.ts';
+import { EVIDENCE_SCHEME, serveEvidence } from './evidence-protocol.ts';
+import { SleepGuard } from './sleep-guard.ts';
 import { EventPorts } from './events-port.ts';
 import { Gateway } from './gateway.ts';
 import { menuTemplate } from './menu.ts';
@@ -25,6 +28,8 @@ applyChromiumPaths(dataDir);
 // Before 'ready': the app scheme is standard and secure, and nothing more (no fetch, no CORS, no streams).
 protocol.registerSchemesAsPrivileged([
   { scheme: APP_SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: false, corsEnabled: false, stream: false, codeCache: false } },
+  // Evidence images (CSP img-src ayar-evidence:): a token in the path, served once (C-17, DEV-5).
+  { scheme: EVIDENCE_SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: false, corsEnabled: false, stream: false, codeCache: false } },
 ]);
 
 const CspViolation = z.strictObject({
@@ -86,6 +91,8 @@ async function run(): Promise<void> {
   const supervisorStream = `supervisor-${randomBytes(9).toString('base64url')}`;
   let supervisorSeq = 0;
   const healthLog: EngineHealth[] = [];
+  // FR-26: a power-save blocker while a run that asks for it is running.
+  const sleepGuard = new SleepGuard({ start: () => powerSaveBlocker.start('prevent-app-suspension'), stop: (id) => powerSaveBlocker.stop(id) });
   const keepLast = <T>(list: T[], item: T, max = 100) => {
     list.push(item);
     if (list.length > max) list.splice(0, list.length - max);
@@ -98,13 +105,19 @@ async function run(): Promise<void> {
     logPath: join(dataDir, 'logs', 'engine.log'),
     onHealth: (payload) => {
       keepLast(healthLog, payload);
+      sleepGuard.onEngineHealth(payload);
       ports.broadcast({ topic: 'engine.health', stream: supervisorStream, seq: ++supervisorSeq, at: new Date().toISOString(), payload });
     },
     onEngineEvent: (e) => {
       if (e.topic === 'engine.health') keepLast(healthLog, e.payload as EngineHealth);
+      if (e.topic === 'run.state') sleepGuard.onRunState(e.payload as { runId: string; state: string; preventSleep: boolean });
       ports.broadcast(deliver(e));
     },
-    onConnected: () => ports.renewAll(),
+    onConnected: () => {
+      // A new engine session: the runs of the previous one are no longer running (FR-25 marks them interrupted).
+      sleepGuard.reset();
+      ports.renewAll();
+    },
     log: (level, message, fields) => logger.log(level, message, fields),
   });
 
@@ -113,8 +126,12 @@ async function run(): Promise<void> {
     engine: supervisor,
     system: electronSystemServices(() => mainWindow),
     tokens,
+    language: () => resolveLanguage('system', app.getPreferredSystemLanguages()),
     log: (level, message, fields) => logger.log(level, message, fields),
   });
+  protocol.handle(EVIDENCE_SCHEME, (req) =>
+    serveEvidence(req.url, { resolve: (token) => supervisor.request('internal.evidencePath', { token }), readFile: async (p) => new Uint8Array(await readFile(p)) }),
+  );
 
   const diagnostics: Diagnostics = { cspViolations: [], rejectedSenders: 0, supervisor, preload: paths.preload, dataDir, health: healthLog };
   if (!app.isPackaged) (globalThis as { ayarDiagnostics?: Diagnostics }).ayarDiagnostics = diagnostics;
@@ -173,8 +190,11 @@ async function run(): Promise<void> {
     stopping = true;
     e.preventDefault();
     logger.log('info', 'quitting: stopping the engine');
-    supervisor
-      .stop()
+    // 9.7: an active run (and a setup command) ends the short way first (its checks «أُلغي» because the app quits),
+    // then the engine stops: SIGTERM, and SIGKILL only after STOP_GRACE_MS, longer than the engine's own wait.
+    const quick = supervisor.request('internal.prepareQuit', {}).catch(() => null);
+    void Promise.race([quick, new Promise((r) => setTimeout(r, PREPARE_QUIT_WAIT_MS))])
+      .then(() => supervisor.stop())
       .catch((err: unknown) => logger.log('error', 'engine stop failed', { error: String(err) }))
       .finally(() => {
         logger.flush();

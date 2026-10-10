@@ -64,16 +64,33 @@ export interface BootResult {
   steps: BootStep[];
 }
 
-/** Marks what an unexpected stop left running as interrupted (FR-25, 7.5). DEV-5 owns the full vocabulary. */
-export function markInterrupted(db: Db, now: Date): { checkRuns: number; runs: number } {
+/**
+ * Marks what an unexpected stop left unfinished as interrupted (FR-25, 7.5, G-DEV3-04): a running check is
+ * «انقطع»; a check of that run that had not started is «انقطع» too (the run was), and the run is «interrupted»,
+ * so «أعد غير المكتمل» finds them all. A run still waiting in the queue was never started: interrupted as well. And a
+ * setup action left «running» ends «failed» (independent review of DEV-5).
+ */
+export function markInterrupted(db: Db, now: Date): { checkRuns: number; runs: number; setupActions: number } {
   return db.transaction(() => {
     const at = now.toISOString();
-    const checkRuns = db.run(
-      "UPDATE check_runs SET outcome = 'interrupted', state = 'finished', finished_at = ? WHERE state IN ('running', 'cancelling')",
+    const stopped = JSON.stringify({ key: 'run.reason.engineStopped' });
+    const notStarted = JSON.stringify({ key: 'run.reason.runInterrupted' });
+    let checkRuns = db.run(
+      "UPDATE check_runs SET outcome = 'interrupted', auto_outcome = 'interrupted', outcome_reason = coalesce(outcome_reason, ?), state = 'finished', finished_at = ? WHERE state IN ('running', 'cancelling')",
+      stopped,
       at,
     ).changes;
-    const runs = db.run("UPDATE runs SET state = 'interrupted', finished_at = ? WHERE state IN ('running', 'cancelling')", at).changes;
-    return { checkRuns, runs };
+    checkRuns += db.run(
+      "UPDATE check_runs SET outcome = 'interrupted', auto_outcome = 'interrupted', outcome_reason = ?, state = 'finished', finished_at = ? WHERE state IN ('planned', 'queued') AND run_id IN (SELECT id FROM runs WHERE state IN ('queued', 'running', 'cancelling'))",
+      notStarted,
+      at,
+    ).changes;
+    const runs = db.run("UPDATE runs SET state = 'interrupted', finished_at = ? WHERE state IN ('queued', 'running', 'cancelling')", at).changes;
+    // A setup action the stop cut short is «failed» with that reason; its readiness is read again when asked.
+    // (Its state column comes with migration 2: a store on another schema has none to settle.)
+    const hasState = db.all<{ name: string }>("SELECT name FROM pragma_table_info('setup_actions')").some((c) => c.name === 'state');
+    const setupActions = hasState ? db.run("UPDATE setup_actions SET state = 'failed', result = 'failed', finished_at = ?, reasons_json = ? WHERE state = 'running'", at, JSON.stringify([{ key: 'setup.failed.interrupted' }])).changes : 0;
+    return { checkRuns, runs, setupActions };
   });
 }
 

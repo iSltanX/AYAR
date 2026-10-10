@@ -32,7 +32,13 @@ export interface SupervisorOptions {
 
 export const RESTART_DELAYS_MS = [1_000, 5_000, 30_000] as const;
 export const RESTART_WINDOW_MS = 5 * 60_000;
-export const STOP_GRACE_MS = 2_000;
+/**
+ * SIGTERM to SIGKILL. Longer than the engine's own wait for an active run's short ending (QUIT_WAIT_MS, 4.5 s:
+ * SIGTERM to the checks, 2 s, SIGKILL and the sweep), so a stopped engine is not killed in the middle of it.
+ */
+export const STOP_GRACE_MS = 5_000;
+/** How long quitting waits for internal.prepareQuit (the runs and setup commands ended the short way). */
+export const PREPARE_QUIT_WAIT_MS = 6_000;
 const EXIT_PROTOCOL_MISMATCH = 76;
 
 export class EngineSupervisor {

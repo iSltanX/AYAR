@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { checkPeerVersion, parseEngineMessage, parseHostMessage, PROTOCOL_VERSION } from '../src/index.ts';
+import { checkPeerVersion, MAX_MESSAGE_DEPTH, messageDepth, parseEngineMessage, parseHostMessage, PROTOCOL_VERSION } from '../src/index.ts';
 import { token, welcome } from './helpers.ts';
 
 const hello = {
@@ -63,6 +63,24 @@ describe('host → engine messages', () => {
 
   it.each([null, 42, 'hello', [], {}, { kind: 'exec' }])('rejects %j', (raw) => {
     expect(parseHostMessage(raw)).toMatchObject({ ok: false, error: { code: 'invalid_message' } });
+  });
+
+  // G-DEV4-02: a payload nested far deeper than any contract would otherwise be walked by a recursive schema
+  // (z.json() in profile references) and could exhaust the engine's stack; it is refused, with the id kept.
+  it('refuses a deeply nested payload with a coded error, before any schema walks it', () => {
+    let deep: unknown = 'x';
+    for (let i = 0; i < 200_000; i++) deep = [deep];
+    const r = parseHostMessage({ kind: 'command', id: 7, command: 'profile.update', payload: { projectId: 'p', patch: { references: { tokens: deep } } } });
+    expect(r).toMatchObject({ ok: false, id: 7, error: { code: 'invalid_payload', details: { reason: 'too_deep', limit: MAX_MESSAGE_DEPTH } } });
+    // A payload within the limit is still validated normally.
+    let shallow: unknown = 'x';
+    for (let i = 0; i < MAX_MESSAGE_DEPTH - 4; i++) shallow = [shallow];
+    expect(parseHostMessage({ kind: 'command', id: 8, command: 'profile.update', payload: { projectId: 'p', patch: { references: { tokens: shallow } } } })).toMatchObject({ ok: true });
+    // The whole message too (the depth is measured before the kind is even read), and messageDepth is iterative.
+    expect(parseHostMessage({ kind: 'command', id: 9, command: 'settings.get', payload: {}, grants: deep })).toMatchObject({ ok: false, id: 9, error: { code: 'invalid_message', details: { reason: 'too_deep' } } });
+    expect(messageDepth(deep, 10)).toBeGreaterThan(10);
+    expect(messageDepth({ a: [1, { b: 2 }] })).toBe(3);
+    expect(messageDepth('x')).toBe(0);
   });
 });
 

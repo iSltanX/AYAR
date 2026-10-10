@@ -17,6 +17,11 @@ export interface Db {
 
 export interface OpenOptions {
   readOnly?: boolean;
+  /**
+   * A backup copy (VACUUM INTO): writable, secure_delete on, but its journal mode is left as it is, so no WAL
+   * files appear next to it (G-DEV4-01: backups are redacted again in place).
+   */
+  backupCopy?: boolean;
 }
 
 /**
@@ -27,7 +32,8 @@ export function openDatabase(path: string, options: OpenOptions = {}): Db {
   const db = new DatabaseSync(path, { readOnly: options.readOnly ?? false, enableForeignKeyConstraints: true });
   try {
     db.exec('PRAGMA busy_timeout = 5000');
-    if (!options.readOnly) {
+    if (options.backupCopy) db.exec('PRAGMA secure_delete = ON');
+    else if (!options.readOnly) {
       const mode = db.prepare('PRAGMA journal_mode = WAL').get() as { journal_mode: string } | undefined;
       if (mode?.journal_mode !== 'wal') throw new Error(`WAL not enabled (journal_mode=${mode?.journal_mode ?? '?'})`);
       db.exec('PRAGMA synchronous = NORMAL');

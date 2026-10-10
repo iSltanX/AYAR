@@ -5,6 +5,7 @@ import { backupDatabase } from './backup.ts';
 import { tableExists, type Db } from './db.ts';
 import { StorageError } from './errors.ts';
 import { INITIAL_SCHEMA } from './schema/0001-initial.ts';
+import { RUNS_SCHEMA } from './schema/0002-runs.ts';
 
 export interface Migration {
   version: number;
@@ -12,7 +13,11 @@ export interface Migration {
   sql: string;
 }
 
-export const MIGRATIONS: readonly Migration[] = [{ version: 1, name: 'initial-schema', sql: INITIAL_SCHEMA }];
+export const MIGRATIONS: readonly Migration[] = [
+  { version: 1, name: 'initial-schema', sql: INITIAL_SCHEMA },
+  // DEV-5: plans (G-24), accepted tool versions (G-25), and the columns of the executor and evidence store.
+  { version: 2, name: 'runs-and-evidence', sql: RUNS_SCHEMA },
+];
 
 export function latestVersion(migrations: readonly Migration[] = MIGRATIONS): number {
   return migrations.at(-1)?.version ?? 0;

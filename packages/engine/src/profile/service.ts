@@ -96,7 +96,8 @@ export class ProfileService {
     const latest = latestProfile(this.#o.db, projectId);
     if (!latest) return emptySettings();
     const { context, references, overrides, custom, untrusted } = latest.content;
-    return { schema: 'ayar-profile/1', context, references, overrides, custom, untrusted };
+    // Profiles saved before protocol 1.2 have no services.
+    return { schema: 'ayar-profile/1', context, references, overrides, custom, services: latest.content.services ?? {}, untrusted };
   }
 
   /** The effective specs for a snapshot and settings (C-09 point 1). */
@@ -139,6 +140,7 @@ export class ProfileService {
       context: c.context,
       references: c.references,
       custom: c.custom,
+      services: c.services ?? {},
       checks: c.checks,
       pending: changeSet(this.#o.db, projectId, c.checks),
       approvals: [...approvalsOf(this.#o.db, projectId).values()].map((a) => ({ instance: a.instance, specHash: a.specHash, approvedAt: a.approvedAt, profileVersion: a.profileVersion })).sort((a, b) => (a.instance < b.instance ? -1 : 1)),
@@ -165,6 +167,7 @@ export class ProfileService {
         // AYAR's and Electron's own variables are always removed from a check (C-07 point 5, review m4).
         if (cls === 'internal') throw invalid('explicit_internal', { instance, name });
       }
+      for (const name of o.services ?? []) if (!settings.services[name]) throw invalid('unknown_service', { instance, name });
       if (o.enabled === false && o.required === true) throw invalid('consistency', { instance });
       const spec = specs.find((s) => s.instance === instance);
       if (o.included === false && (o.required === true || (o.required === undefined && spec?.required === true && o.enabled !== false))) throw invalid('consistency', { instance });
@@ -172,9 +175,21 @@ export class ProfileService {
     for (const [name, c] of Object.entries(settings.custom)) {
       if (judgeCommand(policy, [argvText(c.argv), ...c.argv]).refused.length) throw invalid('sudo', { instance: `custom.${name}@.` });
     }
+    for (const [name, sv] of Object.entries(settings.services)) {
+      if (judgeCommand(policy, [argvText(sv.argv), ...sv.argv]).refused.length) throw invalid('sudo', { instance: `service:${name}` });
+      // FR-21: the readiness pattern is a regular expression the engine runs on the service's log: one that does
+      // not compile is refused here, not discovered at the first run.
+      if (sv.readyPattern !== null) {
+        try {
+          new RegExp(sv.readyPattern);
+        } catch {
+          throw invalid('service_pattern', { name });
+        }
+      }
+    }
     // Nothing is saved before C-18: a profile that holds a secret (in a command, a variable, a reference) is
     // refused rather than stored; a secret reaches a check only as an allowed variable, by name (D-47).
-    const second = this.#o.redaction.redactor().secondPass(JSON.stringify({ context: settings.context, references: settings.references, overrides: settings.overrides, custom: settings.custom }));
+    const second = this.#o.redaction.redactor().secondPass(JSON.stringify({ context: settings.context, references: settings.references, overrides: settings.overrides, custom: settings.custom, services: settings.services }));
     if (!second.ok) throw invalid('secret_in_profile', { rules: second.rules.join(',') });
   }
 
@@ -187,6 +202,7 @@ export class ProfileService {
       references: { ...s.references },
       overrides: { ...s.overrides },
       custom: { ...s.custom },
+      services: { ...s.services },
     };
     for (const [k, v] of Object.entries(patch.references ?? {})) {
       if (v === null) delete next.references[k as keyof typeof next.references];
@@ -200,10 +216,14 @@ export class ProfileService {
       if (c === null) delete next.custom[name];
       else next.custom[name] = c;
     }
+    for (const [name, sv] of Object.entries(patch.services ?? {})) {
+      if (sv === null) delete next.services[name];
+      else next.services[name] = sv;
+    }
     this.validate(next, this.specs(snapshot, { ...next, overrides: {} }));
     this.#o.db.transaction(() => {
       this.regenerate(projectId, snapshot, 'edited', next);
-      recordAudit(this.#o.db, { id: newId(this.#o.ports.random, 'aud'), at: this.#o.ports.clock.now(), action: 'profile.updated', projectId, details: { context: Object.keys(patch.context ?? {}), checks: Object.keys(patch.checks ?? {}), custom: Object.keys(patch.custom ?? {}), references: Object.keys(patch.references ?? {}) } });
+      recordAudit(this.#o.db, { id: newId(this.#o.ports.random, 'aud'), at: this.#o.ports.clock.now(), action: 'profile.updated', projectId, details: { context: Object.keys(patch.context ?? {}), checks: Object.keys(patch.checks ?? {}), custom: Object.keys(patch.custom ?? {}), references: Object.keys(patch.references ?? {}), services: Object.keys(patch.services ?? {}) } });
     });
     return this.view(projectId);
   }
@@ -269,6 +289,8 @@ export class ProfileService {
         ...(o.argv ? { argv: o.argv } : {}),
         ...(o.cwd ? { cwd: o.cwd } : {}),
         ...(o.timeoutMin ? { timeoutMin: o.timeoutMin } : {}),
+        ...(o.idleTimeoutSec ? { idleTimeoutSec: o.idleTimeoutSec } : {}),
+        ...(o.services?.length ? { services: o.services } : {}),
         warningsPolicy: s.warningsPolicy,
         flakyPolicy: s.flakyPolicy,
         ...(s.thresholds ? { thresholds: s.thresholds } : {}),
@@ -276,7 +298,7 @@ export class ProfileService {
         ...(Object.keys(s.env.explicit).length ? { explicitEnv: s.env.explicit } : {}),
       };
     }
-    const exported: ExportedProfile = { schema: 'ayar-profile/1', savedAt: row.createdAt, catalogVersion: this.#o.catalog.version, profileVersion: row.version, context: c.context, references: c.references, checks, custom: c.custom };
+    const exported: ExportedProfile = { schema: 'ayar-profile/1', savedAt: row.createdAt, catalogVersion: this.#o.catalog.version, profileVersion: row.version, context: c.context, references: c.references, checks, custom: c.custom, ...(Object.keys(c.services ?? {}).length ? { services: c.services } : {}) };
     const text = `${JSON.stringify(JSON.parse(canonicalJson(exported)), null, 2)}\n`;
     // The second pass (C-18) before anything leaves AYAR: a high-confidence secret stops the export.
     const second = this.#o.redaction.redactor().secondPass(text);
@@ -317,7 +339,7 @@ export class ProfileService {
     const p = parsed.data;
     const snapshot = this.#snapshotOrThrow(projectId);
     const current = this.settingsOf(projectId);
-    const next: ProfileSettings = { schema: 'ayar-profile/1', context: p.context, references: p.references, overrides: { ...p.checks }, custom: p.custom, untrusted: current.untrusted };
+    const next: ProfileSettings = { schema: 'ayar-profile/1', context: p.context, references: p.references, overrides: { ...p.checks }, custom: p.custom, services: p.services ?? {}, untrusted: current.untrusted };
     this.validate(next, this.specs(snapshot, { ...next, overrides: {} }));
     this.#o.db.transaction(() => {
       this.regenerate(projectId, snapshot, 'imported', next);

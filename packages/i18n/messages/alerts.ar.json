@@ -1,0 +1,15 @@
+{
+  "alerts.cancel": "ألغِ",
+  "alerts.removeProject.title": "أزل «{name}» من عِيَار؟",
+  "alerts.removeProject.detail": "تُحذف تشغيلات هذا المشروع وأدلته من عِيَار. لن يُمس المستودع.",
+  "alerts.removeProject.confirm": "أزل",
+  "alerts.deleteRuns.title": "{count, plural, one {احذف هذا التشغيل؟} two {احذف تشغيلين؟} few {احذف # تشغيلات؟} many {احذف # تشغيلًا؟} other {احذف # تشغيل؟}}",
+  "alerts.deleteRuns.detail": "تُحذف هذه التشغيلات وأدلتها من عِيَار، ولا يُمس المستودع. لا يمكن التراجع.",
+  "alerts.deleteRuns.confirm": "{count, plural, one {احذف التشغيل} other {احذف التشغيلات}}",
+  "alerts.removeTool.title": "أزل {name} من عِيَار؟",
+  "alerts.removeTool.detail": "يُحذف هذا الإصدار من صندوق أدوات عِيَار، وتصير الفحوص التي تحتاجه «ناقص» حتى يُثبَّت من جديد.",
+  "alerts.removeTool.confirm": "أزل الأداة",
+  "alerts.purgeData.title": "احذف كل بيانات عِيَار؟",
+  "alerts.purgeData.detail": "تُحذف المشاريع المضافة وتشغيلاتها وأدلتها والأدوات المنزّلة من هذا الجهاز. لا يُمس أي مستودع. لا يمكن التراجع.",
+  "alerts.purgeData.confirm": "احذف البيانات"
+}

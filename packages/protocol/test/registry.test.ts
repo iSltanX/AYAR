@@ -43,11 +43,16 @@ describe('command registry (6.5)', () => {
   const DEV3_EXTRA = ['confirm.issue', 'dialog.pickDestination', 'dialog.pickFolder', 'dialog.pickSource', 'engine.restart', 'engine.status', 'internal.clipboardText', 'internal.recordCopy'];
   // D-DEV4-02 (protocol 1.1): engine commands 6.5 needs but does not name.
   const DEV4_EXTRA = ['environment.resolve', 'profile.exportPreview', 'profile.importFromRepo', 'project.cancelDiscovery', 'project.confirm', 'project.rename'];
+  // D-DEV5-01 (protocol 1.2): the host-only resolution of an evidence token for ayar-evidence:// and the short
+  // cancellation before quitting, and the run list and run detail 6.5 leaves out.
+  const DEV5_EXTRA = ['internal.evidencePath', 'internal.prepareQuit', 'run.get', 'runs.list'];
 
-  it('adds only the documented main-process, host-only and DEV-4 commands', () => {
+  it('adds only the documented main-process, host-only, DEV-4 and DEV-5 commands', () => {
     const extra = COMMAND_NAMES.filter((c) => !PLAN_COMMANDS.includes(c)).sort();
-    expect(extra).toEqual([...DEV3_EXTRA, ...DEV4_EXTRA].sort());
+    expect(extra).toEqual([...DEV3_EXTRA, ...DEV4_EXTRA, ...DEV5_EXTRA].sort());
     for (const c of extra.filter((c) => c.startsWith('internal.'))) expect(COMMANDS[c].audience).toBe('host');
+    for (const c of ['internal.evidencePath', 'internal.prepareQuit'] as const) expect(COMMANDS[c]).toMatchObject({ handler: 'engine', audience: 'host', since: '1.2', implementedIn: 'DEV-5' });
+    for (const c of ['run.get', 'runs.list'] as const) expect(COMMANDS[c]).toMatchObject({ handler: 'engine', audience: 'renderer', owner: 'C-17', since: '1.2', implementedIn: 'DEV-5', grants: [] });
     for (const c of extra.filter((c) => DEV3_EXTRA.includes(c) && !c.startsWith('internal.'))) {
       expect(COMMANDS[c].handler).toBe('main');
       expect(COMMANDS[c].owner).toBe('C-01');
@@ -95,8 +100,8 @@ describe('command registry (6.5)', () => {
 });
 
 describe('event registry (6.5)', () => {
-  it('contains exactly the events of 6.5, and the two discovery endings of DEV-4 (D-DEV4-02)', () => {
-    expect([...EVENT_TOPICS].sort()).toEqual([...PLAN_EVENTS, 'discovery.cancelled', 'discovery.failed'].sort());
+  it('contains exactly the events of 6.5, the two discovery endings of DEV-4 (D-DEV4-02), and setup progress (DEV-5, G-21)', () => {
+    expect([...EVENT_TOPICS].sort()).toEqual([...PLAN_EVENTS, 'discovery.cancelled', 'discovery.failed', 'setup.progress'].sort());
   });
 });
 

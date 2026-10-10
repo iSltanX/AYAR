@@ -1,0 +1,9 @@
+{
+  "plan.reason.addedAsDependency": "Added because {for} depends on it",
+  "plan.reason.coveredBy": "Covered by {by}, whose result it takes",
+  "plan.reason.sharesExecution": "Shares its execution with {with}",
+  "plan.reason.alternativeOf": "An alternative to {other}; only one of them runs",
+  "plan.reason.disabled": "Disabled in the standards profile",
+  "plan.reason.notApplicable": "Not applicable",
+  "plan.reason.notIncludedByProfile": "Not included in the standards profile"
+}

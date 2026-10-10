@@ -90,7 +90,8 @@ async function acceptedGitdir(fs: DiscoveryFs, gitdir: string, root: string): Pr
   return (await back(worktree)) === root ? real : null;
 }
 
-async function locate(fs: DiscoveryFs, root: string): Promise<{ gitdir: string; commondir: string; linked: boolean } | null> {
+/** The git directory of a work tree and its common directory, judged by their real paths (E-16, D-DEV4-14). */
+export async function locate(fs: DiscoveryFs, root: string): Promise<{ gitdir: string; commondir: string; linked: boolean } | null> {
   const dotGit = posix.join(root, '.git');
   const st = await fs.lstat(dotGit);
   if (!st) return null;

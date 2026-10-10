@@ -26,6 +26,9 @@ import { EventBus } from './event-bus.ts';
 import { RunGate } from './run-gate.ts';
 import { createServices, type EngineServices } from './services.ts';
 
+/** How long a stop waits for an active run's short ending: the 2 s step to SIGKILL, the sweep, and a margin. */
+export const QUIT_WAIT_MS = 4500;
+
 export interface StartEngineOptions {
   ports: EnginePorts;
   channel: HostChannel;
@@ -36,6 +39,8 @@ export interface StartEngineOptions {
   maintenanceIntervalMs?: number;
   /** tools/cli's test hook (Node entry only): the login shell C-07 reads. */
   testLoginShell?: string | null;
+  /** tools/cli's test hook (Node entry only): extra managed-tool entries for AT-35's local server. */
+  testToolRegistry?: readonly unknown[];
 }
 
 export interface EngineHandle {
@@ -120,7 +125,9 @@ export function startEngine(o: StartEngineOptions): EngineHandle {
     }
     if (result.state === 'degraded') degraded = result.reason ?? 'internal';
     bus = new EventBus({ stream, clock: ports.clock, send: (m) => channel.send(m) });
-    if (!degraded && result.db && result.catalog && hmacKey) services = createServices({ catalog: result.catalog, db: result.db, ports, events: bus, logger, hmacKey, testLoginShell: o.testLoginShell ?? null });
+    if (!degraded && result.db && result.catalog && hmacKey && result.layout) {
+      services = createServices({ catalog: result.catalog, db: result.db, layout: result.layout, ports, events: bus, runGate, logger, hmacKey, testLoginShell: o.testLoginShell ?? null, testToolRegistry: o.testToolRegistry ?? [] });
+    }
     if (phase === 'stopping') return result;
     phase = 'serving';
     logger.log('info', 'engine serving', { state: degraded ? 'degraded' : 'ready', reason: degraded, keySource: hmacKey?.source ?? null });
@@ -135,6 +142,7 @@ export function startEngine(o: StartEngineOptions): EngineHandle {
     maintenance = setInterval(() => {
       if (ports.clock.monotonicMs() - lastCheck < WEEK_MS || !result?.db || !result.layout || degraded) return;
       lastCheck = ports.clock.monotonicMs();
+      void services?.evidence.retainAll().catch((e: unknown) => logger.log('error', 'retention failed', { error: String(e) }));
       const integrity = integrityCheck(result.db);
       if (!integrity.ok) {
         degraded = 'db_corrupt';
@@ -194,11 +202,12 @@ export function startEngine(o: StartEngineOptions): EngineHandle {
     stream,
     booted: () => bootPromise,
     stop(code = EXIT.ok) {
-      if (!stopped) {
-        stopped = true;
-        phase = 'stopping';
-        if (maintenance) clearInterval(maintenance);
-        services?.projects.cancelAll();
+      if (stopped) return;
+      stopped = true;
+      phase = 'stopping';
+      if (maintenance) clearInterval(maintenance);
+      services?.projects.cancelAll();
+      const finish = () => {
         bus?.close();
         try {
           result?.db?.close();
@@ -207,8 +216,15 @@ export function startEngine(o: StartEngineOptions): EngineHandle {
         }
         logger.log('info', 'engine stopped', { code });
         logger.flush();
-      }
-      ports.exit(code);
+        ports.exit(code);
+      };
+      // 9.7: a run (or a setup command) still active when the engine is told to stop ends the short way (SIGTERM,
+      // 2 s, SIGKILL and the sweep); the wait leaves room for the SIGKILL. What it cannot finish, the next boot
+      // marks «انقطع» (and reaps by the ledger).
+      if (services && (services.runs.hasActive() || services.setup.hasActive())) {
+        const quick = Promise.all([services.runs.prepareQuit(), services.setup.prepareQuit()]).catch(() => null);
+        void Promise.race([quick, new Promise((r) => setTimeout(r, QUIT_WAIT_MS))]).finally(finish);
+      } else finish();
     },
     crash(error: unknown): never {
       const e = error instanceof Error ? error : new Error(String(error));

@@ -1,6 +1,6 @@
 // The system interactions the UI may ask for (C-01): folder and file dialogs and the clipboard, as an
 // interface the gateway calls. No screens here: these are macOS's own dialogs.
-import { clipboard, dialog, type BrowserWindow } from 'electron';
+import { clipboard, dialog, type BrowserWindow, type MessageBoxOptions } from 'electron';
 import { lstat, realpath } from 'node:fs/promises';
 import type { SystemServices } from './gateway.ts';
 
@@ -27,6 +27,13 @@ export function electronSystemServices(parent: () => BrowserWindow | null): Syst
     },
     async writeClipboard(text) {
       await clipboard.writeText(text); // asynchronous since Electron 44
+    },
+    async confirmDestructive(alert) {
+      // A sheet on the window (D-DEV3-15): «ألغِ» is the default and the cancel; no red button (D-DES3-06).
+      const opts: MessageBoxOptions = { type: 'warning', message: alert.title, detail: alert.detail, buttons: [alert.cancel, alert.confirm], defaultId: 0, cancelId: 0, noLink: true };
+      const w = owner();
+      const r = w ? await dialog.showMessageBox(w, opts) : await dialog.showMessageBox(opts);
+      return r.response === 1;
     },
     async checkFolder(path) {
       try {

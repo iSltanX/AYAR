@@ -70,3 +70,5 @@ export { DIRECT_CONFIRM_COMMANDS } from './system.ts';
 export { SETTINGS, SETTING_KEYS, SettingEntry, SettingKey, SettingValuesSchema, settingDefaults, UserRedactionPattern } from './settings.ts';
 export type { SettingValue, SettingValues } from './settings.ts';
 export { CopyKind, ReportTarget } from './reports.ts';
+export { EvidenceToken } from './results.ts';
+export { ToolKey } from './tools.ts';

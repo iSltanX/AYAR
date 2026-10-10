@@ -1,6 +1,6 @@
 {
   "name": "sigterm-grandchild",
-  "description": "الاختبار يطلق ابنًا ثم حفيدًا يتجاهل SIGTERM ثم يعلق: تنتهي المهلة ويلزم التصعيد إلى SIGKILL لشجرة العمليات.",
+  "description": "الاختبار يطلق ابنًا ثم حفيدًا يتجاهل SIGTERM وSIGINT ثم يعلق: تنتهي المهلة ويلزم التصعيد إلى SIGKILL لشجرة العمليات (G-DEV2-04).",
   "defects": [
     "beh.unit: حفيد يتجاهل SIGTERM"
   ],

@@ -2,9 +2,12 @@
 import type { HandlerTable } from '../host/dispatcher.ts';
 import { advisorSuggest, taskCreate, tasksList } from './advisor.ts';
 import { environmentResolve } from './environment.ts';
+import { evidenceToken, internalEvidencePath } from './evidence.ts';
 import { profileApprove, profileExport, profileExportPreview, profileGet, profileImport, profileImportFromRepo, profilePropose, profileUpdate } from './profile.ts';
 import { projectAdd, projectCancelDiscovery, projectConfirm, projectGet, projectList, projectRelocate, projectRemove, projectRename, projectRescan, projectSetTrust } from './projects.ts';
+import { groupsDelete, groupsList, groupsSave, internalPrepareQuit, runCancel, runContinueRound, runGet, runPlan, runRerun, runsDelete, runsKeep, runsList, runStart } from './runs.ts';
 import { settingsGet, settingsSet } from './settings.ts';
+import { readinessEvaluate, setupExecute, setupPreview, toolsInstall, toolsList, toolsPreview, toolsRemove, toolsVerify } from './setup.ts';
 
 export const HANDLERS: HandlerTable = {
   'settings.get': settingsGet,
@@ -31,4 +34,28 @@ export const HANDLERS: HandlerTable = {
   'advisor.suggest': advisorSuggest,
   'task.create': taskCreate,
   'tasks.list': tasksList,
+  // DEV-5
+  'readiness.evaluate': readinessEvaluate,
+  'setup.preview': setupPreview,
+  'setup.execute': setupExecute,
+  'tools.list': toolsList,
+  'tools.preview': toolsPreview,
+  'tools.install': toolsInstall,
+  'tools.verify': toolsVerify,
+  'tools.remove': toolsRemove,
+  'run.plan': runPlan,
+  'run.start': runStart,
+  'run.cancel': runCancel,
+  'run.rerun': runRerun,
+  'run.continueRound': runContinueRound,
+  'runs.list': runsList,
+  'run.get': runGet,
+  'runs.keep': runsKeep,
+  'runs.delete': runsDelete,
+  'groups.save': groupsSave,
+  'groups.list': groupsList,
+  'groups.delete': groupsDelete,
+  'evidence.token': evidenceToken,
+  'internal.evidencePath': internalEvidencePath,
+  'internal.prepareQuit': internalPrepareQuit,
 };

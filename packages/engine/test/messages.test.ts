@@ -4,7 +4,7 @@
 // a new reason without its messages fails here.
 import { REFERENCE_KINDS, SIGNALS } from '@ayar/catalog';
 import { MESSAGES } from '@ayar/i18n';
-import { ERROR_CODES, ProtectedLocation } from '@ayar/protocol';
+import { ERROR_CODES, MissingRequirement, ProtectedLocation, RawCheckResult, SetupPhase, ToolInstallResult, ToolView } from '@ayar/protocol';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -54,5 +54,28 @@ describe('message keys of DEV-4 (NFR-11)', () => {
 
   it('has both languages for every error code', () => {
     for (const c of ERROR_CODES) both(`errors.${c}`);
+  });
+});
+
+describe('message keys of DEV-5 (NFR-11)', () => {
+  it('has both languages for every readiness, setup, plan and run key the engine writes', () => {
+    const keys = [...new Set([...all.matchAll(/'((?:setup|run|plan)\.(?:reason|note|action|warning|phase|rejected|failed)\.[A-Za-z.]+)'/g)].map((m) => m[1]!))];
+    expect(keys.length).toBeGreaterThan(50);
+    keys.forEach(both);
+  });
+
+  it('has both languages for the keys the engine builds from a value', () => {
+    // `setup.phase.${phase}` (setup.progress), `setup.rejected.${reason}` and `setup.failed.${reason}` (C-11).
+    for (const p of SetupPhase.options) both(`setup.phase.${p}`);
+    for (const r of ToolInstallResult.options) {
+      if (r.shape.status.value === 'rejected' || r.shape.status.value === 'failed') for (const reason of (r.shape as unknown as { reason: { options: string[] } }).reason.options) both(`setup.${r.shape.status.value}.${reason}`);
+    }
+    // `setup.failed.${ended}` for a setup command that did not exit by itself (the supervisor's end reasons).
+    for (const e of RawCheckResult.shape.ended.options) if (e !== 'exited' && e !== 'service_failed') both(`setup.failed.${e}`);
+    // `setup.reason.missing.${kind}` and `setup.reason.ready.${source}` (readiness).
+    for (const m of MissingRequirement.shape.kind.options) both(`setup.reason.missing.${m}`);
+    for (const src of ToolView.shape.source.unwrap().options) both(`setup.reason.ready.${src}`);
+    // The native destructive alerts (D-DEV3-15).
+    for (const a of ['removeProject', 'deleteRuns', 'removeTool', 'purgeData']) for (const p of ['title', 'detail', 'confirm']) both(`alerts.${a}.${p}`);
   });
 });

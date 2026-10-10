@@ -3,6 +3,7 @@ import { discoveryEvents } from './discovery.ts';
 import { engineEvents } from './engine.ts';
 import { findingEvents } from './findings.ts';
 import { runEvents } from './runs.ts';
+import { setupEvents } from './setup.ts';
 import type { z } from '../zod.ts';
 
 export const EVENTS = {
@@ -10,6 +11,7 @@ export const EVENTS = {
   ...runEvents,
   ...findingEvents,
   ...engineEvents,
+  ...setupEvents,
 };
 
 export type EventTopic = keyof typeof EVENTS;
@@ -21,4 +23,5 @@ export function isEventTopic(topic: unknown): topic is EventTopic {
 }
 
 export { EngineHealth, EngineState, HmacKeySource } from './engine.ts';
+export { SetupPhase } from './setup.ts';
 export type { EventDefinition } from './define.ts';

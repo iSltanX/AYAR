@@ -2,6 +2,8 @@
 // parallel phases only meet on one import line. Keys are prefixed by their scope.
 import advisorAr from './advisor.ar.json' with { type: 'json' };
 import advisorEn from './advisor.en.json' with { type: 'json' };
+import alertsAr from './alerts.ar.json' with { type: 'json' };
+import alertsEn from './alerts.en.json' with { type: 'json' };
 import catalogAr from './catalog.ar.json' with { type: 'json' };
 import catalogEn from './catalog.en.json' with { type: 'json' };
 import commonAr from './common.ar.json' with { type: 'json' };
@@ -16,6 +18,8 @@ import glossaryAr from './glossary.ar.json' with { type: 'json' };
 import glossaryEn from './glossary.en.json' with { type: 'json' };
 import menuAr from './menu.ar.json' with { type: 'json' };
 import menuEn from './menu.en.json' with { type: 'json' };
+import planAr from './plan.ar.json' with { type: 'json' };
+import planEn from './plan.en.json' with { type: 'json' };
 import profileAr from './profile.ar.json' with { type: 'json' };
 import profileEn from './profile.en.json' with { type: 'json' };
 import projectsAr from './projects.ar.json' with { type: 'json' };
@@ -30,11 +34,16 @@ import shellAr from './shell.ar.json' with { type: 'json' };
 import shellEn from './shell.en.json' with { type: 'json' };
 import statusAr from './status.ar.json' with { type: 'json' };
 import statusEn from './status.en.json' with { type: 'json' };
+import runAr from './run.ar.json' with { type: 'json' };
+import runEn from './run.en.json' with { type: 'json' };
+import setupAr from './setup.ar.json' with { type: 'json' };
+import setupEn from './setup.en.json' with { type: 'json' };
 import uiAr from './ui.ar.json' with { type: 'json' };
 import uiEn from './ui.en.json' with { type: 'json' };
 
 export const MESSAGE_FILES = {
   advisor: { ar: advisorAr, en: advisorEn },
+  alerts: { ar: alertsAr, en: alertsEn },
   catalog: { ar: catalogAr, en: catalogEn },
   common: { ar: commonAr, en: commonEn },
   discovery: { ar: discoveryAr, en: discoveryEn },
@@ -42,8 +51,11 @@ export const MESSAGE_FILES = {
   errors: { ar: errorsAr, en: errorsEn },
   glossary: { ar: glossaryAr, en: glossaryEn },
   menu: { ar: menuAr, en: menuEn },
+  plan: { ar: planAr, en: planEn },
   profile: { ar: profileAr, en: profileEn },
   projects: { ar: projectsAr, en: projectsEn },
+  run: { ar: runAr, en: runEn },
+  setup: { ar: setupAr, en: setupEn },
   ui: { ar: uiAr, en: uiEn },
   controls: { ar: controlsAr, en: controlsEn },
   results: { ar: resultsAr, en: resultsEn },
@@ -55,6 +67,6 @@ export const MESSAGE_FILES = {
 export type Scope = keyof typeof MESSAGE_FILES;
 
 export const MESSAGES = {
-  ar: { ...advisorAr, ...catalogAr, ...commonAr, ...discoveryAr, ...environmentAr, ...errorsAr, ...glossaryAr, ...menuAr, ...profileAr, ...projectsAr, ...uiAr, ...controlsAr, ...resultsAr, ...sheetsAr, ...shellAr, ...statusAr },
-  en: { ...advisorEn, ...catalogEn, ...commonEn, ...discoveryEn, ...environmentEn, ...errorsEn, ...glossaryEn, ...menuEn, ...profileEn, ...projectsEn, ...uiEn, ...controlsEn, ...resultsEn, ...sheetsEn, ...shellEn, ...statusEn },
+  ar: { ...advisorAr, ...alertsAr, ...catalogAr, ...commonAr, ...controlsAr, ...discoveryAr, ...environmentAr, ...errorsAr, ...glossaryAr, ...menuAr, ...planAr, ...profileAr, ...projectsAr, ...resultsAr, ...runAr, ...setupAr, ...sheetsAr, ...shellAr, ...statusAr, ...uiAr },
+  en: { ...advisorEn, ...alertsEn, ...catalogEn, ...commonEn, ...controlsEn, ...discoveryEn, ...environmentEn, ...errorsEn, ...glossaryEn, ...menuEn, ...planEn, ...profileEn, ...projectsEn, ...resultsEn, ...runEn, ...setupEn, ...sheetsEn, ...shellEn, ...statusEn, ...uiEn },
 } as const;

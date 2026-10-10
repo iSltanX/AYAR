@@ -1,0 +1,9 @@
+{
+  "plan.reason.addedAsDependency": "أُضيف لأن {for} يعتمد عليه",
+  "plan.reason.coveredBy": "يغطيه {by}، فيأخذ نتيجته",
+  "plan.reason.sharesExecution": "يشترك في التنفيذ مع {with}",
+  "plan.reason.alternativeOf": "بديل لـ {other}، فيُشغَّل أحدهما",
+  "plan.reason.disabled": "معطّل في ملف المعايير",
+  "plan.reason.notApplicable": "غير منطبق",
+  "plan.reason.notIncludedByProfile": "غير مضمّن في ملف المعايير"
+}

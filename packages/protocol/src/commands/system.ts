@@ -35,10 +35,15 @@ export const systemCommands = {
     payload: z.strictObject({ purpose: z.enum(['profile.import']) }),
     result: z.union([z.strictObject({ sourceToken: SourceToken }), Cancelled]),
   }),
+  /**
+   * D-DEV3-15 (implemented in DEV-5): the main process first asks in a native macOS alert it shows itself; only
+   * the user's click on its confirm button mints the token. Cancelling mints nothing.
+   */
   'confirm.issue': defineCommand({
     ...base,
+    implementedIn: 'DEV-5',
     payload: z.strictObject({ command: z.enum(DIRECT_CONFIRM_COMMANDS), target: z.string().min(1).max(256) }),
-    result: z.strictObject({ confirmationToken: ConfirmationToken }),
+    result: z.union([z.strictObject({ confirmationToken: ConfirmationToken }), Cancelled]),
   }),
   'engine.status': defineCommand({ ...base, payload: z.strictObject({}), result: EngineHealth }),
   'engine.restart': defineCommand({ ...base, payload: z.strictObject({}), result: z.strictObject({ accepted: z.boolean() }) }),

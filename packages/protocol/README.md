@@ -10,7 +10,7 @@
 - **الرموز والمنح:** الواجهة لا ترسل مسارًا أبدًا. ترسل رمزًا (`sel_` و`dst_` و`src_` و`cfm_`) تصدره العملية الرئيسية بعد نافذة نظام، أو بعد معاينة (`setup.preview` و`tools.preview`)، أو بعد تأكيد الواجهة لإجراء مدمّر (`confirm.issue`). وعند تمرير الأمر إلى المحرك تستبدل العملية الرئيسية بالرمز «منحة» (`grants`) تحمل المسار أو ربط التأكيد بالأمر وهدفه. والمحرك يرفض الأمر دون منحه (`checkGrants`).
 - **الأحداث:** مرقمة في «مجرى» (`stream`) لكل جلسة محرك، وللمشرف مجراه. الفجوة في الترقيم أو تبدّل المجرى تطلق إعادة المزامنة في الجسر (`bridge.resync`).
 - **`report.copied`** سجل تدقيق في `audit_log`، لا حدث (G-21). والأحداث الناقصة (تقدم التجهيز، وحالات فحوص النموذج والبطاقات) تضيفها مراحلها بإصدار ثانوي.
-- **عقود المجال** في `src/domain/` ملفًا لكل مجال: `DiscoverySnapshot` و`ResolvedEnv` وملف المعايير (`ProfileView` و`ExportedProfile` بصيغة `ayar-profile/1`) وعقود المشاريع من DEV-4 (الإصدار 1.1)، وسياق التغيير ونتيجة المستشار (`AdvisorContext` و`AdvisorResult`) والبطاقة (`TaskCard` و`TaskRecord` و`TaskSource`) من DEV-8 (الإصدار 1.2)، و`RunPlan` وغيره تضيفها مراحلها. ونتيجة `z.unknown()` تعني أن عقد النتيجة لم يُعرَّف بعد.
+- **عقود المجال** في `src/domain/` ملفًا لكل مجال: `DiscoverySnapshot` و`ResolvedEnv` وملف المعايير (`ProfileView` و`ExportedProfile` بصيغة `ayar-profile/1`) وعقود المشاريع من DEV-4 (الإصدار 1.1)، وسياق التغيير ونتيجة المستشار (`AdvisorContext` و`AdvisorResult`) والبطاقة (`TaskCard` و`TaskRecord` و`TaskSource`) من DEV-8، و`RunPlan` و`RunView` و`RunDetail` و`SavedGroup` وعقود الأدوات والتجهيز من DEV-5. والمرحلتان أضافتا عقودهما بالتوازي في الإصدار 1.2 نفسه، فجُمعتا فيه عند الدمج (G-WAVE4-03)، ومراحل التشغيل تضيف ما بعدها. ونتيجة `z.unknown()` تعني أن عقد النتيجة لم يُعرَّف بعد.
 
 ## ملكية الأوامر (G-19)
 
@@ -45,6 +45,8 @@
 | `run.cancel` | C-12 | engine | renderer | — | DEV-5 |
 | `run.rerun` | C-10 | engine | renderer | — | DEV-5 |
 | `run.continueRound` | C-10 | engine | renderer | — | DEV-5 |
+| `runs.list` | C-17 | engine | renderer | — | DEV-5 |
+| `run.get` | C-17 | engine | renderer | — | DEV-5 |
 | `runs.keep` | C-17 | engine | renderer | — | DEV-5 |
 | `runs.delete` | C-17 | engine | renderer | confirmation | DEV-5 |
 | `groups.save` | C-10 | engine | renderer | — | DEV-5 |
@@ -79,11 +81,13 @@
 | `dialog.pickFolder` | C-01 | main | renderer | — | DEV-3 |
 | `dialog.pickDestination` | C-01 | main | renderer | — | DEV-3 |
 | `dialog.pickSource` | C-01 | main | renderer | — | DEV-3 |
-| `confirm.issue` | C-01 | main | renderer | — | DEV-3 |
+| `confirm.issue` | C-01 | main | renderer | — | DEV-5 |
 | `engine.status` | C-01 | main | renderer | — | DEV-3 |
 | `engine.restart` | C-01 | main | renderer | — | DEV-3 |
 | `internal.clipboardText` | C-21 | engine | host | — | DEV-9 |
 | `internal.recordCopy` | C-17 | engine | host | — | DEV-9 |
+| `internal.evidencePath` | C-17 | engine | host | — | DEV-5 |
+| `internal.prepareQuit` | C-12 | engine | host | — | DEV-5 |
 
 ## ملكية الأحداث
 
@@ -101,6 +105,7 @@
 | `finding.provisional` | C-15 | DEV-6 |
 | `finding.final` | C-16 | DEV-6 |
 | `engine.health` | C-04 | DEV-3 |
+| `setup.progress` | C-11 | DEV-5 |
 
 ## اتحاد مصفوفة الواجهات (G-18)
 
