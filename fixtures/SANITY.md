@@ -1200,14 +1200,14 @@ There are no .py[i] files in directory 'src'
 
 | الفحص | الأمر | الخروج | النتيجة | ما يثبته |
 |---|---|---|---|---|
-| osv | `osv-scanner scan source -r . --offline` | 128 | ✓ | sec.deps: ناقص (رمز 128) |
+| osv | `node $FX_TOOLS/osv-mini-db/build.mjs --out "$TMPDIR/ayar-osv-mini-db" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY="$TMPDIR/ayar-osv-mini-db" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c` | 128 | ✓ | sec.deps: ناقص (رمز 128) |
 
 <details><summary>osv</summary>
 
 ```text
 Scanning dir .
 Starting filesystem walk for root: /
-End status: 1 dirs visited, 2 inodes visited, 0 Extract calls, 134.375µs elapsed, 135µs wall time
+End status: 1 dirs visited, 2 inodes visited, 0 Extract calls, 140µs elapsed, 140µs wall time
 No package sources found, --help for usage information.
 ```
 
@@ -1217,15 +1217,15 @@ No package sources found, --help for usage information.
 
 | الفحص | الأمر | الخروج | النتيجة | ما يثبته |
 |---|---|---|---|---|
-| osv | `osv-scanner scan source -r . --offline` | 128 | ✓ | sec.deps: تعذّر (رمز 128 مع Error during extraction) |
+| osv | `node $FX_TOOLS/osv-mini-db/build.mjs --out "$TMPDIR/ayar-osv-mini-db" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY="$TMPDIR/ayar-osv-mini-db" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c` | 128 | ✓ | sec.deps: تعذّر (رمز 128 مع Error during extraction) |
 
 <details><summary>osv</summary>
 
 ```text
 Scanning dir .
 Starting filesystem walk for root: /
-End status: 1 dirs visited, 3 inodes visited, 1 Extract calls, 144.833µs elapsed, 145µs wall time
-Error during extraction: (extracting as javascript/packagelockjson) private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-a8UjwG/p/osv/package-lock.json: could not extract: unexpected end of JSON input
+End status: 1 dirs visited, 3 inodes visited, 1 Extract calls, 156.916µs elapsed, 157µs wall time
+Error during extraction: (extracting as javascript/packagelockjson) private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-YWNgQb/p/osv/package-lock.json: could not extract: unexpected end of JSON input
 No package sources found, --help for usage information.
 ```
 
@@ -1378,13 +1378,65 @@ See: https://github.com/lycheeverse/lychee/blob/lychee-v0.24.2/lychee.example.to
 
 | الفحص | الأمر | الخروج | النتيجة | ما يثبته |
 |---|---|---|---|---|
-| osv | — | — | ⏸ لم يُشغَّل: ينتظر E-09 (قاعدة OSV المصغرة في DEV-2) | sec.deps: ثغرة تجريبية في ayar-vuln-fake@1.0.0 |
+| osv | `node $FX_TOOLS/osv-mini-db/build.mjs --out "$TMPDIR/ayar-osv-mini-db" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY="$TMPDIR/ayar-osv-mini-db" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c` | 1 | ✓ | sec.deps: أخفق (رمز 1) — الثغرة التجريبية AYAR-2026-0001 في ayar-vuln-fake@1.0.0 |
+
+<details><summary>osv</summary>
+
+```text
+Scanning dir .
+Starting filesystem walk for root: /
+Scanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-iangaC/p/osv/package-lock.json file and found 2 packages
+End status: 1 dirs visited, 3 inodes visited, 1 Extract calls, 210.083µs elapsed, 211µs wall time
+Loaded npm local db from /var/folders/39/08324w6s5t
+… [اقتُطع] …
+U/C:H/I:H/A:H",
+                  "type": "CVSS_V3"
+                }
+              ],
+              "summary": "ثغرة تجريبية مصطنعة في ayar-vuln-fake (npm) لاختبار عِيَار؛ ليست ثغرة حقيقية"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "experimental_config": {
+    "licenses": {
+      "summary": false,
+      "allowlist": null
+    }
+  }
+}
+```
+
+</details>
 
 ### good:osv
 
 | الفحص | الأمر | الخروج | النتيجة | ما يثبته |
 |---|---|---|---|---|
-| osv | — | — | ⏸ لم يُشغَّل: ينتظر E-09 (قاعدة OSV المصغرة في DEV-2) | sec.deps: اجتاز (صفر ثغرات) |
+| osv | `node $FX_TOOLS/osv-mini-db/build.mjs --out "$TMPDIR/ayar-osv-mini-db" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY="$TMPDIR/ayar-osv-mini-db" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c` | 0 | ✓ | sec.deps: اجتاز (left-pad وحدها؛ صفر ثغرات بقاعدة OSV المصغرة دون اتصال) |
+
+<details><summary>osv</summary>
+
+```text
+Scanning dir .
+Starting filesystem walk for root: /
+Scanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-LHxID0/p/osv/package-lock.json file and found 1 package
+End status: 1 dirs visited, 3 inodes visited, 1 Extract calls, 331.375µs elapsed, 331µs wall time
+Loaded npm local db from /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-osv-mini-db/osv-scalibr/npm/all.zip
+{
+  "results": [],
+  "experimental_config": {
+    "licenses": {
+      "summary": false,
+      "allowlist": null
+    }
+  }
+}
+```
+
+</details>
 
 ## FX-EXT
 
@@ -1407,7 +1459,7 @@ See: https://github.com/lycheeverse/lychee/blob/lychee-v0.24.2/lychee.example.to
 | policy | `node $FX_TOOLS/ext-policy-check.mjs public/manifest.json permissions-policy.json` | 0 | ✓ | sec.ext.permissions: كل الصلاحيات في السياسة |
 | a11y | `pnpm build >/dev/null 2>&1 && node $FX_TOOLS/axe-check.mjs --ext dist --page popup.html --rules color-contrast` | 0 | ✓ | design.a11y: صفر مخالفات تباين |
 | rtl | `pnpm build >/dev/null 2>&1 && node $FX_TOOLS/axe-check.mjs --ext dist --page popup.html --rules html-has-lang` | 0 | ✓ | design.rtl.static: جذر popup.html يعلن dir وlang |
-| sec.deps | — | — | ⏸ لم يُشغَّل: ينتظر E-09 (قاعدة OSV المصغرة في DEV-2) | sec.deps: صفر ثغرات |
+| sec.deps | `node $FX_TOOLS/osv-mini-db/build.mjs --out "$TMPDIR/ayar-osv-mini-db" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY="$TMPDIR/ayar-osv-mini-db" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c` | 0 | ✓ | sec.deps: صفر ثغرات (قاعدة OSV المصغرة دون اتصال) |
 
 <details><summary>ext-load</summary>
 
@@ -1420,8 +1472,8 @@ LOADED
 <details><summary>secrets</summary>
 
 ```text
-11:16AM INF scanned ~13489 bytes (13.49 KB) in 2.67ms
-11:16AM INF no leaks found
+12:13PM INF scanned ~13489 bytes (13.49 KB) in 3.36ms
+12:13PM INF no leaks found
 []
 ```
 
@@ -1449,6 +1501,27 @@ AXE_TOTAL 0
 ```text
 DIR attr=rtl lang=ar computed=rtl
 AXE_TOTAL 0
+```
+
+</details>
+
+<details><summary>sec.deps</summary>
+
+```text
+Scanning dir .
+Starting filesystem walk for root: /
+Scanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-EXT-1k4PAr/p/pnpm-lock.yaml file and found 188 packages
+End status: 13 dirs visited, 40 inodes visited, 1 Extract calls, 2.226375ms elapsed, 2.226ms wall time
+Loaded npm local db from /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-osv-mini-db/osv-scalibr/npm/all.zip
+{
+  "results": [],
+  "experimental_config": {
+    "licenses": {
+      "summary": false,
+      "allowlist": null
+    }
+  }
+}
 ```
 
 </details>
@@ -1690,7 +1763,45 @@ AXE_TOTAL 0
 | types | `pnpm exec tsc --noEmit` | 0 | ✓ | code.types: صفر أخطاء أنواع |
 | unit | `pnpm exec vitest run` | 0 | ✓ | beh.unit: كل الاختبارات تمر |
 | dep-installed | `ls node_modules/ayar-vuln-fake/package.json && node -e "console.log(require('ayar-vuln-fake/package.json').version)"` | 0 | ✓ | sec.deps: التبعية ayar-vuln-fake@1.0.0 مثبتة من قفل pnpm |
-| sec.deps | — | — | ⏸ لم يُشغَّل: ينتظر E-09 (قاعدة OSV المصغرة في DEV-2) | sec.deps: ثغرة تجريبية في ayar-vuln-fake@1.0.0 |
+| sec.deps | `node $FX_TOOLS/osv-mini-db/build.mjs --out "$TMPDIR/ayar-osv-mini-db" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY="$TMPDIR/ayar-osv-mini-db" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c` | 1 | ✓ | sec.deps: أخفق (رمز 1) — AYAR-2026-0001 في ayar-vuln-fake (تبعية file: من pnpm-lock.yaml) |
+
+<details><summary>sec.deps</summary>
+
+```text
+Scanning dir .
+Starting filesystem walk for root: /
+Scanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-EXT-Q3GA1H/p/pnpm-lock.yaml file and found 189 packages
+End status: 12 dirs visited, 44 inodes visited, 1 Extract calls, 5.495208ms elapsed, 5.496ms wall time
+Loaded npm local db from /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-osv-mini-db/osv-scalibr/npm/all.zip
+{
+  "results": [
+    {
+      "source": {
+
+… [اقتُطع] …
+         "severity": [
+                {
+                  "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                  "type": "CVSS_V3"
+                }
+              ],
+              "summary": "ثغرة تجريبية مصطنعة في ayar-vuln-fake (npm) لاختبار عِيَار؛ ليست ثغرة حقيقية"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "experimental_config": {
+    "licenses": {
+      "summary": false,
+      "allowlist": null
+    }
+  }
+}
+```
+
+</details>
 
 ### flaky-vitest
 
@@ -2887,13 +2998,34 @@ progress 2
 | unit | `.venv/bin/python -m pytest -p no:cacheprovider` | 0 | ✓ | beh.unit: pytest يمر |
 | build | `.venv/bin/python -m build --no-isolation --outdir "$TMPDIR/ayar-fx-py-dist"` | 0 | ✓ | code.build: build --no-isolation ينتج sdist وwheel |
 | secrets | `gitleaks dir . --config $FX_TOOLS/gitleaks-fixtures.toml --redact=100 --no-banner --exit-code 42` | 0 | ✓ | sec.secrets.files: لا تسريبات |
-| sec.deps | — | — | ⏸ لم يُشغَّل: ينتظر E-09 (قاعدة OSV المصغرة في DEV-2) | sec.deps: صفر ثغرات |
+| sec.deps | `node $FX_TOOLS/osv-mini-db/build.mjs --out "$TMPDIR/ayar-osv-mini-db" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY="$TMPDIR/ayar-osv-mini-db" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c` | 0 | ✓ | sec.deps: صفر ثغرات (قاعدة OSV المصغرة دون اتصال) |
 | arabic-path | `pwd` | 0 | ✓ | الجذر مسار عربي بمسافات وعلامات تنصيص |
+
+<details><summary>sec.deps</summary>
+
+```text
+Scanning dir .
+Starting filesystem walk for root: /
+Scanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-04UWwx/p/مشاريع تجريبية/مكتبة «النصوص»/uv.lock file and found 19 packages
+End status: 7 dirs visited, 17 inodes visited, 1 Extract calls, 1.854625ms elapsed, 1.855ms wall time
+Loaded PyPI local db from /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-osv-mini-db/osv-scalibr/PyPI/all.zip
+{
+  "results": [],
+  "experimental_config": {
+    "licenses": {
+      "summary": false,
+      "allowlist": null
+    }
+  }
+}
+```
+
+</details>
 
 <details><summary>arabic-path</summary>
 
 ```text
-/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-HBfsYw/p/مشاريع تجريبية/مكتبة «النصوص»
+/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-04UWwx/p/مشاريع تجريبية/مكتبة «النصوص»
 ```
 
 </details>
@@ -3010,7 +3142,7 @@ Found 1 error.
 | lint | `.venv/bin/ruff check --no-cache --output-format concise .` | 0 | ✓ | code.lint: Ruff بلا مخالفات |
 | unit | `.venv/bin/python -m pytest -p no:cacheprovider` | 0 | ✓ | beh.unit: يمر والتبعية مثبتة |
 | dep-locked | `grep -n -A2 'name = "ayar-vuln-fake"' uv.lock` | 0 | ✓ | sec.deps: ayar-vuln-fake@1.0.0 في uv.lock |
-| sec.deps | — | — | ⏸ لم يُشغَّل: ينتظر E-09 (قاعدة OSV المصغرة في DEV-2) | sec.deps: ثغرة تجريبية في ayar-vuln-fake@1.0.0 |
+| sec.deps | `node $FX_TOOLS/osv-mini-db/build.mjs --out "$TMPDIR/ayar-osv-mini-db" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY="$TMPDIR/ayar-osv-mini-db" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c` | 1 | ✓ | sec.deps: أخفق (رمز 1) — AYAR-2026-0002 في ayar-vuln-fake@1.0.0 (تبعية directory من uv.lock) |
 
 <details><summary>dep-locked</summary>
 
@@ -3026,6 +3158,42 @@ Found 1 error.
 369:requires-dist = [{ name = "ayar-vuln-fake", directory = "vendor/ayar-vuln-fake" }]
 370-
 371-[package.metadata.requires-dev]
+```
+
+</details>
+
+<details><summary>sec.deps</summary>
+
+```text
+Scanning dir .
+Starting filesystem walk for root: /
+Scanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-YbI9sl/p/مشاريع تجريبية/مكتبة «النصوص»/uv.lock file and found 20 packages
+End status: 13 dirs visited, 26 inodes visited, 1 Extract calls, 3.374917ms elapsed, 3.375ms wall time
+Loaded PyPI local db from /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-osv-mini-db/osv-scalibr/PyPI/all.zip
+{
+  "results": [
+ 
+… [اقتُطع] …
+        "severity": [
+                {
+                  "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                  "type": "CVSS_V3"
+                }
+              ],
+              "summary": "ثغرة تجريبية مصطنعة في ayar-vuln-fake (PyPI) لاختبار عِيَار؛ ليست ثغرة حقيقية"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "experimental_config": {
+    "licenses": {
+      "summary": false,
+      "allowlist": null
+    }
+  }
+}
 ```
 
 </details>

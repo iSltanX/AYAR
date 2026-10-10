@@ -9,6 +9,8 @@ const build = run('build', 'pnpm build', 'code.build: يمر ويُنتج dist/'
 const loads = run('ext-load', `${BUILD} && node $FX_TOOLS/chrome-load.mjs dist`, 'beh.ext.host: Chromium يحمّل الإضافة دون خطأ', { match: ['^LOADED$'], evidence: true });
 const e2e = run('e2e', `${BUILD} && pnpm exec playwright test`, 'beh.e2e: ثلاث رحلات تمر (عامل الخدمة، النافذة، الخيارات)', { match: ['3 passed'], nomatch: ['flaky', 'failed'] });
 const secrets = (exit, proves, match = []) => ({ id: 'secrets', cmd: 'gitleaks dir . --config $FX_TOOLS/gitleaks-fixtures.toml --redact=100 --no-banner --exit-code 42 --report-format json --report-path ../gl.json; c=$?; cat ../gl.json; exit $c', exit, proves, match, evidence: true });
+// قاعدة OSV المصغرة (E-09، DEV-2): تُبنى وقت التشغيل إلى المجلد المؤقت وتُقرأ دون اتصال؛ المشروع كله هو الهدف (pnpm-lock.yaml)
+const osv = (exit, proves, match = [], nomatch = []) => ({ id: 'sec.deps', cmd: 'node $FX_TOOLS/osv-mini-db/build.mjs --out "$TMPDIR/ayar-osv-mini-db" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY="$TMPDIR/ayar-osv-mini-db" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c', exit, proves, match, nomatch, evidence: true, excerpt: 900 });
 const policy = (exit, proves, match = []) => ({ id: 'policy', cmd: 'node $FX_TOOLS/ext-policy-check.mjs public/manifest.json permissions-policy.json', exit, proves, match, evidence: true });
 const axe = (exit, proves, match = []) => ({ id: 'a11y', cmd: `${BUILD} && node $FX_TOOLS/axe-check.mjs --ext dist --page popup.html --rules color-contrast`, exit, proves, match, evidence: true });
 const rtl = (proves, match) => ({ id: 'rtl', cmd: `${BUILD} && node $FX_TOOLS/axe-check.mjs --ext dist --page popup.html --rules html-has-lang`, exit: 0, proves, match, evidence: true });
@@ -25,7 +27,7 @@ export default {
   variants: {
     good: [...allGoodTools, cov(0, 'تغطية الوحدة 100% فوق عتبات 90/90/80', ['100']), loads, e2e, secrets(0, 'sec.secrets.files: لا تسريبات'), policy(0, 'sec.ext.permissions: كل الصلاحيات في السياسة', ['POLICY_TOTAL 0']), axe(0, 'design.a11y: صفر مخالفات تباين', ['AXE_TOTAL 0']),
       rtl('design.rtl.static: جذر popup.html يعلن dir وlang', ['DIR attr=rtl lang=ar computed=rtl']),
-      { id: 'sec.deps', pending: true, proves: 'sec.deps: صفر ثغرات', reason: 'ينتظر E-09 (قاعدة OSV المصغرة في DEV-2)' }],
+      osv(0, 'sec.deps: صفر ثغرات (قاعدة OSV المصغرة دون اتصال)', ['"results"'], ['AYAR-2026', 'ayar-vuln-fake'])],
     'failing-test': [typecheck, lint, build, run('unit', 'pnpm exec vitest run', 'beh.unit: اختبار «يفصل الكلمات بعلامات الترقيم» يفشل', { exit: 1, match: ['يفصل الكلمات بعلامات الترقيم', '1 failed'], evidence: true })],
     secret: [typecheck, lint, unit, build, secrets(42, 'sec.secrets.files: generic-api-key في src/config.ts', ['"RuleID": "generic-api-key"', '"File": "src/config.ts"'])],
     'all-urls': [typecheck, loads, policy(1, 'sec.ext.permissions: <all_urls> خارج السياسة', ['POLICY_VIOLATION host_permissions <all_urls>'])],
@@ -35,7 +37,7 @@ export default {
     'low-contrast': [typecheck, unit, axe(0, 'design.a11y: axe color-contrast بأثر serious (نسبة 1.98:1)', ['AXE color-contrast serious', '1\\.98'])],
     'missing-dir': [typecheck, rtl('design.rtl.static: الجذر بلا dir فاتجاهه المحسوب ltr مع lang=ar', ['DIR attr=null lang=ar computed=ltr'])],
     'vuln-dep': [typecheck, unit, run('dep-installed', 'ls node_modules/ayar-vuln-fake/package.json && node -e "console.log(require(\'ayar-vuln-fake/package.json\').version)"', 'sec.deps: التبعية ayar-vuln-fake@1.0.0 مثبتة من قفل pnpm', { match: ['1\\.0\\.0'] }),
-      { id: 'sec.deps', pending: true, proves: 'sec.deps: ثغرة تجريبية في ayar-vuln-fake@1.0.0', reason: 'ينتظر E-09 (قاعدة OSV المصغرة في DEV-2)' }],
+      osv(1, 'sec.deps: أخفق (رمز 1) — AYAR-2026-0001 في ayar-vuln-fake (تبعية file: من pnpm-lock.yaml)', ['AYAR-2026-0001', 'ayar-vuln-fake'])],
     'flaky-vitest': [run('stability', 'for i in 1 2 3 4 5; do pnpm exec vitest run src/lib/flaky.test.ts >/dev/null 2>&1; echo "run$i=$?"; done', 'beh.stability: تناوب إخفاق/نجاح عبر خمسة تكرارات', { match: ['run1=1', 'run2=0', 'run3=1', 'run4=0', 'run5=1'], evidence: true })],
     'flaky-playwright': [run('flaky', `${BUILD} && pnpm exec playwright test e2e/flaky.spec.ts --reporter=json`, 'beh.e2e: Playwright يسجل الحالة flaky بعد إعادة', { match: ['"status": "flaky"', '"flaky": 1'], evidence: true, excerpt: 600 })],
     'options-console-error': [typecheck, lint, build, e2eFails('beh.ext.host/beh.e2e: خطأ TypeError في وحدة تحكم options.html', ['صفحة الخيارات تُفتح دون أخطاء', 'Cannot set properties of null'])],

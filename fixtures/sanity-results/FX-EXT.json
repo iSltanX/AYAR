@@ -7,7 +7,7 @@
         "cmd": "pnpm exec tsc --noEmit",
         "ok": true,
         "code": 0,
-        "ms": 963,
+        "ms": 1280,
         "proves": "code.types: صفر أخطاء أنواع",
         "problems": [],
         "evidence": false,
@@ -18,7 +18,7 @@
         "cmd": "pnpm exec eslint src e2e",
         "ok": true,
         "code": 0,
-        "ms": 959,
+        "ms": 1113,
         "proves": "code.lint: صفر أخطاء",
         "problems": [],
         "evidence": false,
@@ -29,40 +29,40 @@
         "cmd": "pnpm exec vitest run",
         "ok": true,
         "code": 0,
-        "ms": 1247,
+        "ms": 1295,
         "proves": "beh.unit: كل الاختبارات تمر",
         "problems": [],
         "evidence": false,
-        "excerpt": "RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-EXT-YT3yJE/p\n\n\n Test Files  2 passed (2)\n      Tests  13 passed (13)\n   Start at  11:16:44\n   Duration  113ms (transform 38%, tests 38%, import 16%, worker 8%)"
+        "excerpt": "RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-EXT-1k4PAr/p\n\n\n Test Files  2 passed (2)\n      Tests  13 passed (13)\n   Start at  12:13:30\n   Duration  150ms (tests 61%, transform 26%, import 9%, worker 4%)"
       },
       {
         "id": "build",
         "cmd": "pnpm build",
         "ok": true,
         "code": 0,
-        "ms": 1180,
+        "ms": 1188,
         "proves": "code.build: يمر ويُنتج dist/",
         "problems": [],
         "evidence": false,
-        "excerpt": "$ tsc --noEmit && vite build\nvite v8.3.4 building client environment for production...\ntransforming...\n✓ 10 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/options.html                  0.70 kB │ gzip: 0.43 kB\ndist/popup.html                    0.79 kB │ gzip: 0.45 kB\ndist/assets/settings-By4ZKIQq.css  0.25 kB │ gzip: 0.20 kB\ndist/background.js                 0.09 kB │ gzip: 0.10 kB\ndist/assets/options-FPSwmY6t.js    0.27 kB │ gzip: 0.22 kB\ndist/assets/popup-vGU0hrIV.js      0.57 kB │ gzip: 0.39 kB\ndist/assets/settings-Dgk2447Q.js   0.99 kB │ gzip: 0.52 kB\n\n✓ built in 263ms"
+        "excerpt": "$ tsc --noEmit && vite build\nvite v8.3.4 building client environment for production...\ntransforming...\n✓ 10 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/options.html                  0.70 kB │ gzip: 0.43 kB\ndist/popup.html                    0.79 kB │ gzip: 0.45 kB\ndist/assets/settings-By4ZKIQq.css  0.25 kB │ gzip: 0.20 kB\ndist/background.js                 0.09 kB │ gzip: 0.10 kB\ndist/assets/options-FPSwmY6t.js    0.27 kB │ gzip: 0.22 kB\ndist/assets/popup-vGU0hrIV.js      0.57 kB │ gzip: 0.39 kB\ndist/assets/settings-Dgk2447Q.js   0.99 kB │ gzip: 0.52 kB\n\n✓ built in 269ms"
       },
       {
         "id": "coverage",
         "cmd": "pnpm exec vitest run --coverage",
         "ok": true,
         "code": 0,
-        "ms": 355,
+        "ms": 365,
         "proves": "تغطية الوحدة 100% فوق عتبات 90/90/80",
         "problems": [],
         "evidence": false,
-        "excerpt": "RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-EXT-YT3yJE/p\n      Coverage enabled with v8\n\n\n Test Files  2 passed (2)\n      Tests  13 passed (13)\n   Start at  11:16:46\n   Duration  105ms (transform 36%, worker 30%, tests 19%, import 16%)\n\n % Coverage report from v8\nNo files with missing coverage.\n2 files fully covered.\n\n=============================== Coverage summary ===============================\nStatements   : 100% ( 18/18 )\nBranches     : 100% ( 11/11 )\nFunctions    : 100% ( 8/8 )\nLines        : 100% ( 15/15 )\n================================================================================"
+        "excerpt": "RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-EXT-1k4PAr/p\n      Coverage enabled with v8\n\n\n Test Files  2 passed (2)\n      Tests  13 passed (13)\n   Start at  12:13:31\n   Duration  122ms (transform 44%, worker 23%, tests 19%, import 13%)\n\n % Coverage report from v8\nNo files with missing coverage.\n2 files fully covered.\n\n=============================== Coverage summary ===============================\nStatements   : 100% ( 18/18 )\nBranches     : 100% ( 11/11 )\nFunctions    : 100% ( 8/8 )\nLines        : 100% ( 15/15 )\n================================================================================"
       },
       {
         "id": "ext-load",
         "cmd": "pnpm build >/dev/null 2>&1 && node $FX_TOOLS/chrome-load.mjs dist",
         "ok": true,
         "code": 0,
-        "ms": 7709,
+        "ms": 8335,
         "proves": "beh.ext.host: Chromium يحمّل الإضافة دون خطأ",
         "problems": [],
         "evidence": true,
@@ -73,29 +73,29 @@
         "cmd": "pnpm build >/dev/null 2>&1 && pnpm exec playwright test",
         "ok": true,
         "code": 0,
-        "ms": 2257,
+        "ms": 2387,
         "proves": "beh.e2e: ثلاث رحلات تمر (عامل الخدمة، النافذة، الخيارات)",
         "problems": [],
         "evidence": false,
-        "excerpt": "Running 3 tests using 1 worker\n\n(node:15335) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n  ✓  1 e2e/extension.spec.ts:23:1 › عامل الخدمة مسجل بمعرّف الإضافة (11ms)\n  ✓  2 e2e/extension.spec.ts:27:1 › النافذة المنبثقة تعدّ الكلمات بالعربية (142ms)\n  ✓  3 e2e/extension.spec.ts:35:1 › صفحة الخيارات تُفتح دون أخطاء في وحدة التحكم (93ms)\n\n  3 passed (1.0s)"
+        "excerpt": "Running 3 tests using 1 worker\n\n(node:44934) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n  ✓  1 e2e/extension.spec.ts:23:1 › عامل الخدمة مسجل بمعرّف الإضافة (6ms)\n  ✓  2 e2e/extension.spec.ts:27:1 › النافذة المنبثقة تعدّ الكلمات بالعربية (200ms)\n  ✓  3 e2e/extension.spec.ts:35:1 › صفحة الخيارات تُفتح دون أخطاء في وحدة التحكم (110ms)\n\n  3 passed (1.1s)"
       },
       {
         "id": "secrets",
         "cmd": "gitleaks dir . --config $FX_TOOLS/gitleaks-fixtures.toml --redact=100 --no-banner --exit-code 42 --report-format json --report-path ../gl.json; c=$?; cat ../gl.json; exit $c",
         "ok": true,
         "code": 0,
-        "ms": 63,
+        "ms": 68,
         "proves": "sec.secrets.files: لا تسريبات",
         "problems": [],
         "evidence": true,
-        "excerpt": "11:16AM INF scanned ~13489 bytes (13.49 KB) in 2.67ms\n11:16AM INF no leaks found\n[]"
+        "excerpt": "12:13PM INF scanned ~13489 bytes (13.49 KB) in 3.36ms\n12:13PM INF no leaks found\n[]"
       },
       {
         "id": "policy",
         "cmd": "node $FX_TOOLS/ext-policy-check.mjs public/manifest.json permissions-policy.json",
         "ok": true,
         "code": 0,
-        "ms": 26,
+        "ms": 25,
         "proves": "sec.ext.permissions: كل الصلاحيات في السياسة",
         "problems": [],
         "evidence": true,
@@ -106,7 +106,7 @@
         "cmd": "pnpm build >/dev/null 2>&1 && node $FX_TOOLS/axe-check.mjs --ext dist --page popup.html --rules color-contrast",
         "ok": true,
         "code": 0,
-        "ms": 1375,
+        "ms": 1366,
         "proves": "design.a11y: صفر مخالفات تباين",
         "problems": [],
         "evidence": true,
@@ -117,7 +117,7 @@
         "cmd": "pnpm build >/dev/null 2>&1 && node $FX_TOOLS/axe-check.mjs --ext dist --page popup.html --rules html-has-lang",
         "ok": true,
         "code": 0,
-        "ms": 1410,
+        "ms": 1358,
         "proves": "design.rtl.static: جذر popup.html يعلن dir وlang",
         "problems": [],
         "evidence": true,
@@ -125,10 +125,14 @@
       },
       {
         "id": "sec.deps",
+        "cmd": "node $FX_TOOLS/osv-mini-db/build.mjs --out \"$TMPDIR/ayar-osv-mini-db\" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY=\"$TMPDIR/ayar-osv-mini-db\" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c",
         "ok": true,
-        "pending": true,
-        "proves": "sec.deps: صفر ثغرات",
-        "reason": "ينتظر E-09 (قاعدة OSV المصغرة في DEV-2)"
+        "code": 0,
+        "ms": 188,
+        "proves": "sec.deps: صفر ثغرات (قاعدة OSV المصغرة دون اتصال)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Scanning dir .\nStarting filesystem walk for root: /\nScanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-EXT-1k4PAr/p/pnpm-lock.yaml file and found 188 packages\nEnd status: 13 dirs visited, 40 inodes visited, 1 Extract calls, 2.226375ms elapsed, 2.226ms wall time\nLoaded npm local db from /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-osv-mini-db/osv-scalibr/npm/all.zip\n{\n  \"results\": [],\n  \"experimental_config\": {\n    \"licenses\": {\n      \"summary\": false,\n      \"allowlist\": null\n    }\n  }\n}"
       }
     ],
     "failing-test": [
@@ -417,7 +421,7 @@
         "cmd": "pnpm exec tsc --noEmit",
         "ok": true,
         "code": 0,
-        "ms": 752,
+        "ms": 726,
         "proves": "code.types: صفر أخطاء أنواع",
         "problems": [],
         "evidence": false,
@@ -428,18 +432,18 @@
         "cmd": "pnpm exec vitest run",
         "ok": true,
         "code": 0,
-        "ms": 1095,
+        "ms": 1130,
         "proves": "beh.unit: كل الاختبارات تمر",
         "problems": [],
         "evidence": false,
-        "excerpt": "RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-EXT-VYeyqz/p\n\n\n Test Files  3 passed (3)\n      Tests  14 passed (14)\n   Start at  11:18:07\n   Duration  103ms (transform 53%, import 19%, tests 18%, worker 10%)"
+        "excerpt": "RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-EXT-Q3GA1H/p\n\n\n Test Files  3 passed (3)\n      Tests  14 passed (14)\n   Start at  12:13:48\n   Duration  91ms (transform 52%, import 20%, tests 18%, worker 10%)"
       },
       {
         "id": "dep-installed",
         "cmd": "ls node_modules/ayar-vuln-fake/package.json && node -e \"console.log(require('ayar-vuln-fake/package.json').version)\"",
         "ok": true,
         "code": 0,
-        "ms": 29,
+        "ms": 34,
         "proves": "sec.deps: التبعية ayar-vuln-fake@1.0.0 مثبتة من قفل pnpm",
         "problems": [],
         "evidence": false,
@@ -447,10 +451,14 @@
       },
       {
         "id": "sec.deps",
+        "cmd": "node $FX_TOOLS/osv-mini-db/build.mjs --out \"$TMPDIR/ayar-osv-mini-db\" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY=\"$TMPDIR/ayar-osv-mini-db\" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c",
         "ok": true,
-        "pending": true,
-        "proves": "sec.deps: ثغرة تجريبية في ayar-vuln-fake@1.0.0",
-        "reason": "ينتظر E-09 (قاعدة OSV المصغرة في DEV-2)"
+        "code": 1,
+        "ms": 72,
+        "proves": "sec.deps: أخفق (رمز 1) — AYAR-2026-0001 في ayar-vuln-fake (تبعية file: من pnpm-lock.yaml)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Scanning dir .\nStarting filesystem walk for root: /\nScanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-EXT-Q3GA1H/p/pnpm-lock.yaml file and found 189 packages\nEnd status: 12 dirs visited, 44 inodes visited, 1 Extract calls, 5.495208ms elapsed, 5.496ms wall time\nLoaded npm local db from /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-osv-mini-db/osv-scalibr/npm/all.zip\n{\n  \"results\": [\n    {\n      \"source\": {\n\n… [اقتُطع] …\n         \"severity\": [\n                {\n                  \"score\": \"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H\",\n                  \"type\": \"CVSS_V3\"\n                }\n              ],\n              \"summary\": \"ثغرة تجريبية مصطنعة في ayar-vuln-fake (npm) لاختبار عِيَار؛ ليست ثغرة حقيقية\"\n            }\n          ]\n        }\n      ]\n    }\n  ],\n  \"experimental_config\": {\n    \"licenses\": {\n      \"summary\": false,\n      \"allowlist\": null\n    }\n  }\n}"
       }
     ],
     "flaky-vitest": [

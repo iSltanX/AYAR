@@ -17,7 +17,7 @@
 | [FX-MALICIOUS](FX-MALICIOUS/project.json) | مستودع Git مفخخ **يُولَّد** وقت الاختبار (`tools/malicious/generate.mjs`) ولا يُلتزم | 1 (مولَّد) | AT-01 AT-42 |
 | [FX-REPORTS](FX-REPORTS/project.json) | تقارير حقيقية لأربع أدوات ونسخها التالفة والمتعارضة | 6: السليمة، وJUnit تالف، وSARIF ناقص، وJSON عميق، وأكبر من الحد (يُولَّد)، وخروج 0 مع إخفاقات | AT-14 |
 | [FX-MONO](FX-MONO/project.json) | مساحة عمل pnpm بحزمتين | 2: السليمة، وإخفاق في الحزمة الأساسية | AT-16 والمكوّنات وعدم التكرار |
-| [FX-ADAPTERS](FX-ADAPTERS/project.json) | **مشاريع المحولات** (G-06): مكوّن لكل محول بقفله، بالمتغيرات الستة | 57: السليمة، و56 معيبة (`<أداة>--<نوع>`) | AT-14 |
+| [FX-ADAPTERS](FX-ADAPTERS/project.json) | **مشاريع المحولات** (G-06): مكوّن لكل محول بقفله، بالمتغيرات الستة (ومكوّن osv يُفحص بقاعدة OSV المصغرة من DEV-2) | 57: السليمة، و56 معيبة (`<أداة>--<نوع>`) | AT-14 |
 
 المحولات الداخلة: vitest وjest وnode:test وplaywright وeslint وbiome وtsc وknip وpyright وpytest وruff وmypy وsemgrep وosv-scanner وgitleaks وlychee. **مؤجل:** Stryker وk6 (اختياريان وثقيلان)، يُبنيان مع محوليهما.
 
@@ -105,6 +105,7 @@ node fixtures/tools/validate.mjs FX-EXT
 | `sanity.mjs` | يشغّل الأدوات الأصلية على كل نسخة ويحفظ `sanity-results/*.json` ثم يبني `SANITY.md` |
 | `sanity-helpers.mjs` | يشغّل اختبارات المساعدات أدناه |
 | `bootstrap-toolchain.sh` | يبني صندوق الأدوات (semgrep وuv وosv-scanner وlychee وplaywright-core وaxe-core وeslint وChromium) بإصدارات مثبتة (`toolchain.json`) |
+| `osv-mini-db/build.mjs` + `records/` | **قاعدة OSV المصغرة** (E-09، DEV-2): سجلان مصطنعان `AYAR-2026-0001` (npm) و`AYAR-2026-0002` (PyPI) للحزمة `ayar-vuln-fake@1.0.0`، يُبنيان وقت الاختبار إلى `<cache>/osv-scalibr/<Ecosystem>/all.zip` (التخطيط الذي يقرؤه osv-scanner 2.6.0 مع `OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY`) بكاتب ZIP حتمي بلا تبعيات؛ ملفات zip لا تُلتزم |
 | `malicious/generate.mjs` + `test.mjs` | مولّد FX-MALICIOUS واختباره (**لا يشغّل `git` في المستودع المولَّد**، D-38) |
 | `tool-server/server.mjs` + `test.mjs` | **AT-35**: خادم محلي يقدّم أداة بصمتها لا تطابق الكتالوج + مدخل كتالوج تاريخ تحققه أقدم من 180 يومًا (`--honest` ضابط سلبي) |
 | `synth-repo/generate.mjs` + `test.mjs` | **AT-36**: مستودعات اصطناعية حتمية بـ 1000 و10000 و50000 ملف (`--preset small/medium/large`) |
@@ -126,6 +127,6 @@ Node 24.16.0 مع pnpm 12.8.1 (`packageManager` في كل مشروع pnpm)، وu
 | المطلب | المرحلة | التفصيل |
 |---|---|---|
 | **AT-26** مولّد حالة بيانات عِيَار: مشروع بـ 21 تشغيلًا أحدها «محفوظ دائمًا» ومراجعات وبطاقات وصور مرجعية | **DEV-5** (حين يوجد مخطط القاعدة) | يُكتب في `fixtures/tools/` بالنمط نفسه، ويُحمَّل بمخطط القاعدة لا بنسخة منه |
-| قاعدة OSV المصغرة (حزمة وثغرة مزيفتان) و`sec.deps` لنسخ `vuln-dep` (FX-EXT وFX-PY) و`osv--bad` | **DEV-2** (E-09) | الحزمة المصطنعة `ayar-vuln-fake@1.0.0` محلية في `vendor/` وفي الأقفال؛ وكل توقعاتها موسومة `pending: E-09` ولم تُشغَّل |
+| قاعدة OSV المصغرة (حزمة وثغرة مزيفتان) و`sec.deps` لنسخ `vuln-dep` (FX-EXT وFX-PY) و`osv--bad` | **أُنجز في DEV-2** (E-09) | `tools/osv-mini-db/`؛ وثبت أن osv-scanner يقرأ تبعية `file:` من `pnpm-lock.yaml` (بإصدار نصي `file:vendor/ayar-vuln-fake`) وتبعية `directory` من `uv.lock` (بإصدارها 1.0.0) ويطابقهما؛ فلا حاجة لمدخل قفل بسجل وهمي |
 | معرّفات القواعد (`rule`) في كل ملفات التوقع | **DEV-6** | كلها `null` بوسم `rule_pending: true` |
 | محولا Stryker وk6 | DEV-6 أو DEV-8 | اختياريان |

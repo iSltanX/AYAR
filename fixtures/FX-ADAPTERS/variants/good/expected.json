@@ -152,13 +152,6 @@
       ]
     }
   ],
-  "pending": [
-    {
-      "waits_for": "E-09",
-      "check": "sec.deps",
-      "reason": "good لـ OSV يحتاج قاعدة OSV المصغرة (DEV-2)"
-    }
-  ],
   "engine_expectations": [
     {
       "id": "AT-14-matrix",
