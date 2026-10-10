@@ -1,0 +1,332 @@
+{
+  "schema": "fixture-facts/1",
+  "project": "FX-EXT",
+  "variant": "good",
+  "scanner": "discovery/1.0.0",
+  "components": [
+    "."
+  ],
+  "partial": false,
+  "facts": [
+    {
+      "key": "build.tool",
+      "component": ".",
+      "value": {
+        "name": "vite",
+        "config": "vite.config.ts"
+      },
+      "source": {
+        "file": "vite.config.ts",
+        "pointer": "",
+        "line": null
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "node.lockfile",
+      "component": ".",
+      "value": {
+        "file": "pnpm-lock.yaml",
+        "manager": "pnpm"
+      },
+      "source": {
+        "file": "pnpm-lock.yaml",
+        "pointer": "",
+        "line": null
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "node.package",
+      "component": ".",
+      "value": {
+        "name": "ayar-fx-ext",
+        "version": "1.0.0",
+        "private": true,
+        "type": "module",
+        "hasBin": false,
+        "hasExports": false
+      },
+      "source": {
+        "file": "package.json",
+        "pointer": "",
+        "line": 1
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "node.packageManager",
+      "component": ".",
+      "value": {
+        "name": "pnpm",
+        "version": "12.8.1",
+        "spec": "pnpm@12.8.1"
+      },
+      "source": {
+        "file": "package.json",
+        "pointer": "/packageManager",
+        "line": 7
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "quality.tool",
+      "component": ".",
+      "value": {
+        "name": "eslint",
+        "from": "config",
+        "config": "eslint.config.js"
+      },
+      "source": {
+        "file": "eslint.config.js",
+        "pointer": "",
+        "line": null
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "quality.tool",
+      "component": ".",
+      "value": {
+        "name": "eslint",
+        "from": "dependency",
+        "config": null
+      },
+      "source": {
+        "file": "package.json",
+        "pointer": "/devDependencies/eslint",
+        "line": 22
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "quality.tool",
+      "component": ".",
+      "value": {
+        "name": "typescript",
+        "from": "config",
+        "config": "tsconfig.json"
+      },
+      "source": {
+        "file": "tsconfig.json",
+        "pointer": "",
+        "line": null
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "quality.tool",
+      "component": ".",
+      "value": {
+        "name": "typescript",
+        "from": "dependency",
+        "config": null
+      },
+      "source": {
+        "file": "package.json",
+        "pointer": "/devDependencies/typescript",
+        "line": 23
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "references.buildOutput",
+      "component": ".",
+      "value": {
+        "dir": "dist",
+        "from": "vite.config"
+      },
+      "source": {
+        "file": "vite.config.ts",
+        "pointer": "build.outDir",
+        "line": 6
+      },
+      "proof": "inferred"
+    },
+    {
+      "key": "references.cssVariables",
+      "component": ".",
+      "value": {
+        "files": [
+          "src/popup.css"
+        ]
+      },
+      "source": {
+        "file": "src/popup.css",
+        "pointer": "",
+        "line": null
+      },
+      "proof": "inferred"
+    },
+    {
+      "key": "references.manifest",
+      "component": ".",
+      "value": {
+        "path": "public/manifest.json",
+        "generated": false
+      },
+      "source": {
+        "file": "public/manifest.json",
+        "pointer": "",
+        "line": 1
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "references.permissionsPolicy",
+      "component": ".",
+      "value": {
+        "path": "permissions-policy.json",
+        "valid": true
+      },
+      "source": {
+        "file": "permissions-policy.json",
+        "pointer": "",
+        "line": null
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "testing.framework",
+      "component": ".",
+      "value": {
+        "name": "playwright",
+        "from": "config",
+        "version": null
+      },
+      "source": {
+        "file": "playwright.config.ts",
+        "pointer": "",
+        "line": null
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "testing.framework",
+      "component": ".",
+      "value": {
+        "name": "playwright",
+        "from": "dependency",
+        "version": "1.64.0"
+      },
+      "source": {
+        "file": "package.json",
+        "pointer": "/devDependencies/@playwright~1test",
+        "line": 18
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "testing.framework",
+      "component": ".",
+      "value": {
+        "name": "vitest",
+        "from": "config",
+        "version": null
+      },
+      "source": {
+        "file": "vitest.config.ts",
+        "pointer": "",
+        "line": null
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "testing.framework",
+      "component": ".",
+      "value": {
+        "name": "vitest",
+        "from": "dependency",
+        "version": "5.0.3"
+      },
+      "source": {
+        "file": "package.json",
+        "pointer": "/devDependencies/vitest",
+        "line": 26
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "type.browserExtension",
+      "component": ".",
+      "value": {
+        "manifest": "public/manifest.json",
+        "manifestVersion": 3,
+        "generated": false,
+        "framework": null,
+        "permissions": 1,
+        "hostPermissions": 1
+      },
+      "source": {
+        "file": "public/manifest.json",
+        "pointer": "/manifest_version",
+        "line": 2
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "ui.defaultLocale",
+      "component": ".",
+      "value": {
+        "value": "ar"
+      },
+      "source": {
+        "file": "public/manifest.json",
+        "pointer": "/default_locale",
+        "line": 6
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "ui.entryPages",
+      "component": ".",
+      "value": {
+        "files": [
+          "options.html",
+          "popup.html"
+        ]
+      },
+      "source": {
+        "file": "options.html",
+        "pointer": "",
+        "line": null
+      },
+      "proof": "inferred"
+    },
+    {
+      "key": "ui.locales",
+      "component": ".",
+      "value": {
+        "dir": "public/_locales",
+        "languages": [
+          "ar"
+        ]
+      },
+      "source": {
+        "file": "public/_locales/ar/messages.json",
+        "pointer": "",
+        "line": null
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "ui.rtl",
+      "component": ".",
+      "value": {
+        "files": [
+          "options.html",
+          "popup.html"
+        ],
+        "languages": [
+          "ar"
+        ]
+      },
+      "source": {
+        "file": "options.html",
+        "pointer": "",
+        "line": 2
+      },
+      "proof": "declared"
+    }
+  ]
+}

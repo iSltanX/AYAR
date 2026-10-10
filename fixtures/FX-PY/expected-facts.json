@@ -1,0 +1,229 @@
+{
+  "schema": "fixture-facts/1",
+  "project": "FX-PY",
+  "variant": "good",
+  "scanner": "discovery/1.0.0",
+  "components": [
+    "."
+  ],
+  "partial": false,
+  "facts": [
+    {
+      "key": "python.buildSystem",
+      "component": ".",
+      "value": {
+        "backend": "setuptools.build_meta",
+        "frontend": "build"
+      },
+      "source": {
+        "file": "pyproject.toml",
+        "pointer": "build-system",
+        "line": 19
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "python.lockfile",
+      "component": ".",
+      "value": {
+        "file": "uv.lock",
+        "manager": "uv"
+      },
+      "source": {
+        "file": "uv.lock",
+        "pointer": "",
+        "line": null
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "python.manager",
+      "component": ".",
+      "value": {
+        "name": "uv"
+      },
+      "source": {
+        "file": "uv.lock",
+        "pointer": "",
+        "line": null
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "python.project",
+      "component": ".",
+      "value": {
+        "name": "nusus",
+        "version": "1.0.0",
+        "requiresPython": ">=3.12"
+      },
+      "source": {
+        "file": "pyproject.toml",
+        "pointer": "project",
+        "line": 1
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "quality.tool",
+      "component": ".",
+      "value": {
+        "name": "mypy",
+        "from": "config",
+        "config": "pyproject.toml"
+      },
+      "source": {
+        "file": "pyproject.toml",
+        "pointer": "tool.mypy",
+        "line": 40
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "quality.tool",
+      "component": ".",
+      "value": {
+        "name": "mypy",
+        "from": "dependency",
+        "config": null
+      },
+      "source": {
+        "file": "pyproject.toml",
+        "pointer": "dependency-groups",
+        "line": 13
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "quality.tool",
+      "component": ".",
+      "value": {
+        "name": "ruff",
+        "from": "config",
+        "config": "pyproject.toml"
+      },
+      "source": {
+        "file": "pyproject.toml",
+        "pointer": "tool.ruff",
+        "line": 33
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "quality.tool",
+      "component": ".",
+      "value": {
+        "name": "ruff",
+        "from": "dependency",
+        "config": null
+      },
+      "source": {
+        "file": "pyproject.toml",
+        "pointer": "dependency-groups",
+        "line": 15
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "runtime.python",
+      "component": ".",
+      "value": {
+        "spec": "3.12",
+        "from": "python-version"
+      },
+      "source": {
+        "file": ".python-version",
+        "pointer": "",
+        "line": 1
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "runtime.python",
+      "component": ".",
+      "value": {
+        "spec": ">=3.12",
+        "from": "requires-python"
+      },
+      "source": {
+        "file": "pyproject.toml",
+        "pointer": "project.requires-python",
+        "line": 6
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "testing.framework",
+      "component": ".",
+      "value": {
+        "name": "hypothesis",
+        "from": "dependency",
+        "version": null
+      },
+      "source": {
+        "file": "pyproject.toml",
+        "pointer": "dependency-groups",
+        "line": 12
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "testing.framework",
+      "component": ".",
+      "value": {
+        "name": "pytest",
+        "from": "config",
+        "version": null
+      },
+      "source": {
+        "file": "pyproject.toml",
+        "pointer": "tool.pytest.ini_options",
+        "line": 29
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "testing.framework",
+      "component": ".",
+      "value": {
+        "name": "pytest",
+        "from": "config",
+        "version": null
+      },
+      "source": {
+        "file": "tests/conftest.py",
+        "pointer": "",
+        "line": null
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "testing.framework",
+      "component": ".",
+      "value": {
+        "name": "pytest",
+        "from": "dependency",
+        "version": null
+      },
+      "source": {
+        "file": "pyproject.toml",
+        "pointer": "dependency-groups",
+        "line": 14
+      },
+      "proof": "declared"
+    },
+    {
+      "key": "type.library",
+      "component": ".",
+      "value": {
+        "ecosystem": "python"
+      },
+      "source": {
+        "file": "pyproject.toml",
+        "pointer": "project",
+        "line": 1
+      },
+      "proof": "inferred"
+    }
+  ]
+}
