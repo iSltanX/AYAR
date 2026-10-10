@@ -1,6 +1,6 @@
 <script lang="ts">
-  // Empty state (Figma 113:8501, C-21): 480 wide, centred, padding 32, gap 12: a Lucide icon (24, text/secondary;
-  // Icon has 12/16/20, so the 20 is scaled by 1.2, which also gives Figma's 1.5 px stroke), the title
+  // Empty state (Figma 113:8501, C-21): 480 wide, centred, padding 32, gap 12: a Lucide icon (24, text/secondary,
+  // a 1.5 px stroke as in Figma), the title
   // (title/sub), one sentence (body, text/secondary, max 400) and at most one button. No illustration.
   import { EMPTY_STATES, type EmptyKind } from '../lib/empty-states.ts';
   import Button from './Button.svelte';
@@ -18,7 +18,7 @@
 </script>
 
 <div class="empty">
-  <span class="icon"><Icon name={spec.icon} size={20} /></span>
+  <span class="icon"><Icon name={spec.icon} size={24} /></span>
   <p class="title">{t(spec.title)}</p>
   <p class="body">{t(spec.body)}</p>
   {#if spec.action}
@@ -44,9 +44,6 @@
     inline-size: 24px;
     block-size: 24px;
     color: var(--text-secondary);
-  }
-  .icon :global(svg) {
-    transform: scale(1.2);
   }
   .title,
   .body {

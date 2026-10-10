@@ -1,12 +1,12 @@
 <script lang="ts">
-  // A Lucide icon (A-12, D-DES2-03): 16 and 20 with a 1.5 stroke, 12 (tag icons) with a 2 stroke, in
+  // A Lucide icon (A-12, D-DES2-03): 16, 20 and 24 (empty states) with a 1.5 stroke, 12 (tag icons) with a 2 stroke, in
   // currentColor. Decorative unless it has a label. Directional icons are chosen per language by the caller
   // (D-DES2-02), never mirrored by transform.
   import { LUCIDE, type LucideName } from '../design/icons.generated.ts';
 
   interface Props {
     name: LucideName;
-    size?: 12 | 16 | 20;
+    size?: 12 | 16 | 20 | 24;
     /** An accessible name; without one the icon is aria-hidden. */
     label?: string;
   }
