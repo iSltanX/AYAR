@@ -31,6 +31,9 @@ export function openDatabase(path: string, options: OpenOptions = {}): Db {
       const mode = db.prepare('PRAGMA journal_mode = WAL').get() as { journal_mode: string } | undefined;
       if (mode?.journal_mode !== 'wal') throw new Error(`WAL not enabled (journal_mode=${mode?.journal_mode ?? '?'})`);
       db.exec('PRAGMA synchronous = NORMAL');
+      // Deleted and overwritten content is zeroed on disk [D-DEV4-07]: when C-18 re-redacts a stored row (a value
+      // that became known as sensitive), the old bytes do not survive in free pages.
+      db.exec('PRAGMA secure_delete = ON');
     }
   } catch (e) {
     db.close();

@@ -66,7 +66,8 @@ export const CustomCheck = z.strictObject({
 export type CustomCheck = z.infer<typeof CustomCheck>;
 export const CustomName = z.string().regex(/^[a-z][a-z0-9-]{0,39}$/);
 
-export const InstanceKey = z.string().min(3).max(512).regex(/^[^@\s]+@[^@\s]+$/);
+/** `checkId@component` (D-45): the check id has no `@`; the component is a relative path and may (`@scope/x`). */
+export const InstanceKey = z.string().min(3).max(4200).regex(/^[^@\s]+@.+$/);
 
 /** What the user changes; profile.update validates it (C-09 point 7) before anything is saved. */
 export const ProfilePatch = z.strictObject({

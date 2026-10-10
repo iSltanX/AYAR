@@ -17,7 +17,7 @@ import { homedir } from 'node:os';
 import { posix } from 'node:path';
 import { discover, DiscoveryCancelled, SCANNER_VERSION } from '../discovery/discover.ts';
 import type { EventBus } from '../host/event-bus.ts';
-import { CommandError } from '../host/errors.ts';
+import { CommandError, fsError } from '../host/errors.ts';
 import { newId } from '../host/ids.ts';
 import type { EnginePorts, Logger } from '../ports/index.ts';
 import { latestSnapshot, type ProfileService } from '../profile/service.ts';
@@ -94,24 +94,19 @@ export class ProjectsService {
   /** A granted path: it exists, it is a folder, and it can be read (EPERM/EACCES become guidance, FR-59). */
   async #inspect(path: string): Promise<string> {
     const { fs } = this.#o.ports;
-    let real: string | null;
     try {
-      real = await fs.realpath(path);
-    } catch (e) {
-      if (isPermissionError(e)) throw new CommandError('permission_denied', { location: protectedLocation(path, this.#home) });
-      throw e;
-    }
-    if (!real) throw new CommandError('path_missing');
-    const st = await fs.stat(real);
-    if (!st) throw new CommandError('path_missing');
-    if (!st.isDirectory) throw new CommandError('not_a_directory');
-    try {
+      const real = await fs.realpath(path);
+      if (!real) throw new CommandError('path_missing');
+      const st = await fs.stat(real);
+      if (!st) throw new CommandError('path_missing');
+      if (!st.isDirectory) throw new CommandError('not_a_directory');
       await fs.readdirEntries(real);
+      return real;
     } catch (e) {
-      if (isPermissionError(e)) throw new CommandError('permission_denied', { location: protectedLocation(real, this.#home) });
-      throw e;
+      if (e instanceof CommandError) throw e;
+      if (isPermissionError(e)) throw new CommandError('permission_denied', { location: protectedLocation(path, this.#home) });
+      throw fsError(e);
     }
-    return real;
   }
 
   #pend(p: Omit<Pending, 'expiresAtMs'>, details: { expected: string | null; found: string | null }): PendingConfirmation {
@@ -150,7 +145,7 @@ export class ProjectsService {
   async #insert(path: string, real: string): Promise<{ status: 'added'; project: Project; discoveryId: string }> {
     const id = newId(this.#o.ports.random, 'prj');
     const now = this.#now().toISOString();
-    const name = posix.basename(real) || real;
+    const name = (posix.basename(real) || real).slice(0, 200);
     this.#o.db.transaction(() => {
       // Not in «مشروع غير موثوق» mode until the user says so (FR-55: the mode is switched on, AT-05 step 7).
       this.#o.db.run('INSERT INTO projects (id, display_name, root_path, root_realpath, trusted, created_at, last_opened_at) VALUES (?, ?, ?, ?, 1, ?, ?)', id, name, path, real, now, now);
@@ -209,10 +204,14 @@ export class ProjectsService {
     const { fs } = this.#o.ports;
     return readIdentity(
       async (file) => {
-        const p = posix.join(root, file);
-        const st = await fs.lstat(p);
-        if (!st?.isFile || st.size > 2 * 1024 * 1024) return null;
-        return new TextDecoder().decode((await fs.readFilePrefix(p, 2 * 1024 * 1024)).data);
+        try {
+          const p = posix.join(root, file);
+          const st = await fs.lstat(p);
+          if (!st?.isFile || st.size > 2 * 1024 * 1024) return null;
+          return new TextDecoder().decode((await fs.readFilePrefix(p, 2 * 1024 * 1024)).data);
+        } catch {
+          return null;
+        }
       },
       (data) => hmacHex(this.#o.hmacKey, data),
     );
@@ -389,7 +388,15 @@ export class ProjectsService {
         events.emit('discovery.cancelled', { projectId, discoveryId });
         return;
       }
-      const error = e instanceof CommandError ? e.error : isPermissionError(e) ? protocolError('permission_denied', { location: protectedLocation(this.#safeRoot(projectId), this.#home) }) : protocolError('internal', { stage: 'discovery' });
+      const code = (e as { code?: string } | null)?.code;
+      const error =
+        e instanceof CommandError
+          ? e.error
+          : isPermissionError(e)
+            ? protocolError('permission_denied', { location: protectedLocation(this.#safeRoot(projectId), this.#home) })
+            : code === 'ENOENT' || code === 'ENOTDIR'
+              ? protocolError('path_missing')
+              : protocolError('internal', { stage: 'discovery' });
       this.#o.logger.log('error', 'discovery failed', { projectId, code: error.code, error: e instanceof Error ? e.message.slice(0, 300) : String(e) });
       events.emit('discovery.failed', { projectId, discoveryId, error });
     }

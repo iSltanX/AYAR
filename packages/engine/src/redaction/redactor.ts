@@ -65,7 +65,14 @@ export function compileRules(data: RedactionData, o: { user?: readonly UserPatte
     ...(p.minEntropy !== undefined ? { minEntropy: p.minEntropy } : {}),
   }));
   const blocks = data.multiline.map((m) => ({ rule: m.id, begin: new RegExp(m.begin.pattern, m.begin.flags), end: new RegExp(m.end.pattern, m.end.flags) }));
-  const user = (o.user ?? []).map((u) => ({ rule: `user:${u.id}`, regex: new RegExp(u.pattern, flagsWith(u.flags ?? '', 'g')) }));
+  // A user pattern that does not compile is left out, never a reason to stop redacting (review M6).
+  const user = (o.user ?? []).flatMap((u) => {
+    try {
+      return [{ rule: `user:${u.id}`, regex: new RegExp(u.pattern, flagsWith(u.flags ?? '', 'g')) }];
+    } catch {
+      return [];
+    }
+  });
   return { highConfidence, blocks, user, known: expandKnown(o.known ?? [], data.minValueLength), minValueLength: data.minValueLength };
 }
 

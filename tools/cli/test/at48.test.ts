@@ -4,7 +4,7 @@
 // the changed spec); and neither value reaches the data folder. Delivering the variables to a real child
 // process, and the raw-report half, are DEV-5's.
 import type { ChildEnvSummary, ProfileView, ResolvedEnv } from '@ayar/protocol';
-import { chmodSync, writeFileSync } from 'node:fs';
+import { chmodSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { addProject, connectEngine, filesContaining, materialize, ok, tempDir } from './support/fixtures.ts';
@@ -26,11 +26,20 @@ describe('AT-48 (environment): sensitive variables are withheld, and allowed one
     const engine = await connectEngine({ dataDir, env: { AYAR_TEST_LOGIN_SHELL: shell } });
     try {
       await engine.waitForEvent('engine.health');
-      const { projectId, profile } = await addProject(engine, materialize('FX-EXT', 'good', join(root, 'FX-EXT')));
-      ok(await engine.invoke('profile.approve', { projectId, changeSetId: profile.pending.id }));
+      // The project's own files carry one of the values in a form no pattern recognizes (review M3): discovery,
+      // which reads no environment (AT-01), saves it; reading the environment redacts it again everywhere.
+      const project = materialize('FX-EXT', 'good', join(root, 'FX-EXT'));
+      const pkg = JSON.parse(readFileSync(join(project, 'package.json'), 'utf8')) as { scripts: Record<string, string> };
+      pkg.scripts['env:echo'] = `echo ${myToken}`;
+      writeFileSync(join(project, 'package.json'), JSON.stringify(pkg, null, 2));
+      const { projectId } = await addProject(engine, project);
 
       const first = ok<{ env: ResolvedEnv; child: ChildEnvSummary }>(await engine.invoke('environment.resolve', { projectId, instance: 'beh.unit@.' }));
       expect(first.env).toMatchObject({ source: 'login_shell', shell });
+      const script = ok<{ snapshot: { facts: { key: string; value: { name?: string; text?: string } }[] } }>(await engine.invoke('project.get', { projectId })).snapshot.facts.find((f) => f.key === 'node.script' && f.value.name === 'env:echo');
+      expect(script?.value.text).toBe('echo ⟦redacted:env:MY_API_TOKEN⟧');
+      const proposed = ok<ProfileView>(await engine.invoke('profile.get', { projectId }));
+      ok(await engine.invoke('profile.approve', { projectId, changeSetId: proposed.pending.id }));
       expect(first.env.withheld).toEqual(['MY_API_TOKEN', 'NPM_TOKEN']);
       expect(first.child.withheld).toEqual(['MY_API_TOKEN', 'NPM_TOKEN']);
       expect(first.child.passed).not.toContain('MY_API_TOKEN');

@@ -211,3 +211,13 @@ describe('sensitive names (C-18 layer 1, C-07, G-35)', () => {
     expect(classifyEnvName('ELECTRON_RUN_AS_NODE', rules)).toBe('internal');
   });
 });
+
+describe('user patterns (review M6)', () => {
+  it('validates a pattern with its own flags, and a pattern that does not compile is skipped, not fatal', async () => {
+    const { SettingEntry } = await import('@ayar/protocol');
+    expect(SettingEntry.safeParse({ key: 'redaction.userPatterns', value: [{ id: 'mail', pattern: '\\w+\\@\\w+', flags: 'u' }] }).success).toBe(false);
+    expect(SettingEntry.safeParse({ key: 'redaction.userPatterns', value: [{ id: 'mail', pattern: '\\w+@\\w+', flags: 'u' }] }).success).toBe(true);
+    const r = redactor({ user: [{ id: 'bad', pattern: '\\w+\\@', flags: 'u' }, { id: 'ok', pattern: 'zz\\d+' }] });
+    expect(r.redactText('a zz12 b').text).toBe(`a ${REDACTED('user:ok')} b`);
+  });
+});

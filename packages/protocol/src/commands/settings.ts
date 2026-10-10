@@ -5,22 +5,21 @@ import { z } from '../zod.ts';
 import { defineCommand } from './define.ts';
 
 /** A user redaction pattern (C-18 layer 4): it must compile, and stays short. */
-export const UserRedactionPattern = z.strictObject({
-  id: z.string().regex(/^[a-z][a-z0-9-]{0,39}$/),
-  pattern: z
-    .string()
-    .min(1)
-    .max(512)
-    .refine((p) => {
-      try {
-        new RegExp(p, 'g');
-        return true;
-      } catch {
-        return false;
-      }
-    }, 'pattern does not compile'),
-  flags: z.string().regex(/^[imsu]*$/).optional(),
-});
+export const UserRedactionPattern = z
+  .strictObject({
+    id: z.string().regex(/^[a-z][a-z0-9-]{0,39}$/),
+    pattern: z.string().min(1).max(512),
+    flags: z.string().regex(/^[imsu]*$/).optional(),
+  })
+  // Compiled exactly as C-18 compiles it: with its own flags, plus g (a `u` pattern has stricter escapes).
+  .refine((u) => {
+    try {
+      new RegExp(u.pattern, `${u.flags ?? ''}g`);
+      return true;
+    } catch {
+      return false;
+    }
+  }, 'pattern does not compile');
 export type UserRedactionPattern = z.infer<typeof UserRedactionPattern>;
 
 const ShellPath = z

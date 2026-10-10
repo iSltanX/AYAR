@@ -5,7 +5,7 @@
 // every approval again; sudo is refused; a mass deletion is flagged and approved on its own; the «مشروع غير
 // موثوق» flag is recorded. (Running checks, and the untrusted mode at run time, are DEV-5.)
 import type { CheckSpec, ExportPreview, ProfileView } from '@ayar/protocol';
-import { appendFileSync, existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
+import { appendFileSync, chmodSync, existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { pathGrant } from '../src/grants.ts';
@@ -165,6 +165,41 @@ describe('nothing is saved before C-18 (D-21)', () => {
       } finally {
         outside.cleanup();
       }
+    } finally {
+      await engine.close();
+    }
+  }, 60_000);
+});
+
+describe('hostile profiles are refused, not fatal (review M4, M5)', () => {
+  it('refuses a deeply nested profile and a read-only destination with coded errors, and the engine keeps serving', async () => {
+    const engine = await connectEngine({ dataDir: join(root, 'AYAR') });
+    try {
+      await engine.waitForEvent('engine.health');
+      const project = materialize('FX-EXT', 'good', join(root, 'FX-EXT'));
+      const { projectId } = await addProject(engine, project);
+      const deep = join(root, 'deep.json');
+      writeFileSync(deep, `{"schema":"ayar-profile/1","checks":{"beh.unit@.":{"thresholds":{"x":${'['.repeat(200_000)}${']'.repeat(200_000)}}}}}`);
+      const src = pathGrant('source', deep);
+      expect(await engine.invoke('profile.import', { projectId, sourceToken: src.token }, src.grants)).toMatchObject({ ok: false, error: { code: 'profile_invalid', details: { rule: 'too_deep' } } });
+      const readonly = join(root, 'readonly');
+      mkdirSync(readonly);
+      chmodSync(readonly, 0o500);
+      try {
+        const preview = ok<ExportPreview>(await engine.invoke('profile.exportPreview', { projectId }));
+        const dst = pathGrant('destination', join(readonly, 'profile.json'));
+        expect(await engine.invoke('profile.export', { projectId, destinationToken: dst.token, previewDigest: preview.previewDigest }, dst.grants)).toMatchObject({ ok: false, error: { code: 'permission_denied' } });
+      } finally {
+        chmodSync(readonly, 0o700);
+      }
+      // A valid profile that carries sudo is refused by the sudo rule itself.
+      const sudo = join(root, 'sudo.json');
+      const exported = JSON.parse(ok<ExportPreview>(await engine.invoke('profile.exportPreview', { projectId })).text) as { checks: Record<string, { argv?: string[] }> };
+      exported.checks['beh.unit@.']!.argv = ['sudo', 'pnpm', 'test'];
+      writeFileSync(sudo, JSON.stringify(exported));
+      const s2 = pathGrant('source', sudo);
+      expect(await engine.invoke('profile.import', { projectId, sourceToken: s2.token }, s2.grants)).toMatchObject({ ok: false, error: { code: 'profile_invalid', details: { rule: 'sudo', instance: 'beh.unit@.' } } });
+      expect(ok<{ projects: unknown[] }>(await engine.invoke('project.list', {})).projects).toHaveLength(1);
     } finally {
       await engine.close();
     }

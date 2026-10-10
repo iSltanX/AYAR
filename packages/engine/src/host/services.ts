@@ -5,6 +5,7 @@ import { EnvironmentService } from '../environment/service.ts';
 import type { EnginePorts, Logger } from '../ports/index.ts';
 import { ProfileService } from '../profile/service.ts';
 import { ProjectsService } from '../projects/service.ts';
+import { rescrub } from '../redaction/rescrub.ts';
 import { RedactionService } from '../redaction/service.ts';
 import type { Db } from '../storage/db.ts';
 import type { HmacKey } from '../storage/hmac-key.ts';
@@ -46,6 +47,10 @@ export function createServices(o: ServicesInput): EngineServices {
     logger: o.logger,
     catalog: o.catalog,
     shellOverride: o.testLoginShell ?? null,
+    onSensitiveValues: () => {
+      const r = rescrub(o.db, redaction.redactor());
+      if (r.rows) o.logger.log('info', 'stored rows redacted again with newly known sensitive values', { rows: r.rows });
+    },
     settings: () => {
       const s = readSettings(o.db, ['environment.shell', 'environment.timeoutSeconds']);
       return { shell: s['environment.shell'] ?? null, timeoutSeconds: s['environment.timeoutSeconds'] ?? 10 };

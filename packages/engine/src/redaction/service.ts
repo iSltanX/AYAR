@@ -28,8 +28,8 @@ export class RedactionService {
     this.#names = null;
   }
 
-  /** Layer 1: values of sensitive variables (8 characters or more are kept by the redactor). */
-  registerKnownValues(values: readonly KnownValue[]): void {
+  /** Layer 1: values of sensitive variables (8 characters or more are kept by the redactor). True when new. */
+  registerKnownValues(values: readonly KnownValue[]): boolean {
     let changed = false;
     for (const v of values) {
       const key = `${v.rule}\u0000${v.value}`;
@@ -39,6 +39,7 @@ export class RedactionService {
       }
     }
     if (changed) this.#redactor = null;
+    return changed;
   }
 
   redactor(): Redactor {

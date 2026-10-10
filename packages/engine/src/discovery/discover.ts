@@ -125,7 +125,7 @@ export async function discover(o: DiscoverOptions): Promise<DiscoveryResult> {
     if (o.signal.aborted) throw new DiscoveryCancelled();
     const ctx: DetectorContext = { reader, component: comp, files: filesByComponent.get(comp.id)!, dirs: dirsByComponent.get(comp.id)! };
     for (const d of COMPONENT_DETECTORS) {
-      await d.run(ctx, (key, value, source, proof) => facts.push({ key, component: comp.id, value: value as Fact['value'], source, proof, detector: `${d.id}@${d.version}` }));
+      await d.run(ctx, (key, value, source, proof) => facts.push({ key, component: comp.id, value: value as Fact['value'], source: bounded(source), proof, detector: `${d.id}@${d.version}` }));
     }
     deriveTypes(facts, comp.id);
     const pkg = facts.find((f) => f.component === comp.id && f.key === 'node.package');
@@ -199,6 +199,11 @@ export async function discover(o: DiscoverOptions): Promise<DiscoveryResult> {
     partialReasons: w.partialReasons,
     opened: reader.opened,
   };
+}
+
+/** A pointer longer than the contract allows (a hostile key) keeps its file and line, without the pointer. */
+function bounded(source: FactSource | null): FactSource | null {
+  return source && source.pointer.length > 1024 ? { ...source, pointer: '' } : source;
 }
 
 const WEB_BUILD_TOOLS = ['vite', 'next', 'astro', 'svelte', 'nuxt'];

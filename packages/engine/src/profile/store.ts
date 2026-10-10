@@ -175,7 +175,7 @@ export function changeSet(db: Db, projectId: string, specs: readonly CheckSpec[]
 
 export function writeApprovals(db: Db, o: { projectId: string; items: readonly { instance: string; specHash: string }[]; profileVersion: number; now: Date; note: string | null; newId: () => string }): void {
   for (const it of o.items) {
-    const at = it.instance.lastIndexOf('@');
+    const at = it.instance.indexOf('@');
     const checkId = it.instance.slice(0, at);
     const component = it.instance.slice(at + 1);
     db.run(

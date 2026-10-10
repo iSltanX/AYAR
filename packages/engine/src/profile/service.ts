@@ -27,6 +27,21 @@ import { emptySettings, proposeChecks, type ProfileSettings } from './propose.ts
 import { approvalsOf, changeSet, clearApprovals, latestProfile, saveProfile, writeApprovals, type ProfileContent, type ProfileRow } from './store.ts';
 
 const MAX_PROFILE_BYTES = 2 * 1024 * 1024;
+const MAX_PROFILE_DEPTH = 64;
+
+/** The nesting depth of a JSON value, iteratively (no recursion to exhaust). */
+export function jsonDepth(value: unknown): number {
+  let max = 0;
+  const stack: [unknown, number][] = [[value, 1]];
+  while (stack.length) {
+    const [v, d] = stack.pop()!;
+    if (v === null || typeof v !== 'object') continue;
+    max = Math.max(max, d);
+    if (max > 1000) return max;
+    for (const x of Array.isArray(v) ? v : Object.values(v as Record<string, unknown>)) stack.push([x, d + 1]);
+  }
+  return max;
+}
 
 export interface ProfileServiceOptions {
   db: Db;
@@ -136,7 +151,7 @@ export class ProfileService {
     const names = this.#o.redaction.names();
     const known = new Set(this.#o.catalog.checks.map((c) => c.id));
     for (const [instance, o] of Object.entries(settings.overrides)) {
-      const checkId = instance.slice(0, instance.lastIndexOf('@'));
+      const checkId = instance.slice(0, instance.indexOf('@'));
       if (!known.has(checkId) && !(checkId.startsWith('custom.') && settings.custom[checkId.slice('custom.'.length)])) throw invalid('unknown_check', { instance });
       if (o.argv && judgeCommand(policy, [argvText(o.argv)]).refused.length) throw invalid('sudo', { instance });
       for (const name of Object.keys(o.explicitEnv ?? {})) if (classifyEnvName(name, names) === 'sensitive') throw invalid('explicit_sensitive', { instance, name });
@@ -284,6 +299,9 @@ export class ProfileService {
     } catch {
       throw invalid('not_json');
     }
+    // A file from a repository is hostile until proven otherwise: a nesting deep enough to exhaust the stack is
+    // refused before any recursive step touches it (review M4).
+    if (jsonDepth(raw) > MAX_PROFILE_DEPTH) throw invalid('too_deep');
     const parsed = ExportedProfile.safeParse(raw);
     if (!parsed.success) throw invalid('schema', { path: parsed.error.issues[0]?.path.join('.') ?? '' });
     const p = parsed.data;

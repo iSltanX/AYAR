@@ -129,3 +129,30 @@ describe('project registry (C-05)', () => {
     }
   }, 60_000);
 });
+
+describe('component paths with @ and spaces (review M7)', () => {
+  it('proposes, shows and approves instances of components like packages/@scope/x and "apps/my app"', async () => {
+    const engine = await connectEngine({ dataDir: join(root, 'AYAR') });
+    try {
+      await engine.waitForEvent('engine.health');
+      const dir = join(root, 'mono');
+      project(dir, 'mono');
+      writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'mono', workspaces: ['packages/@scope/*', 'apps/*'] }));
+      for (const p of ['packages/@scope/foo', 'apps/my app']) {
+        mkdirSync(join(dir, p), { recursive: true });
+        writeFileSync(join(dir, p, 'package.json'), JSON.stringify({ name: p, scripts: { test: 'vitest run' } }));
+        writeFileSync(join(dir, p, 'a.test.ts'), 'x');
+      }
+      const added = ok<{ project: Project; discoveryId: string }>(await add(engine, dir));
+      await engine.waitForEvent('discovery.done', (e) => e.payload.discoveryId === added.discoveryId);
+      const profile = ok<{ checks: { instance: string; applicable: boolean }[]; pending: { id: string } }>(await engine.invoke('profile.get', { projectId: added.project.id }));
+      expect(profile.checks.filter((c) => c.applicable).map((c) => c.instance)).toEqual(expect.arrayContaining(['beh.unit@packages/@scope/foo', 'beh.unit@apps/my app']));
+      const approved = ok<{ approved: string[] }>(await engine.invoke('profile.approve', { projectId: added.project.id, changeSetId: profile.pending.id }));
+      expect(approved.approved).toEqual(expect.arrayContaining(['beh.unit@packages/@scope/foo', 'beh.unit@apps/my app']));
+      const after = ok<{ approvals: { instance: string }[] }>(await engine.invoke('profile.get', { projectId: added.project.id }));
+      expect(after.approvals.map((a) => a.instance)).toContain('beh.unit@packages/@scope/foo');
+    } finally {
+      await engine.close();
+    }
+  }, 60_000);
+});

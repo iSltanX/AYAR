@@ -35,6 +35,7 @@ export class EnvironmentService {
   readonly #settings: () => EnvironmentSettings;
   readonly #processEnv: Readonly<Record<string, string | undefined>>;
   readonly #shellOverride: string | null;
+  readonly #onSensitiveValues: () => void;
   #base: Promise<BaseEnv> | null = null;
 
   constructor(o: {
@@ -46,7 +47,10 @@ export class EnvironmentService {
     processEnv?: Readonly<Record<string, string | undefined>>;
     /** A shell chosen by the host itself (tools/cli's test hook), not by the renderer. */
     shellOverride?: string | null;
+    /** Called after sensitive values were registered with C-18, so stored rows can be redacted again. */
+    onSensitiveValues?: () => void;
   }) {
+    this.#onSensitiveValues = o.onSensitiveValues ?? (() => {});
     this.#ports = o.ports;
     this.#redaction = o.redaction;
     this.#logger = o.logger;
@@ -109,10 +113,21 @@ export class EnvironmentService {
         functions: [],
       };
     }
-    // C-18 layer 1: the values of sensitive variables are redacted wherever they appear, passed or not.
-    const rules = this.#redaction.names();
-    this.#redaction.registerKnownValues(Object.entries(out.env).filter(([n]) => classifyEnvName(n, rules) === 'sensitive').map(([n, value]) => ({ rule: `env:${n}`, value })));
+    this.#register(out.env);
     return out;
+  }
+
+  /** C-18 layer 1: the values of sensitive variables are redacted wherever they appear, passed or not. */
+  #register(env: Readonly<Record<string, string>>): void {
+    const rules = this.#redaction.names();
+    const added = this.#redaction.registerKnownValues(Object.entries(env).filter(([n]) => classifyEnvName(n, rules) === 'sensitive').map(([n, value]) => ({ rule: `env:${n}`, value })));
+    if (added) this.#onSensitiveValues();
+  }
+
+  /** After the user named more sensitive variables (settings), their values in the session's environment too. */
+  async reRegister(): Promise<void> {
+    if (!this.#base) return;
+    this.#register((await this.#base).env);
   }
 
   /** ResolvedEnv for a project (names only, never values). */

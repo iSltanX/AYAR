@@ -16,7 +16,7 @@ export async function fallbackPath(fs: Pick<FileSystem, 'stat'>, home: string): 
   const out: string[] = [];
   for (const d of FALLBACK_DIRS) {
     const dir = d.startsWith('~/') ? posix.join(home, d.slice(2)) : d;
-    if ((await fs.stat(dir))?.isDirectory) out.push(dir);
+    if ((await fs.stat(dir).catch(() => null))?.isDirectory) out.push(dir);
   }
   return [...out, '/usr/bin', '/bin', '/usr/sbin', '/sbin'];
 }
@@ -60,7 +60,8 @@ async function onPath(fs: Pick<FileSystem, 'stat'>, path: readonly string[], nam
   for (const dir of path) {
     if (!dir.startsWith('/')) continue;
     const p = posix.join(dir, name);
-    const st = await fs.stat(p);
+    // Any error (a PATH entry that is a file, a folder without permission) means «not here» (review M5).
+    const st = await fs.stat(p).catch(() => null);
     if (st?.isFile && (st.mode & 0o111) !== 0) return p;
   }
   return null;
@@ -115,7 +116,7 @@ export async function resolveTools(i: ResolveToolsInput): Promise<ToolResolution
     if (t.name === 'python3') {
       const venv = posix.join(i.projectRoot, '.venv');
       const venvPython = posix.join(venv, 'bin/python3');
-      if ((await i.fs.stat(venvPython))?.isFile) {
+      if ((await i.fs.stat(venvPython).catch(() => null))?.isFile) {
         path = venvPython;
         try {
           const cfg = new TextDecoder().decode((await i.fs.readFilePrefix(posix.join(venv, 'pyvenv.cfg'), 16 * 1024)).data);
@@ -129,7 +130,7 @@ export async function resolveTools(i: ResolveToolsInput): Promise<ToolResolution
         }
       }
     }
-    const realPath = path ? await i.fs.realpath(path) : null;
+    const realPath = path ? await i.fs.realpath(path).catch(() => null) : null;
     const viaCorepack = !!realPath && /\/corepack\/dist\/(pnpm|yarn|pnpx|yarnpkg)\.js$/.test(realPath);
     if (!version && realPath && !viaCorepack) {
       version = versionFromPath(realPath);

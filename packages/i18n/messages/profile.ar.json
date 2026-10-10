@@ -86,5 +86,6 @@
   "profile.export.preview": "معاينة الفرق قبل الكتابة في المستودع",
   "profile.repoProfile.available": "في المستودع ملف معايير. استخدامه يتطلب اعتماد أوامره.",
   "profile.invalid.secret_in_profile": "ملف المعايير يحوي سرًا ({rules})، فلم يُحفظ. مرّر السر متغيرَ بيئة مسموحًا باسمه بدل كتابته في الملف.",
-  "profile.invalid.outside_project": "ملف المعايير في المستودع يشير إلى خارج المشروع، فلم يُقرأ."
+  "profile.invalid.outside_project": "ملف المعايير في المستودع يشير إلى خارج المشروع، فلم يُقرأ.",
+  "profile.invalid.too_deep": "ملف المعايير متداخل بعمق يتجاوز الحد، فرُفض."
 }

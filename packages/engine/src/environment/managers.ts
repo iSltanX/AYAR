@@ -23,7 +23,7 @@ async function list(fs: ManagersFs, dir: string): Promise<string[]> {
 }
 
 async function executable(fs: ManagersFs, path: string): Promise<boolean> {
-  const st = await fs.stat(path);
+  const st = await fs.stat(path).catch(() => null);
   return st !== null && st.isFile && (st.mode & 0o111) !== 0;
 }
 

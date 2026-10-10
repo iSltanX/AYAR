@@ -248,3 +248,11 @@ describe('nothing of the project runs at readiness, and the shell is a system on
   });
 });
 
+
+describe('file-system errors are answers, not crashes (review M5)', () => {
+  it('treats a PATH entry that is a file, or unreadable, as «not here»', async () => {
+    writeFileSync(join(root, 'not-a-dir'), 'x');
+    const tools = await resolveTools({ fs: nodeFileSystem, path: [join(root, 'not-a-dir'), '/etc/hosts', '/usr/bin'], projectRoot: root, facts: [fact('node.package', {})], installed: [], shellFunctions: [], nvmDefault: null });
+    expect(tools.find((t) => t.tool === 'node')).toBeDefined();
+  });
+});
