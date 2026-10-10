@@ -106,7 +106,22 @@ if (!handoff) {
     else fail(`نتيجة فحص ليست «نجح» في تسليم delivered: ${cells[0]} → ${result}`);
   }
 
-  // 6. اعتماد التصميم
+  // 6. التنظيف (AGENTS.md القسم 10): قسم معبّأ بجدول أو بسطر «لا شيء» وحده
+  const cleanup = handoffText.split('\n## التنظيف')[1]?.split('\n## ')[0];
+  if (cleanup === undefined) fail('لا قسم «التنظيف» في التسليم (AGENTS.md القسم 10)');
+  else {
+    const lines = cleanup.split('\n').map((l) => l.trim());
+    const cleanRows = lines.filter((l) => /^\|/.test(l) && !/^\|\s*-/.test(l) && !/\|\s*المصير\s*\|/.test(l));
+    const filled = cleanRows.filter((r) => !/\|\s*…\s*\|/.test(r));
+    if (!filled.length && !lines.some((l) => /^لا شيء\.?$/.test(l))) fail('قسم «التنظيف» في التسليم غير معبّأ');
+    else pass(`قسم التنظيف معبّأ (${filled.length ? `البنود: ${filled.length}` : 'لا شيء'})`);
+    const later = filled.filter((r) => /يُ?حذف بعد الإغلاق/.test(r)).length;
+    const owner = filled.filter((r) => /ينتظر المالك/.test(r)).length;
+    if (later) warn(`بنود تحذفها الجلسة الرئيسية بعد الوسم: ${later} (قسم «التنظيف» في التسليم)`);
+    if (owner) warn(`بنود تنظيف تنتظر قرار المالك: ${owner}`);
+  }
+
+  // 7. اعتماد التصميم
   if (track === 'design') {
     if (!handoff.approval || handoff.approval === '—') fail('مرحلة تصميم دون اعتماد المالك في حقل approval');
     const designDoc = git(['show', `${branch}:docs/design/README.md`]) ?? '';
