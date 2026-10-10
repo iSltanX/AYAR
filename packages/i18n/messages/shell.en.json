@@ -1,3 +1,25 @@
 {
-  "shell.runBar.showFollowUp": "Show progress"
+  "shell.runBar.showFollowUp": "Show progress",
+  "shell.titleBar.breadcrumb": "Breadcrumb",
+  "shell.sidebar.label": "Navigation",
+  "shell.navBadge.failures": "{count, plural, one {# failure} other {# failures}}",
+  "shell.runBar.label": "Current run",
+  "shell.runBar.kind.fullScan": "Full scan",
+  "shell.runBar.cycle": "{kind} · {status}",
+  "shell.runBar.counts": "Results so far",
+  "shell.runBar.count": "{status}: {count}",
+  "shell.runBar.elapsed": "Elapsed",
+  "shell.progress.complete": "{done} of {total} complete",
+  "shell.progress.noTotal": "Total unknown, so no percentage.",
+  "shell.banner.needsApproval": "Changes need approval ({count})",
+  "shell.banner.showDiff": "Show diff…",
+  "shell.banner.engineRestarting": "The engine stopped and is restarting",
+  "shell.banner.monitoringResumes": "Monitoring resumes automatically",
+  "shell.toast.report": "Report copied for the model ({count, plural, one {# character} other {# characters}})",
+  "shell.toast.card": "Card {id} copied for the model",
+  "shell.toast.instructions": "Instructions file {id} copied",
+  "shell.selectionBar.count": "{count} selected",
+  "shell.selectionBar.runSelected": "Run selected ({count})",
+  "shell.selectionBar.recheckSelected": "Re-check selected ({count})",
+  "shell.selectionBar.copyScope": "«Copy for the model» scope: Selected ({count})"
 }
