@@ -4,8 +4,8 @@ track: dev
 number: 3
 stage: engine
 title: الهيكل والبروتوكول والغلاف الآمن والتخزين
-status: not-started
-status_date: 2026-10-09
+status: in-progress
+status_date: 2026-10-10
 depends_on: [DEV-0]
 design_gates: []
 owner_gates: [Q-04]
@@ -138,8 +138,9 @@ closing_commit:
 
 ## 11. حالة التقدم ونقطة الاستئناف
 
-- **الحالة:** لم تبدأ.
-- **آخر تحديث:** 2026-10-09.
-- **المنجز:** —
-- **آخر commit:** —
-- **نقطة الاستئناف:** المهمة 1 (المستودع).
+- **الحالة:** جارية (وكيل المرحلة في `AYAR-wt/DEV-3` على `phase/DEV-3`).
+- **آخر تحديث:** 2026-10-10.
+- **المنجز:**
+  - المهمة 1 (المستودع): مساحات عمل npm (`packages/*` و`apps/*` و`tools/cli`، بلا `fixtures/` ولا `spikes/`)، و`package-lock.json`، وTypeScript 6.0.3 و7.0.2 بمساريهما (D-55)، وVitest 5.0.3، وESLint 10 بقواعد منع `electron` في `packages/**`، وسكربتات `build` و`typecheck` و`lint` و`test` و`test:e2e`. والملف الثنائي لـ Electron 44.7.0 بخطوة `postinstall` (E-01).
+- **آخر commit:** يُملأ بعد الالتزام التالي.
+- **نقطة الاستئناف:** المهمة 3 (`packages/protocol`).

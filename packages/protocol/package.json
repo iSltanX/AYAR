@@ -1,0 +1,17 @@
+{
+  "name": "@ayar/protocol",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Typed, versioned messages between the AYAR UI, the main process and the engine (D-29). Node-free: the renderer imports it.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "node ../../node_modules/@typescript/native/bin/tsc -p tsconfig.json && node ../../node_modules/@typescript/native/bin/tsc -p test/tsconfig.json"
+  },
+  "dependencies": {
+    "zod": "4.6.5"
+  }
+}

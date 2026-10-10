@@ -1,0 +1,17 @@
+{
+  "name": "@ayar/i18n",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AYAR messages in Arabic and English (ICU, C-24): one file per scope and language, plus formatting functions. Node-free.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "node ../../node_modules/@typescript/native/bin/tsc -p tsconfig.json && node ../../node_modules/@typescript/native/bin/tsc -p test/tsconfig.json"
+  },
+  "dependencies": {
+    "intl-messageformat": "12.1.3"
+  }
+}
