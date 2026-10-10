@@ -1,6 +1,7 @@
 // The command registry: one file per domain, merged here (docs/waves/README.md 6). Names are those of 6.5.
 import { aiCheckCommands } from './ai-checks.ts';
 import { dataCommands } from './data.ts';
+import { environmentCommands } from './environment.ts';
 import { internalCommands } from './internal.ts';
 import { profileCommands } from './profile.ts';
 import { projectCommands } from './projects.ts';
@@ -18,6 +19,7 @@ import type { CommandDefinition } from './define.ts';
 export const COMMANDS = {
   ...projectCommands,
   ...profileCommands,
+  ...environmentCommands,
   ...setupCommands,
   ...runCommands,
   ...resultCommands,

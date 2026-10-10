@@ -39,15 +39,22 @@ describe('command registry (6.5)', () => {
     }
   });
 
-  it('adds only the documented main-process and host-only commands', () => {
+  // D-DEV3-03: the main process's commands and the host-only ones.
+  const DEV3_EXTRA = ['confirm.issue', 'dialog.pickDestination', 'dialog.pickFolder', 'dialog.pickSource', 'engine.restart', 'engine.status', 'internal.clipboardText', 'internal.recordCopy'];
+  // D-DEV4-02 (protocol 1.1): engine commands 6.5 needs but does not name.
+  const DEV4_EXTRA = ['environment.resolve', 'profile.exportPreview', 'profile.importFromRepo', 'project.cancelDiscovery', 'project.confirm', 'project.rename'];
+
+  it('adds only the documented main-process, host-only and DEV-4 commands', () => {
     const extra = COMMAND_NAMES.filter((c) => !PLAN_COMMANDS.includes(c)).sort();
-    expect(extra).toEqual(
-      ['confirm.issue', 'dialog.pickDestination', 'dialog.pickFolder', 'dialog.pickSource', 'engine.restart', 'engine.status', 'internal.clipboardText', 'internal.recordCopy'].sort(),
-    );
+    expect(extra).toEqual([...DEV3_EXTRA, ...DEV4_EXTRA].sort());
     for (const c of extra.filter((c) => c.startsWith('internal.'))) expect(COMMANDS[c].audience).toBe('host');
-    for (const c of extra.filter((c) => !c.startsWith('internal.'))) {
+    for (const c of extra.filter((c) => DEV3_EXTRA.includes(c) && !c.startsWith('internal.'))) {
       expect(COMMANDS[c].handler).toBe('main');
       expect(COMMANDS[c].owner).toBe('C-01');
+    }
+    for (const c of DEV4_EXTRA as (keyof typeof COMMANDS)[]) {
+      expect(COMMANDS[c]).toMatchObject({ handler: 'engine', audience: 'renderer', since: '1.1', implementedIn: 'DEV-4' });
+      expect(COMMANDS[c].grants).toEqual([]);
     }
     expect(RENDERER_COMMAND_NAMES).not.toContain('internal.clipboardText');
   });
@@ -88,8 +95,8 @@ describe('command registry (6.5)', () => {
 });
 
 describe('event registry (6.5)', () => {
-  it('contains exactly the events of 6.5', () => {
-    expect([...EVENT_TOPICS].sort()).toEqual([...PLAN_EVENTS].sort());
+  it('contains exactly the events of 6.5, and the two discovery endings of DEV-4 (D-DEV4-02)', () => {
+    expect([...EVENT_TOPICS].sort()).toEqual([...PLAN_EVENTS, 'discovery.cancelled', 'discovery.failed'].sort());
   });
 });
 

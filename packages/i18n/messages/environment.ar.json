@@ -1,0 +1,16 @@
+{
+  "environment.source.login_shell": "من صدفة الدخول",
+  "environment.source.fallback": "احتياطي",
+  "environment.fallback.timeout": "تجاوزت قراءة صدفة الدخول المهلة، فاستُخدم PATH احتياطي من مجلدات معروفة.",
+  "environment.fallback.exit": "خرجت صدفة الدخول بخطأ، فاستُخدم PATH احتياطي.",
+  "environment.fallback.no_markers": "لم تطبع صدفة الدخول البيئة كاملة، فاستُخدم PATH احتياطي.",
+  "environment.fallback.spawn_failed": "تعذّر تشغيل صدفة الدخول، فاستُخدم PATH احتياطي.",
+  "environment.tool.status.ok": "مطابق",
+  "environment.tool.status.mismatch": "يحتاج تجهيزًا: النسخة المطلوبة {required}، والمتاحة {available}",
+  "environment.tool.status.missing": "يحتاج تجهيزًا: الأداة غير موجودة",
+  "environment.tool.status.unknown": "النسخة غير معروفة حتى فحص الإصدار",
+  "environment.tool.proposed": "وُجدت نسخة مطابقة مثبتة في {manager}، وتُقترح صراحة في ملف المعايير: {path}",
+  "environment.tool.corepack": "{tool} هنا غلاف من corepack، وقد ينزّل النسخة المعلنة. يُفحص دون شبكة، فإن غابت النسخة فالفحص يحتاج تجهيزًا.",
+  "environment.tool.shellFunction": "في طرفيتك «{tool}» دالة صدفة (nvm)، فنسختها هناك {terminal}، ونسخة PATH {path}.",
+  "environment.probe.failed": "تعذّر فحص الإصدار"
+}

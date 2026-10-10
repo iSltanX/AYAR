@@ -1,0 +1,13 @@
+{
+  "discovery.progress": "{files, plural, =0 {No files} one {# file} other {# files}} scanned so far",
+  "discovery.cancelled": "Discovery was cancelled; no snapshot was saved.",
+  "discovery.failed": "Discovery failed.",
+  "discovery.partial": "Partial scan: discovery reached a declared limit.",
+  "discovery.warning.unreadable": "Could not read “{path}”; it was skipped.",
+  "discovery.warning.symlinkOutside": "The symbolic link “{path}” points outside the project; it was not followed.",
+  "discovery.warning.symlinkDirNotFollowed": "The symbolic link “{path}” points to a folder; discovery does not follow folder links.",
+  "discovery.warning.partialScan": "Partial scan ({reasons}): {entries} entries were read, then discovery stopped at the limit.",
+  "discovery.warning.configTooLarge": "The configuration file “{path}” is larger than the limit; it was not read.",
+  "discovery.warning.configInvalid": "The configuration file “{path}” is invalid; checks that depend on it may be unavailable.",
+  "discovery.sensitive.named": "“{path}” was recorded by name only; its values were not read."
+}

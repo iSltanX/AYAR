@@ -117,8 +117,8 @@ export function startEngine(o: StartEngineOptions): EngineHandle {
       }
     }
     if (result.state === 'degraded') degraded = result.reason ?? 'internal';
-    if (!degraded && result.db && result.catalog) services = createServices({ catalog: result.catalog, db: result.db });
     bus = new EventBus({ stream, clock: ports.clock, send: (m) => channel.send(m) });
+    if (!degraded && result.db && result.catalog && hmacKey) services = createServices({ catalog: result.catalog, db: result.db, ports, events: bus, logger, hmacKey });
     if (phase === 'stopping') return result;
     phase = 'serving';
     logger.log('info', 'engine serving', { state: degraded ? 'degraded' : 'ready', reason: degraded, keySource: hmacKey?.source ?? null });
@@ -196,6 +196,7 @@ export function startEngine(o: StartEngineOptions): EngineHandle {
         stopped = true;
         phase = 'stopping';
         if (maintenance) clearInterval(maintenance);
+        services?.projects.cancelAll();
         bus?.close();
         try {
           result?.db?.close();

@@ -47,7 +47,9 @@ describe('tools/cli (D-19)', () => {
     expect(JSON.parse(boot.stdout)).toMatchObject({ health: { state: 'ready', hmacKeySource: 'test' } });
     const set = await run(process.execPath, [MAIN, '--data-dir', dir, 'invoke', 'settings.set', '{"key":"ui.language","value":"en"}']);
     expect(JSON.parse(set.stdout)).toEqual({ ok: true, result: { key: 'ui.language', value: 'en' } });
-    await expect(run(process.execPath, [MAIN, '--data-dir', dir, 'invoke', 'project.list'])).rejects.toMatchObject({ code: 1 });
+    expect(JSON.parse((await run(process.execPath, [MAIN, '--data-dir', dir, 'invoke', 'project.list'])).stdout)).toEqual({ ok: true, result: { projects: [] } });
+    // A command a later phase implements still answers not_implemented, and the tool exits 1.
+    await expect(run(process.execPath, [MAIN, '--data-dir', dir, 'invoke', 'tools.list'])).rejects.toMatchObject({ code: 1 });
     await expect(run(process.execPath, [MAIN, '--data-dir', dir, 'invoke', 'shell.exec'])).rejects.toMatchObject({ code: 2 });
   });
 

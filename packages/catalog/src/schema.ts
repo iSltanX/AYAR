@@ -3,7 +3,7 @@
 // discovery signals, its requirements, the runner it binds to (by id), default policies, resource class,
 // side effects, network need, cost tag, next-step class per outcome, relations, and dated sources. The engine
 // evaluates the conditions (C-09); the catalog only names them.
-import { z } from '@ayar/protocol';
+import { AUDIENCE_VALUES, REFERENCE_KINDS as PROFILE_REFERENCE_KINDS, z } from '@ayar/protocol';
 
 export const SECTION_IDS = ['design', 'security', 'code', 'behavior', 'performance', 'custom', 'integrity', 'model'] as const;
 export const SectionId = z.enum(SECTION_IDS);
@@ -45,21 +45,11 @@ export const Signal = z.enum(SIGNALS);
 export type Signal = z.infer<typeof Signal>;
 
 /** References the user declares in the profile (or discovery finds): their absence is «ناقص إعداد» or optional (G-39). */
-export const REFERENCE_KINDS = [
-  'tokens',
-  'fonts',
-  'renderTarget',
-  'states',
-  'budgets',
-  'permissionsPolicy',
-  'baselines',
-  'recoveryCommand',
-  'reviewScope',
-] as const;
+export const REFERENCE_KINDS = PROFILE_REFERENCE_KINDS;
 export const ReferenceKind = z.enum(REFERENCE_KINDS);
 export type ReferenceKind = z.infer<typeof ReferenceKind>;
 
-export const AUDIENCES = ['solo', 'small_group', 'public'] as const;
+export const AUDIENCES = AUDIENCE_VALUES;
 export const Audience = z.enum(AUDIENCES);
 export type Audience = z.infer<typeof Audience>;
 

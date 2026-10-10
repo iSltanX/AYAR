@@ -3,13 +3,19 @@
 // it uses the declared test HMAC key, so it refuses the app's own data folder unless told otherwise.
 //   node tools/cli/src/main.ts --data-dir <dir> boot
 //   node tools/cli/src/main.ts --data-dir <dir> invoke <command> [json-payload]
+//     [--select <path>]       attach a selection grant to selectionToken (project.add, project.relocate)
+//     [--source <path>]       attach a source grant to sourceToken (profile.import)
+//     [--destination <path>]  attach a destination grant to destinationToken (profile.export)
+//     [--confirm <target>]    attach a confirmation grant for this command and target (project.remove)
+//     [--wait <topic>]        after the command, wait for this event (discovery.done) and print it
 import { realpathSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
-import { isCommandName } from '@ayar/protocol';
+import { isCommandName, isEventTopic } from '@ayar/protocol';
 import { connectEngine } from './engine-client.ts';
+import { confirmationGrant, pathGrant } from './grants.ts';
 
-const USAGE = 'usage: ayar-cli --data-dir <dir> [--allow-app-data] (boot | invoke <command> [json])';
+const USAGE = 'usage: ayar-cli --data-dir <dir> [--allow-app-data] (boot | invoke <command> [json] [--select|--source|--destination <path>] [--confirm <target>] [--wait <topic>])';
 
 function fail(message: string, code = 2): never {
   process.stderr.write(`${message}\n${USAGE}\n`);
@@ -17,11 +23,25 @@ function fail(message: string, code = 2): never {
 }
 
 const args = process.argv.slice(2);
-const at = args.indexOf('--data-dir');
-if (at < 0 || !args[at + 1]) fail('ayar-cli: --data-dir is required');
-const dataDir = resolve(args[at + 1]!);
+/** Takes `--name value` out of the arguments. */
+function option(name: string): string | undefined {
+  const i = args.indexOf(name);
+  if (i < 0) return undefined;
+  const value = args[i + 1];
+  if (value === undefined) fail(`ayar-cli: ${name} needs a value`);
+  args.splice(i, 2);
+  return value;
+}
+const dataDirArg = option('--data-dir');
+if (!dataDirArg) fail('ayar-cli: --data-dir is required');
+const dataDir = resolve(dataDirArg);
+const select = option('--select');
+const source = option('--source');
+const destination = option('--destination');
+const confirmTarget = option('--confirm');
+const waitTopic = option('--wait');
 const allowAppData = args.includes('--allow-app-data');
-const rest = args.filter((a, i) => i !== at && i !== at + 1 && a !== '--allow-app-data');
+const rest = args.filter((a) => a !== '--allow-app-data');
 /** Real path, case-folded (APFS is case-insensitive by default): resolves symbolic links and case variants. */
 function canonical(p: string): string {
   let head = p;
@@ -51,16 +71,33 @@ let ok = health.payload.state === 'ready';
 if (verb === 'boot') {
   process.stdout.write(`${JSON.stringify({ welcome: engine.welcome, health: health.payload }, null, 2)}\n`);
 } else {
-  let payload: unknown = {};
+  let payload: Record<string, unknown> = {};
   try {
-    payload = json ? JSON.parse(json) : {};
+    payload = json ? (JSON.parse(json) as Record<string, unknown>) : {};
   } catch {
     await engine.close();
     fail('ayar-cli: the payload is not valid JSON');
   }
-  const result = await engine.invoke(command as Parameters<typeof engine.invoke>[0], payload);
+  // The CLI is the host: it attaches the grants the main process would attach after a system dialog.
+  let grants = {};
+  for (const [kind, path, field] of [['selection', select, 'selectionToken'], ['source', source, 'sourceToken'], ['destination', destination, 'destinationToken']] as const) {
+    if (!path) continue;
+    const g = pathGrant(kind, resolve(path));
+    payload[field] = g.token;
+    grants = { ...grants, ...g.grants };
+  }
+  if (confirmTarget) {
+    const g = confirmationGrant(command!, confirmTarget);
+    payload.confirmationToken = g.token;
+    grants = { ...grants, ...g.grants };
+  }
+  const result = await engine.invoke(command as Parameters<typeof engine.invoke>[0], payload, grants);
   ok = result.ok;
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+  if (ok && waitTopic && isEventTopic(waitTopic)) {
+    const event = await engine.waitForEvent(waitTopic, undefined, 120_000);
+    process.stdout.write(`${JSON.stringify(event, null, 2)}\n`);
+  }
 }
 const code = await engine.close();
 process.exit(ok && code === 0 ? 0 : 1);
