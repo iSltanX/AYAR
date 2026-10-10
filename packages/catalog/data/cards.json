@@ -1,0 +1,109 @@
+{
+  "version": "1.0.0",
+  "verifiedAt": "2026-10-09",
+  "nameFormat": "{type}: {behavior} — {location}",
+  "types": [
+    {
+      "id": "unit_test",
+      "name": "اختبار وحدة",
+      "nextStep": "model",
+      "isTest": true
+    },
+    {
+      "id": "integration_test",
+      "name": "اختبار تكامل",
+      "nextStep": "model",
+      "isTest": true
+    },
+    {
+      "id": "journey_test",
+      "name": "اختبار رحلة",
+      "nextStep": "model",
+      "isTest": true
+    },
+    {
+      "id": "property_test",
+      "name": "اختبار خصائص",
+      "nextStep": "model",
+      "isTest": true
+    },
+    {
+      "id": "characterization_test",
+      "name": "اختبار توصيفي",
+      "nextStep": "model",
+      "isTest": true
+    },
+    {
+      "id": "bug_repro_test",
+      "name": "اختبار يعيد إنتاج خلل",
+      "nextStep": "model",
+      "isTest": true
+    },
+    {
+      "id": "ui_state_review",
+      "name": "مراجعة حالة واجهة",
+      "nextStep": "review",
+      "isTest": false
+    },
+    {
+      "id": "ui_states_definition",
+      "name": "تعريف حالات واجهة",
+      "nextStep": "direct",
+      "isTest": false
+    },
+    {
+      "id": "check_setup",
+      "name": "تجهيز فحص",
+      "nextStep": "direct",
+      "isTest": false
+    },
+    {
+      "id": "permission_review",
+      "name": "مراجعة صلاحية",
+      "nextStep": "review",
+      "isTest": false
+    },
+    {
+      "id": "human_a11y_review",
+      "name": "مراجعة إتاحة بشرية",
+      "nextStep": "review",
+      "isTest": false
+    },
+    {
+      "id": "exploratory_session",
+      "name": "جلسة استكشاف",
+      "nextStep": "review",
+      "isTest": false
+    },
+    {
+      "id": "refactor_review",
+      "name": "مراجعة إعادة هيكلة",
+      "nextStep": "review",
+      "isTest": false
+    },
+    {
+      "id": "strengthen_assertions",
+      "name": "تقوية تأكيدات",
+      "nextStep": "model",
+      "isTest": true
+    },
+    {
+      "id": "model_check",
+      "name": "فحص نموذج",
+      "nextStep": "model",
+      "isTest": false
+    },
+    {
+      "id": "fix_verification",
+      "name": "تحقق إصلاح",
+      "nextStep": "direct",
+      "isTest": false
+    }
+  ],
+  "generic": {
+    "id": "generic",
+    "name": "مهمة",
+    "nextStep": "review",
+    "isTest": false
+  }
+}

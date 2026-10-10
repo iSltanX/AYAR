@@ -1,0 +1,823 @@
+{
+  "verifiedAt": "2026-10-09",
+  "tools": [
+    {
+      "ecosystem": "any",
+      "category": "deps",
+      "name": "OSV-Scanner",
+      "description": "يفحص ملفات القفل لكل اللغات تقريبًا مقابل قاعدة ثغرات مفتوحة.",
+      "exampleCommand": "osv-scanner scan source -r .",
+      "version": "v2.6",
+      "url": "https://google.github.io/osv-scanner/usage/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "any",
+      "category": "deps",
+      "name": "Renovate",
+      "description": "تحديث التبعيات آليًا، ويعمل مع GitLab وGitea وForgejo وBitbucket لا مع GitHub وحده.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://docs.renovatebot.com/modules/platform/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "any",
+      "category": "secrets",
+      "name": "gitleaks",
+      "description": "فاحص أسرار. أعلن مشرفوه أنه مكتمل الميزات ويتلقى إصلاحات أمنية فقط، ويشيرون إلى Betterleaks خلفًا له.",
+      "exampleCommand": "gitleaks dir . --redact",
+      "version": "v8.30",
+      "url": "https://github.com/gitleaks/gitleaks",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "any",
+      "category": "sast",
+      "name": "Semgrep CE",
+      "description": "فحص أنماط أمنية في الشيفرة المصدرية لعدة لغات.",
+      "exampleCommand": "semgrep scan",
+      "version": null,
+      "url": "https://docs.semgrep.dev/getting-started/cli",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "any",
+      "category": "dast",
+      "name": "ZAP",
+      "description": "مسح أساسي لتطبيق ويب يعمل. شغّله على بيئتك أنت فقط.",
+      "exampleCommand": "docker run -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t https://<موقعك-التجريبي>",
+      "version": "2.17",
+      "url": "https://www.zaproxy.org/docs/docker/baseline-scan/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "any",
+      "category": "hooks",
+      "name": "pre-commit",
+      "description": "يشغّل الفحوص قبل كل إيداع محليًا، بصرف النظر عن منصة الاستضافة.",
+      "exampleCommand": "pre-commit install",
+      "version": null,
+      "url": "https://pre-commit.com",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "any",
+      "category": "hooks",
+      "name": "lefthook",
+      "description": "بديل سريع لإدارة خطافات Git.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://lefthook.dev",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "any",
+      "category": "load",
+      "name": "Grafana k6",
+      "description": "اختبار حمل بسكربتات JavaScript. وصل إلى الإصدار الرئيسي 2 في 2026.",
+      "exampleCommand": "k6 run script.js",
+      "version": "v2.x",
+      "url": "https://grafana.com/docs/k6/latest/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "any",
+      "category": "contract",
+      "name": "Schemathesis",
+      "description": "يولّد اختبارات خصائص من مخطط OpenAPI أو GraphQL، أيًّا كانت لغة الخادم.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://schemathesis.readthedocs.io/en/stable/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "js",
+      "category": "unit",
+      "name": "Vitest",
+      "description": "مشغّل اختبارات مبني على Vite. الإصدار 5 يتطلب Node 22.12 أو أحدث.",
+      "exampleCommand": "npx vitest run",
+      "version": "5.0",
+      "url": "https://vitest.dev/guide/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "js",
+      "category": "unit",
+      "name": "Jest",
+      "description": "بديل راسخ. في الإصدار 30 تغيّر اسم الخيار إلى `--testPathPatterns`.",
+      "exampleCommand": null,
+      "version": "30",
+      "url": "https://jestjs.io/docs/getting-started",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "js",
+      "category": "unit",
+      "name": "مشغّل Node المدمج",
+      "description": "دون تبعيات، مناسب للمكتبات الصغيرة.",
+      "exampleCommand": "node --test",
+      "version": null,
+      "url": "https://nodejs.org/api/test.html",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "js",
+      "category": "integration",
+      "name": "Vitest أو Jest",
+      "description": "مع مكوّنات حقيقية أو مزيفة موثوقة.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://vitest.dev/guide/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "js",
+      "category": "mocknet",
+      "name": "Mock Service Worker",
+      "description": "اعتراض الشبكة على مستوى الطلب. الإصدار 3 بصيغة ESM فقط ويتطلب Node 22 أو أحدث.",
+      "exampleCommand": null,
+      "version": "3.0",
+      "url": "https://mswjs.io/docs/getting-started",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "js",
+      "category": "component",
+      "name": "Testing Library",
+      "description": "استعلام عن العناصر بالدور والاسم كما يراها المستخدم.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://testing-library.com/docs/react-testing-library/intro",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "js",
+      "category": "component",
+      "name": "Playwright (mount)",
+      "description": "حزم اختبار المكوّنات التجريبية القديمة أُزيلت؛ البديل منذ 1.62 مدمج في `@playwright/test`.",
+      "exampleCommand": null,
+      "version": "1.64",
+      "url": "https://playwright.dev/docs/intro",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "js",
+      "category": "e2e",
+      "name": "Playwright",
+      "description": "رحلات كاملة على Chromium وFirefox وWebKit.",
+      "exampleCommand": "npx playwright test",
+      "version": "1.64",
+      "url": "https://playwright.dev/docs/intro",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "js",
+      "category": "visual",
+      "name": "Playwright toHaveScreenshot",
+      "description": "لقطات مقارنة مرتبطة بالنظام والمتصفح؛ ولّدها وقارنها في البيئة نفسها.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://playwright.dev/docs/test-snapshots",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "js",
+      "category": "a11y",
+      "name": "@axe-core/playwright",
+      "description": "فحص آلي داخل اختبارات Playwright: `new AxeBuilder({ page }).analyze()`.",
+      "exampleCommand": null,
+      "version": "axe-core 4.14",
+      "url": "https://playwright.dev/docs/accessibility-testing",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "js",
+      "category": "a11y",
+      "name": "Lighthouse",
+      "description": "تدقيق أداء وإتاحة لصفحة. يتطلب Chrome، والإصدار 13 يتطلب Node 22.19 أو أحدث.",
+      "exampleCommand": "lighthouse <url>",
+      "version": "13",
+      "url": "https://developer.chrome.com/docs/lighthouse/overview",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "js",
+      "category": "perf",
+      "name": "Lighthouse / Lighthouse CI",
+      "description": "قياس مختبري قابل للتكرار مع عتبات.",
+      "exampleCommand": "lhci autorun",
+      "version": null,
+      "url": "https://github.com/GoogleChrome/lighthouse-ci",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "js",
+      "category": "property",
+      "name": "fast-check",
+      "description": "اختبار الخصائص مع أي مشغّل.",
+      "exampleCommand": null,
+      "version": "4.10",
+      "url": "https://fast-check.dev/docs/introduction/getting-started/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "js",
+      "category": "mutation",
+      "name": "StrykerJS",
+      "description": "اختبار الطفرات لـ JavaScript وTypeScript.",
+      "exampleCommand": "npx stryker run",
+      "version": "10.0",
+      "url": "https://stryker-mutator.io/docs/stryker-js/getting-started/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "js",
+      "category": "deps",
+      "name": "npm audit",
+      "description": "فحص التبعيات المدمج. انتبه: npm 12 يمنع سكربتات ما بعد التثبيت افتراضيًا، فبعض الأدوات (مثل Cypress) تحتاج خطوة تثبيت صريحة.",
+      "exampleCommand": "npm audit",
+      "version": null,
+      "url": "https://docs.npmjs.com/cli/v12/commands/npm-audit",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "js",
+      "category": "rtl",
+      "name": "Playwright",
+      "description": "شغّل الرحلات و اللقطات بلغة عربية واتجاه من اليمين: `locale: 'ar'` في إعداد المشروع.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://playwright.dev/docs/emulation",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "python",
+      "category": "unit",
+      "name": "pytest",
+      "description": "المشغّل الأكثر استخدامًا. الإصدار 9 يتطلب Python 3.10 أو أحدث.",
+      "exampleCommand": "pytest",
+      "version": "9.1",
+      "url": "https://docs.pytest.org/en/stable/getting-started.html",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "python",
+      "category": "integration",
+      "name": "pytest",
+      "description": "مع مكوّنات حقيقية في fixtures.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://docs.pytest.org/en/stable/getting-started.html",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "python",
+      "category": "property",
+      "name": "Hypothesis",
+      "description": "اختبار الخصائص ويعمل تحت pytest.",
+      "exampleCommand": null,
+      "version": "6.168",
+      "url": "https://hypothesis.readthedocs.io",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "python",
+      "category": "mutation",
+      "name": "mutmut",
+      "description": "اختبار الطفرات. لا يعمل على Windows مباشرة (استخدم WSL).",
+      "exampleCommand": "mutmut run",
+      "version": "3.8",
+      "url": "https://mutmut.readthedocs.io",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "python",
+      "category": "deps",
+      "name": "pip-audit",
+      "description": "فحص تبعيات Python من PyPA.",
+      "exampleCommand": "pip-audit -r requirements.txt",
+      "version": null,
+      "url": "https://pypi.org/project/pip-audit/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "python",
+      "category": "load",
+      "name": "Locust",
+      "description": "اختبار حمل بسكربتات Python.",
+      "exampleCommand": "locust",
+      "version": null,
+      "url": "https://docs.locust.io",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "python",
+      "category": "contract",
+      "name": "Schemathesis",
+      "description": "اختبارات مولّدة من مخطط OpenAPI.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://schemathesis.readthedocs.io/en/stable/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "swift",
+      "category": "unit",
+      "name": "Swift Testing",
+      "description": "إطار Apple الحالي (`@Test` و`#expect`)، ويتعايش مع XCTest في الهدف نفسه.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://developer.apple.com/documentation/testing",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "swift",
+      "category": "unit",
+      "name": "swift test",
+      "description": "لحزم Swift Package Manager.",
+      "exampleCommand": "swift test",
+      "version": null,
+      "url": "https://docs.swift.org/latest/documentation/packagemanagerdocs/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "swift",
+      "category": "unit",
+      "name": "xcodebuild",
+      "description": "تشغيل اختبارات مشروع Xcode من الطرفية.",
+      "exampleCommand": "xcodebuild test -scheme <Scheme>",
+      "version": null,
+      "url": "https://developer.apple.com/documentation/xcode/running-tests-and-interpreting-results",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "swift",
+      "category": "integration",
+      "name": "Swift Testing",
+      "description": "مع مكوّنات حقيقية أو مزيفة.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://developer.apple.com/documentation/testing",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "swift",
+      "category": "e2e",
+      "name": "XCUIAutomation",
+      "description": "اختبارات الواجهة (انتقلت إلى إطار مستقل منذ Xcode 16.3).",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://developer.apple.com/documentation/xcuiautomation",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "swift",
+      "category": "a11y",
+      "name": "performAccessibilityAudit",
+      "description": "تدقيق إتاحة داخل اختبارات الواجهة (iOS 17 أو أحدث)، مع Accessibility Inspector والاختبار اليدوي بـ VoiceOver على جهاز حقيقي.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://developer.apple.com/documentation/accessibility/performing-accessibility-testing-for-your-app",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "swift",
+      "category": "perf",
+      "name": "XCTMetric",
+      "description": "قياس الزمن والذاكرة وزمن الإقلاع عبر `measure(metrics:)`.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://developer.apple.com/documentation/xctest/xctmetric",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "swift",
+      "category": "rtl",
+      "name": "لغة RTL الزائفة",
+      "description": "اختر Right-to-Left Pseudolanguage من إعدادات المخطط (App Language) لعكس الواجهة دون ترجمة.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://developer.apple.com/videos/play/wwdc2022/10107/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "swift",
+      "category": "compat",
+      "name": "TestFlight",
+      "description": "توزيع تجريبي حتى 10,000 مختبر خارجي قبل الإصدار، وأول بناء خارجي يمر بمراجعة.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://developer.apple.com/testflight/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "android",
+      "category": "unit",
+      "name": "JUnit + Robolectric",
+      "description": "اختبارات محلية على JVM.",
+      "exampleCommand": "./gradlew test",
+      "version": null,
+      "url": "https://developer.android.com/studio/test/command-line",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "android",
+      "category": "integration",
+      "name": "Robolectric",
+      "description": "سلوك الواجهة على JVM دون جهاز.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://developer.android.com/training/testing/local-tests/robolectric",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "android",
+      "category": "e2e",
+      "name": "Espresso / Compose UI test",
+      "description": "اختبارات على جهاز أو محاكٍ. واجهات Compose v2 هي الموصى بها حديثًا.",
+      "exampleCommand": "./gradlew connectedAndroidTest",
+      "version": null,
+      "url": "https://developer.android.com/develop/ui/compose/testing",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "android",
+      "category": "a11y",
+      "name": "Accessibility checks",
+      "description": "`AccessibilityChecks.enable()` في Espresso، و`enableAccessibilityChecks()` في Compose، مع TalkBack يدويًا.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://developer.android.com/guide/topics/ui/accessibility/testing",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "android",
+      "category": "perf",
+      "name": "Macrobenchmark",
+      "description": "قياس الإقلاع وسلاسة الإطارات على جهاز حقيقي لا محاكٍ.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://developer.android.com/topic/performance/benchmarking/macrobenchmark-overview",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "android",
+      "category": "rtl",
+      "name": "اللغة الزائفة ar-XB",
+      "description": "تعكس الواجهة ونصوصها، مع خيار المطوّر «فرض الاتجاه من اليمين».",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://developer.android.com/guide/topics/resources/pseudolocales",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "flutter",
+      "category": "unit",
+      "name": "flutter test",
+      "description": "اختبارات الوحدة والعناصر (widgets).",
+      "exampleCommand": "flutter test",
+      "version": null,
+      "url": "https://docs.flutter.dev/testing/overview",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "flutter",
+      "category": "e2e",
+      "name": "integration_test",
+      "description": "رحلات على جهاز أو محاكٍ.",
+      "exampleCommand": "flutter test integration_test/app_test.dart",
+      "version": null,
+      "url": "https://docs.flutter.dev/testing/integration-tests",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "flutter",
+      "category": "visual",
+      "name": "Golden tests",
+      "description": "لقطات مرجعية. الخط الافتراضي للاختبار (Ahem) لا يمثل العربية، فحمّل خطًا حقيقيًا لاختبار العرض العربي.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://api.flutter.dev/flutter/flutter_test/matchesGoldenFile.html",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "wordpress",
+      "category": "unit",
+      "name": "WP-CLI scaffold + PHPUnit",
+      "description": "يجهّز بيئة اختبار الوحدة لإضافة أو قالب.",
+      "exampleCommand": "wp scaffold plugin-tests <slug>",
+      "version": null,
+      "url": "https://developer.wordpress.org/cli/commands/scaffold/plugin-tests/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "wordpress",
+      "category": "unit",
+      "name": "wp-env",
+      "description": "بيئة WordPress محلية. خيار `testsEnvironment` صار مهملًا؛ استخدم ملف إعداد منفصلًا للاختبار.",
+      "exampleCommand": "wp-env run cli phpunit",
+      "version": null,
+      "url": "https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "wordpress",
+      "category": "integration",
+      "name": "wp-env",
+      "description": "تشغيل الإضافة أو القالب داخل WordPress حقيقي.",
+      "exampleCommand": "wp-env start",
+      "version": null,
+      "url": "https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "wordpress",
+      "category": "static",
+      "name": "Plugin Check",
+      "description": "إلزامي لنجاح الإرسال الجديد إلى مستودع الإضافات.",
+      "exampleCommand": "wp plugin check <plugin>",
+      "version": null,
+      "url": "https://wordpress.org/plugins/plugin-check/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "wordpress",
+      "category": "static",
+      "name": "Theme Check",
+      "description": "الفحوص نفسها التي يستخدمها مستودع القوالب.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://wordpress.org/plugins/theme-check/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "wordpress",
+      "category": "e2e",
+      "name": "@wordpress/e2e-test-utils-playwright",
+      "description": "أدوات Playwright لمحرر WordPress. ما زالت بإصدار 0.x وقد تنكسر، فثبّت الإصدار.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://developer.wordpress.org/block-editor/reference-guides/packages/packages-e2e-test-utils-playwright/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "wordpress",
+      "category": "visual",
+      "name": "Theme Unit Test data",
+      "description": "محتوى اختبار رسمي يغطي حالات العرض الصعبة للقالب.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://make.wordpress.org/themes/handbook/review/theme-unit-test/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "wordpress",
+      "category": "a11y",
+      "name": "متطلبات accessibility-ready",
+      "description": "قائمة متطلبات وسم الإتاحة للقوالب: رابط التخطي، المعالم، لوحة المفاتيح، التباين وغيرها.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://make.wordpress.org/themes/handbook/review/accessibility/required/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "wordpress",
+      "category": "compat",
+      "name": "مصفوفة إصدارات WordPress",
+      "description": "الإصدار الحالي 7.1.3 (6 أكتوبر 2026)؛ اختبر الأقدم المدعوم في ترويسة الإضافة والأحدث.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://wordpress.org/download/releases/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "qt",
+      "category": "unit",
+      "name": "Qt Test",
+      "description": "اختبارات C++ مع أحداث واجهة محاكاة، ويعمل دون شاشة عبر `-platform offscreen`.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://doc.qt.io/qt-6/qtest-overview.html",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "qt",
+      "category": "unit",
+      "name": "Qt Quick Test",
+      "description": "اختبارات QML في ملفات `tst_*.qml` بعنصر `TestCase`.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://doc.qt.io/qt-6/qtquicktest-index.html",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "qt",
+      "category": "visual",
+      "name": "plasmoidviewer",
+      "description": "عرض الودجة بمقاسات وحواف ومقياس مختلفة، مثل `QT_SCALE_FACTOR=2`.",
+      "exampleCommand": "plasmoidviewer -a <id|path>",
+      "version": null,
+      "url": "https://develop.kde.org/docs/plasma/widget/testing/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "qt",
+      "category": "visual",
+      "name": "إعادة تحميل نمط Plasma",
+      "description": "ضع الثيم في `~/.local/share/plasma/desktoptheme/` ثم امسح ذاكرة Plasma المؤقتة وأعد تشغيل الصدفة.",
+      "exampleCommand": "plasmashell --replace",
+      "version": null,
+      "url": "https://develop.kde.org/docs/plasma/theme/quickstart/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "qt",
+      "category": "rtl",
+      "name": "خيار -reverse",
+      "description": "يفرض الاتجاه من اليمين في أي تطبيق Qt، للتصحيح لا للإنتاج.",
+      "exampleCommand": "<app> -reverse",
+      "version": null,
+      "url": "https://doc.qt.io/qt-6/qguiapplication.html",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "qt",
+      "category": "compat",
+      "name": "إصدارات Plasma",
+      "description": "المستقر 6.7.5، و6.8 مجدول في 14 أكتوبر 2026؛ اختبر الثيم على الإصدار الذي تستهدفه توزيعتك وعلى القادم.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://community.kde.org/Schedules/Plasma_6",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "obsidian",
+      "category": "unit",
+      "name": "Vitest أو Jest مع فصل المنطق",
+      "description": "لا توجد إرشادات اختبار رسمية. الممارسة المجتمعية: افصل المنطق عن وحدة `obsidian` واختبره منفردًا.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "obsidian",
+      "category": "static",
+      "name": "eslint-plugin-obsidianmd",
+      "description": "قواعد مدقق تطابق إرشادات الإضافات.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://github.com/obsidianmd/eslint-plugin",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "obsidian",
+      "category": "static",
+      "name": "إرشادات الإضافات",
+      "description": "لا `innerHTML` بمدخل المستخدم، التسجيل عبر `registerEvent`، لا اختصارات افتراضية، وتجنّب lookbehind في التعبيرات النمطية على الجوال.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "obsidian",
+      "category": "e2e",
+      "name": "خزنة اختبار",
+      "description": "خزنة منفصلة بملاحظات عربية ممثلة، وتجربة على سطح المكتب والجوال.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://docs.obsidian.md/Plugins/Releasing/Submit+your+plugin",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "extension",
+      "category": "e2e",
+      "name": "Playwright",
+      "description": "تحميل الإضافة عبر `launchPersistentContext` و`--load-extension` مع `channel: 'chromium'`؛ متصفحا Chrome وEdge الرسميان لم يعودا يسمحان بالتحميل الجانبي.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://playwright.dev/docs/chrome-extensions",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "extension",
+      "category": "static",
+      "name": "web-ext lint",
+      "description": "فحص بيان الإضافة وشيفرتها.",
+      "exampleCommand": "web-ext lint",
+      "version": null,
+      "url": "https://extensionworkshop.com/documentation/develop/web-ext-command-reference/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "extension",
+      "category": "compat",
+      "name": "web-ext run",
+      "description": "تشغيل الإضافة على Firefox أو Chromium.",
+      "exampleCommand": "web-ext run --target chromium",
+      "version": null,
+      "url": "https://extensionworkshop.com/documentation/develop/web-ext-command-reference/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "electron",
+      "category": "e2e",
+      "name": "Playwright _electron",
+      "description": "دعم تجريبي لتطبيقات Electron 21 فأحدث.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://playwright.dev/docs/api/class-electron",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "electron",
+      "category": "e2e",
+      "name": "WebdriverIO",
+      "description": "الخيار الذي يذكره توثيق Electron أولًا، ويدعم Tauri عبر خدمة مخصصة.",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://www.electronjs.org/docs/latest/tutorial/automated-testing",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "electron",
+      "category": "unit",
+      "name": "Tauri mocks",
+      "description": "`mockIPC` في الواجهة، و`tauri::test` في Rust (غير مستقر بعد).",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://v2.tauri.app/develop/tests/mocking/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "go",
+      "category": "unit",
+      "name": "go test",
+      "description": "المشغّل المدمج، ومعه `-race` لكشف التسابق.",
+      "exampleCommand": "go test -race",
+      "version": null,
+      "url": "https://go.dev/doc/articles/race_detector",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "go",
+      "category": "fuzz",
+      "name": "Go fuzzing",
+      "description": "مدمج منذ Go 1.18.",
+      "exampleCommand": "go test -fuzz=FuzzName -fuzztime=30s",
+      "version": null,
+      "url": "https://go.dev/doc/security/fuzz/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "rust",
+      "category": "unit",
+      "name": "cargo test",
+      "description": "اختبارات الوحدة والتكامل والتوثيق.",
+      "exampleCommand": "cargo test",
+      "version": null,
+      "url": "https://doc.rust-lang.org/cargo/commands/cargo-test.html",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "rust",
+      "category": "property",
+      "name": "proptest",
+      "description": "اختبار الخصائص (في صيانة خاملة).",
+      "exampleCommand": null,
+      "version": null,
+      "url": "https://proptest-rs.github.io/proptest/",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "rust",
+      "category": "fuzz",
+      "name": "cargo-fuzz",
+      "description": "Fuzzing عبر libFuzzer، ويتطلب نسخة nightly.",
+      "exampleCommand": "cargo fuzz run <target>",
+      "version": null,
+      "url": "https://rust-fuzz.github.io/book/cargo-fuzz/setup.html",
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "ecosystem": "rust",
+      "category": "deps",
+      "name": "cargo-audit",
+      "description": "فحص التبعيات مقابل قاعدة RustSec.",
+      "exampleCommand": "cargo audit",
+      "version": null,
+      "url": "https://github.com/rustsec/rustsec/tree/main/cargo-audit",
+      "verifiedAt": "2026-10-09"
+    }
+  ],
+  "alerts": [
+    "Trivy تعرّض لاختراق سلسلة توريد في مارس 2026 (CVE-2026-33634)؛ ثبّت أي أداة فحص بالبصمة لا بالوسم.",
+    "gitleaks مكتمل الميزات ويتلقى إصلاحات أمنية فقط، ومشرفوه يشيرون إلى Betterleaks.",
+    "حزم اختبار المكوّنات التجريبية في Playwright أُزيلت؛ البديل مدمج في `@playwright/test` منذ 1.62.",
+    "MSW 3 بصيغة ESM فقط، وVitest 5 يتطلب Node 22.12 أو أحدث، وPlaywright 1.64 يتطلب Node 20 أو أحدث.",
+    "npm 12 (صدر في يوليو 2026 ولم يُضمَّن بعد في خطوط Node المستقرة) يعطّل سكربتات تثبيت التبعيات افتراضيًا؛ أدوات تنزّل ملفات تنفيذية عند التثبيت تحتاج خطوة صريحة.",
+    "في wp-env صار `testsEnvironment` مهملًا؛ استخدم ملف إعداد منفصلًا لبيئة الاختبار."
+  ]
+}

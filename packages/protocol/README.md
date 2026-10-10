@@ -59,7 +59,7 @@
 | `clipboard.copy` | C-01 | main | renderer | — | DEV-9 |
 | `tasks.list` | C-20 | engine | renderer | — | DEV-8 |
 | `task.create` | C-20 | engine | renderer | — | DEV-8 |
-| `task.update` | C-20 | engine | renderer | — | DEV-8 |
+| `task.update` | C-20 | engine | renderer | — | DEV-9 |
 | `advisor.suggest` | C-20 | engine | renderer | — | DEV-8 |
 | `report.export` | C-23 | engine | renderer | destination | DEV-9 |
 | `aiChecks.needs` | C-25 | engine | renderer | — | DEV-9 |

@@ -1,0 +1,15 @@
+{
+  "schema": "ayar-kb/1",
+  "version": "1.0.0",
+  "lang": "ar",
+  "source": "docs/plan/AYAR-plan-3-engine.md §28",
+  "verifiedAt": "2026-10-09",
+  "algorithm": {
+    "effortUnits": { "1": 1, "2": 3, "3": 8 },
+    "capacity": { "minutes": 2, "hours": 8, "days": 40 },
+    "levelBonus": { "low": 0, "medium": 0, "high": 1, "critical": 2 },
+    "priorityThresholds": { "top": 5, "medium": 3 },
+    "riskBands": { "low": 3, "medium": 6, "high": 9 },
+    "baseDepth": { "low": "focused", "medium": "focused_reg", "high": "expanded", "critical": "comprehensive" }
+  }
+}

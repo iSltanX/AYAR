@@ -1,0 +1,1066 @@
+{
+  "verifiedAt": "2026-10-09",
+  "rules": [
+    {
+      "id": "R01",
+      "kind": "input",
+      "description": "أي تغيير في الشيفرة (عدا الشكلي)",
+      "archiveCondition": "e => e.situation && e.situation !== 'cosmetic'",
+      "adds": {
+        "items": [
+          "static_gate"
+        ],
+        "weights": {
+          "static_gate": 2
+        },
+        "expression": null
+      },
+      "reason": "كل تغيير في الشيفرة يستحق فحصًا ساكنًا رخيصًا.",
+      "replacedBy": null
+    },
+    {
+      "id": "R02",
+      "kind": "input",
+      "description": "شيفرة مولّدة لم تُراجع",
+      "archiveCondition": "e => has(e.factors, 'ai_generated')",
+      "adds": {
+        "items": [
+          "static_gate",
+          "unit_logic",
+          "exploratory_session"
+        ],
+        "weights": {
+          "static_gate": 3,
+          "unit_logic": 1,
+          "exploratory_session": 1
+        },
+        "expression": null
+      },
+      "reason": "الشيفرة المولّدة غير المراجعة: دراسات وجدت فيها ثغرات أكثر مع ثقة أعلى بها، فالمراجعة الدقيقة أول خط.",
+      "replacedBy": null
+    },
+    {
+      "id": "R03",
+      "kind": "input",
+      "description": "إصلاح خلل",
+      "archiveCondition": "e => e.situation === 'bugfix'",
+      "adds": {
+        "items": [
+          "confirm_bug",
+          "regression_neighbors"
+        ],
+        "weights": {
+          "confirm_bug": 6,
+          "regression_neighbors": 2
+        },
+        "expression": null
+      },
+      "reason": "إصلاح الخلل يُثبت بإعادة إنتاجه أولًا، ثم بالتأكد أن الجوار لم ينكسر.",
+      "replacedBy": null
+    },
+    {
+      "id": "R04",
+      "kind": "input",
+      "description": "منطق جديد أو متغيّر",
+      "archiveCondition": "e => has(e.areas, 'logic') && ['new_feature', 'change_behavior', 'bugfix', 'new_project', 'refactor', 'shared_change'].includes(e.situation)",
+      "adds": {
+        "items": [
+          "unit_logic"
+        ],
+        "weights": {
+          "unit_logic": 3
+        },
+        "expression": null
+      },
+      "reason": "المنطق المتغيّر يخطئ بصمت، واختبار الوحدة أسرع طريق لكشفه.",
+      "replacedBy": null
+    },
+    {
+      "id": "R05",
+      "kind": "input",
+      "description": "منطق معقد",
+      "archiveCondition": "e => has(e.areas, 'logic') && has(e.factors, 'complex')",
+      "adds": {
+        "items": [
+          "property_logic"
+        ],
+        "weights": {
+          "property_logic": 2
+        },
+        "expression": null
+      },
+      "reason": "الحالات الحدية الكثيرة يصعب حصرها بأمثلة يدوية.",
+      "replacedBy": null
+    },
+    {
+      "id": "R06",
+      "kind": "input",
+      "description": "منطق يعالج نصًا عربيًا",
+      "archiveCondition": "e => has(e.areas, 'logic') && has(e.areas, 'arabic')",
+      "adds": {
+        "items": [
+          "property_logic"
+        ],
+        "weights": {
+          "property_logic": 2
+        },
+        "expression": null
+      },
+      "reason": "فضاء النص العربي (حركات، همزات، أرقام، اتجاه) أوسع من أن تغطيه أمثلة قليلة.",
+      "replacedBy": null
+    },
+    {
+      "id": "R07",
+      "kind": "input",
+      "description": "منتج لمعالجة النصوص أو البيانات",
+      "archiveCondition": "e => has(e.platform, 'text') && has(e.areas, 'logic')",
+      "adds": {
+        "items": [
+          "property_logic"
+        ],
+        "weights": {
+          "property_logic": 1
+        },
+        "expression": null
+      },
+      "reason": "معالجة النصوص والبيانات مجال طبيعي لاختبار الخصائص.",
+      "replacedBy": null
+    },
+    {
+      "id": "R08",
+      "kind": "input",
+      "description": "إعادة هيكلة دون شبكة أمان",
+      "archiveCondition": "e => e.situation === 'refactor' && e.evidence !== 'good'",
+      "adds": {
+        "items": [
+          "characterization"
+        ],
+        "weights": {
+          "characterization": 6
+        },
+        "expression": null
+      },
+      "reason": "إعادة الهيكلة تعني «السلوك لا يتغير»، ولا يمكن التحقق من ذلك دون تثبيت السلوك أولًا.",
+      "replacedBy": null
+    },
+    {
+      "id": "R09",
+      "kind": "input",
+      "description": "إعادة هيكلة مع أدلة جيدة",
+      "archiveCondition": "e => e.situation === 'refactor' && e.evidence === 'good'",
+      "adds": {
+        "items": [
+          "regression_neighbors"
+        ],
+        "weights": {
+          "regression_neighbors": 4
+        },
+        "expression": null
+      },
+      "reason": "أدلتك الحالية هي شبكة الأمان؛ شغّلها قبل التعديل وبعده.",
+      "replacedBy": null
+    },
+    {
+      "id": "R10",
+      "kind": "input",
+      "description": "تعديل سلوك أو مكوّن مشترك بأدلة ضعيفة",
+      "archiveCondition": "e => ['change_behavior', 'shared_change'].includes(e.situation) && e.evidence !== 'good'",
+      "adds": {
+        "items": [
+          "characterization"
+        ],
+        "weights": {
+          "characterization": 3
+        },
+        "expression": null
+      },
+      "reason": "ثبّت ما يجب ألا يتغير قبل أن تغيّر ما يجب أن يتغير.",
+      "replacedBy": null
+    },
+    {
+      "id": "R11",
+      "kind": "input",
+      "description": "تعديل مكوّن مشترك",
+      "archiveCondition": "e => e.situation === 'shared_change'",
+      "adds": {
+        "items": [
+          "regression_full",
+          "regression_neighbors"
+        ],
+        "weights": {
+          "regression_full": 4,
+          "regression_neighbors": 2
+        },
+        "expression": null
+      },
+      "reason": "المكوّن المشترك يصل إلى أماكن لا تعرفها كلها.",
+      "replacedBy": null
+    },
+    {
+      "id": "R12",
+      "kind": "input",
+      "description": "نطاق أثر واسع",
+      "archiveCondition": "e => e.scope === 'wide'",
+      "adds": {
+        "items": [
+          "regression_full"
+        ],
+        "weights": {
+          "regression_full": 3
+        },
+        "expression": null
+      },
+      "reason": "حين يتعذر حصر الأثر، تشغيل الحزمة كلها أرخص من تخمين حدودها.",
+      "replacedBy": null
+    },
+    {
+      "id": "R13",
+      "kind": "input",
+      "description": "نطاق وحدة أو ميزة",
+      "archiveCondition": "e => e.scope === 'module'",
+      "adds": {
+        "items": [
+          "regression_neighbors"
+        ],
+        "weights": {
+          "regression_neighbors": 3
+        },
+        "expression": null
+      },
+      "reason": "الكسور غير المقصودة تقع غالبًا قرب التغيير.",
+      "replacedBy": null
+    },
+    {
+      "id": "R14",
+      "kind": "input",
+      "description": "تغيير موضعي مع اختبارات قائمة",
+      "archiveCondition": "e => e.scope === 'local' && e.evidence !== 'none' && e.situation !== 'cosmetic'",
+      "adds": {
+        "items": [
+          "regression_neighbors"
+        ],
+        "weights": {
+          "regression_neighbors": 2
+        },
+        "expression": null
+      },
+      "reason": "شغّل الاختبارات القريبة الموجودة؛ كلفتها دقائق.",
+      "replacedBy": null
+    },
+    {
+      "id": "R15",
+      "kind": "input",
+      "description": "بيانات محفوظة",
+      "archiveCondition": "e => has(e.areas, 'data')",
+      "adds": {
+        "items": [
+          "integration_boundary",
+          "error_paths"
+        ],
+        "weights": {
+          "integration_boundary": 3,
+          "error_paths": 1
+        },
+        "expression": null
+      },
+      "reason": "التخزين حد حقيقي لا تمثله البدائل بدقة، خصوصًا مع النص العربي.",
+      "replacedBy": null
+    },
+    {
+      "id": "R16",
+      "kind": "input",
+      "description": "تغيير بنية بيانات عالية العاقبة أو صعبة الاستعادة",
+      "archiveCondition": "e => has(e.areas, 'data') && ['new_feature', 'change_behavior', 'shared_change', 'deps_upgrade', 'release', 'refactor'].includes(e.situation) && (e.impact >= 3 || e.reversibility === 'hard')",
+      "adds": {
+        "items": [
+          "migration_rehearsal"
+        ],
+        "weights": null,
+        "expression": "e => ({ migration_rehearsal: e.impact >= 4 ? 6 : 4 })"
+      },
+      "reason": "فقدان البيانات أصعب الأضرار عكسًا؛ البروفة والاستعادة الفعلية هما الدليل.",
+      "replacedBy": {
+        "rule": "C-20.5",
+        "description": "بيانات دائمة مع ترحيل مكتشف أو معلن، أو مع عاقبة 3 فأعلى وتراجع صعب، أيًّا كان الموقف بما فيه إصلاح الخلل"
+      }
+    },
+    {
+      "id": "R17",
+      "kind": "input",
+      "description": "خدمة خارجية",
+      "archiveCondition": "e => has(e.areas, 'external')",
+      "adds": {
+        "items": [
+          "integration_boundary",
+          "contract_api",
+          "error_paths"
+        ],
+        "weights": {
+          "integration_boundary": 3,
+          "contract_api": 2,
+          "error_paths": 3
+        },
+        "expression": null
+      },
+      "reason": "الخدمة الخارجية تتغير دونك وتفشل أحيانًا؛ ومعالجة الأخطاء مصدر معظم الأعطال الكارثية المدروسة.",
+      "replacedBy": null
+    },
+    {
+      "id": "R18",
+      "kind": "input",
+      "description": "خادم يغيّر سلوكه لمستهلكين",
+      "archiveCondition": "e => has(e.platform, 'api') && ['change_behavior', 'shared_change', 'deps_upgrade'].includes(e.situation)",
+      "adds": {
+        "items": [
+          "contract_api"
+        ],
+        "weights": {
+          "contract_api": 3
+        },
+        "expression": null
+      },
+      "reason": "من يستهلك واجهتك البرمجية يعتمد على شكلها الحالي.",
+      "replacedBy": null
+    },
+    {
+      "id": "R19",
+      "kind": "input",
+      "description": "الدخول والصلاحيات",
+      "archiveCondition": "e => has(e.areas, 'auth')",
+      "adds": {
+        "items": [
+          "security_authz"
+        ],
+        "weights": null,
+        "expression": "e => ({ security_authz: e.audience === 'me' ? 2 : 5 })"
+      },
+      "reason": "التحكم المكسور في الوصول أول فئات OWASP Top 10:2025.",
+      "replacedBy": null
+    },
+    {
+      "id": "R20",
+      "kind": "input",
+      "description": "مدخلات غير موثوقة",
+      "archiveCondition": "e => has(e.areas, 'input')",
+      "adds": {
+        "items": [
+          "security_input"
+        ],
+        "weights": null,
+        "expression": "e => ({ security_input: e.audience === 'public' ? 5 : 3 })"
+      },
+      "reason": "كل مدخل من خارجك محتمل العداء أو التلف.",
+      "replacedBy": null
+    },
+    {
+      "id": "R21",
+      "kind": "input",
+      "description": "مدخلات غير موثوقة في شيفرة مولّدة",
+      "archiveCondition": "e => has(e.areas, 'input') && has(e.factors, 'ai_generated')",
+      "adds": {
+        "items": [
+          "security_input"
+        ],
+        "weights": {
+          "security_input": 2
+        },
+        "expression": null
+      },
+      "reason": "الحقن من أكثر ما ظهر في دراسات الشيفرة المولّدة.",
+      "replacedBy": null
+    },
+    {
+      "id": "R22",
+      "kind": "input",
+      "description": "ترقية تبعيات أو منصة",
+      "archiveCondition": "e => e.situation === 'deps_upgrade'",
+      "adds": {
+        "items": [
+          "security_deps",
+          "build_config",
+          "compat_matrix",
+          "regression_full"
+        ],
+        "weights": {
+          "security_deps": 3,
+          "build_config": 3,
+          "compat_matrix": 3,
+          "regression_full": 4
+        },
+        "expression": null
+      },
+      "reason": "الترقية تغيّر ما تحت كل شيء: البناء، والتوافق، والسلوك الافتراضي.",
+      "replacedBy": null
+    },
+    {
+      "id": "R23",
+      "kind": "input",
+      "description": "تحضير إصدار",
+      "archiveCondition": "e => e.situation === 'release'",
+      "adds": {
+        "items": [
+          "regression_full",
+          "smoke_release",
+          "exploratory_session",
+          "risk_inventory"
+        ],
+        "weights": {
+          "regression_full": 4,
+          "smoke_release": 5,
+          "exploratory_session": 3,
+          "risk_inventory": 2
+        },
+        "expression": null
+      },
+      "reason": "الإصدار حدث له مخاطره: الحزمة النهائية والإعداد والنشر.",
+      "replacedBy": null
+    },
+    {
+      "id": "R24",
+      "kind": "input",
+      "description": "إصدار لجمهور غيرك",
+      "archiveCondition": "e => e.situation === 'release' && e.audience !== 'me'",
+      "adds": {
+        "items": [
+          "security_deps",
+          "e2e_critical"
+        ],
+        "weights": {
+          "security_deps": 3,
+          "e2e_critical": 4
+        },
+        "expression": null
+      },
+      "reason": "المستخدمون سيمرون بالرحلات الحرجة أولًا، والتبعيات المعرّضة تصل إليهم.",
+      "replacedBy": null
+    },
+    {
+      "id": "R25",
+      "kind": "input",
+      "description": "إصدار واجهة لجمهور",
+      "archiveCondition": "e => e.situation === 'release' && e.audience !== 'me' && (has(e.areas, 'ui') || any(e.platform, ['web', 'mobile', 'desktop', 'theme']))",
+      "adds": {
+        "items": [
+          "a11y_check",
+          "compat_matrix"
+        ],
+        "weights": {
+          "a11y_check": 2,
+          "compat_matrix": 2
+        },
+        "expression": null
+      },
+      "reason": "واجهة يستخدمها غيرك تحتاج إتاحة وتوافقًا مع بيئاتهم.",
+      "replacedBy": null
+    },
+    {
+      "id": "R26",
+      "kind": "input",
+      "description": "واجهة جديدة أو متغيرة",
+      "archiveCondition": "e => has(e.areas, 'ui') && ['new_feature', 'change_behavior', 'shared_change', 'new_project'].includes(e.situation)",
+      "adds": {
+        "items": [
+          "component_ui"
+        ],
+        "weights": {
+          "component_ui": 3
+        },
+        "expression": null
+      },
+      "reason": "حالات المكوّن غير السعيدة (فارغ، خطأ، نص طويل) أقل ما يُجرَّب.",
+      "replacedBy": null
+    },
+    {
+      "id": "R27",
+      "kind": "input",
+      "description": "الواجهة متأثرة",
+      "archiveCondition": "e => has(e.areas, 'ui')",
+      "adds": {
+        "items": [
+          "visual_check",
+          "exploratory_session"
+        ],
+        "weights": null,
+        "expression": "e => Object.assign({ visual_check: 2 }, e.situation !== 'cosmetic' ? { exploratory_session: 1 } : {})"
+      },
+      "reason": "أخطاء المظهر لا ترمي استثناءات.",
+      "replacedBy": null
+    },
+    {
+      "id": "R28",
+      "kind": "input",
+      "description": "واجهة لجمهور غيرك",
+      "archiveCondition": "e => has(e.areas, 'ui') && e.audience !== 'me' && e.situation !== 'cosmetic'",
+      "adds": {
+        "items": [
+          "a11y_check"
+        ],
+        "weights": null,
+        "expression": "e => ({ a11y_check: e.audience === 'public' ? 4 : 3 })"
+      },
+      "reason": "عائق الإتاحة يمنع فئة من المستخدمين كليًا.",
+      "replacedBy": null
+    },
+    {
+      "id": "R29",
+      "kind": "input",
+      "description": "النص العربي والاتجاه",
+      "archiveCondition": "e => has(e.areas, 'arabic')",
+      "adds": {
+        "items": [
+          "arabic_rtl"
+        ],
+        "weights": null,
+        "expression": "e => ({ arabic_rtl: e.situation === 'cosmetic' ? 2 : 5 })"
+      },
+      "reason": "أخطاء الاتجاه والتطبيع لا تظهر إلا مع النص العربي الحقيقي.",
+      "replacedBy": null
+    },
+    {
+      "id": "R30",
+      "kind": "input",
+      "description": "واجهة عربية",
+      "archiveCondition": "e => has(e.areas, 'ui') && has(e.areas, 'arabic')",
+      "adds": {
+        "items": [
+          "visual_check"
+        ],
+        "weights": {
+          "visual_check": 1
+        },
+        "expression": null
+      },
+      "reason": "الاتجاه المعكوس يغيّر التخطيط كله.",
+      "replacedBy": null
+    },
+    {
+      "id": "R31",
+      "kind": "input",
+      "description": "مسار حساس للأداء",
+      "archiveCondition": "e => has(e.areas, 'perf')",
+      "adds": {
+        "items": [
+          "perf_budget"
+        ],
+        "weights": {
+          "perf_budget": 4
+        },
+        "expression": null
+      },
+      "reason": "دون خط أساس لا يمكن الحكم إن صار التغيير أبطأ.",
+      "replacedBy": null
+    },
+    {
+      "id": "R32",
+      "kind": "input",
+      "description": "خادم عام وأداء متأثر",
+      "archiveCondition": "e => has(e.areas, 'perf') && has(e.platform, 'api') && e.audience === 'public'",
+      "adds": {
+        "items": [
+          "load_test"
+        ],
+        "weights": {
+          "load_test": 3
+        },
+        "expression": null
+      },
+      "reason": "أخطاء الحمل لا تظهر مع مستخدم واحد.",
+      "replacedBy": null
+    },
+    {
+      "id": "R33",
+      "kind": "input",
+      "description": "الإعداد والبناء",
+      "archiveCondition": "e => has(e.areas, 'config')",
+      "adds": {
+        "items": [
+          "build_config",
+          "smoke_release"
+        ],
+        "weights": {
+          "build_config": 4,
+          "smoke_release": 2
+        },
+        "expression": null
+      },
+      "reason": "أعطال الإعداد من أبرز أسباب الانقطاعات، ولا تكشفها بيئة التطوير.",
+      "replacedBy": null
+    },
+    {
+      "id": "R34",
+      "kind": "input",
+      "description": "التوافق متأثر",
+      "archiveCondition": "e => has(e.areas, 'compat')",
+      "adds": {
+        "items": [
+          "compat_matrix"
+        ],
+        "weights": {
+          "compat_matrix": 4
+        },
+        "expression": null
+      },
+      "reason": "ما تدّعي دعمه يجب أن يُختبر ولو بمصفوفة صغيرة.",
+      "replacedBy": null
+    },
+    {
+      "id": "R35",
+      "kind": "input",
+      "description": "إضافة أو ثيم مع ترقية أو إصدار",
+      "archiveCondition": "e => any(e.platform, ['plugin', 'theme']) && ['deps_upgrade', 'release'].includes(e.situation)",
+      "adds": {
+        "items": [
+          "compat_matrix"
+        ],
+        "weights": {
+          "compat_matrix": 2
+        },
+        "expression": null
+      },
+      "reason": "المنصة المضيفة تتحدث دونك، والإضافات والقوالب أول ما ينكسر.",
+      "replacedBy": null
+    },
+    {
+      "id": "R36",
+      "kind": "input",
+      "description": "عاقبة عالية في الواجهة",
+      "archiveCondition": "e => e.impact >= 3 && has(e.areas, 'ui')",
+      "adds": {
+        "items": [
+          "e2e_critical"
+        ],
+        "weights": {
+          "e2e_critical": 3
+        },
+        "expression": null
+      },
+      "reason": "حين يكون التعطل جوهريًا، تحتاج دليلًا على أن الرحلة تكتمل فعلًا.",
+      "replacedBy": null
+    },
+    {
+      "id": "R37",
+      "kind": "input",
+      "description": "عاقبة عالية في سلوك جديد أو متغيّر",
+      "archiveCondition": "e => e.impact >= 3 && ['new_feature', 'change_behavior', 'shared_change', 'release'].includes(e.situation)",
+      "adds": {
+        "items": [
+          "exploratory_session"
+        ],
+        "weights": {
+          "exploratory_session": 2
+        },
+        "expression": null
+      },
+      "reason": "كلما ارتفعت العاقبة ارتفعت كلفة ما لم تفكر فيه.",
+      "replacedBy": null
+    },
+    {
+      "id": "R38",
+      "kind": "input",
+      "description": "سلوك جديد أو متغيّر",
+      "archiveCondition": "e => APPLIES_EXPECTED.includes(e.situation)",
+      "adds": {
+        "items": [
+          "acceptance_examples"
+        ],
+        "weights": null,
+        "expression": "e => ({ acceptance_examples: e.expected === 'vague' ? 6 : e.expected === 'clear' ? 2 : 4 })"
+      },
+      "reason": "كل اختبار يحتاج مرجع حكم، والأمثلة المكتوبة قبل البناء هي ذلك المرجع.",
+      "replacedBy": null
+    },
+    {
+      "id": "R39",
+      "kind": "input",
+      "description": "بداية مشروع",
+      "archiveCondition": "e => e.situation === 'new_project'",
+      "adds": {
+        "items": [
+          "risk_inventory",
+          "static_gate",
+          "test_health"
+        ],
+        "weights": {
+          "risk_inventory": 4,
+          "static_gate": 2,
+          "test_health": 3
+        },
+        "expression": null
+      },
+      "reason": "إعداد الفحص والتشغيل الآلي اليوم يكلف دقائق، ولاحقًا أيامًا.",
+      "replacedBy": null
+    },
+    {
+      "id": "R40",
+      "kind": "input",
+      "description": "تقييم مشروع قائم",
+      "archiveCondition": "e => e.situation === 'legacy_assess'",
+      "adds": {
+        "items": [
+          "risk_inventory",
+          "characterization",
+          "e2e_critical",
+          "security_deps",
+          "test_health",
+          "exploratory_session"
+        ],
+        "weights": {
+          "risk_inventory": 6,
+          "characterization": 4,
+          "e2e_critical": 3,
+          "security_deps": 3,
+          "test_health": 3,
+          "exploratory_session": 3
+        },
+        "expression": null
+      },
+      "reason": "لا يمكن تقييم الاختبار دون معرفة ما يجب ألا يتعطل وما الدليل عليه.",
+      "replacedBy": null
+    },
+    {
+      "id": "R41",
+      "kind": "input",
+      "description": "اختبارات متقلبة",
+      "archiveCondition": "e => e.flaky",
+      "adds": {
+        "items": [
+          "test_health"
+        ],
+        "weights": {
+          "test_health": 5
+        },
+        "expression": null
+      },
+      "reason": "لا قرار يُبنى على حزمة متقلبة.",
+      "replacedBy": null
+    },
+    {
+      "id": "R42",
+      "kind": "input",
+      "description": "تغيير متكرر بلا تشغيل آلي",
+      "archiveCondition": "e => (e.automation === 'none' || e.automation === 'manual') && e.frequency === 'frequent'",
+      "adds": {
+        "items": [
+          "test_health"
+        ],
+        "weights": {
+          "test_health": 3
+        },
+        "expression": null
+      },
+      "reason": "ما يتغير كثيرًا ولا تُشغَّل اختباراته آليًا سينكسر دون أن تلاحظ.",
+      "replacedBy": null
+    },
+    {
+      "id": "R43",
+      "kind": "input",
+      "description": "منطقة سبقت فيها أخطاء",
+      "archiveCondition": "e => has(e.factors, 'defect_history')",
+      "adds": {
+        "items": [
+          "exploratory_session",
+          "regression_neighbors",
+          "property_logic"
+        ],
+        "weights": null,
+        "expression": "e => Object.assign({ exploratory_session: 2, regression_neighbors: 1 }, has(e.areas, 'logic') ? { property_logic: 1 } : {})"
+      },
+      "reason": "العيوب تتكتل في مكونات قليلة؛ المنطقة التي أخطأت قبلًا مرشحة لتخطئ مجددًا.",
+      "replacedBy": null
+    },
+    {
+      "id": "R44",
+      "kind": "input",
+      "description": "توقيت أو تزامن",
+      "archiveCondition": "e => has(e.factors, 'async')",
+      "adds": {
+        "items": [
+          "error_paths"
+        ],
+        "weights": {
+          "error_paths": 2
+        },
+        "expression": null
+      },
+      "reason": "المهلات والتسابق وإعادة المحاولة مسارات لا يجربها الاستخدام العادي.",
+      "replacedBy": null
+    },
+    {
+      "id": "R45",
+      "kind": "input",
+      "description": "شيفرة غير مألوفة",
+      "archiveCondition": "e => has(e.factors, 'unfamiliar')",
+      "adds": {
+        "items": [
+          "exploratory_session",
+          "characterization"
+        ],
+        "weights": null,
+        "expression": "e => Object.assign({ exploratory_session: 1 }, e.situation !== 'new_feature' && e.situation !== 'new_project' ? { characterization: 1 } : {})"
+      },
+      "reason": "ما لا تعرفه جيدًا يخفي افتراضات لا تراها.",
+      "replacedBy": null
+    },
+    {
+      "id": "R46",
+      "kind": "input",
+      "description": "تعديل نصي أو شكلي",
+      "archiveCondition": "e => e.situation === 'cosmetic'",
+      "adds": {
+        "items": [
+          "visual_check"
+        ],
+        "weights": {
+          "visual_check": 2
+        },
+        "expression": null
+      },
+      "reason": "نظرة على الشاشة المتأثرة تكفي للتأكد.",
+      "replacedBy": null
+    },
+    {
+      "id": "R47",
+      "kind": "input",
+      "description": "ثيم أو قالب",
+      "archiveCondition": "e => has(e.platform, 'theme') && e.situation !== 'cosmetic'",
+      "adds": {
+        "items": [
+          "visual_check",
+          "a11y_check"
+        ],
+        "weights": {
+          "visual_check": 3,
+          "a11y_check": 1
+        },
+        "expression": null
+      },
+      "reason": "الثيم بصري في جوهره، وتغيير الألوان يمس التباين.",
+      "replacedBy": null
+    },
+    {
+      "id": "R48",
+      "kind": "input",
+      "description": "إصدار تطبيق جوال",
+      "archiveCondition": "e => has(e.platform, 'mobile') && e.situation === 'release'",
+      "adds": {
+        "items": [
+          "compat_matrix",
+          "smoke_release"
+        ],
+        "weights": {
+          "compat_matrix": 2,
+          "smoke_release": 1
+        },
+        "expression": null
+      },
+      "reason": "التراجع في المتاجر بطيء، والأجهزة وإصدارات النظام متنوعة.",
+      "replacedBy": null
+    },
+    {
+      "id": "R49",
+      "kind": "input",
+      "description": "مكتبة يتغير سلوكها",
+      "archiveCondition": "e => has(e.platform, 'library') && ['change_behavior', 'shared_change'].includes(e.situation)",
+      "adds": {
+        "items": [
+          "regression_full",
+          "acceptance_examples"
+        ],
+        "weights": {
+          "regression_full": 2,
+          "acceptance_examples": 2
+        },
+        "expression": null
+      },
+      "reason": "من يستخدم مكتبتك يعتمد على سلوكها العام؛ التغيير قد يكون كاسرًا.",
+      "replacedBy": null
+    },
+    {
+      "id": "R50",
+      "kind": "input",
+      "description": "لم تُحدَّد المناطق المتأثرة",
+      "archiveCondition": "e => !e.areas.length && !['legacy_assess', 'new_project', 'release', 'cosmetic'].includes(e.situation)",
+      "adds": {
+        "items": [
+          "regression_neighbors",
+          "exploratory_session"
+        ],
+        "weights": {
+          "regression_neighbors": 2,
+          "exploratory_session": 2
+        },
+        "expression": null
+      },
+      "reason": "حين لا تُعرف المناطق المتأثرة، الانحدار القريب والاستكشاف أوسع شبكة متاحة.",
+      "replacedBy": null
+    },
+    {
+      "id": "R51",
+      "kind": "input",
+      "description": "منتج مستخدم",
+      "archiveCondition": "e => ['released', 'maintenance'].includes(e.stage) && e.situation !== 'cosmetic'",
+      "adds": {
+        "items": [
+          "regression_neighbors"
+        ],
+        "weights": {
+          "regression_neighbors": 1
+        },
+        "expression": null
+      },
+      "reason": "في منتج مستخدم، حماية ما يعمل أولى من إضافة الجديد.",
+      "replacedBy": null
+    },
+    {
+      "id": "D01",
+      "kind": "depth",
+      "description": "العمق «شامل»",
+      "archiveCondition": "(e, x) => x.depth === 'comprehensive'",
+      "adds": {
+        "items": [
+          "risk_inventory",
+          "exploratory_session",
+          "regression_full",
+          "security_deps"
+        ],
+        "weights": {
+          "risk_inventory": 4,
+          "exploratory_session": 2,
+          "regression_full": 2,
+          "security_deps": 1
+        },
+        "expression": null
+      },
+      "reason": "الشامل يُعرَّف نسبة إلى جرد مخاطر المشروع، ويحتاج الحزمة كلها واستكشافًا.",
+      "replacedBy": null
+    },
+    {
+      "id": "D02",
+      "kind": "depth",
+      "description": "العمق «موسّع»",
+      "archiveCondition": "(e, x) => x.depth === 'expanded'",
+      "adds": {
+        "items": [
+          "regression_full",
+          "exploratory_session"
+        ],
+        "weights": {
+          "regression_full": 2,
+          "exploratory_session": 1
+        },
+        "expression": null
+      },
+      "reason": "التوسيع يعني الحزمة كاملة وجلسة استكشاف.",
+      "replacedBy": null
+    },
+    {
+      "id": "D04",
+      "kind": "depth",
+      "description": "العمق «شامل» في منتج له واجهة",
+      "archiveCondition": "(e, x) => x.depth === 'comprehensive' && (has(e.areas, 'ui') || any(e.platform, ['web', 'mobile', 'desktop', 'plugin', 'theme']))",
+      "adds": {
+        "items": [
+          "e2e_critical"
+        ],
+        "weights": {
+          "e2e_critical": 3
+        },
+        "expression": null
+      },
+      "reason": "التقييم الشامل يشمل الرحلات الحرجة كاملة كما يمر بها المستخدم.",
+      "replacedBy": null
+    },
+    {
+      "id": "D03",
+      "kind": "depth",
+      "description": "خطر مرتفع أو حرج في الواجهة",
+      "archiveCondition": "(e, x) => x.risk.levelIdx >= 2 && has(e.areas, 'ui')",
+      "adds": {
+        "items": [
+          "e2e_critical"
+        ],
+        "weights": {
+          "e2e_critical": 2
+        },
+        "expression": null
+      },
+      "reason": "مع خطر مرتفع، رحلة كاملة واحدة على الأقل تثبت أن المسار يعمل مجمّعًا.",
+      "replacedBy": null
+    }
+  ],
+  "omit": [
+    {
+      "item": "e2e_critical",
+      "archiveCondition": "e => e.situation !== 'cosmetic'",
+      "archiveReason": "e => has(e.areas, 'ui') ? 'العاقبة دون «تعطّل جوهري»؛ الاختبارات الأدنى تعطي الدليل نفسه بكلفة وتقلب أقل. يصبح ضروريًا إن ارتفعت العاقبة أو كان هذا تحضيرًا لإصدار.' : 'لم تحدد أن التغيير يمس الواجهة؛ الاختبارات الأدنى تعطي الدليل نفسه بكلفة وتقلب أقل. يصبح ضروريًا إن مسّ التغيير مسار مستخدم حرجًا أو كان هذا تحضيرًا لإصدار.'",
+      "hints": [
+        "الاختبارات الأدنى تعطي الدليل نفسه بكلفة وتقلب أقل. يصبح ضروريًا إن ارتفعت العاقبة أو كان هذا تحضيرًا لإصدار.",
+        "الاختبارات الأدنى تعطي الدليل نفسه بكلفة وتقلب أقل. يصبح ضروريًا إن مسّ التغيير مسار مستخدم حرجًا أو كان هذا تحضيرًا لإصدار."
+      ]
+    },
+    {
+      "item": "regression_full",
+      "archiveCondition": "e => e.situation !== 'cosmetic'",
+      "archiveReason": "التغيير لا يمس مكوّنًا مشتركًا ولا نطاقًا واسعًا، فالانحدار الموجّه يكفي. أعد النظر إن فشل اختبار بعيد أو اكتشفت مستدعين لم تعرفهم.",
+      "hints": [
+        "الانحدار الموجّه يكفي. أعد النظر إن فشل اختبار بعيد أو اكتشفت مستدعين لم تعرفهم."
+      ]
+    },
+    {
+      "item": "perf_budget",
+      "archiveCondition": "e => any(e.areas, ['logic', 'data', 'ui']) && e.situation !== 'cosmetic'",
+      "archiveReason": "لم تحدد أن التغيير يمس مسارًا حساسًا للأداء؛ القياس دون سؤال محدد لا يغيّر قرارًا.",
+      "hints": [
+        "القياس دون سؤال محدد لا يغيّر قرارًا."
+      ]
+    },
+    {
+      "item": "load_test",
+      "archiveCondition": "e => has(e.platform, 'api')",
+      "archiveReason": "يُقترح للخوادم ذات الجمهور العام حين يمس التغيير الأداء.",
+      "hints": [
+        "يُقترح للخوادم ذات الجمهور العام حين يمس التغيير الأداء."
+      ]
+    },
+    {
+      "item": "security_authz",
+      "archiveCondition": "e => e.audience !== 'me' && any(e.areas, ['data', 'external'])",
+      "archiveReason": "التغيير لا يمس الدخول أو الصلاحيات. إن كان يضيف طريقًا جديدًا إلى بيانات المستخدم فحدد «الدخول والصلاحيات».",
+      "hints": [
+        "إن كان يضيف طريقًا جديدًا إلى بيانات المستخدم فحدد «الدخول والصلاحيات»."
+      ]
+    },
+    {
+      "item": "a11y_check",
+      "archiveCondition": "e => has(e.areas, 'ui') && e.situation !== 'cosmetic'",
+      "archiveReason": "أنت المستخدم الوحيد للواجهة الآن؛ يصبح الفحص لازمًا حين يتسع الجمهور.",
+      "hints": [
+        "يصبح الفحص لازمًا حين يتسع الجمهور."
+      ]
+    },
+    {
+      "item": "migration_rehearsal",
+      "archiveCondition": "e => has(e.areas, 'data')",
+      "archiveReason": "البيانات متأثرة، لكن العاقبة دون «تعطّل جوهري» والتراجع سهل؛ اختبار التكامل عند التخزين يكفي.",
+      "hints": [
+        "اختبار التكامل عند التخزين يكفي."
+      ]
+    },
+    {
+      "item": "exploratory_session",
+      "archiveCondition": "e => e.situation && e.situation !== 'cosmetic'",
+      "archiveReason": "التغيير محدود ومعروف السلوك؛ جلسة الاستكشاف تضيف قليلًا هنا مقارنة بكلفتها.",
+      "hints": [
+        "جلسة الاستكشاف تضيف قليلًا هنا مقارنة بكلفتها."
+      ]
+    },
+    {
+      "item": "characterization",
+      "archiveCondition": "e => ['refactor', 'change_behavior', 'shared_change'].includes(e.situation) && e.evidence === 'good'",
+      "archiveReason": "أدلتك الحالية جيدة وتؤدي دور شبكة الأمان.",
+      "hints": [
+        "أدلتك الحالية تؤدي دور شبكة الأمان."
+      ]
+    }
+  ]
+}
