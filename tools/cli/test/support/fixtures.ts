@@ -46,6 +46,7 @@ export async function rescan(engine: EngineConnection, projectId: string): Promi
 }
 
 export { connectEngine };
+export type { EngineConnection };
 
 // ── AT-02 views ─────────────────────────────────────────────────────────────────────────────────────────
 
