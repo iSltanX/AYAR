@@ -1,0 +1,85 @@
+{
+ "source": "use_figma read-only audit scripts, 2026-10-10, after both rounds of review fixes",
+ "page": "Components 49:1056",
+ "totals": {
+  "componentSets": 62,
+  "variants": 471,
+  "nodes": 14957
+ },
+ "direction": {
+  "setsWithoutDirection": [
+   "Icon button",
+   "Nav badge"
+  ],
+  "why": "no text and no reading order; directional glyphs are swapped at use (D-DES3-09)",
+  "setsWithOnlyOneDirection": []
+ },
+ "stateCoverage": {
+  "Button": "default,hover,pressed,focus,disabled",
+  "Icon button": "default,hover,pressed,focus,disabled",
+  "Search field": "default,hover,focus,filled,disabled",
+  "Text field": "default,hover,focus,filled,disabled",
+  "Select": "default,hover,pressed,focus,disabled",
+  "Switch": "default,hover,focus,disabled (pressed = hover)",
+  "Checkbox": "default,hover,pressed,focus,disabled",
+  "Segment": "default,hover,pressed,focus,disabled",
+  "Tab": "default,hover,focus,disabled",
+  "Argument editor": "default,focus",
+  "Nav item": "default,hover,pressed,focus,selected,disabled",
+  "Project switcher": "default,hover,pressed,focus",
+  "Check row": "default,hover,selected,focus",
+  "Finding row": "default,hover,selected,focus",
+  "Path pill": "default,hover,focus",
+  "Command block": "default,hover,focus",
+  "Capture tile": "default,hover,focus",
+  "Copy for model button": "default,hover,pressed,focus,disabled",
+  "Table header cell": "default,hover,sorted-asc,sorted-desc,focus",
+  "Table group row": "default,hover,focus",
+  "Menu item": "default,highlighted,disabled",
+  "Term": "default,hover,focus",
+  "Radio": "default,hover,focus,disabled",
+  "Model claim row": "default,hover,focus"
+ },
+ "binding": {
+  "paints": 6539,
+  "bound": 6539,
+  "textSegments": 3930,
+  "textBound": 3930,
+  "effectsWithoutStyle": 0
+ },
+ "redGreen": {
+  "occurrences": 306,
+  "outsideAllowedComponents": [],
+  "destructiveButtonRed": 0,
+  "allowed": [
+   "Result badge",
+   "Status symbol",
+   "Verdict badge",
+   "Purity card",
+   "Nav badge (failure count, plan 13.2)"
+  ]
+ },
+ "copyForModel": {
+  "contextsWithCopyButton": 14,
+  "maxPerVariant": 1,
+  "otherButtonsLabelledCopy": 0
+ },
+ "hitTargets": {
+  "interactiveVariants": 313,
+  "below28": [],
+  "nestedInteractiveInstances": 1099,
+  "nestedBelow28": 0
+ },
+ "mirroring": {
+  "rtlLtrPairs": 232,
+  "directionalIconsChecked": 16,
+  "failures": [],
+  "tracksChecked": 20,
+  "trackAlignmentFailures": []
+ },
+ "untouched": {
+  "archiveNodes": 5336,
+  "identityOriginalNodes": 420,
+  "baseline": "DES-1 audit: 5336 and 420"
+ }
+}
