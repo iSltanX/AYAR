@@ -26,7 +26,7 @@ beforeAll(async () => {
   t = tempDataDir();
   run = await launch(t.dataDir);
 });
-afterAll(async () => {
+afterAll(() => {
   t?.cleanup();
 });
 

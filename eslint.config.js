@@ -85,5 +85,5 @@ export default defineConfig(
   },
   // Svelte 5: `let { ... }: Props = $props()` is the documented form, and $props() is typed any (E-13).
   { files: ['**/*.svelte'], rules: { '@typescript-eslint/no-unsafe-assignment': 'off' } },
-  { files: ['**/*.js', '**/*.cjs', '**/*.mjs', '**/*.config.ts'], ...tseslint.configs.disableTypeChecked },
+  { files: ['**/*.js', '**/*.cjs', '**/*.mjs', '**/*.config.ts', '**/*.config.d.ts'], ...tseslint.configs.disableTypeChecked },
 );
