@@ -1,0 +1,22 @@
+/* The one place where a status family meets its colours (D-16, D-49, plan 16.3). Components never name a
+   status colour: they set class="status-<id>" from a typed status and read --status-fg/-bg/-border/-icon.
+   Green is only passed and pure; red only failed and blocked (checked by test/design/source-rules.test.ts). */
+.status-passed { --status-fg: var(--result-passed-fg); --status-bg: var(--result-passed-bg); --status-border: var(--result-passed-border); --status-icon: var(--result-passed-icon); }
+.status-failed { --status-fg: var(--result-failed-fg); --status-bg: var(--result-failed-bg); --status-border: var(--result-failed-border); --status-icon: var(--result-failed-icon); }
+.status-warning { --status-fg: var(--result-warning-fg); --status-bg: var(--result-warning-bg); --status-border: var(--result-warning-border); --status-icon: var(--result-warning-icon); }
+.status-needs-review { --status-fg: var(--result-needs-review-fg); --status-bg: var(--result-needs-review-bg); --status-border: var(--result-needs-review-border); --status-icon: var(--result-needs-review-icon); }
+.status-flaky { --status-fg: var(--result-flaky-fg); --status-bg: var(--result-flaky-bg); --status-border: var(--result-flaky-border); --status-icon: var(--result-flaky-icon); }
+.status-missing { --status-fg: var(--result-missing-fg); --status-bg: var(--result-missing-bg); --status-border: var(--result-missing-border); --status-icon: var(--result-missing-icon); }
+.status-unavailable { --status-fg: var(--result-unavailable-fg); --status-bg: var(--result-unavailable-bg); --status-border: var(--result-unavailable-border); --status-icon: var(--result-unavailable-icon); }
+.status-timed-out { --status-fg: var(--result-timed-out-fg); --status-bg: var(--result-timed-out-bg); --status-border: var(--result-timed-out-border); --status-icon: var(--result-timed-out-icon); }
+.status-cancelled { --status-fg: var(--result-cancelled-fg); --status-bg: var(--result-cancelled-bg); --status-border: var(--result-cancelled-border); --status-icon: var(--result-cancelled-icon); }
+.status-interrupted { --status-fg: var(--result-interrupted-fg); --status-bg: var(--result-interrupted-bg); --status-border: var(--result-interrupted-border); --status-icon: var(--result-interrupted-icon); }
+.status-skipped { --status-fg: var(--result-skipped-fg); --status-bg: var(--result-skipped-bg); --status-border: var(--result-skipped-border); --status-icon: var(--result-skipped-icon); }
+.status-not-applicable { --status-fg: var(--result-not-applicable-fg); --status-bg: var(--result-not-applicable-bg); --status-border: var(--result-not-applicable-border); --status-icon: var(--result-not-applicable-icon); }
+.status-queued { --status-fg: var(--cycle-queued-fg); --status-bg: var(--cycle-queued-bg); --status-border: var(--cycle-queued-border); --status-icon: var(--cycle-queued-icon); }
+.status-running { --status-fg: var(--cycle-running-fg); --status-bg: var(--cycle-running-bg); --status-border: var(--cycle-running-border); --status-icon: var(--cycle-running-icon); }
+.status-cancelling { --status-fg: var(--cycle-cancelling-fg); --status-bg: var(--cycle-cancelling-bg); --status-border: var(--cycle-cancelling-border); --status-icon: var(--cycle-cancelling-icon); }
+.status-pure { --status-fg: var(--verdict-pure-fg); --status-bg: var(--verdict-pure-bg); --status-border: var(--verdict-pure-border); --status-icon: var(--verdict-pure-icon); }
+.status-incomplete { --status-fg: var(--verdict-incomplete-fg); --status-bg: var(--verdict-incomplete-bg); --status-border: var(--verdict-incomplete-border); --status-icon: var(--verdict-incomplete-icon); }
+.status-blocked { --status-fg: var(--verdict-blocked-fg); --status-bg: var(--verdict-blocked-bg); --status-border: var(--verdict-blocked-border); --status-icon: var(--verdict-blocked-icon); }
+.status-model-claim { --status-fg: var(--tag-model-claim-fg); --status-bg: var(--tag-model-claim-bg); --status-border: var(--tag-model-claim-border); --status-icon: var(--tag-model-claim-icon); }

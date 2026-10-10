@@ -1,0 +1,5 @@
+/* The design system, in one import: fonts, generated tokens, status colour mapping and base rules. */
+@import './fonts.css';
+@import './tokens.css';
+@import './status.css';
+@import './base.css';

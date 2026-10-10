@@ -1,0 +1,171 @@
+# Figma variables of file UXkPakdqRuHDVTs78DO4uC (DES-1, approved 2026-10-10), dumped read-only by DEV-10 on
+# 2026-10-10 through use_figma (getLocalVariableCollectionsAsync). One line per variable: name|Light|Dark.
+# "@x" is an alias resolved in the same mode (D-DES1-06). The Dimensions collection has one mode (Value).
+#COL Primitives
+neutral/0|#fffcf4|#0b1116
+neutral/100|#f7f4ec|#141b20
+neutral/200|#ebeae3|#1c2429
+neutral/300|#d9d9d4|#272f34
+neutral/400|#b8bcb9|#3b454b
+neutral/500|#7b8588|#515d62
+neutral/600|#59676c|#728085
+neutral/700|#434f54|#97a0a2
+neutral/800|#313b40|#babfbd
+neutral/900|#21292e|#dadbd6
+neutral/1000|#141b20|#f7f4ec
+green/100|#edf6f0|#162d21
+green/200|#d9ecdf|#183b29
+green/300|#b7dbc4|#135537
+green/400|#7ebb95|#048454
+green/500|#388f60|#3fb87f
+green/600|#177648|#73d1a0
+green/700|#025d35|#a6e5c1
+red/100|#ffefef|#3c1d1f
+red/200|#ffdddd|#4f2327
+red/300|#ffbdc0|#752c34
+red/400|#f8828c|#b73f4f
+red/500|#d53954|#f66a79
+red/600|#b6123c|#ff99a0
+red/700|#92002c|#ffc2c5
+blue/100|#eef4ff|#1c283c
+blue/200|#dae7ff|#22334f
+blue/300|#b9d2ff|#2c4777
+blue/400|#7da9ff|#416cbb
+blue/500|#3170f9|#699df9
+blue/600|#1754db|#94bbff
+blue/700|#083eb4|#bdd5ff
+amber/100|#fbf2e9|#342410
+amber/200|#f5e3d2|#442e10
+amber/300|#ebcaab|#633f02
+amber/400|#d39f6a|#976200
+amber/500|#ad6a13|#d48e1f
+amber/600|#8d5400|#eaad5e
+amber/700|#6f4100|#f7cc96
+purple/100|#f4f1ff|#292438
+purple/200|#e7e2ff|#352d49
+purple/300|#d2c8ff|#4c3e6d
+purple/400|#af97ff|#765eab
+purple/500|#855be5|#a68ce6
+purple/600|#6d3fc8|#c1acfa
+purple/700|#562ba3|#d8cbff
+#COL Semantic
+bg/canvas|@neutral/100|@neutral/100
+bg/surface|@neutral/0|@neutral/200
+bg/sunken|@neutral/200|@neutral/0
+bg/elevated|@neutral/0|@neutral/300
+border/subtle|@neutral/300|@neutral/400
+border/strong|@neutral/500|@neutral/600
+text/primary|@neutral/1000|@neutral/1000
+text/secondary|@neutral/700|@neutral/800
+text/tertiary|@neutral/600|@neutral/700
+text/inverse|@neutral/100|@neutral/100
+focus/ring|@neutral/1000|@neutral/1000
+selection|@neutral/200|@neutral/300
+overlay|#141b2052|#0b111699
+#COL Status
+result/passed/fg|@green/700|@green/700
+result/passed/bg|@green/100|@green/100
+result/passed/border|@green/500|@green/500
+result/passed/icon|@green/500|@green/500
+result/failed/fg|@red/700|@red/700
+result/failed/bg|@red/100|@red/100
+result/failed/border|@red/500|@red/500
+result/failed/icon|@red/500|@red/500
+result/warning/fg|@amber/700|@amber/700
+result/warning/bg|@amber/100|@amber/100
+result/warning/border|@amber/500|@amber/500
+result/warning/icon|@amber/500|@amber/500
+result/needs-review/fg|@purple/700|@purple/700
+result/needs-review/bg|@purple/100|@purple/100
+result/needs-review/border|@purple/500|@purple/500
+result/needs-review/icon|@purple/500|@purple/500
+result/flaky/fg|@amber/700|@amber/700
+result/flaky/bg|@amber/100|@amber/100
+result/flaky/border|@amber/500|@amber/500
+result/flaky/icon|@amber/500|@amber/500
+result/missing/fg|@neutral/900|@neutral/1000
+result/missing/bg|@neutral/200|@neutral/400
+result/missing/border|@neutral/500|@neutral/600
+result/missing/icon|@neutral/600|@neutral/800
+result/unavailable/fg|@neutral/1000|@neutral/1000
+result/unavailable/bg|@neutral/400|@neutral/500
+result/unavailable/border|@neutral/600|@neutral/700
+result/unavailable/icon|@neutral/800|@neutral/900
+result/timed-out/fg|@amber/700|@amber/700
+result/timed-out/bg|@amber/300|@amber/300
+result/timed-out/border|@amber/600|@amber/600
+result/timed-out/icon|@amber/600|@amber/600
+result/cancelled/fg|@neutral/1000|@neutral/1000
+result/cancelled/bg|@neutral/300|@neutral/400
+result/cancelled/border|@neutral/500|@neutral/600
+result/cancelled/icon|@neutral/700|@neutral/800
+result/interrupted/fg|@neutral/1000|@neutral/1000
+result/interrupted/bg|@neutral/300|@neutral/400
+result/interrupted/border|@neutral/500|@neutral/600
+result/interrupted/icon|@neutral/700|@neutral/800
+result/skipped/fg|@neutral/800|@neutral/900
+result/skipped/bg|@neutral/200|@neutral/300
+result/skipped/border|@neutral/500|@neutral/600
+result/skipped/icon|@neutral/600|@neutral/700
+result/not-applicable/fg|@neutral/700|@neutral/800
+result/not-applicable/bg|@neutral/100|@neutral/300
+result/not-applicable/border|@neutral/500|@neutral/600
+result/not-applicable/icon|@neutral/600|@neutral/700
+cycle/queued/fg|@neutral/800|@neutral/800
+cycle/queued/bg|@neutral/100|@neutral/300
+cycle/queued/border|@neutral/500|@neutral/600
+cycle/queued/icon|@neutral/600|@neutral/700
+cycle/running/fg|@blue/700|@blue/700
+cycle/running/bg|@blue/100|@blue/100
+cycle/running/border|@blue/500|@blue/500
+cycle/running/icon|@blue/500|@blue/500
+cycle/cancelling/fg|@neutral/900|@neutral/1000
+cycle/cancelling/bg|@neutral/200|@neutral/400
+cycle/cancelling/border|@neutral/500|@neutral/600
+cycle/cancelling/icon|@neutral/700|@neutral/800
+verdict/pure/fg|@green/700|@green/700
+verdict/pure/bg|@green/100|@green/100
+verdict/pure/border|@green/500|@green/500
+verdict/pure/icon|@green/500|@green/500
+verdict/incomplete/fg|@neutral/1000|@neutral/1000
+verdict/incomplete/bg|@neutral/0|@neutral/200
+verdict/incomplete/border|@neutral/500|@neutral/600
+verdict/incomplete/icon|@neutral/700|@neutral/800
+verdict/blocked/fg|@red/700|@red/700
+verdict/blocked/bg|@red/100|@red/100
+verdict/blocked/border|@red/500|@red/500
+verdict/blocked/icon|@red/500|@red/500
+tag/model-claim/fg|@purple/700|@purple/700
+tag/model-claim/bg|@purple/100|@purple/100
+tag/model-claim/border|@purple/500|@purple/500
+tag/model-claim/icon|@purple/500|@purple/500
+#COL Dimensions
+space/4|4
+space/8|8
+space/12|12
+space/16|16
+space/24|24
+space/32|32
+space/48|48
+radius/control|6
+radius/card|10
+radius/sheet|14
+focus/width|2
+focus/offset|2
+#TEXT name|family style|size|lineHeight
+display/karat|Cairo ExtraBold|48|56
+title/page|Cairo Bold|24|34
+title/section|Cairo Bold|19|28
+title/sub|Cairo SemiBold|16|24
+label|Cairo SemiBold|13|20
+button|Cairo SemiBold|13|20
+numeric/live|Cairo SemiBold|13|20
+body|Almarai Regular|14|24
+body/strong|Almarai Bold|14|24
+body/small|Almarai Regular|12.5|20
+mono|JetBrains Mono Regular|12.5|20
+#EFFECT shadow/overlay: two drop shadows (x|y|blur|spread|color)
+shadow/overlay|0|0|1|0|#141b2014
+shadow/overlay|0|8|24|0|#141b2029
+#GRID
+grid/4|4

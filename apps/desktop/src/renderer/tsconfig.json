@@ -10,7 +10,8 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "types": [
-      "svelte"
+      "svelte",
+      "vite/client"
     ]
   },
   "include": [
