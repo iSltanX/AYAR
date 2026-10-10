@@ -1,0 +1,11 @@
+{
+  "name": "launchctl-submit",
+  "description": "الاختبار يسجل وظيفة launchd (launchctl submit) تنام 10 دقائق: عملية خارج شجرة الفحص كليًّا.",
+  "role": "neutral",
+  "defects": [
+    "beh.unit: وظيفة launchd تبقى بعد الفحص"
+  ],
+  "delete": [
+    "test/ok.test.js"
+  ]
+}

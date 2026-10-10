@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-PROC",
+  "variant": "good",
+  "summary": "لا عمليات يتيمة.",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "no-survivors",
+      "statement": "بعد الفحص لا عملية باقية من شجرة الفحص ولا دفتر عمليات غير فارغ",
+      "acceptance": "AT-01"
+    }
+  ]
+}

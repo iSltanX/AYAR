@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-PROC",
+  "variant": "double-fork",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "reason": "الاختبار نفسه ينجح؛ والمخالفة سلوكية: شبح بعده"
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "daemon-reported",
+      "statement": "الشبح المتفرع مرتين (ppid=1 وجلسة جديدة) يخرج من شجرة العمليات؛ يُرصد من الدفتر وقت النشوء وتُحاول إنهاؤه، وإلا يُعرض عملية باقية",
+      "acceptance": "AT-11"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-PROC",
+  "variant": "idle-silent",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "انتهت المهلة",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "test/idle-silent.test.js",
+        "line": 7,
+        "anchor": "ينام صامتًا بلا حساب"
+      },
+      "confidence": "مخالفة مثبتة",
+      "reason": "مهلة الخمول 20 ثانية: لا خرج ولا نشاط معالج"
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "idle-timeout",
+      "statement": "مهلة الخمول (20 ث) تنهي هذا الفحص بسبب «خمول» ولا تنهي busy-silent",
+      "acceptance": "AT-12"
+    }
+  ]
+}

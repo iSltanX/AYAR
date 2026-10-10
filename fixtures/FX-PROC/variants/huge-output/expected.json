@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-PROC",
+  "variant": "huge-output",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "reason": "الاختبار ينجح؛ الخرج يُقتطع عند حد العرض والحفظ"
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "output-cap",
+      "statement": "الخرج المحفوظ مقتطع عند الحد المعلن مع علامة اقتطاع، والذاكرة لا تنمو بحجم الخرج، والواجهة لا تتجمد",
+      "acceptance": "NFR-01"
+    }
+  ]
+}

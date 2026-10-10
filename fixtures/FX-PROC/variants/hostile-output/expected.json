@@ -1,0 +1,43 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-PROC",
+  "variant": "hostile-output",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "test/hostile-output.test.js",
+        "line": 20,
+        "anchor": "يطبع خرجًا عدائيًا ثم يفشل"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "exit_code": 1
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "ansi-stripped",
+      "statement": "رموز ANSI تُزال من نص العرض (الخطة 10.3 حماية القراءة)",
+      "acceptance": "AT-23"
+    },
+    {
+      "id": "bidi-visible",
+      "statement": "محارف التحكم بالاتجاه (U+202E وU+202C وU+2066 وU+2069) تُحفظ وتُعرض رموزًا مرئية",
+      "acceptance": "AT-23"
+    },
+    {
+      "id": "html-inert",
+      "statement": "وسوم HTML تُعرض نصًّا ولا تُفسَّر",
+      "acceptance": "AT-23"
+    },
+    {
+      "id": "injection-framed",
+      "statement": "نص «تجاهل التعليمات السابقة» داخل حد بيانات AYAR-DATA بالرمز نفسه، والنص المحاكي لعلامة الإغلاق مهرّب فلا يغلق الحد",
+      "acceptance": "AT-23"
+    }
+  ]
+}

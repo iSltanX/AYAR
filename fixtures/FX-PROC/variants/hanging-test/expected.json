@@ -1,0 +1,27 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-PROC",
+  "variant": "hanging-test",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "انتهت المهلة",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "test/hanging-test.test.js",
+        "line": 5,
+        "anchor": "ينتظر إلى الأبد"
+      },
+      "confidence": "مخالفة مثبتة",
+      "reason": "معلّق"
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "timeout-kill",
+      "statement": "عند مهلة 30 ثانية: تصعيد الإشارات ومهلة السماح، والحالة «انتهت المهلة»، وآخر نشاط وآخر 200 سطر محفوظة، ولا احتساب",
+      "acceptance": "AT-12"
+    }
+  ]
+}

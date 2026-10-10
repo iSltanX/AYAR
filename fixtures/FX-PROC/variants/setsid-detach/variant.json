@@ -1,0 +1,11 @@
+{
+  "name": "setsid-detach",
+  "description": "الاختبار ينجح بسرعة لكنه يترك عملية في جلسة جديدة (detached/setsid) تنام 10 دقائق: خارج مجموعة العمليات.",
+  "role": "neutral",
+  "defects": [
+    "beh.unit: عملية منفصلة بـ setsid تبقى بعد الفحص"
+  ],
+  "delete": [
+    "test/ok.test.js"
+  ]
+}

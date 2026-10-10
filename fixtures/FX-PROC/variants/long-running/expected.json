@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-PROC",
+  "variant": "long-running",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "reason": "يكمل إن لم يُقطع"
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "long-run-recovery",
+      "statement": "عند قتل المحرك أثناءه: الفحص «انقطع»، والعمليات اليتيمة تُنهى بعد مطابقة وقت البدء فقط، ولا تقرير خام يبقى في tmp/",
+      "acceptance": "AT-13"
+    }
+  ]
+}

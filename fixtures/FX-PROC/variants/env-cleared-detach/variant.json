@@ -1,0 +1,11 @@
+{
+  "name": "env-cleared-detach",
+  "description": "الاختبار يطلق عملية تمسح بيئتها كلها (env -i) ثم تنفصل بجلسة جديدة: فلا يبقى عليها وسم بيئة يدل على أنها من الفحص.",
+  "role": "neutral",
+  "defects": [
+    "beh.unit: عملية تمسح بيئتها وتنفصل"
+  ],
+  "delete": [
+    "test/ok.test.js"
+  ]
+}
