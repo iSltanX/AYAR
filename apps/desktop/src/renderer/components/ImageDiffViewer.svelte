@@ -19,6 +19,7 @@
   import AutoText from './AutoText.svelte';
   import Icon from './Icon.svelte';
   import ResultBadge from './ResultBadge.svelte';
+  import SegmentedControl from './SegmentedControl.svelte';
   import Tag from './Tag.svelte';
 
   interface Props {
@@ -43,34 +44,14 @@
     position = $bindable(50),
     onmodechange,
   }: Props = $props();
-  const { t, dir } = useLocale();
+  const { t } = useLocale();
 
   const MODE_KEYS = {
     'side-by-side': 'results.imageDiff.mode.sideBySide',
     overlay: 'results.imageDiff.mode.overlay',
     slider: 'results.imageDiff.mode.slider',
   } as const;
-  const segments: HTMLButtonElement[] = $state([]);
-
-  function choose(next: DiffMode, focus = false) {
-    mode = next;
-    onmodechange?.(next);
-    if (focus) segments[DIFF_MODES.indexOf(next)]?.focus();
-  }
-  function onkeydown(e: KeyboardEvent) {
-    const forward = dir === 'rtl' ? 'ArrowLeft' : 'ArrowRight';
-    const back = dir === 'rtl' ? 'ArrowRight' : 'ArrowLeft';
-    const i = DIFF_MODES.indexOf(mode);
-    const n = DIFF_MODES.length;
-    let next: number | undefined;
-    if (e.key === forward || e.key === 'ArrowDown') next = (i + 1) % n;
-    else if (e.key === back || e.key === 'ArrowUp') next = (i - 1 + n) % n;
-    else if (e.key === 'Home') next = 0;
-    else if (e.key === 'End') next = n - 1;
-    if (next === undefined) return;
-    e.preventDefault();
-    choose(DIFF_MODES[next]!, true);
-  }
+  const modeOptions = $derived(DIFF_MODES.map((m) => ({ value: m, label: t(MODE_KEYS[m]) })));
 
   /** The image box keeps the image's aspect ratio inside the capture frame. */
   const ratio =
@@ -98,22 +79,7 @@
 
 <div class="image-diff">
   <div class="toolbar">
-    <div class="modes" role="radiogroup" aria-label={t('results.imageDiff.mode')}>
-      {#each DIFF_MODES as m, i (m)}
-        <button
-          type="button"
-          class="segment"
-          role="radio"
-          aria-checked={mode === m}
-          tabindex={mode === m ? 0 : -1}
-          bind:this={segments[i]}
-          onclick={() => choose(m)}
-          {onkeydown}
-        >
-          {t(MODE_KEYS[m])}
-        </button>
-      {/each}
-    </div>
+    <SegmentedControl bind:value={mode} options={modeOptions} label={t('results.imageDiff.mode')} onchange={(m: DiffMode) => onmodechange?.(m)} />
     <span class="spacer"></span>
     <ResultBadge {result} />
   </div>
@@ -203,34 +169,6 @@
   }
   .spacer {
     flex: 1;
-  }
-  .modes {
-    display: inline-flex;
-    align-items: center;
-    gap: 2px;
-    flex: none;
-    padding: 2px;
-    border-radius: var(--radius-control);
-    background: var(--bg-sunken);
-  }
-  .segment {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 28px;
-    padding: 0 var(--space-12);
-    border: 0;
-    border-radius: 4px;
-    background: transparent;
-    color: var(--text-secondary);
-    font: var(--type-button);
-    white-space: nowrap;
-    cursor: default;
-  }
-  .segment[aria-checked='true'] {
-    border: 1px solid var(--border-strong);
-    background: var(--bg-surface);
-    color: var(--text-primary);
   }
   .capture-key {
     display: flex;

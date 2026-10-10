@@ -10,7 +10,9 @@
   import { formatNumber } from '@ayar/i18n';
   import { codePointLabel, logPieces, type LogLine } from '../lib/evidence.ts';
   import { useLocale } from '../lib/locale.ts';
+  import Checkbox from './Checkbox.svelte';
   import Icon from './Icon.svelte';
+  import SearchField from './SearchField.svelte';
   import Tag from './Tag.svelte';
 
   interface Props {
@@ -48,23 +50,19 @@
 <div class="log-viewer">
   <div class="toolbar">
     <span class="search">
-      <span class="search-icon"><Icon name="search" size={16} /></span>
-      <input
-        type="search"
-        placeholder={t('controls.search.placeholder')}
-        aria-label={t('controls.search.placeholder')}
-        bind:value={query}
-        oninput={() => onquerychange?.(query)}
-      />
+      <SearchField bind:value={query} width="fill" oninput={() => onquerychange?.(query)} onclear={() => onquerychange?.(query)} />
     </span>
     <span class="count">{t('results.log.lineCount', { count: totalLines ?? lines.length })}</span>
-    <label class="follow">
-      <span class="box">
-        <input type="checkbox" bind:checked={follow} onchange={() => onfollowchange?.(follow)} />
-        {#if follow}<span class="check"><Icon name="check" size={12} /></span>{/if}
-      </span>
-      <span class="follow-label">{t('results.log.follow')}</span>
-    </label>
+    <span class="follow">
+      <Checkbox
+        checked={follow}
+        label={t('results.log.follow')}
+        onchange={(on: boolean) => {
+          follow = on;
+          onfollowchange?.(on);
+        }}
+      />
+    </span>
   </div>
   <!-- A scrolling log must be reachable from the keyboard (axe scrollable-region-focusable, FR-53). -->
   <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
@@ -117,34 +115,6 @@
     flex: 1 1 320px;
     min-width: 0;
   }
-  .search-icon {
-    position: absolute;
-    inset-block: 0;
-    inset-inline-start: var(--space-8);
-    display: flex;
-    align-items: center;
-    color: var(--text-secondary);
-    pointer-events: none;
-  }
-  .search input {
-    width: 100%;
-    height: 28px;
-    margin: 0;
-    padding-block: 0;
-    padding-inline: calc(var(--space-8) + 16px + var(--space-8)) var(--space-8);
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-control);
-    background: var(--bg-surface);
-    color: var(--text-primary);
-    font: var(--type-body);
-    appearance: none;
-  }
-  .search input::placeholder {
-    color: var(--text-tertiary);
-  }
-  .search input::-webkit-search-cancel-button {
-    appearance: none;
-  }
   .count {
     flex: none;
     font: var(--type-body-small);
@@ -153,40 +123,8 @@
   }
   .follow {
     display: inline-flex;
-    align-items: center;
-    gap: var(--space-8);
     flex: none;
-    height: 28px;
-    font: var(--type-body);
-    color: var(--text-primary);
     white-space: nowrap;
-  }
-  .box {
-    position: relative;
-    display: inline-flex;
-    flex: none;
-    width: 14px;
-    height: 14px;
-  }
-  .box input {
-    width: 14px;
-    height: 14px;
-    margin: 0;
-    border: 1px solid var(--border-strong);
-    border-radius: 4px;
-    background: var(--bg-surface);
-    appearance: none;
-  }
-  .box input:checked {
-    border-color: var(--text-primary);
-    background: var(--text-primary);
-  }
-  .check {
-    position: absolute;
-    inset: 1px;
-    display: flex;
-    color: var(--text-inverse);
-    pointer-events: none;
   }
   .lines {
     display: flex;
