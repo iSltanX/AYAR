@@ -42,7 +42,8 @@ function sh(cmd, cwd, { env = {}, timeout = 180 } = {}) {
 }
 
 function excerpt(out, max = 1800) {
-  const clean = out.replace(/\u001b\[[0-9;]*m/g, '').trim();
+  // لا يُحفظ في النتائج مسار صفحة المستخدم الرئيسية ولا ما يشبه رمز جلسة (تنقية احترازية؛ المصدر الصحيح بيئة نظيفة env -i)
+  const clean = out.replace(/\u001b\[[0-9;]*m/g, '').replaceAll(os.homedir(), '~').replace(/("?[A-Z0-9_]*(?:TOKEN|SECRET|PASSWORD|API_KEY)[A-Z0-9_]*"?\s*[:=]\s*"?)(?!ayr_|<unset>)[A-Za-z0-9_\-./+=]{12,}/g, '$1[مُنقّى]').trim();
   if (clean.length <= max) return clean;
   const half = Math.floor(max / 2);
   return `${clean.slice(0, half)}\n… [اقتُطع] …\n${clean.slice(-half)}`;
@@ -102,7 +103,7 @@ async function runProject(id, only) {
           if (r.after) { const a = r.after(dir, res); if (a) problems.push(a); }
           const ok = problems.length === 0;
           if (!ok) bad++;
-          rec.push({ id: r.id, cmd: r.cmd, ok, code: res.timedOut ? 'مهلة' : res.code, ms: res.ms, proves: r.proves, problems, excerpt: excerpt(res.out, r.excerpt ?? 1200) });
+          rec.push({ id: r.id, cmd: r.cmd, ok, code: res.timedOut ? 'مهلة' : res.code, ms: res.ms, proves: r.proves, problems, evidence: r.evidence ?? !(wantExit.length === 1 && wantExit[0] === 0), excerpt: excerpt(res.out, r.excerpt ?? 1200) });
           console.log(`${ok ? '✓' : '✗'} ${id}/${variant}/${r.id} (exit ${res.code})${ok ? '' : ` — ${problems.join('; ')}`}`);
         }
       }

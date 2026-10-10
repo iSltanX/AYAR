@@ -42,8 +42,9 @@ export default {
     'unresolved-cause': [run('unit', 'pnpm exec vitest run src/lib/remote.test.ts', 'beh.unit: إخفاق ثابت سببه غير محسوم', { exit: 1, match: ['expected undefined to be defined'], evidence: true })],
     'secret-in-test-log': [run('unit', 'pnpm exec vitest run src/lib/connect.test.ts', 'beh.unit: إخفاق يطبع السر في السجل', { exit: 1, match: ['connecting with key ayr_live_8f3c1a77d02e4b58a6c1e0d94f7b2a35d0c4'], evidence: true }), secrets(42, 'sec.secrets.files: السر في ملف الاختبار', ['"File": "src/lib/connect.test.ts"'])],
     'env-leak': [
-      run('env-printed', 'pnpm exec vitest run src/lib/env.test.ts', 'AT-48: السكربت يطبع البيئة (القيمتان المصطنعتان ظاهرتان في الخرج حين تمرران إليه)', { exit: 1, env: { MY_API_TOKEN: 'ayr_fakelogin_9a8b7c6d5e4f', NPM_TOKEN: 'ayr_fakenpm_1f2e3d4c5b6a' }, match: ['MY_API_TOKEN=ayr_fakelogin_9a8b7c6d5e4f', 'NPM_TOKEN=ayr_fakenpm_1f2e3d4c5b6a'], evidence: true }),
-      run('json-report', 'pnpm exec vitest run src/lib/env.test.ts --reporter=json --outputFile=../report.json; grep -o "ayr_envleak_5d2e9b1f7a3c4086b9e1d2c7a4f50e83" ../report.json | head -1', 'AT-48: السر المصطنع يصل إلى تقرير JSON للأداة', { match: ['ayr_envleak_5d2e9b1f7a3c4086b9e1d2c7a4f50e83'], evidence: true }),
+      // بيئة نظيفة (env -i): لا يُطبع في الخرج إلا ما نمرره؛ فلا تتسرب بيئة جهاز المنفّذ إلى النتائج المحفوظة
+      run('env-printed', 'env -i PATH="$PATH" MY_API_TOKEN=ayr_fakelogin_9a8b7c6d5e4f NPM_TOKEN=ayr_fakenpm_1f2e3d4c5b6a pnpm exec vitest run src/lib/env.test.ts', 'AT-48: السكربت يطبع البيئة (القيمتان المصطنعتان ظاهرتان في الخرج حين تمرران إليه)', { exit: 1, match: ['MY_API_TOKEN=ayr_fakelogin_9a8b7c6d5e4f', 'NPM_TOKEN=ayr_fakenpm_1f2e3d4c5b6a'], evidence: true }),
+      run('json-report', 'env -i PATH="$PATH" pnpm exec vitest run src/lib/env.test.ts --reporter=json --outputFile=../report.json >/dev/null 2>&1; grep -o "ayr_envleak_5d2e9b1f7a3c4086b9e1d2c7a4f50e83" ../report.json | head -1', 'AT-48: السر المصطنع يصل إلى تقرير JSON للأداة', { match: ['ayr_envleak_5d2e9b1f7a3c4086b9e1d2c7a4f50e83'], evidence: true }),
       secrets(0, 'sec.secrets.files: السر لا يظهر حرفيًّا في الملفات (مبني وقت التشغيل)')],
     'integrity-real-fix': [typecheck, lint, unit, cov(0, 'التغطية فوق العتبات', ['100'])],
     'integrity-baseline': [typecheck,
