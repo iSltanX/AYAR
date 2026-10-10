@@ -1,0 +1,19 @@
+node_modules/svelte-check/bin/ts-version-check.js:38
+    throw new Error(message);
+    ^
+
+Error: TypeScript 7 support currently requires both TypeScript 7 and TypeScript 6 installed in your project, and requires using the --tsgo or --tsgo-experimental-api flag. You can setup both version with an npm alias via the following command.
+npm install --save-dev typescript@~6 @typescript/native@npm:typescript@7
+
+    at checkTypeScriptVersion (node_modules/svelte-check/bin/ts-version-check.js:38:11)
+    at Object.<anonymous> (node_modules/svelte-check/bin/ts-version-check.js:8:1)
+    at Module._compile (node:internal/modules/cjs/loader:1871:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:2002:10)
+    at Module.load (node:internal/modules/cjs/loader:1594:32)
+    at Module._load (node:internal/modules/cjs/loader:1396:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.require (node:internal/modules/cjs/loader:1617:12)
+    at require (node:internal/modules/helpers:153:16)
+    at Object.<anonymous> (node_modules/svelte-check/bin/svelte-check:3:1)
+
+Node.js v24.18.1

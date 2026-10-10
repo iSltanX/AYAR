@@ -1,0 +1,75 @@
+{
+  "label": "control-package",
+  "app": "AYAR Spike.app",
+  "at": "2026-10-10T05:32:22.181Z",
+  "checks": {
+    "inspect": {
+      "code": null,
+      "signal": "SIGKILL",
+      "killedAfterMs": 6000,
+      "output": [
+        "Debugger listening on ws://127.0.0.1:54784/5ce37cf5-b196-4136-a414-233d5091dec4",
+        "For help, see: https://nodejs.org/learn/getting-started/debugging"
+      ],
+      "nodeInspectorOpened": true
+    },
+    "remoteDebuggingPort": {
+      "code": 78,
+      "signal": null,
+      "killedAfterMs": null,
+      "output": [
+        "AYAR Spike: refusing remote debugging switches without the inspector fuse"
+      ],
+      "devtoolsOpened": false
+    },
+    "remoteDebuggingPipe": {
+      "code": 78,
+      "signal": null,
+      "killedAfterMs": null,
+      "output": [
+        "AYAR Spike: refusing remote debugging switches without the inspector fuse"
+      ]
+    },
+    "remoteDebuggingAddress": {
+      "code": 78,
+      "signal": null,
+      "killedAfterMs": null,
+      "output": [
+        "AYAR Spike: refusing remote debugging switches without the inspector fuse"
+      ]
+    },
+    "sigusr1": {
+      "code": null,
+      "signal": "SIGKILL",
+      "inspectorOpened": true
+    },
+    "runAsNode": {
+      "code": 0,
+      "signal": null,
+      "killedAfterMs": null,
+      "output": [
+        "RUN_AS_NODE_OK"
+      ],
+      "actedAsNode": true
+    },
+    "nodeOptions": {
+      "code": null,
+      "signal": "SIGKILL",
+      "killedAfterMs": 6000,
+      "output": [
+        "[9848:1010/083210.213638:ERROR:electron/shell/common/node_bindings.cc:492] Most NODE_OPTIONs are not supported in packaged apps. See documentation for more details."
+      ],
+      "requireRan": false
+    },
+    "nodeOptionsHttp": {
+      "code": null,
+      "signal": "SIGKILL",
+      "killedAfterMs": 6000,
+      "output": [
+        "AYAR_HTTP_MAX_HEADER=12345"
+      ],
+      "maxHeaderSize": 12345,
+      "honored": true
+    }
+  }
+}

@@ -1,0 +1,11 @@
+▶ sectionVerdict (node:test)
+  ✔ is pure only when every required check passed (0.398125ms)
+✔ sectionVerdict (node:test) (0.884291ms)
+ℹ tests 1
+ℹ suites 1
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 104.164166

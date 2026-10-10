@@ -1,0 +1,34 @@
+{
+  "spike": "E-05",
+  "mode": "replay",
+  "at": "2026-10-10T04:43:41.932Z",
+  "bundleId": "com.bysltan.ayar.spike.e05",
+  "buildInfo": {
+    "mode": "e05",
+    "bundleId": "com.bysltan.ayar.spike.e05",
+    "productName": "AYAR Spike E05",
+    "signed": "identity",
+    "buildTag": "",
+    "builtAt": "2026-10-10T04:37:18.248Z"
+  },
+  "locations": [
+    {
+      "key": "documents",
+      "label": "المستندات",
+      "t0": "2026-10-10T04:43:41.932Z",
+      "discover": {
+        "ok": true,
+        "files": 4,
+        "ms": 2
+      },
+      "test": {
+        "ok": true,
+        "exit": 0,
+        "out": "PROBE_TEST_OK",
+        "ms": 8
+      },
+      "t1": "2026-10-10T04:43:41.942Z"
+    }
+  ],
+  "finishedAt": "2026-10-10T04:43:41.942Z"
+}

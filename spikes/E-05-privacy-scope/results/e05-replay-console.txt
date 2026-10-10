@@ -1,0 +1,10 @@
+# E-05, 2026-10-10 07:43: relaunch of AYAR Spike E05 (com.bysltan.ayar.spike.e05) with --replay, i.e. the
+# five stored project paths accessed WITHOUT the open panel. The app's e05-replay.json was later
+# overwritten by the E05B run (same userData folder), so this is the console output as printed then:
+documents discover={"ok":true,"files":5,"ms":3} test={"ok":true,"exit":0,"ms":9,"out":"PROBE_TEST_OK"}
+desktop   discover={"ok":true,"files":5,"ms":2} test={"ok":true,"exit":0,"ms":7,"out":"PROBE_TEST_OK"}
+downloads discover={"ok":true,"files":5,"ms":1} test={"ok":true,"exit":0,"ms":10,"out":"PROBE_TEST_OK"}
+icloud    discover={"ok":true,"files":6,"ms":1} test={"ok":true,"exit":0,"ms":6,"out":"PROBE_TEST_OK"}
+external  discover={"ok":true,"files":5,"ms":1} test={"ok":true,"exit":0,"ms":7,"out":"PROBE_TEST_OK"}
+# The privacy log for the same window is results/tcc-replay.json: 1 request (ListenEvent), 0 prompts,
+# and no SystemPolicy* request at all.

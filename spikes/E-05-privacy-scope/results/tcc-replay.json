@@ -1,0 +1,24 @@
+{
+  "start": "2026-10-10 07:43:05",
+  "prefix": "com.bysltan.ayar.spike.e05",
+  "requests": 1,
+  "prompted": 0,
+  "byService": {
+    "kTCCServiceListenEvent": {
+      "requests": 1,
+      "prompted": 0,
+      "denied": 0
+    }
+  },
+  "requestsDetail": [
+    {
+      "time": "2026-10-10 07:43:06.056",
+      "service": "kTCCServiceListenEvent",
+      "responsible": "com.bysltan.ayar.spike.e05",
+      "accessing": "com.bysltan.ayar.spike.e05.helper spikes/E-01-electron-forge/out/AYAR Spike E05-darwin-arm64/AYAR Spike E05.app/Contents/Frameworks/AYAR Spike E05 Helper.app/Contents/MacOS/AYAR Spike E05 Helper",
+      "authValue": 1,
+      "authReason": 5,
+      "prompted": false
+    }
+  ]
+}

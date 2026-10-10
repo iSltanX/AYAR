@@ -1,0 +1,3 @@
+typescript (top-level): 6.0.3
+tsc used: node_modules/.bin/tsc -> Version 6.0.3
+svelte-check resolves: node_modules/typescript/lib/typescript.js

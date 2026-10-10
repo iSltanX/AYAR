@@ -1,0 +1,15 @@
+2026-10-09T20:19:02.862Z pw:browser <launching> ../E-01-electron-forge/out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/MacOS/AYAR Spike --inspect=0 --remote-debugging-port=0 --no-selftest
+2026-10-09T20:19:02.865Z pw:browser <launched> pid=71425
+2026-10-09T20:19:03.001Z pw:browser [pid=71425][err] 
+2026-10-09T20:19:03.001Z pw:browser [pid=71425][err] DevTools listening on ws://127.0.0.1:52142/devtools/browser/3b004e95-a1e6-4a21-98b3-5ae6023a19bd
+2026-10-09T20:19:32.864Z pw:browser [pid=71425] <kill>
+2026-10-09T20:19:32.865Z pw:browser [pid=71425] <will force kill>
+node:internal/process/promises:394
+    triggerUncaughtException(err, true /* fromPromise */);
+    ^
+
+TimeoutError: Timeout 30000ms exceeded.
+    at _ProgressController.run (spikes/G-05-e2e-fuses/node_modules/playwright-core/lib/coreBundle.js:13004:32)
+    at DispatcherConnection.dispatch (spikes/G-05-e2e-fuses/node_modules/playwright-core/lib/coreBundle.js:20191:44)
+
+Node.js v24.18.1

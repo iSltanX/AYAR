@@ -1,0 +1,25 @@
+❯ Checking your system
+❯ Checking package manager version
+✔ Found npm@11.16.0
+✔ Checking your system
+❯ Preparing to package application
+✔ Preparing to package application
+❯ Running packaging hooks
+❯ Running generateAssets hook
+✔ Running generateAssets hook
+❯ Running prePackage hook
+✔ Running prePackage hook
+✔ Running packaging hooks
+❯ Packaging application
+› Determining targets...
+❯ Packaging for arm64 on darwin
+❯ Copying files
+✔ Copying files
+❯ Preparing native dependencies
+✔ Preparing native dependencies
+❯ Finalizing package
+✔ Finalizing package
+✔ Packaging for arm64 on darwin
+✔ Packaging application
+❯ Running postPackage hook
+✔ Running postPackage hook

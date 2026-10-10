@@ -1,0 +1,18 @@
+{
+  "label": "release-guard-1",
+  "appPath": "AYAR Spike.app",
+  "startedAt": "2026-10-09T20:25:56.762Z",
+  "devtools": {
+    "exited": {
+      "code": 78,
+      "signal": null
+    }
+  },
+  "exit": {
+    "code": 78,
+    "signal": null
+  },
+  "stderr": [
+    "AYAR Spike: refusing remote debugging switches without the inspector fuse"
+  ]
+}

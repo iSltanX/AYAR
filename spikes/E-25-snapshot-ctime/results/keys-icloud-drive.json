@@ -1,0 +1,205 @@
+{
+  "label": "icloud-drive",
+  "dir": "~/Library/Mobile Documents/com~apple~CloudDocs/ayar-spike-tmp",
+  "fs": {
+    "personality": "APFS",
+    "location": "Internal",
+    "protocol": "Apple Fabric"
+  },
+  "at": "2026-10-09T21:26:25.139Z",
+  "methods": {
+    "write+touch-r": {
+      "contentChanged": true,
+      "changed": {
+        "size": false,
+        "mtimeNs": false,
+        "ctimeNs": true,
+        "ino": false
+      },
+      "keyChanged": true,
+      "detected": true,
+      "laterChangedBySystem": false,
+      "before": {
+        "size": 4096,
+        "mtimeNs": "1791581185140293796",
+        "ctimeNs": "1791581185252433616",
+        "ino": "110755623"
+      },
+      "after": {
+        "size": 4096,
+        "mtimeNs": "1791581185140293796",
+        "ctimeNs": "1791581186253814329",
+        "ino": "110755623"
+      }
+    },
+    "cp-p": {
+      "contentChanged": true,
+      "changed": {
+        "size": false,
+        "mtimeNs": false,
+        "ctimeNs": true,
+        "ino": false
+      },
+      "keyChanged": true,
+      "detected": true,
+      "laterChangedBySystem": true,
+      "before": {
+        "size": 4096,
+        "mtimeNs": "1791581187757260655",
+        "ctimeNs": "1791581187770657437",
+        "ino": "110755657"
+      },
+      "after": {
+        "size": 4096,
+        "mtimeNs": "1791581187757260655",
+        "ctimeNs": "1791581188874806418",
+        "ino": "110755657"
+      }
+    },
+    "ditto": {
+      "contentChanged": true,
+      "changed": {
+        "size": false,
+        "mtimeNs": false,
+        "ctimeNs": true,
+        "ino": true
+      },
+      "keyChanged": true,
+      "detected": true,
+      "laterChangedBySystem": false,
+      "before": {
+        "size": 4096,
+        "mtimeNs": "1791581190378791873",
+        "ctimeNs": "1791581190526541387",
+        "ino": "110755690"
+      },
+      "after": {
+        "size": 4096,
+        "mtimeNs": "1791581190378791873",
+        "ctimeNs": "1791581191504131887",
+        "ino": "110755711"
+      }
+    },
+    "atomic-rename": {
+      "contentChanged": true,
+      "changed": {
+        "size": false,
+        "mtimeNs": false,
+        "ctimeNs": true,
+        "ino": true
+      },
+      "keyChanged": true,
+      "detected": true,
+      "laterChangedBySystem": false,
+      "before": {
+        "size": 4096,
+        "mtimeNs": "1791581193007753756",
+        "ctimeNs": "1791581193012679699",
+        "ino": "110755729"
+      },
+      "after": {
+        "size": 4096,
+        "mtimeNs": "1791581193007753756",
+        "ctimeNs": "1791581194121746333",
+        "ino": "110755747"
+      }
+    },
+    "utimes-api": {
+      "contentChanged": true,
+      "changed": {
+        "size": false,
+        "mtimeNs": true,
+        "ctimeNs": true,
+        "ino": false
+      },
+      "keyChanged": true,
+      "detected": true,
+      "laterChangedBySystem": false,
+      "before": {
+        "size": 4096,
+        "mtimeNs": "1791581195623705151",
+        "ctimeNs": "1791581195631789695",
+        "ino": "110755764"
+      },
+      "after": {
+        "size": 4096,
+        "mtimeNs": "1791581195624000072",
+        "ctimeNs": "1791581196732653117",
+        "ino": "110755764"
+      }
+    },
+    "inplace-pwrite+touch-r": {
+      "contentChanged": true,
+      "changed": {
+        "size": false,
+        "mtimeNs": false,
+        "ctimeNs": true,
+        "ino": false
+      },
+      "keyChanged": true,
+      "detected": true,
+      "laterChangedBySystem": false,
+      "before": {
+        "size": 4096,
+        "mtimeNs": "1791581198235212606",
+        "ctimeNs": "1791581198240125883",
+        "ino": "110755808"
+      },
+      "after": {
+        "size": 4096,
+        "mtimeNs": "1791581198235212606",
+        "ctimeNs": "1791581199347892009",
+        "ino": "110755808"
+      }
+    },
+    "chmod-only": {
+      "contentChanged": false,
+      "changed": {
+        "size": false,
+        "mtimeNs": false,
+        "ctimeNs": true,
+        "ino": false
+      },
+      "keyChanged": true,
+      "detected": true,
+      "laterChangedBySystem": false,
+      "before": {
+        "size": 4096,
+        "mtimeNs": "1791581200850476997",
+        "ctimeNs": "1791581200862846065",
+        "ino": "110755844"
+      },
+      "after": {
+        "size": 4096,
+        "mtimeNs": "1791581200850476997",
+        "ctimeNs": "1791581201957799330",
+        "ino": "110755844"
+      }
+    },
+    "xattr-only": {
+      "contentChanged": false,
+      "changed": {
+        "size": false,
+        "mtimeNs": false,
+        "ctimeNs": true,
+        "ino": false
+      },
+      "keyChanged": true,
+      "detected": true,
+      "laterChangedBySystem": false,
+      "before": {
+        "size": 4096,
+        "mtimeNs": "1791581203460277693",
+        "ctimeNs": "1791581203580029096",
+        "ino": "110755878"
+      },
+      "after": {
+        "size": 4096,
+        "mtimeNs": "1791581203460277693",
+        "ctimeNs": "1791581204579561424",
+        "ino": "110755878"
+      }
+    }
+  },
+  "allDetected": true
+}

@@ -1,0 +1,13 @@
+# E-01 size, 2026-10-09 23:15 +0300
+$ du -sh <app>
+302M	out/AYAR Spike-darwin-arm64/AYAR Spike.app
+$ du -sk <app> (KiB)
+308880	out/AYAR Spike-darwin-arm64/AYAR Spike.app
+$ du -sh <app>/Contents/Frameworks/Electron Framework.framework
+299M	out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Frameworks/Electron Framework.framework
+$ du -sh <app>/Contents/Resources/app.asar
+128K	out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Resources/app.asar
+$ ls -d <app>/Contents/Resources/*.lproj | wc -l
+      55
+$ ditto -c -k --sequesterRsrc --keepParent <app> e01.zip ; ls -l e01.zip
+127119666 bytes

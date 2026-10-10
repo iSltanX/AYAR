@@ -1,0 +1,44 @@
+{
+  "label": "external-apfs-usb",
+  "dir": "/Volumes/iSltanXx/ayar-e25-tmp",
+  "fs": {
+    "personality": "APFS",
+    "location": "External",
+    "protocol": "USB"
+  },
+  "at": "2026-10-09T21:28:14.387Z",
+  "n": 50000,
+  "generate": {
+    "ms": 2999,
+    "bytes": 494804504
+  },
+  "timingsMs": {
+    "fullFirst": 933,
+    "fullSecond": 877,
+    "shortcutFirst": 263,
+    "shortcutSecond": 248
+  },
+  "shortcutHashed": [
+    0,
+    0
+  ],
+  "mutation": {
+    "mutatedFiles": 240,
+    "contentChanged": 180,
+    "shortcutRehashed": 240,
+    "missedByShortcut": 0,
+    "missedByMethod": {
+      "write+touch-r": 0,
+      "cp-p": 0,
+      "ditto": 0,
+      "atomic-rename": 0,
+      "utimes-api": 0,
+      "inplace-pwrite+touch-r": 0,
+      "chmod-only": 0,
+      "xattr-only": 0
+    },
+    "shortcutMs": 245,
+    "fullMs": 851
+  },
+  "cleanupMs": 1481
+}

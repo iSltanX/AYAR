@@ -1,0 +1,12 @@
+# E-04 build B fuses as packaged (2026-10-10)
+Analyzing app: AYAR Spike E04.app
+Fuse Version: v1
+  RunAsNode is Disabled
+  EnableCookieEncryption is Enabled
+  EnableNodeOptionsEnvironmentVariable is Disabled
+  EnableNodeCliInspectArguments is Disabled
+  EnableEmbeddedAsarIntegrityValidation is Enabled
+  OnlyLoadAppFromAsar is Enabled
+  LoadBrowserProcessSpecificV8Snapshot is Disabled
+  GrantFileProtocolExtraPrivileges is Disabled
+  WasmTrapHandlers is Enabled

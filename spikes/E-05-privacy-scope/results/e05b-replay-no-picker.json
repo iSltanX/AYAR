@@ -1,0 +1,102 @@
+{
+  "spike": "E-05",
+  "mode": "replay",
+  "at": "2026-10-10T04:47:04.541Z",
+  "bundleId": "com.bysltan.ayar.spike.e05b",
+  "buildInfo": {
+    "mode": "e05",
+    "bundleId": "com.bysltan.ayar.spike.e05b",
+    "productName": "AYAR Spike E05B",
+    "signed": "identity",
+    "buildTag": "",
+    "builtAt": "2026-10-10T04:44:52.717Z"
+  },
+  "locations": [
+    {
+      "key": "documents",
+      "label": "المستندات",
+      "t0": "2026-10-10T04:47:04.541Z",
+      "discover": {
+        "ok": true,
+        "files": 5,
+        "ms": 576983
+      },
+      "test": {
+        "ok": true,
+        "exit": 0,
+        "out": "PROBE_TEST_OK",
+        "ms": 12
+      },
+      "t1": "2026-10-10T04:56:41.592Z"
+    },
+    {
+      "key": "desktop",
+      "label": "سطح المكتب",
+      "t0": "2026-10-10T04:56:41.592Z",
+      "discover": {
+        "ok": true,
+        "files": 5,
+        "ms": 1113
+      },
+      "test": {
+        "ok": true,
+        "exit": 0,
+        "out": "PROBE_TEST_OK",
+        "ms": 14
+      },
+      "t1": "2026-10-10T04:56:42.734Z"
+    },
+    {
+      "key": "downloads",
+      "label": "التنزيلات",
+      "t0": "2026-10-10T04:56:42.734Z",
+      "discover": {
+        "ok": true,
+        "files": 5,
+        "ms": 749
+      },
+      "test": {
+        "ok": true,
+        "exit": 0,
+        "out": "PROBE_TEST_OK",
+        "ms": 18
+      },
+      "t1": "2026-10-10T04:56:43.506Z"
+    },
+    {
+      "key": "icloud",
+      "label": "iCloud Drive",
+      "t0": "2026-10-10T04:56:43.506Z",
+      "discover": {
+        "ok": true,
+        "files": 6,
+        "ms": 3035
+      },
+      "test": {
+        "ok": true,
+        "exit": 0,
+        "out": "PROBE_TEST_OK",
+        "ms": 26
+      },
+      "t1": "2026-10-10T04:56:46.568Z"
+    },
+    {
+      "key": "external",
+      "label": "القرص الخارجي",
+      "t0": "2026-10-10T04:56:46.568Z",
+      "discover": {
+        "ok": true,
+        "files": 5,
+        "ms": 1457
+      },
+      "test": {
+        "ok": true,
+        "exit": 0,
+        "out": "PROBE_TEST_OK",
+        "ms": 17
+      },
+      "t1": "2026-10-10T04:56:48.059Z"
+    }
+  ],
+  "finishedAt": "2026-10-10T04:56:48.060Z"
+}

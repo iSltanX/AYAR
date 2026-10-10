@@ -1,0 +1,127 @@
+{
+  "spike": "E-05",
+  "mode": "pick",
+  "at": "2026-10-10T04:33:22.760Z",
+  "bundleId": "com.bysltan.ayar.spike.e05",
+  "buildInfo": {
+    "mode": "e05",
+    "bundleId": "com.bysltan.ayar.spike.e05",
+    "productName": "AYAR Spike E05",
+    "signed": "identity",
+    "buildTag": "",
+    "builtAt": "2026-10-10T04:21:11.416Z"
+  },
+  "locations": [
+    {
+      "key": "documents",
+      "label": "المستندات",
+      "t0": "2026-10-10T04:33:22.760Z",
+      "pick": {
+        "canceled": false,
+        "path": "/Applications",
+        "ms": 20615
+      },
+      "discover": {
+        "ok": false,
+        "code": "ENOENT",
+        "ms": 36438
+      },
+      "test": {
+        "ok": false,
+        "exit": 127,
+        "out": "/bin/sh: test/run.sh: No such file or directory",
+        "ms": 20
+      },
+      "t1": "2026-10-10T04:34:19.850Z"
+    },
+    {
+      "key": "desktop",
+      "label": "سطح المكتب",
+      "t0": "2026-10-10T04:34:19.855Z",
+      "pick": {
+        "canceled": false,
+        "path": "~/Desktop/ayar-e05-probe",
+        "ms": 7946
+      },
+      "discover": {
+        "ok": true,
+        "files": 4,
+        "ms": 5
+      },
+      "test": {
+        "ok": true,
+        "exit": 0,
+        "out": "PROBE_TEST_OK",
+        "ms": 18
+      },
+      "t1": "2026-10-10T04:34:27.835Z"
+    },
+    {
+      "key": "downloads",
+      "label": "التنزيلات",
+      "t0": "2026-10-10T04:34:27.835Z",
+      "pick": {
+        "canceled": false,
+        "path": "~/Downloads/ayar-e05-probe",
+        "ms": 15715
+      },
+      "discover": {
+        "ok": true,
+        "files": 4,
+        "ms": 3
+      },
+      "test": {
+        "ok": true,
+        "exit": 0,
+        "out": "PROBE_TEST_OK",
+        "ms": 16
+      },
+      "t1": "2026-10-10T04:34:43.572Z"
+    },
+    {
+      "key": "icloud",
+      "label": "iCloud Drive",
+      "t0": "2026-10-10T04:34:43.572Z",
+      "pick": {
+        "canceled": false,
+        "path": "~/Library/Mobile Documents/com~apple~CloudDocs/ayar-e05-probe",
+        "ms": 62208
+      },
+      "discover": {
+        "ok": true,
+        "files": 4,
+        "ms": 2
+      },
+      "test": {
+        "ok": true,
+        "exit": 0,
+        "out": "PROBE_TEST_OK",
+        "ms": 19
+      },
+      "t1": "2026-10-10T04:35:45.803Z"
+    },
+    {
+      "key": "external",
+      "label": "القرص الخارجي",
+      "t0": "2026-10-10T04:35:45.803Z",
+      "pick": {
+        "canceled": false,
+        "path": "/Volumes/iSltanXx/ayar-e05-probe",
+        "ms": 5665
+      },
+      "discover": {
+        "ok": true,
+        "files": 4,
+        "ms": 2
+      },
+      "test": {
+        "ok": true,
+        "exit": 0,
+        "out": "PROBE_TEST_OK",
+        "ms": 16
+      },
+      "t1": "2026-10-10T04:35:51.490Z"
+    }
+  ],
+  "finishedAt": "2026-10-10T04:35:51.491Z"
+}

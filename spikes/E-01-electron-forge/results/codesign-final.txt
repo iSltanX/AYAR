@@ -1,0 +1,50 @@
+$ codesign -dvvv --entitlements - <app>
+Identifier=com.bysltan.ayar.spike
+Format=app bundle with Mach-O thin (arm64)
+CodeDirectory v=20500 size=439 flags=0x10002(adhoc,runtime) hashes=3+7 location=embedded
+Hash type=sha256 size=32
+CandidateCDHash sha256=5b018eb735252a405abfa9b420d76963c6469b86
+CandidateCDHashFull sha256=5b018eb735252a405abfa9b420d76963c6469b86929269dfd5592ad4b8744c62
+Hash choices=sha256
+CMSDigest=5b018eb735252a405abfa9b420d76963c6469b86929269dfd5592ad4b8744c62
+CMSDigestType=2
+CDHash=5b018eb735252a405abfa9b420d76963c6469b86
+Signature=adhoc
+Info.plist entries=31
+TeamIdentifier=not set
+Runtime Version=26.5.0
+Sealed Resources version=2 rules=13 files=10
+Internal requirements count=0 size=12
+Total signatures=1
+Chosen signature=1
+[Dict]
+	[Key] com.apple.security.cs.allow-jit
+	[Value]
+		[Bool] true
+	[Key] com.apple.security.cs.disable-library-validation
+	[Value]
+		[Bool] true
+$ codesign --verify --deep --strict --verbose=2 <app>
+--prepared:out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Frameworks/AYAR Spike Helper.app
+--prepared:out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Frameworks/AYAR Spike Helper (GPU).app
+--prepared:out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Frameworks/ReactiveObjC.framework/Versions/Current/.
+--validated:out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Frameworks/AYAR Spike Helper.app
+--validated:out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Frameworks/AYAR Spike Helper (GPU).app
+--prepared:out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Frameworks/AYAR Spike Helper (Renderer).app
+--prepared:out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Frameworks/AYAR Spike Helper (Plugin).app
+--validated:out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Frameworks/ReactiveObjC.framework/Versions/Current/.
+--validated:out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Frameworks/AYAR Spike Helper (Renderer).app
+--validated:out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Frameworks/AYAR Spike Helper (Plugin).app
+--prepared:out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Frameworks/Squirrel.framework/Versions/Current/.
+--prepared:out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Frameworks/Mantle.framework/Versions/Current/.
+--validated:out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Frameworks/Squirrel.framework/Versions/Current/.
+--validated:out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Frameworks/Mantle.framework/Versions/Current/.
+--prepared:out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Frameworks/Electron Framework.framework/Versions/Current/.
+--prepared:out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Frameworks/Electron Framework.framework/Versions/Current/Helpers/chrome_crashpad_handler
+--validated:out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Frameworks/Electron Framework.framework/Versions/Current/Helpers/chrome_crashpad_handler
+--validated:out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/Frameworks/Electron Framework.framework/Versions/Current/.
+out/AYAR Spike-darwin-arm64/AYAR Spike.app: valid on disk
+out/AYAR Spike-darwin-arm64/AYAR Spike.app: satisfies its Designated Requirement
+$ codesign -d -r- <app>
+Executable=out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/MacOS/AYAR Spike
+# designated => cdhash H"5b018eb735252a405abfa9b420d76963c6469b86"

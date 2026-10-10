@@ -1,0 +1,1 @@
+2026-10-09 23:12:31.080 E  tccd[416:534f99] [com.apple.TCC:access] IDENTITY_ATTRIBUTION: Failed to copy signing info for 68712, responsible for /Volumes/iSltanXx/Projects/AYAR/spikes/E-01-electron-forge/out/AYAR Spike-darwin-arm64/AYAR Spike.app/Contents/MacOS/AYAR Spike: #-67030: Error Domain=NSOSStatusErrorDomain Code=-67030 "(null)"

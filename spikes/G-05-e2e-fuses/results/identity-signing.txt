@@ -1,0 +1,11 @@
+# G-05 with the self-signed identity (E-04), 2026-10-10
+## AYAR Spike.app (release)
+Identifier=com.bysltan.ayar.spike
+Authority=AYAR Local Code Signing
+designated => identifier "com.bysltan.ayar.spike" and certificate leaf = H"86526c3ec084f4676eecbd8d298c35eab3278364"
+verify: ok
+## AYAR Spike.app (derived test package)
+Identifier=com.bysltan.ayar.spike
+Authority=AYAR Local Code Signing
+designated => identifier "com.bysltan.ayar.spike" and certificate leaf = H"86526c3ec084f4676eecbd8d298c35eab3278364"
+verify: ok

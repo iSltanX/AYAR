@@ -1,0 +1,16 @@
+# E-04, 2026-10-10. The owner ran create-identity.sh (first version): the identity was imported,
+# then `security add-trusted-cert -r trustAsRoot -p codeSign` failed:
+#   SecTrustSettingsSetTrustSettings: One or more parameters passed to a function were not valid.
+# (trustAsRoot is for non-root certificates; this one is self-signed.) Then, without any trust setting:
+$ security find-identity -p codesigning | grep AYAR
+  2) 86526C3EC084F4676EECBD8D298C35EAB3278364 "AYAR Local Code Signing" (CSSMERR_TP_NOT_TRUSTED)
+$ codesign --force --sign "AYAR Local Code Signing" e04-selftest     # copy of /usr/bin/true
+exit 0
+$ codesign --verify -v e04-selftest
+e04-selftest: valid on disk
+e04-selftest: satisfies its Designated Requirement
+$ codesign -d -r- e04-selftest
+designated => identifier "e04-selftest" and certificate leaf = H"86526c3ec084f4676eecbd8d298c35eab3278364"
+$ security dump-trust-settings
+SecTrustSettingsCopyCertificates: No Trust Settings were found.
+# Conclusion: no trust setting is needed to sign; the trust step was removed from the script.

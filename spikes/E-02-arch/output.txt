@@ -1,0 +1,18 @@
+$ uname -m
+arm64
+$ sw_vers
+ProductName:		macOS
+ProductVersion:		27.0.1
+BuildVersion:		26A434
+$ sysctl -n machdep.cpu.brand_string
+Apple M4
+$ sysctl -n hw.optional.arm64
+1
+$ sysctl -n sysctl.proc_translated
+0
+$ sysctl -n hw.memsize
+17179869184
+$ date
+2026-10-09 23:04:48 +0300
+$ /usr/libexec/PlistBuddy -c "Print :LSMinimumSystemVersion" spikes/E-01-electron-forge/node_modules/electron/dist/Electron.app/Contents/Info.plist   # Electron 44.7.0
+13.0

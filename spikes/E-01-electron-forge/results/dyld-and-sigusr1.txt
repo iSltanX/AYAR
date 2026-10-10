@@ -1,0 +1,6 @@
+# D-50 / D-52 evidence, 2026-10-10 (Electron 44.7.0). inject.dylib: a constructor that writes a marker file.
+## DYLD_INSERT_LIBRARIES
+path 1 (fuses-only ad-hoc, no hardened runtime): INJECTED  <- positive control
+path 2 (osxSign, hardened runtime, allow-jit + disable-library-validation): not injected
+## SIGUSR1 to the release build's main process (Node starts its inspector on SIGUSR1 unless disabled)
+Debugger listening lines: 0; TCP listeners of the main process after the signal: 0; process after signal: exited

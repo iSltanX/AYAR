@@ -1,0 +1,4 @@
+1791580815132 START "negative-svelte"
+1791580815132 WARNING "Bad.svelte" 5:24 "This reference only captures the initial value of `count`. Did you mean to reference it inside a closure instead?\nhttps://svelte.dev/e/state_referenced_locally"
+1791580815133 ERROR "Bad.svelte" 5:9 "Type 'string' is not assignable to type 'number'."
+1791580815133 COMPLETED 93 FILES 1 ERRORS 1 WARNINGS 1 FILES_WITH_PROBLEMS

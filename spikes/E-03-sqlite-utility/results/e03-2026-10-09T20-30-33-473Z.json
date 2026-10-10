@@ -1,0 +1,209 @@
+{
+  "spike": "E-03",
+  "at": "2026-10-09T20:30:33.473Z",
+  "electron": "44.7.0",
+  "dbDir": "~/Library/Application Support/ayar-spike-e03/e03",
+  "steps": {
+    "open": {
+      "ok": true,
+      "writer": {
+        "pid": 72735,
+        "journal": {
+          "journal_mode": "wal"
+        },
+        "sqlite": "3.53.4",
+        "node": "24.21.0",
+        "warnings": []
+      }
+    },
+    "readersOpen": {
+      "ok": true,
+      "r1": {
+        "pid": 72736,
+        "journal": {
+          "journal_mode": "wal"
+        },
+        "sqlite": "3.53.4",
+        "node": "24.21.0",
+        "warnings": []
+      },
+      "r2": {
+        "pid": 72737,
+        "journal": {
+          "journal_mode": "wal"
+        },
+        "sqlite": "3.53.4",
+        "node": "24.21.0",
+        "warnings": []
+      }
+    },
+    "insert100kWithConcurrentReads": {
+      "ok": true,
+      "insertMs": 72.6,
+      "rowsPerSecond": 1376659,
+      "count": 100000,
+      "reader1": {
+        "samples": 56,
+        "samplesDuringWrite": 29,
+        "errors": 0,
+        "firstError": null,
+        "countsSeen": [
+          0,
+          100000
+        ],
+        "onlyCommittedStates": true,
+        "maxReadMs": 6.11
+      },
+      "reader2": {
+        "samples": 56,
+        "samplesDuringWrite": 29,
+        "errors": 0,
+        "firstError": null,
+        "countsSeen": [
+          0,
+          100000
+        ],
+        "onlyCommittedStates": true,
+        "maxReadMs": 6.1
+      },
+      "filesAfter": {
+        "db": 4096,
+        "-wal": 22767152,
+        "-shm": 65536
+      }
+    },
+    "tenTransactionsWithConcurrentReads": {
+      "ok": true,
+      "count": 200000,
+      "reader1": {
+        "samples": 10,
+        "samplesDuringWrite": 10,
+        "errors": 0,
+        "firstError": null,
+        "countsSeen": [
+          100000,
+          110000,
+          120000,
+          130000,
+          140000,
+          150000,
+          160000,
+          180000,
+          190000
+        ],
+        "onlyCommittedStates": true,
+        "maxReadMs": 12.36
+      }
+    },
+    "killDuringOpenTransaction": {
+      "ok": true,
+      "exitCode": 9,
+      "filesBeforeKill": {
+        "db": 4096,
+        "-wal": 55657112,
+        "-shm": 131072
+      },
+      "count": 200000,
+      "byRun": [
+        {
+          "run": "A",
+          "n": 100000
+        },
+        {
+          "run": "B",
+          "n": 100000
+        }
+      ],
+      "integrity": [
+        "ok"
+      ],
+      "expectedCount": 200000,
+      "recovered": true
+    },
+    "killAfterCommitBeforeCheckpoint": {
+      "ok": true,
+      "exitCode": 9,
+      "filesBeforeKill": {
+        "db": 4096,
+        "-wal": 55657112,
+        "-shm": 131072
+      },
+      "count": 220000,
+      "byRun": [
+        {
+          "run": "A",
+          "n": 100000
+        },
+        {
+          "run": "B",
+          "n": 100000
+        },
+        {
+          "run": "D",
+          "n": 20000
+        }
+      ],
+      "integrity": [
+        "ok"
+      ],
+      "expectedCount": 220000,
+      "recovered": true
+    },
+    "killMidInsert": {
+      "ok": true,
+      "exitCode": 9,
+      "count": 220000,
+      "byRun": [
+        {
+          "run": "A",
+          "n": 100000
+        },
+        {
+          "run": "B",
+          "n": 100000
+        },
+        {
+          "run": "D",
+          "n": 20000
+        }
+      ],
+      "integrity": [
+        "ok"
+      ],
+      "expectedCount": 220000,
+      "recovered": true
+    },
+    "vacuumInto": {
+      "ok": true,
+      "vacuumMs": 119.1,
+      "backupCount": 220000,
+      "backupIntegrity": [
+        "ok"
+      ],
+      "backupSizes": {
+        "db": 49983488,
+        "-wal": null,
+        "-shm": null
+      },
+      "sourceSizes": {
+        "db": 4096,
+        "-wal": 176888112,
+        "-shm": 360448
+      },
+      "readerDuringVacuum": {
+        "samples": 12,
+        "samplesDuringWrite": 12,
+        "errors": 0,
+        "firstError": null,
+        "countsSeen": [
+          220000
+        ],
+        "onlyCommittedStates": true,
+        "maxReadMs": 8.15
+      },
+      "warnings": [],
+      "matches": true
+    }
+  },
+  "ok": true
+}

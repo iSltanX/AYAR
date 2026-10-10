@@ -1,0 +1,19 @@
+typescript-eslint does not support TS 7.0.
+Please see https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-6.0 to run typescript-eslint using the TS 6 API.
+See also https://github.com/typescript-eslint/typescript-eslint/issues/10940 for tracking typescript-eslint's support for TS >=7.1
+
+Oops! Something went wrong! :(
+
+ESLint: 10.12.0
+
+Error: typescript-eslint does not support TS 7.0.
+    at Object.<anonymous> (node_modules/typescript-eslint/dist/index.js:52:11)
+    at Module._compile (node:internal/modules/cjs/loader:1871:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:2002:10)
+    at Module.load (node:internal/modules/cjs/loader:1594:32)
+    at Module._load (node:internal/modules/cjs/loader:1396:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:372:15)
+    at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:244:9)
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:643:26)

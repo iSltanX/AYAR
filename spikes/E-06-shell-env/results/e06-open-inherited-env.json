@@ -1,0 +1,103 @@
+{
+  "spike": "E-06",
+  "at": "2026-10-09T21:11:09.598Z",
+  "buildInfo": {
+    "mode": "e06",
+    "bundleId": "com.bysltan.ayar.spike.e06",
+    "productName": "AYAR Spike E06",
+    "signed": "identity",
+    "buildTag": "",
+    "builtAt": "2026-10-09T21:11:03.399Z"
+  },
+  "launchedFrom": {
+    "ppid": 1
+  },
+  "mainEnv": {
+    "PATH": "/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+    "SHELL": "/bin/zsh",
+    "LANG": null
+  },
+  "probe": {
+    "inheritedPATH": "/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+    "inheritedSHELL": "/bin/zsh",
+    "results": [
+      {
+        "run": 1,
+        "ms": 54.8,
+        "code": 0,
+        "timedOut": false,
+        "parsed": true,
+        "noiseBeforeBytes": 0,
+        "stderr": "",
+        "leftoverProcesses": "",
+        "changedFiles": [],
+        "PATH": "~/.kimi-code/bin:~/.fly/bin:~/.fly/bin:/usr/local/bin:~/.bun/bin:~/.local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/Applications/Little Snitch.app/Contents/Components:/opt/homebrew/bin:~/.cargo/bin",
+        "varCount": 72,
+        "varNamesNotInMinimalRun": 44
+      },
+      {
+        "run": 2,
+        "ms": 48.8,
+        "code": 0,
+        "timedOut": false,
+        "parsed": true,
+        "noiseBeforeBytes": 0,
+        "stderr": "",
+        "leftoverProcesses": "",
+        "changedFiles": [],
+        "PATH": "~/.kimi-code/bin:~/.fly/bin:~/.fly/bin:/usr/local/bin:~/.bun/bin:~/.local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/Applications/Little Snitch.app/Contents/Components:/opt/homebrew/bin:~/.cargo/bin",
+        "varCount": 72,
+        "varNamesNotInMinimalRun": 44
+      },
+      {
+        "run": 3,
+        "ms": 47,
+        "code": 0,
+        "timedOut": false,
+        "parsed": true,
+        "noiseBeforeBytes": 0,
+        "stderr": "",
+        "leftoverProcesses": "",
+        "changedFiles": [],
+        "PATH": "~/.kimi-code/bin:~/.fly/bin:~/.fly/bin:/usr/local/bin:~/.bun/bin:~/.local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/Applications/Little Snitch.app/Contents/Components:/opt/homebrew/bin:~/.cargo/bin",
+        "varCount": 72,
+        "varNamesNotInMinimalRun": 44
+      },
+      {
+        "run": 4,
+        "ms": 41.7,
+        "code": 0,
+        "timedOut": false,
+        "parsed": true,
+        "noiseBeforeBytes": 0,
+        "stderr": "",
+        "leftoverProcesses": "",
+        "changedFiles": [],
+        "PATH": "~/.kimi-code/bin:~/.fly/bin:~/.fly/bin:/usr/local/bin:~/.bun/bin:~/.local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/Applications/Little Snitch.app/Contents/Components:/opt/homebrew/bin:~/.cargo/bin",
+        "varCount": 72,
+        "varNamesNotInMinimalRun": 44
+      },
+      {
+        "run": 5,
+        "ms": 42.9,
+        "code": 0,
+        "timedOut": false,
+        "parsed": true,
+        "noiseBeforeBytes": 0,
+        "stderr": "",
+        "leftoverProcesses": "",
+        "changedFiles": [],
+        "PATH": "~/.kimi-code/bin:~/.fly/bin:~/.fly/bin:/usr/local/bin:~/.bun/bin:~/.local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/Applications/Little Snitch.app/Contents/Components:/opt/homebrew/bin:~/.cargo/bin",
+        "varCount": 72,
+        "varNamesNotInMinimalRun": 44
+      }
+    ]
+  },
+  "whence": {
+    "ms": 593.2,
+    "code": 0,
+    "out": "node is a shell function from ~/.zshrc\nnpm is a shell function from ~/.zshrc\nnpx is a shell function from ~/.zshrc\npnpm is a shell function from ~/.zshrc\ncorepack is a shell function from ~/.zshrc\npython3 is /usr/bin/python3\nuv not found\nbun is ~/.bun/bin/bun\ncargo is ~/.cargo/bin/cargo\ngit is /usr/bin/git\n---\nnode => /opt/homebrew/bin/node\nnpm => /opt/homebrew/bin/npm\nnpx => /opt/homebrew/bin/npx\npnpm => \ncorepack => /opt/homebrew/bin/corepack\npython3 => /usr/bin/python3\nuv => \nbun => ~/.bun/bin/bun\ncargo => ~/.cargo/bin/cargo\ngit => /usr/bin/git\n---\nv24.16.0\n",
+    "stderr": ""
+  },
+  "note": "varNames removed: the app was opened with open(1) from the Claude Code shell and inherited its environment; only counts are kept."
+}

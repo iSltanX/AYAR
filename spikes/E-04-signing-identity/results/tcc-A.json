@@ -1,0 +1,70 @@
+{
+  "start": "2026-10-10 07:25:52",
+  "prefix": "com.bysltan.ayar.spike.e04",
+  "requests": 5,
+  "prompted": 1,
+  "byService": {
+    "kTCCServiceListenEvent": {
+      "requests": 1,
+      "prompted": 0,
+      "denied": 0
+    },
+    "kTCCServiceSystemPolicyAllFiles": {
+      "requests": 2,
+      "prompted": 0,
+      "denied": 2
+    },
+    "kTCCServiceSystemPolicyDocumentsFolder": {
+      "requests": 2,
+      "prompted": 1,
+      "denied": 0
+    }
+  },
+  "requestsDetail": [
+    {
+      "time": "2026-10-10 07:26:03.573",
+      "service": "kTCCServiceListenEvent",
+      "responsible": "com.bysltan.ayar.spike.e04",
+      "accessing": "com.bysltan.ayar.spike.e04.helper spikes/E-01-electron-forge/out/AYAR Spike E04-darwin-arm64/AYAR Spike E04.app/Contents/Frameworks/AYAR Spike E04 Helper.app/Contents/MacOS/AYAR Spike E04 Helper",
+      "authValue": 1,
+      "authReason": 5,
+      "prompted": false
+    },
+    {
+      "time": "2026-10-10 07:26:03.800",
+      "service": "kTCCServiceSystemPolicyAllFiles",
+      "responsible": "com.bysltan.ayar.spike.e04",
+      "accessing": "com.bysltan.ayar.spike.e04.helper spikes/E-01-electron-forge/out/AYAR Spike E04-darwin-arm64/AYAR Spike E04.app/Contents/Frameworks/AYAR Spike E04 Helper.app/Contents/MacOS/AYAR Spike E04 Helper",
+      "authValue": 0,
+      "authReason": 5,
+      "prompted": false
+    },
+    {
+      "time": "2026-10-10 07:26:03.818",
+      "service": "kTCCServiceSystemPolicyDocumentsFolder",
+      "responsible": "com.bysltan.ayar.spike.e04",
+      "accessing": "com.bysltan.ayar.spike.e04.helper spikes/E-01-electron-forge/out/AYAR Spike E04-darwin-arm64/AYAR Spike E04.app/Contents/Frameworks/AYAR Spike E04 Helper.app/Contents/MacOS/AYAR Spike E04 Helper",
+      "authValue": 2,
+      "authReason": 2,
+      "prompted": true
+    },
+    {
+      "time": "2026-10-10 07:26:08.964",
+      "service": "kTCCServiceSystemPolicyAllFiles",
+      "responsible": "com.bysltan.ayar.spike.e04",
+      "accessing": "com.apple.cat /bin/cat",
+      "authValue": 0,
+      "authReason": 5,
+      "prompted": false
+    },
+    {
+      "time": "2026-10-10 07:26:08.982",
+      "service": "kTCCServiceSystemPolicyDocumentsFolder",
+      "responsible": "com.bysltan.ayar.spike.e04",
+      "accessing": "com.apple.cat /bin/cat",
+      "authValue": 2,
+      "authReason": 2,
+      "prompted": false
+    }
+  ]
+}

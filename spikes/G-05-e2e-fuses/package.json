@@ -1,0 +1,11 @@
+{
+  "name": "ayar-spike-g05",
+  "version": "0.0.1",
+  "private": true,
+  "description": "DEV-0 spike G-05: Playwright _electron against the packaged app with final fuses",
+  "type": "module",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "playwright-core": "1.64.0"
+  }
+}
