@@ -1,0 +1,17 @@
+# إعداد Gitleaks لفحص مشاريع الاختبار نفسها (DEV-1): القواعد الافتراضية، ويُستثنى ما ليس من شيفرة المشروع.
+title = "ayar-fixtures"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "مخرجات التثبيت والبناء وملفات القفل (بصمات integrity ليست أسرارًا)"
+paths = [
+  '''(^|/)node_modules/''',
+  '''(^|/)dist/''',
+  '''(^|/)coverage/''',
+  '''(^|/)\.venv/''',
+  '''pnpm-lock\.yaml$''',
+  '''package-lock\.json$''',
+  '''uv\.lock$''',
+]

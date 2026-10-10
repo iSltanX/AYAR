@@ -1,0 +1,15 @@
+{
+  "$comment": "صندوق أدوات مشاريع الاختبار: مجلد خارج المستودع تُثبَّت فيه الأدوات بإصدارات مثبتة (ORG-09). يُبنى بـ fixtures/tools/bootstrap-toolchain.sh.",
+  "home": "~/.cache/ayar-fixtures-toolchain",
+  "path_dirs": ["~/.cache/ayar-fixtures-toolchain/bin", "~/.cache/ayar-fixtures-toolchain/py/bin"],
+  "pins": {
+    "node": "24.16.0 (يشغّل مشروعات pnpm؛ يجب أن يكون pnpm 12.8.1 في المجلد نفسه)",
+    "pnpm": "12.8.1",
+    "uv": "0.13.0",
+    "semgrep": "1.180.0",
+    "osv-scanner": "2.6.0 (SHA256 98c460dcd37de25819babd757d04542045b6243113e209edcd4d89fedb0256b4، darwin_arm64)",
+    "lychee": "0.24.2 (lychee-aarch64-apple-darwin.tar.gz)",
+    "gitleaks": "8.30.1 (مثبت مسبقًا في النظام)",
+    "playwright-chromium": "Chromium 156.0.8078.4 عبر @playwright/test 1.64.0"
+  }
+}
