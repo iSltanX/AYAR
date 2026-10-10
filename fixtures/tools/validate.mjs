@@ -18,6 +18,7 @@ import { FIXTURES_ROOT, readJson, loadProject, resolveFiles, materialize } from 
 
 const schema = readJson(path.join(FIXTURES_ROOT, 'schema', 'fixture-expect-1.schema.json'));
 const errors = [];
+const tmpDirs = [];
 let checked = 0;
 
 // ── مدقق مخطط مصغر: يكفي المجموعة المستعملة في fixture-expect/1 ──
@@ -65,7 +66,7 @@ function check(value, sch, where, out) {
 
 function fail(msg) { errors.push(msg); }
 
-function validateExpected(id, variant, expectedPath, tree, role) {
+function validateExpected(id, variant, expectedPath, tree, role, manifest = null) {
   const where = `${id}/${variant}`;
   let doc;
   try { doc = readJson(expectedPath); } catch (e) { fail(`${where}: تعذرت قراءة expected.json (${e.message})`); return; }
@@ -85,6 +86,11 @@ function validateExpected(id, variant, expectedPath, tree, role) {
     if (['أخفق', 'تحذير', 'متذبذب'].includes(e.result) && e.confidence === null && !e.reason) fail(`${w}: ${e.result} بلا درجة ثبوت ولا سبب مكتوب`);
     if (['اجتاز', 'غير منطبق', 'غير مضمّن', 'ناقص', 'ناقص إعداد'].includes(e.result) && e.confidence !== null && !(e.result === 'اجتاز' && e.confidence === 'اقتراح تحسين')) fail(`${w}: ${e.result} لا تحمل درجة ثبوت (عدا ملاحظة «اقتراح تحسين» على اجتاز)`);
     if (isClean && !['اجتاز', 'غير منطبق', 'غير مضمّن', 'ناقص إعداد', 'ناقص'].includes(e.result)) fail(`${w}: النسخة السليمة لا يجوز أن تتوقع ${e.result}`);
+    if (e.location?.history !== undefined) {
+      const ok = manifest && [manifest.first_commit, manifest.head].some((c) => c.startsWith(e.location.history));
+      if (!ok) fail(`${w}: التزام التاريخ ${e.location.history} لا يطابق MANIFEST.json المولَّد`);
+      return;
+    }
     if (e.location && tree) {
       const src = tree.get(e.location.path);
       if (!src) { fail(`${w}: الموضع ${e.location.path} غير موجود في النسخة المركّبة`); return; }
@@ -118,6 +124,7 @@ function validateProject(id) {
   if (meta.kind === 'overlay' && !declared.includes('good')) fail(`${id}: النسخة السليمة good غير معلنة`);
 
   let genTree = null;
+  let genManifest = null;
   const roles = {};
   for (const v of names) {
     const vdir = path.join(vroot, v);
@@ -141,20 +148,23 @@ function validateProject(id) {
     else {
       if (!genTree) {
         const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ayar-fx-validate-'));
+        tmpDirs.push(tmp);
         const dest = path.join(tmp, 'out');
-        materialize(id, v, dest);
+        const rootDir = materialize(id, v, dest);
+        const mf = path.join(dest, 'MANIFEST.json');
+        genManifest = fs.existsSync(mf) ? readJson(mf) : null;
         genTree = new Map();
         (function w(rel = '') {
-          for (const e of fs.readdirSync(path.join(dest, rel), { withFileTypes: true })) {
+          for (const e of fs.readdirSync(path.join(rootDir, rel), { withFileTypes: true })) {
             const r = rel ? `${rel}/${e.name}` : e.name;
             if (e.isSymbolicLink()) continue;
-            if (e.isDirectory()) { if (e.name !== '.git') w(r); } else genTree.set(r, path.join(dest, r));
+            if (e.isDirectory()) { if (e.name !== '.git') w(r); } else genTree.set(r, path.join(rootDir, r));
           }
         })();
       }
       tree = genTree;
     }
-    validateExpected(id, v, expected, tree, roles[v] ?? (v === 'good' ? 'clean' : 'defect'));
+    validateExpected(id, v, expected, tree, roles[v] ?? (v === 'good' ? 'clean' : 'defect'), genManifest);
   }
 }
 
@@ -167,6 +177,7 @@ if (only && ids.length === 0) { console.error(`مشروع غير معروف: ${o
 for (const id of ids) {
   try { validateProject(id); } catch (e) { fail(`${id}: ${e.message}`); }
 }
+for (const d of tmpDirs) fs.rmSync(d, { recursive: true, force: true });
 if (errors.length) {
   console.error(errors.map((e) => `✗ ${e}`).join('\n'));
   console.error(`\nأخفق التحقق: ${errors.length} مخالفة في ${ids.length} مشروع`);

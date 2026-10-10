@@ -11,5 +11,9 @@ export default {
       run('tracked-diff', 'git diff --stat', 'data/runs.json تعدّل (runs: 0 ← 1)', { match: ['data/runs\\.json'] }),
       run('nvmrc', 'cat .nvmrc && (ls "$HOME/.nvm/versions/node" | grep -c "^v22\\.11\\.0$" || true)', '.nvmrc يطلب 22.11.0 وهو غير مثبت (عدد النسخ المطابقة 0)', { match: ['^22\\.11\\.0$', '^0$'] }),
     ],
+    'pnpm-unpinned': [
+      run('declared', 'node -e "console.log(\'PM_DECLARED=\' + require(\'./package.json\').packageManager)"', 'packageManager يطلب pnpm@9.15.4 (والمثبت 12.8.1)', { match: ['PM_DECLARED=pnpm@9\\.15\\.4'] }),
+      run('pnpm-offline', 'pnpm --version', 'pnpm (عبر Corepack) بلا شبكة لا ينزّل pnpm@9.15.4: يخرج بخطأ «Network access disabled» لا بتنزيل صامت (AT-31)', { exit: 1, env: { COREPACK_ENABLE_NETWORK: '0' }, match: ['Network access disabled by the environment', 'pnpm-9\\.15\\.4'] }),
+    ],
   },
 };

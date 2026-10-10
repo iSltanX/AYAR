@@ -17,16 +17,9 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { FIXTURES_ROOT, materialize, readJson } from './materialize.mjs';
+import { TC_HOME, toolPath } from './toolpath.mjs';
 
 const RESULTS = path.join(FIXTURES_ROOT, 'sanity-results');
-const toolchain = readJson(path.join(FIXTURES_ROOT, 'tools', 'toolchain.json'));
-const TC_HOME = (toolchain.home ?? '').replace(/^~/, os.homedir());
-
-export function toolPath() {
-  const extra = [path.dirname(process.execPath), ...(toolchain.path_dirs ?? []).map((d) => d.replace(/^~/, os.homedir()))];
-  return [...extra, process.env.PATH].join(path.delimiter);
-}
-
 /** ينفّذ أمرًا في صدفة في مجموعة عمليات مستقلة، ويقتل المجموعة كلها عند انتهاء المهلة (لا عمليات يتيمة). */
 function sh(cmd, cwd, { env = {}, timeout = 180 } = {}) {
   return new Promise((resolve) => {

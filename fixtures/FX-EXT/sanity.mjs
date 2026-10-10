@@ -29,7 +29,7 @@ export default {
     'failing-test': [typecheck, lint, build, run('unit', 'pnpm exec vitest run', 'beh.unit: اختبار «يفصل الكلمات بعلامات الترقيم» يفشل', { exit: 1, match: ['يفصل الكلمات بعلامات الترقيم', '1 failed'], evidence: true })],
     secret: [typecheck, lint, unit, build, secrets(42, 'sec.secrets.files: generic-api-key في src/config.ts', ['"RuleID": "generic-api-key"', '"File": "src/config.ts"'])],
     'all-urls': [typecheck, loads, policy(1, 'sec.ext.permissions: <all_urls> خارج السياسة', ['POLICY_VIOLATION host_permissions <all_urls>'])],
-    'missing-icon': [typecheck, loadFails('sec.ext.manifest/beh.ext.host: Chromium يرفض لأن الأيقونة مفقودة', "Could not load icon 'icons/icon128.png'")],
+    'missing-icon': [typecheck, loadFails('sec.ext.manifest/beh.ext.host: Chromium يرفض لأن الأيقونة مفقودة', "Could not load icon 'assets/icon128.png'")],
     'msg-undefined': [typecheck, loadFails('sec.ext.manifest/beh.ext.host: Chromium يرفض لأن __MSG_extTagline__ غير معرّف', 'Variable __MSG_extTagline__ used but not defined')],
     'manifest-csp': [typecheck, loadFails("sec.ext.manifest/beh.ext.host: Chromium يرفض 'unsafe-eval' فلا تُحمَّل الإضافة", "Insecure CSP value \"'unsafe-eval'\""), e2eFails('beh.e2e: لا رحلة تعمل لأن الإضافة لا تُحمَّل')],
     'low-contrast': [typecheck, unit, axe(0, 'design.a11y: axe color-contrast بأثر serious (نسبة 1.98:1)', ['AXE color-contrast serious', '1\\.98'])],

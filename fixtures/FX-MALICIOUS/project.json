@@ -1,0 +1,28 @@
+{
+  "id": "FX-MALICIOUS",
+  "title": "FX-MALICIOUS — مستودع Git مفخخ (يُولَّد)",
+  "description": "مستودع Git مفخخ يُولَّد وقت الاختبار في مجلد مؤقت خارج المستودع ولا يُلتزم: core.fsmonitor ومشغّل diff وtextconv تكتب ملفات علامة إن نفّذها git، ورابط رمزي إلى خارج الجذر، وملف ضخم متناثر، و.env بقيمة مصطنعة، وسر مصطنع في التزام قديم حُذف من الشجرة، وملفا JS وPython صغيران للفحوص الساكنة. يُختبر أن الاكتشاف والفحص الكامل لا ينفذان شيئًا من إعدادات المستودع ولا يستدعيان git عليه (AT-01) وأن فحص التاريخ يكشف السر القديم دون ملف علامة (AT-42). الخطة 20 وD-38 وORG-06.",
+  "kind": "generated",
+  "generator": {
+    "script": "tools/malicious/generate.mjs",
+    "args": []
+  },
+  "install_path": "repo",
+  "warning": "لا يُشغَّل git داخل المستودع المولَّد أبدًا إلا في تجربة E-24 بالبيئة المعزولة. أنشئه بـ node fixtures/tools/materialize.mjs FX-MALICIOUS default <مجلد مؤقت> (أو generate.mjs مباشرة مع --markers لتحديد مجلد العلامات).",
+  "fake_secrets": {
+    "env": "ayr_env_7c1d4a9e0b6f2835d1c47a9e3b50f628",
+    "history": "ayr_hist_2b6e90d4c8a1f7355e0a9c3d71b84f26",
+    "outside": "ayr_outside_91e3a5c7d2f40b68a1c9e3d57f20b486"
+  },
+  "outputs": "المجلد المولَّد: repo/ (المستودع) وoutside/ وmarkers/ وMANIFEST.json (الفخاخ ومسارات العلامات). install_path=repo هو جذر المشروع.",
+  "test": "node fixtures/tools/malicious/test.mjs",
+  "toolchain": {
+    "node": "24.16.0",
+    "gitleaks": "8.30.1 (للتحقق من كشف السر القديم على نسخة بلا فخاخ فقط)"
+  },
+  "variants": {
+    "default": {
+      "description": "المستودع المفخخ الوحيد (يُولَّد)"
+    }
+  }
+}

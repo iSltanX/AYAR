@@ -90,7 +90,7 @@ export function materialize(id, variant, dest) {
     const gen = path.join(FIXTURES_ROOT, meta.generator.script);
     const r = spawnSync(process.execPath, [gen, ...(meta.generator.args ?? []), '--out', dest], { stdio: 'inherit' });
     if (r.status !== 0) throw new Error(`فشل المولّد ${meta.generator.script}`);
-    return dest;
+    return path.join(dest, meta.install_path ?? '');
   }
   const root = path.join(dest, installPath(id, variant));
   for (const [rel, src] of resolveFiles(id, variant)) {

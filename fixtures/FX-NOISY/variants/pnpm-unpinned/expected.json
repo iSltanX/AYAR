@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-NOISY",
+  "variant": "pnpm-unpinned",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "reason": "الاختبارات نفسها تنجح؛ والمسألة جاهزية مدير الحزم"
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "AT-31-pm-readiness",
+      "statement": "نسخة pnpm المطلوبة (9.15.4) غير مثبتة فتظهر «نقص جاهزية: إصدار مدير الحزم غير مثبت» لا تنزيلًا: Corepack لا ينزّل شيئًا (COREPACK_ENABLE_NETWORK=0)، ولا تثبيت تلقائي من مدير إصدارات، وصفر اتصالات من عِيَار وأدواته",
+      "acceptance": "AT-31"
+    }
+  ]
+}

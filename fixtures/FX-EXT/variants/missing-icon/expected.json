@@ -11,7 +11,7 @@
       "location": {
         "path": "public/manifest.json",
         "line": 10,
-        "anchor": "icons/icon128.png"
+        "anchor": "assets/icon128.png"
       },
       "confidence": "مخالفة مثبتة",
       "origin": "المشروع",
@@ -25,11 +25,11 @@
       "location": {
         "path": "public/manifest.json",
         "line": 10,
-        "anchor": "icons/icon128.png"
+        "anchor": "assets/icon128.png"
       },
       "confidence": "مخالفة مثبتة",
       "origin": "المشروع",
-      "reason": "Chromium يرفض التحميل: Could not load icon 'icons/icon128.png' (D-DEV1-01)"
+      "reason": "Chromium يرفض التحميل: Could not load icon 'assets/icon128.png' (D-DEV1-01)"
     },
     {
       "check": "sec.ext.permissions",

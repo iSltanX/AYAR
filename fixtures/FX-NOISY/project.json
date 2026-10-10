@@ -1,11 +1,14 @@
 {
   "id": "FX-NOISY",
   "title": "FX-NOISY — آثار جانبية وسكربت مركب",
-  "description": "مشروع بلا عيوب سلوك: اختباره يكتب ملفات جديدة في المستودع (.cache/ وreports/) ويعدّل ملفًا متتبعًا (data/runs.json)، وسكربت test مركب (node scripts/prepare.mjs && node --test)، و.nvmrc يطلب Node 22.11.0 غير المثبت على الجهاز. لاختبار رصد الآثار الجانبية والجاهزية والسكربت المركب. الخطة 20.",
+  "description": "مشروع بلا عيوب سلوك: اختباره يكتب ملفات جديدة في المستودع (.cache/ وreports/) ويعدّل ملفًا متتبعًا (data/runs.json)، وسكربت test مركب (node scripts/prepare.mjs && node --test)، و.nvmrc يطلب Node 22.11.0 غير المثبت على الجهاز. لاختبار رصد الآثار الجانبية والجاهزية والسكربت المركب. الخطة 20. ونسخة pnpm-unpinned: packageManager بنسخة pnpm غير مثبتة (AT-31).",
   "kind": "overlay",
   "variants": {
     "good": {
       "description": "النسخة الوحيدة: لا عيوب سلوك. تُرصد آثارها الجانبية وجاهزية Node وسكربتها المركب."
+    },
+    "pnpm-unpinned": {
+      "description": "المشروع نفسه مع packageManager يطلب pnpm@9.15.4 وهو غير مثبت على الجهاز (المثبت 12.8.1). لاختبار AT-31: نقص جاهزية لا تنزيل تلقائي."
     }
   },
   "prepare": [
