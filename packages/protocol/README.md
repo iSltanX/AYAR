@@ -1,0 +1,125 @@
+# @ayar/protocol
+
+عقود الرسائل بين الواجهة والعملية الرئيسية والمحرك (الخطة 6.5، D-29). **بلا Node:** الواجهة تستوردها، فلا يدخلها `node:*` ولا `electron` (قاعدة في `eslint.config.js`).
+
+## القواعد
+
+- **الإصدار:** `PROTOCOL_VERSION` في `src/version.ts`. يتصافح المضيف (العملية الرئيسية أو `tools/cli`) والمحرك عليه (`hello` ثم `welcome` أو `refuse`)، ويفحص كل طرف الرقم الرئيسي بنفسه. واختلافه يوقف الاتصال بالرمز `protocol_mismatch`. **وتغيير عقد قائم يرفع الرقم الرئيسي، وإضافة عقد ترفع الثانوي.**
+- **ملف لكل مجال:** الأوامر في `src/commands/<المجال>.ts` والأحداث في `src/events/<المجال>.ts`، ويجمعها `index.ts` في كل مجلد. فالمرحلتان المتوازيتان لا تلتقيان إلا في سطر الفهرس.
+- **التحقق في الطرفين:** `parseHostMessage` في المحرك، و`parseEngineMessage` و`ProtocolClient` في المضيف (ومنه نتيجة كل أمر مقابل مخططه). وما لا يطابق يُرفض ويُسجَّل. ورسائل الخطأ تذكر المسار ونوع المخالفة، لا القيمة المرفوضة.
+- **الرموز والمنح:** الواجهة لا ترسل مسارًا أبدًا. ترسل رمزًا (`sel_` و`dst_` و`src_` و`cfm_`) تصدره العملية الرئيسية بعد نافذة نظام، أو بعد معاينة (`setup.preview` و`tools.preview`)، أو بعد تأكيد الواجهة لإجراء مدمّر (`confirm.issue`). وعند تمرير الأمر إلى المحرك تستبدل العملية الرئيسية بالرمز «منحة» (`grants`) تحمل المسار أو ربط التأكيد بالأمر وهدفه. والمحرك يرفض الأمر دون منحه (`checkGrants`).
+- **الأحداث:** مرقمة في «مجرى» (`stream`) لكل جلسة محرك، وللمشرف مجراه. الفجوة في الترقيم أو تبدّل المجرى تطلق إعادة المزامنة في الجسر (`bridge.resync`).
+- **`report.copied`** سجل تدقيق في `audit_log`، لا حدث (G-21). والأحداث الناقصة (تقدم التجهيز، وحالات فحوص النموذج والبطاقات) تضيفها مراحلها بإصدار ثانوي.
+- **عقود المجال** (`DiscoverySnapshot` و`RunPlan` وغيرها) تضيفها مراحلها. ونتيجة `z.unknown()` في الجدول تعني أن عقد النتيجة لم يُعرَّف بعد.
+
+## ملكية الأوامر (G-19)
+
+مولّد من السجل نفسه (`ownershipMarkdown()`)، واختبار `test/readme.test.ts` يمنع افتراقهما. «المنفّذ» `main` يعني أن العملية الرئيسية تنفذه بنفسها. و«من يستدعيه» `host` يعني أن الواجهة لا تستطيعه. والأوامر الثمانية خارج 6.5 قرار D-DEV3-03.
+
+| الأمر | المالك | المنفّذ | من يستدعيه | المنح المطلوبة | المرحلة |
+|---|---|---|---|---|---|
+| `project.add` | C-05 | engine | renderer | selection | DEV-4 |
+| `project.list` | C-05 | engine | renderer | — | DEV-4 |
+| `project.get` | C-05 | engine | renderer | — | DEV-4 |
+| `project.rescan` | C-05 | engine | renderer | — | DEV-4 |
+| `project.relocate` | C-05 | engine | renderer | selection | DEV-4 |
+| `project.remove` | C-05 | engine | renderer | confirmation | DEV-4 |
+| `project.setTrust` | C-05 | engine | renderer | — | DEV-4 |
+| `profile.propose` | C-09 | engine | renderer | — | DEV-4 |
+| `profile.get` | C-09 | engine | renderer | — | DEV-4 |
+| `profile.update` | C-09 | engine | renderer | — | DEV-4 |
+| `profile.approve` | C-09 | engine | renderer | — | DEV-4 |
+| `profile.export` | C-09 | engine | renderer | destination | DEV-4 |
+| `profile.import` | C-09 | engine | renderer | source | DEV-4 |
+| `readiness.evaluate` | C-10 | engine | renderer | — | DEV-5 |
+| `setup.preview` | C-11 | engine | renderer | — | DEV-5 |
+| `setup.execute` | C-11 | engine | renderer | confirmation | DEV-5 |
+| `run.plan` | C-10 | engine | renderer | — | DEV-5 |
+| `run.start` | C-12 | engine | renderer | — | DEV-5 |
+| `run.cancel` | C-12 | engine | renderer | — | DEV-5 |
+| `run.rerun` | C-10 | engine | renderer | — | DEV-5 |
+| `run.continueRound` | C-10 | engine | renderer | — | DEV-5 |
+| `runs.keep` | C-17 | engine | renderer | — | DEV-5 |
+| `runs.delete` | C-17 | engine | renderer | confirmation | DEV-5 |
+| `groups.save` | C-10 | engine | renderer | — | DEV-5 |
+| `groups.list` | C-10 | engine | renderer | — | DEV-5 |
+| `groups.delete` | C-10 | engine | renderer | — | DEV-5 |
+| `results.query` | C-17 | engine | renderer | — | DEV-6 |
+| `finding.get` | C-17 | engine | renderer | — | DEV-6 |
+| `evidence.token` | C-17 | engine | renderer | — | DEV-5 |
+| `review.record` | C-16 | engine | renderer | — | DEV-9 |
+| `baseline.approve` | C-14 | engine | renderer | — | DEV-7 |
+| `report.build` | C-21 | engine | renderer | — | DEV-9 |
+| `clipboard.copy` | C-01 | main | renderer | — | DEV-9 |
+| `tasks.list` | C-20 | engine | renderer | — | DEV-8 |
+| `task.create` | C-20 | engine | renderer | — | DEV-8 |
+| `task.update` | C-20 | engine | renderer | — | DEV-8 |
+| `advisor.suggest` | C-20 | engine | renderer | — | DEV-8 |
+| `report.export` | C-23 | engine | renderer | destination | DEV-9 |
+| `aiChecks.needs` | C-25 | engine | renderer | — | DEV-9 |
+| `aiChecks.provideInput` | C-25 | engine | renderer | — | DEV-9 |
+| `aiChecks.generate` | C-25 | engine | renderer | — | DEV-9 |
+| `aiChecks.save` | C-25 | engine | renderer | destination | DEV-9 |
+| `aiChecks.importResults` | C-25 | engine | renderer | — | DEV-9 |
+| `compare.runs` | C-22 | engine | renderer | — | DEV-9 |
+| `tools.list` | C-11 | engine | renderer | — | DEV-5 |
+| `tools.preview` | C-11 | engine | renderer | — | DEV-5 |
+| `tools.install` | C-11 | engine | renderer | confirmation | DEV-5 |
+| `tools.verify` | C-11 | engine | renderer | — | DEV-5 |
+| `tools.remove` | C-11 | engine | renderer | confirmation | DEV-5 |
+| `settings.get` | C-17 | engine | renderer | — | DEV-3 |
+| `settings.set` | C-17 | engine | renderer | — | DEV-3 |
+| `data.purge` | C-17 | engine | renderer | confirmation | DEV-12 |
+| `dialog.pickFolder` | C-01 | main | renderer | — | DEV-3 |
+| `dialog.pickDestination` | C-01 | main | renderer | — | DEV-3 |
+| `dialog.pickSource` | C-01 | main | renderer | — | DEV-3 |
+| `confirm.issue` | C-01 | main | renderer | — | DEV-3 |
+| `engine.status` | C-01 | main | renderer | — | DEV-3 |
+| `engine.restart` | C-01 | main | renderer | — | DEV-3 |
+| `internal.clipboardText` | C-21 | engine | host | — | DEV-9 |
+| `internal.recordCopy` | C-17 | engine | host | — | DEV-9 |
+
+## ملكية الأحداث
+
+| الحدث | المالك | المرحلة |
+|---|---|---|
+| `discovery.progress` | C-06 | DEV-4 |
+| `discovery.done` | C-06 | DEV-4 |
+| `run.state` | C-12 | DEV-5 |
+| `check.state` | C-12 | DEV-5 |
+| `check.progress` | C-12 | DEV-5 |
+| `check.log` | C-12 | DEV-5 |
+| `run.summary` | C-16 | DEV-6 |
+| `finding.provisional` | C-15 | DEV-6 |
+| `finding.final` | C-16 | DEV-6 |
+| `engine.health` | C-04 | DEV-3 |
+
+## اتحاد مصفوفة الواجهات (G-18)
+
+اتحاد عمودي «يزوّد» و«يستهلك من» في مصفوفة الخطة (القسم 8): تُعد A مزوّدًا لـ B إن ذكرتها إحدى الخانتين. والعلامة \* على علاقة وردت في خانة واحدة فقط (28 علاقة). ونصوص «العلاقات» في المكونات غير موجّهة، فلا تضيف اتجاهًا. وصفّا C-04 (يزوّد كل مكونات المجال ويستهلك من C-01) وC-17 («معظم المكونات» في الخانتين) لا يُفصَّلان.
+
+| المكوّن | يزوّد (الاتحاد) | يستهلك من (الاتحاد) |
+|---|---|---|
+| C-01 | C-02، C-04، C-05\*، C-12\*، C-14، C-18، C-23\* | C-04، C-17، C-21\* |
+| C-02 | C-03 | C-01 |
+| C-03 | المستخدم | C-02، C-10\*، C-19\*، C-20\*، C-21\*، C-22\*، C-24، C-25\* |
+| C-05 | C-06، C-17 | C-01\*، C-04 |
+| C-06 | C-07، C-09، C-10\*، C-13، C-17، C-20، C-25\* | C-05، C-08 |
+| C-07 | C-09، C-10، C-11\*، C-12، C-18 | C-06، C-08\*، C-11\* |
+| C-08 | C-06، C-07\*، C-09، C-10، C-11، C-13، C-15، C-16، C-18\*، C-19، C-20، C-21، C-24، C-25 | يُحمَّل عند الإقلاع |
+| C-09 | C-10، C-12\*، C-13\*، C-16، C-19 | C-06، C-07، C-08، C-20 |
+| C-10 | C-03\*، C-12 | C-06\*، C-07، C-08، C-09، C-11، C-17، C-20 |
+| C-11 | C-07\*، C-10، C-12، C-14، C-15 | C-07\*، C-08، C-17 |
+| C-12 | C-13\*، C-14، C-15، C-16، C-17 | C-01\*، C-07، C-09\*، C-10، C-11، C-15\*، C-18 |
+| C-13 | C-16، C-20 | C-06، C-08، C-09\*، C-12\*، C-17 |
+| C-14 | C-15\*، C-16، C-17 | C-01، C-11، C-12 |
+| C-15 | C-12\*، C-16 | C-08، C-11، C-12، C-14\*، C-18 |
+| C-16 | C-17، C-19، C-20، C-21، C-22، C-25\* | C-08، C-09، C-12، C-13، C-14، C-15، C-17، C-22، C-25\* |
+| C-18 | C-12، C-15، C-17، C-21، C-23، C-25\* | C-01، C-07، C-08\* |
+| C-19 | C-03\*، C-17، C-22 | C-08، C-09، C-16، C-22\* |
+| C-20 | C-03\*، C-09، C-10، C-21، C-25\* | C-06، C-08، C-13، C-16، C-17 |
+| C-21 | C-01\*، C-03\*، C-17، C-23\* | C-08، C-16، C-18، C-20، C-24، C-25 |
+| C-22 | C-03\*، C-16، C-19\* | C-16، C-17، C-19، C-25\* |
+| C-23 | المستخدم | C-01\*، C-17، C-18، C-21\*، C-24 |
+| C-24 | C-03، C-21، C-23، C-25 | C-08 |
+| C-25 | C-03\*، C-16\*، C-17، C-21، C-22\* | C-06\*، C-08، C-16\*، C-18\*، C-20\*، C-24 |
