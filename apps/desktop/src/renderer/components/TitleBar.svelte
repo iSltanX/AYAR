@@ -58,7 +58,7 @@
         icon={dir === 'rtl' ? 'panel-left' : 'panel-right'}
         label={t('controls.inspectorToggle')}
         aria-pressed={inspectorOpen}
-        aria-controls={inspectorId}
+        aria-controls={inspectorOpen ? inspectorId : undefined}
         onclick={() => oninspectortoggle?.()}
       />
     </div>

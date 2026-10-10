@@ -178,7 +178,7 @@
   }
   .header-row {
     display: grid;
-    grid-template-columns: var(--finding-columns);
+    grid-template-columns: var(--finding-columns, 28px 64px 112px minmax(0, 1fr) 196px 80px 64px);
     column-gap: var(--space-8);
     align-items: center;
     height: 33px;

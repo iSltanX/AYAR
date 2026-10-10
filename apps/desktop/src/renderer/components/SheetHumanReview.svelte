@@ -62,7 +62,7 @@
   // Reset on every opening and when what is reviewed changes (Sheet.svelte contract).
   const shouldReset = sheetResetter();
   $effect.pre(() => {
-    if (shouldReset(open, sheetResetKey(variant, subject, scope, claim))) {
+    if (shouldReset(open, sheetResetKey(variant, subject, claim))) {
       untrack(() => {
         decision = REVIEW_DECISIONS[variant][0][0];
         note = '';

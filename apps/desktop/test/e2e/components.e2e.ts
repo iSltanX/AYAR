@@ -4,7 +4,7 @@
 //   while open; a glossary term shows its tooltip on keyboard focus and hides it on Escape; all under the CSP.
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { launchGallery, showGallery } from './gallery-support.ts';
 import { tempDataDir, type Launched } from './support.ts';
 
@@ -15,6 +15,10 @@ beforeAll(async () => {
   t = tempDataDir();
   run = await launchGallery(t.dataDir);
 });
+afterEach(async () => {
+  // A failed test must not leave a modal over the page for the next one.
+  await run?.page.evaluate(() => document.querySelectorAll<HTMLDialogElement>('dialog[open]').forEach((d) => d.close()));
+});
 afterAll(async () => {
   await run?.app.close();
   t?.cleanup();
@@ -23,7 +27,7 @@ afterAll(async () => {
 const panel = (section: string, lang: 'ar' | 'en') => `[data-panel="${section}/${lang}/light"]`;
 const checkedIndex = (selector: string, attr: 'aria-checked' | 'aria-selected') =>
   run.page.$$eval(selector, (els, a) => els.findIndex((e) => e.getAttribute(a) === 'true'), attr);
-const focusedIndex = (selector: string) => run.page.$$eval(selector, (els) => els.indexOf(document.activeElement as Element));
+const focusedIndex = (selector: string) => run.page.$$eval(selector, (els) => (els as Element[]).indexOf(document.activeElement as Element));
 
 describe('arrow keys follow the reading direction', () => {
   for (const lang of ['ar', 'en'] as const) {
@@ -105,6 +109,91 @@ describe('modal sheet (C-19)', () => {
       await run.page.waitForSelector(`${demo} dialog:not([open])`, { state: 'attached' });
     });
   }
+});
+
+describe('sheet state is reset on every opening (C-19)', () => {
+  it('reopens the human review with the first decision and an empty note', async () => {
+    await showGallery(run.page, { lang: 'en', theme: 'light', section: 'C-19' });
+    const demo = `${panel('C-19', 'en')} [data-demo="Sheet/Human review/modal"]`;
+    const dialog = `${demo} dialog`;
+    const decision = () => run.page.$$eval(`${dialog} input[type="radio"]`, (els) => els.findIndex((e) => (e as HTMLInputElement).checked));
+    const noteField = `${dialog} input[id$="-note"]`;
+    const note = () => run.page.$eval(noteField, (e) => (e as HTMLInputElement).value);
+    await run.page.click(`${demo} > .specimen > button`);
+    await run.page.waitForSelector(`${dialog}[open]`);
+    expect(await decision()).toBe(0);
+    await run.page.click(`${dialog} label:has(input[type="radio"]) >> nth=1`);
+    await run.page.fill(noteField, 'a note that must not survive');
+    expect(await decision()).toBe(1);
+    await run.page.keyboard.press('Escape');
+    await run.page.waitForSelector(`${dialog}:not([open])`, { state: 'attached' });
+    await run.page.click(`${demo} > .specimen > button`);
+    await run.page.waitForSelector(`${dialog}[open]`);
+    expect(await decision()).toBe(0);
+    expect(await note()).toBe('');
+    await run.page.keyboard.press('Escape');
+    await run.page.waitForSelector(`${dialog}:not([open])`, { state: 'attached' });
+  });
+
+  it('keeps the open prop in step when the dialog closes natively, and opens again', async () => {
+    await showGallery(run.page, { lang: 'ar', theme: 'light', section: 'C-19' });
+    const demo = `${panel('C-19', 'ar')} [data-demo="Sheet/Cancel confirmation/modal"]`;
+    await run.page.click(`${demo} > .specimen > button`);
+    await run.page.waitForSelector(`${demo} dialog[open]`);
+    // A close that does not go through the cancel event (as Chromium does on a second, non-cancelable Escape).
+    await run.page.$eval(`${demo} dialog`, (d) => (d as HTMLDialogElement).close());
+    await run.page.waitForSelector(`${demo} dialog:not([open])`, { state: 'attached' });
+    await run.page.click(`${demo} > .specimen > button`);
+    await run.page.waitForSelector(`${demo} dialog[open]`);
+    await run.page.keyboard.press('Escape');
+    await run.page.waitForSelector(`${demo} dialog:not([open])`, { state: 'attached' });
+  });
+});
+
+describe('findings table keyboard (C-17)', () => {
+  for (const lang of ['ar', 'en'] as const) {
+    it(`is one tab stop, moves with the arrows, toggles groups and selects rows (${lang})`, async () => {
+      await showGallery(run.page, { lang, theme: 'light', section: 'C-17' });
+      const table = `${panel('C-17', lang)} [data-demo="Table/findings"] [role="grid"]`;
+      const stops = await run.page.$$eval(`${table} [tabindex="0"]`, (els) => els.length);
+      expect(stops).toBe(1);
+      const navs = `${table} [data-nav]`;
+      await run.page.focus(`${table} [data-nav][tabindex="0"]`);
+      const first = await focusedIndex(navs);
+      await run.page.keyboard.press('ArrowDown');
+      expect(await focusedIndex(navs)).toBe(first + 1);
+      await run.page.keyboard.press('End');
+      const count = await run.page.$$eval(navs, (els) => els.length);
+      expect(await focusedIndex(navs)).toBe(count - 1);
+      await run.page.keyboard.press('Home');
+      expect(await focusedIndex(navs)).toBe(0);
+      // Space on a finding row selects it.
+      await run.page.focus(`${table} [role="row"][aria-selected]`);
+      const before = await run.page.$eval(`${table} [role="row"][aria-selected]`, (e) => e.getAttribute('aria-selected'));
+      await run.page.keyboard.press('Space');
+      const after = await run.page.$eval(`${table} [role="row"][aria-selected]`, (e) => e.getAttribute('aria-selected'));
+      expect(after).not.toBe(before);
+      // Still one tab stop after moving.
+      expect(await run.page.$$eval(`${table} [tabindex="0"]`, (els) => els.length)).toBe(1);
+    });
+  }
+});
+
+describe('argument editor focus (C-18)', () => {
+  it('moves focus to a remove button after removing an argument, never to the page', async () => {
+    await showGallery(run.page, { lang: 'en', theme: 'light', section: 'C-18' });
+    const editor = `${panel('C-18', 'en')} [data-demo="Argument editor/default"]`;
+    const before = await run.page.$$eval(`${editor} [data-arg-input]`, (els) => els.length);
+    expect(before).toBeGreaterThan(1);
+    await run.page.focus(`${editor} .remove button >> nth=0`);
+    await run.page.keyboard.press('Enter');
+    expect(await run.page.$$eval(`${editor} [data-arg-input]`, (els) => els.length)).toBe(before - 1);
+    const focused = await run.page.evaluate((sel) => {
+      const a = document.activeElement as HTMLElement;
+      return { inEditor: !!document.querySelector(sel)?.contains(a), tag: a.tagName, remove: !!a.closest('.remove') };
+    }, editor);
+    expect(focused).toEqual({ inEditor: true, tag: 'BUTTON', remove: true });
+  });
 });
 
 describe('glossary term tooltip (C-21)', () => {

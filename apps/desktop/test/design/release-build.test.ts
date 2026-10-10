@@ -19,6 +19,7 @@ describe('release build without the gallery', () => {
     expect(pkg.scripts['build']).toMatch(/^AYAR_GALLERY= vite build -c vite\.renderer\.config\.ts && /);
     expect(pkg.scripts['build']).not.toContain('AYAR_GALLERY=1');
     expect(pkg.scripts['build:gallery']).toContain('AYAR_GALLERY=1');
+    expect(pkg.scripts['gallery']).toMatch(/status=\$\?; AYAR_GALLERY= vite build -c vite\.renderer\.config\.ts[^;]*; exit \$status\)$/);
     expect(pkg.scripts['test:e2e']).toMatch(/status=\$\?; AYAR_GALLERY= vite build -c vite\.renderer\.config\.ts[^;]*; exit \$status\)$/);
   });
 

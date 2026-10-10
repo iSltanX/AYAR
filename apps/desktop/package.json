@@ -14,7 +14,7 @@
     "package": "npm run build && electron-forge package",
     "test:e2e": "npm run build && npm run build:gallery && (vitest run -c vitest.e2e.config.ts; status=$?; AYAR_GALLERY= vite build -c vite.renderer.config.ts --logLevel warn; exit $status)",
     "build:gallery": "AYAR_GALLERY=1 vite build -c vite.renderer.config.ts",
-    "gallery": "npm run build && npm run build:gallery && node test/gallery/open.ts",
+    "gallery": "npm run build && npm run build:gallery && (node test/gallery/open.ts; status=$?; AYAR_GALLERY= vite build -c vite.renderer.config.ts --logLevel warn; exit $status)",
     "design:generate": "node test/design/generate.ts"
   },
   "devDependencies": {
