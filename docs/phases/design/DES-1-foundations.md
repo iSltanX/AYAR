@@ -4,7 +4,7 @@ track: design
 number: 1
 stage: design
 title: تنظيم الملف وإكمال الهوية والأسس
-status: delivered
+status: closed
 status_date: 2026-10-10
 depends_on: []
 design_gates: []
@@ -24,7 +24,7 @@ outputs:
   - صفحة Identity مكتملة
   - صفحة Foundations بالمتغيرات الأربع وجدول تباين موثق وأنماط النص والأسس
   - اعتماد المالك مسجل في docs/design/README.md
-closing_commit:
+closing_commit: ae9f0e3
 ---
 
 # DES-1 — تنظيم الملف وإكمال الهوية والأسس
