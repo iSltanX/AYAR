@@ -11,5 +11,10 @@ export const settingsGet: CommandHandler = (payload, ctx) => {
 export const settingsSet: CommandHandler = (payload, ctx) => {
   const entry = payload as SettingEntry;
   writeSetting(ctx.db, entry);
+  // C-18 layer 4 and the extra sensitive names take effect at once.
+  if (entry.key === 'redaction.userPatterns' || entry.key === 'redaction.sensitiveNames') {
+    const s = readSettings(ctx.db, ['redaction.userPatterns', 'redaction.sensitiveNames']);
+    ctx.services.redaction.configure(s['redaction.userPatterns'] ?? [], s['redaction.sensitiveNames'] ?? []);
+  }
   return entry;
 };

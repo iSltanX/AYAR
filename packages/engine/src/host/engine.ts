@@ -6,6 +6,7 @@ import {
   protocolError,
   PROTOCOL_VERSION,
   type EngineHealth,
+  type ErrorCode,
   type Hello,
   type ParsedCommand,
 } from '@ayar/protocol';
@@ -23,6 +24,7 @@ import { Dispatcher, type HandlerTable, type ServiceState } from './dispatcher.t
 import { EXIT } from './errors.ts';
 import { EventBus } from './event-bus.ts';
 import { RunGate } from './run-gate.ts';
+import { createServices, type EngineServices } from './services.ts';
 
 export interface StartEngineOptions {
   ports: EnginePorts;
@@ -74,15 +76,16 @@ export function startEngine(o: StartEngineOptions): EngineHandle {
   let hmacKey: HmacKey | null = null;
   let bus: EventBus | null = null;
   let logPath: string | null = null;
-  let degraded: StorageError['code'] | null = null;
+  let degraded: ErrorCode | null = null;
+  let services: EngineServices | null = null;
   let maintenance: ReturnType<typeof setInterval> | null = null;
   let stopped = false;
 
   const state = (): ServiceState => {
     if (phase === 'awaiting_hello' || phase === 'booting') return { kind: 'unavailable', error: protocolError('engine_starting') };
     if (phase === 'stopping') return { kind: 'unavailable', error: protocolError('engine_unavailable') };
-    if (degraded || !result?.db || !result.catalog || !hmacKey || !bus) return { kind: 'unavailable', error: protocolError(degraded ?? 'internal') };
-    return { kind: 'ready', context: { db: result.db, clock: ports.clock, logger, events: bus, runGate, hmacKey, catalog: result.catalog, ports } };
+    if (degraded || !result?.db || !result.catalog || !hmacKey || !bus || !services) return { kind: 'unavailable', error: protocolError(degraded ?? 'internal') };
+    return { kind: 'ready', context: { db: result.db, clock: ports.clock, logger, events: bus, runGate, hmacKey, catalog: result.catalog, ports, services } };
   };
   const dispatcher = new Dispatcher(o.handlers ?? HANDLERS, state, () => logger);
 
@@ -114,6 +117,7 @@ export function startEngine(o: StartEngineOptions): EngineHandle {
       }
     }
     if (result.state === 'degraded') degraded = result.reason ?? 'internal';
+    if (!degraded && result.db && result.catalog) services = createServices({ catalog: result.catalog, db: result.db });
     bus = new EventBus({ stream, clock: ports.clock, send: (m) => channel.send(m) });
     if (phase === 'stopping') return result;
     phase = 'serving';

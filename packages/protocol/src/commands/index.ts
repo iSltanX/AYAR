@@ -65,6 +65,6 @@ export { defineCommand } from './define.ts';
 export type { Audience, CommandDefinition, Handler } from './define.ts';
 export { ConfirmablePreview, ConfirmablePreviewWithToken } from './previews.ts';
 export { DIRECT_CONFIRM_COMMANDS } from './system.ts';
-export { SETTINGS, SETTING_KEYS, SettingEntry, SettingKey, SettingValuesSchema, settingDefaults } from './settings.ts';
+export { SETTINGS, SETTING_KEYS, SettingEntry, SettingKey, SettingValuesSchema, settingDefaults, UserRedactionPattern } from './settings.ts';
 export type { SettingValue, SettingValues } from './settings.ts';
 export { CopyKind, ReportTarget } from './reports.ts';

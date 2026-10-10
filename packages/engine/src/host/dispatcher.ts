@@ -11,6 +11,7 @@ import type { HmacKey } from '../storage/hmac-key.ts';
 import { CommandError } from './errors.ts';
 import type { EventBus } from './event-bus.ts';
 import type { RunGate } from './run-gate.ts';
+import type { EngineServices } from './services.ts';
 
 export interface HandlerContext {
   db: Db;
@@ -23,6 +24,7 @@ export interface HandlerContext {
   catalog: Catalog;
   /** The engine's ports (file system, processes, clock, randomness). */
   ports: EnginePorts;
+  services: EngineServices;
   grants: Grants;
 }
 

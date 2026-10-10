@@ -10,6 +10,7 @@ import type { Db } from '../src/storage/db.ts';
 import { fakeClock } from './support/tmp.ts';
 import type { Catalog } from '@ayar/catalog';
 import { nodePorts } from '../src/node/ports.ts';
+import type { EngineServices } from '../src/host/services.ts';
 
 const logger = { log: () => {}, flush: () => {} };
 const ready: ServiceState = {
@@ -23,6 +24,7 @@ const ready: ServiceState = {
     hmacKey: { source: 'test', key: new Uint8Array(32), fingerprint: 'x', created: false },
     catalog: {} as Catalog,
     ports: nodePorts,
+    services: {} as EngineServices,
   },
 };
 const cmd = (command: string, payload: unknown, grants = {}) => ({ kind: 'command' as const, id: 7, command: command as never, payload, grants });
