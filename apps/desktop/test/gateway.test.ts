@@ -2,14 +2,16 @@
 // resolved into grants, previews bound to their confirmation, and the main-process commands.
 import { protocolError, type CommandName, type EngineHealth, type Grants, type InvokeResult } from '@ayar/protocol';
 import { describe, expect, it } from 'vitest';
+import type { DestructiveAlert } from '../src/main/destructive-alert.ts';
 import { Gateway, type EngineLink, type SystemServices } from '../src/main/gateway.ts';
 import { TokenRegistry } from '../src/main/tokens.ts';
 
 type Call = { command: CommandName; payload: unknown; grants: Grants | undefined };
 
-function setup(o: { engine?: (c: Call) => InvokeResult<unknown>; picked?: string | null; folder?: string | null; dialogThrows?: boolean } = {}) {
+function setup(o: { engine?: (c: Call) => InvokeResult<unknown>; picked?: string | null; folder?: string | null; dialogThrows?: boolean; confirm?: boolean; lang?: 'ar' | 'en' } = {}) {
   const calls: Call[] = [];
   const clipboard: string[] = [];
+  const alerts: DestructiveAlert[] = [];
   let now = 0;
   let seed = 0;
   const tokens = new TokenRegistry({ randomBytes: (n) => new Uint8Array(n).fill(++seed % 250), clock: { wall: () => 1_800_000_000_000 + now, mono: () => now } });
@@ -32,9 +34,13 @@ function setup(o: { engine?: (c: Call) => InvokeResult<unknown>; picked?: string
       return Promise.resolve();
     },
     checkFolder: (p) => Promise.resolve(o.folder === undefined ? `/private${p}` : o.folder),
+    confirmDestructive: (a) => {
+      alerts.push(a);
+      return Promise.resolve(o.confirm ?? true);
+    },
   };
-  const gw = new Gateway({ engine, system, tokens });
-  return { gw, calls, clipboard, advance: (ms: number) => (now += ms) };
+  const gw = new Gateway({ engine, system, tokens, language: () => o.lang ?? 'ar' });
+  return { gw, calls, clipboard, alerts, advance: (ms: number) => (now += ms) };
 }
 
 const ok = <T>(r: InvokeResult<T>): T => {
@@ -167,6 +173,20 @@ describe('gateway: confirmations', () => {
     await gw.invoke({ command: 'data.purge', payload: { confirmationToken: purge.confirmationToken } });
     expect(calls.at(-1)?.grants).toEqual({ confirmationToken: { kind: 'confirmation', command: 'data.purge', target: '*', digest: null } });
     expect(await gw.invoke({ command: 'confirm.issue', payload: { command: 'setup.execute', target: 'act-1' } })).toMatchObject({ ok: false, error: { code: 'invalid_payload' } });
+  });
+
+  it('asks in a native alert first (D-DEV3-15): «ألغِ» issues nothing, and the alert names what goes', async () => {
+    const cancelled = setup({ confirm: false, engine: (c) => (c.command === 'project.get' ? { ok: true, result: { project: { displayName: 'متجر الورد' } } } : { ok: true, result: null }) });
+    expect(await cancelled.gw.invoke({ command: 'confirm.issue', payload: { command: 'project.remove', target: 'prj-1' } })).toEqual({ ok: true, result: { cancelled: true } });
+    expect(cancelled.alerts).toEqual([{ title: 'أزل «متجر الورد» من عِيَار؟', detail: expect.stringContaining('لن يُمس المستودع') as unknown, confirm: 'أزل', cancel: 'ألغِ' }]);
+    // Nothing was minted: the command cannot run without a token.
+    expect(cancelled.calls.map((c) => c.command)).toEqual(['project.get']);
+    const english = setup({ lang: 'en' });
+    const r = ok(await english.gw.invoke({ command: 'confirm.issue', payload: { command: 'tools.remove', target: 'gitleaks' } })) as { confirmationToken: string };
+    expect(r.confirmationToken).toMatch(/^cfm_/);
+    expect(english.alerts[0]).toMatchObject({ confirm: expect.any(String) as unknown, cancel: expect.any(String) as unknown });
+    expect(english.alerts[0]?.title).toContain('gitleaks');
+    expect(english.alerts[0]?.cancel).not.toBe('ألغِ');
   });
 });
 

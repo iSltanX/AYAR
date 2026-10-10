@@ -1,0 +1,15 @@
+{
+  "alerts.cancel": "Cancel",
+  "alerts.removeProject.title": "Remove «{name}» from AYAR?",
+  "alerts.removeProject.detail": "This project’s runs and evidence are deleted from AYAR. The repository is not touched.",
+  "alerts.removeProject.confirm": "Remove",
+  "alerts.deleteRuns.title": "{count, plural, one {Delete this run?} other {Delete # runs?}}",
+  "alerts.deleteRuns.detail": "These runs and their evidence are deleted from AYAR; the repository is not touched. This cannot be undone.",
+  "alerts.deleteRuns.confirm": "{count, plural, one {Delete run} other {Delete runs}}",
+  "alerts.removeTool.title": "Remove {name} from AYAR?",
+  "alerts.removeTool.detail": "This version is deleted from AYAR’s toolbox; checks that need it become «Missing» until it is installed again.",
+  "alerts.removeTool.confirm": "Remove tool",
+  "alerts.purgeData.title": "Delete all AYAR data?",
+  "alerts.purgeData.detail": "Added projects, their runs and evidence, and downloaded tools are deleted from this Mac. No repository is touched. This cannot be undone.",
+  "alerts.purgeData.confirm": "Delete data"
+}

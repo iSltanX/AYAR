@@ -19,6 +19,8 @@ import {
   type ProtocolError,
   z,
 } from '@ayar/protocol';
+import type { Lang } from '@ayar/i18n';
+import { destructiveAlert, type DestructiveAlert } from './destructive-alert.ts';
 import type { TokenRegistry } from './tokens.ts';
 
 export interface SystemServices {
@@ -29,6 +31,8 @@ export interface SystemServices {
   writeClipboard(text: string): Promise<void>;
   /** The real path of a directory that is not a symbolic link, or null (C-01: checks on a picked folder). */
   checkFolder(path: string): Promise<string | null>;
+  /** D-DEV3-15: a native alert attached to the window; true only when the user clicked its confirm button. */
+  confirmDestructive(alert: DestructiveAlert): Promise<boolean>;
 }
 
 export interface EngineLink {
@@ -41,6 +45,8 @@ export interface GatewayOptions {
   engine: EngineLink;
   system: SystemServices;
   tokens: TokenRegistry;
+  /** The language of the native texts (the system's, like the menus). */
+  language?: () => Lang;
   log?: (level: 'info' | 'warn' | 'error', message: string, fields?: Record<string, string | number | boolean | null>) => void;
 }
 
@@ -111,6 +117,18 @@ export class Gateway {
     return { ok: true, result: { ...preview.data, confirmationToken } };
   }
 
+  /** What the alert names: the project's display name, the tool, the number of runs. */
+  async #subject(command: CommandPayload<'confirm.issue'>['command'], id: string): Promise<{ name?: string; count?: number }> {
+    if (command === 'project.remove') {
+      const r = await this.#o.engine.request('project.get', { projectId: id });
+      const name = r.ok ? (r.result as { project?: { displayName?: unknown } }).project?.displayName : undefined;
+      return { name: typeof name === 'string' ? name : id };
+    }
+    if (command === 'tools.remove') return { name: id };
+    if (command === 'runs.delete') return { count: 1 };
+    return {};
+  }
+
   async #main(command: CommandName, payload: unknown): Promise<InvokeResult<unknown>> {
     const { system, tokens, engine } = this.#o;
     switch (command) {
@@ -136,6 +154,9 @@ export class Gateway {
       }
       case 'confirm.issue': {
         const { command: target, target: id } = payload as CommandPayload<'confirm.issue'>;
+        // D-DEV3-15: the user answers in the main process's own alert; a compromised renderer cannot click it.
+        const alert = destructiveAlert(this.#o.language?.() ?? 'ar', target, await this.#subject(target, id));
+        if (!(await system.confirmDestructive(alert))) return { ok: true, result: { cancelled: true } };
         const bound = COMMANDS[target].grants.find((g) => g.kind === 'confirmation');
         const targetValue = bound && bound.kind === 'confirmation' && bound.targetField === null ? '*' : id;
         return { ok: true, result: { confirmationToken: tokens.issue({ kind: 'confirmation', command: target, target: targetValue, digest: null }) } };

@@ -81,7 +81,7 @@
 | `dialog.pickFolder` | C-01 | main | renderer | — | DEV-3 |
 | `dialog.pickDestination` | C-01 | main | renderer | — | DEV-3 |
 | `dialog.pickSource` | C-01 | main | renderer | — | DEV-3 |
-| `confirm.issue` | C-01 | main | renderer | — | DEV-3 |
+| `confirm.issue` | C-01 | main | renderer | — | DEV-5 |
 | `engine.status` | C-01 | main | renderer | — | DEV-3 |
 | `engine.restart` | C-01 | main | renderer | — | DEV-3 |
 | `internal.clipboardText` | C-21 | engine | host | — | DEV-9 |
