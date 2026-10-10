@@ -63,4 +63,24 @@ describe('AT-48 (environment): sensitive variables are withheld, and allowed one
     }
     for (const v of [myToken, npmToken]) expect(filesContaining(dataDir, v)).toEqual([]);
   }, 60_000);
+
+  it('a new user pattern redacts what is already stored, too (re-review R3)', async () => {
+    const codename = ['internal', 'codename', 'Qv7Rk2Zp9'].join('-');
+    const dataDir = join(root, 'AYAR');
+    const engine = await connectEngine({ dataDir });
+    try {
+      await engine.waitForEvent('engine.health');
+      const project = materialize('FX-EXT', 'good', join(root, 'FX-EXT'));
+      const pkg = JSON.parse(readFileSync(join(project, 'package.json'), 'utf8')) as { scripts: Record<string, string> };
+      pkg.scripts['deploy:x'] = `echo ${codename}`;
+      writeFileSync(join(project, 'package.json'), JSON.stringify(pkg, null, 2));
+      const { projectId } = await addProject(engine, project);
+      ok(await engine.invoke('settings.set', { key: 'redaction.userPatterns', value: [{ id: 'codename', pattern: 'internal-codename-[A-Za-z0-9]+' }] }));
+      const facts = ok<{ snapshot: { facts: { key: string; value: { name?: string; text?: string } }[] } }>(await engine.invoke('project.get', { projectId })).snapshot.facts;
+      expect(facts.find((f) => f.key === 'node.script' && f.value.name === 'deploy:x')?.value.text).toBe('echo ⟦redacted:user:codename⟧');
+    } finally {
+      await engine.close();
+    }
+    expect(filesContaining(dataDir, codename)).toEqual([]);
+  }, 60_000);
 });

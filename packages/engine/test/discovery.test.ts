@@ -299,11 +299,27 @@ describe('Git from files (E-16, T2)', () => {
       cleanup();
       ({ dir: root, cleanup } = tempRoot('ayar-DEV-4-discovery-'));
       write('.git', `gitdir: ${join(main.dir, '.git/worktrees/wt')}\n`);
+      // Without Git's back-link from the work tree folder to this root, the folder is someone else's (re-review R1).
+      expect(fact(await run(), 'git.repository')).toEqual([]);
+      writeFileSync(join(main.dir, '.git/worktrees/wt/gitdir'), `${join(root, '.git')}\n`);
       r = await run();
       expect(fact(r, 'git.repository')[0]?.value).toMatchObject({ branch: 'feature', commit: sha('d'), linkedWorktree: true });
     } finally {
       main.cleanup();
     }
+  });
+
+  it('reads an initialized submodule only when its module folder points back to it (re-review R1)', async () => {
+    write('.git/HEAD', 'ref: refs/heads/main\n');
+    write('.git/refs/heads/main', `${sha('a')}\n`);
+    write('.gitmodules', '[submodule "lib"]\n\tpath = lib\n');
+    write('lib/.git', 'gitdir: ../.git/modules/lib\n');
+    write('.git/modules/lib/HEAD', `${sha('b')}\n`);
+    write('.git/modules/lib/config', '[core]\n\tbare = false\n');
+    const sub = async () => (fact(await run(), 'git.repository')[0]?.value as { submodules: unknown[] }).submodules;
+    expect(await sub()).toEqual([{ path: 'lib', initialized: false, commit: null }]);
+    write('.git/modules/lib/config', '[core]\n\tbare = false\n\tworktree = ../../../lib\n');
+    expect(await sub()).toEqual([{ path: 'lib', initialized: true, commit: sha('b') }]);
   });
 
   it('keeps only the host of a remote URL', () => {
@@ -401,6 +417,10 @@ describe('hostile inputs stay cheap and confined (review M1, M2)', () => {
       mkdirSync(join(elsewhere.dir, 'repo'), { recursive: true });
       writeFileSync(join(elsewhere.dir, 'repo/HEAD'), `${'f'.repeat(40)}\n`);
       write('.git', `gitdir: ${join(elsewhere.dir, 'repo')}\n`);
+      expect(fact(await run(), 'git.repository')).toEqual([]);
+      // Nor through a link inside the root that leads out of it (re-review R1).
+      symlinkSync(join(elsewhere.dir, 'repo'), join(root, 'lnk'));
+      write('.git', 'gitdir: lnk\n');
       expect(fact(await run(), 'git.repository')).toEqual([]);
     } finally {
       elsewhere.cleanup();

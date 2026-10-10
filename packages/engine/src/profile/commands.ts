@@ -80,11 +80,22 @@ const VALUE_FLAGS = new Set(['--filter', '-F', '--prefix', '-C', '--dir', '--wor
 const BUILTINS = new Set(['install', 'i', 'add', 'remove', 'rm', 'uninstall', 'update', 'up', 'exec', 'dlx', 'x', 'create', 'init', 'link', 'unlink', 'publish', 'pack', 'audit', 'outdated', 'list', 'ls', 'why', 'config', 'set', 'get', 'store', 'cache', 'import', 'rebuild', 'prune', 'patch', 'env', 'setup', 'self-update', 'help', 'bin', 'root', 'deploy', 'fetch', 'install-test', 'it', 'licenses', 'node', 'workspace', 'workspaces', 'dedupe', 'upgrade', 'info', 'version', 'login', 'logout', 'whoami']);
 const NPM_SHORTCUTS: Record<string, string> = { test: 'test', t: 'test', tst: 'test', start: 'start', stop: 'stop', restart: 'restart' };
 
-/**
- * The project script an argument vector runs, whatever the form (review M8): `npm run x`, `npm run-script x`,
- * `npm test`, `npm start`, `pnpm x`, `pnpm --filter a run x`, `yarn x`, `bun run x`. Null for anything else.
- */
-export function scriptNameOf(argv: readonly string[], scripts: readonly { name: string }[]): string | null {
+/** Scripts the managers run on their own for a built-in command (lifecycle scripts; re-review R2). */
+const INSTALL_LIFECYCLE = ['preinstall', 'install', 'postinstall', 'prepublish', 'preprepare', 'prepare', 'postprepare'];
+const LIFECYCLE: Record<string, readonly string[]> = {
+  install: INSTALL_LIFECYCLE,
+  i: INSTALL_LIFECYCLE,
+  ci: INSTALL_LIFECYCLE,
+  add: INSTALL_LIFECYCLE,
+  rebuild: ['preinstall', 'install', 'postinstall', 'prepare'],
+  'install-test': [...INSTALL_LIFECYCLE, 'pretest', 'test', 'posttest'],
+  it: [...INSTALL_LIFECYCLE, 'pretest', 'test', 'posttest'],
+  pack: ['prepack', 'prepare', 'postpack'],
+  publish: ['prepublishOnly', 'prepack', 'prepare', 'postpack', 'publish', 'postpublish'],
+};
+
+/** The manager of an argument vector (`npm`, `/opt/homebrew/bin/pnpm`…) and its positional arguments. */
+function managerCall(argv: readonly string[]): { pm: string; positional: string[] } | null {
   const pm = argv[0]?.split('/').pop();
   if (!pm || !MANAGERS.includes(pm)) return null;
   const positional: string[] = [];
@@ -98,6 +109,17 @@ export function scriptNameOf(argv: readonly string[], scripts: readonly { name: 
     if (a.startsWith('-')) continue;
     positional.push(a);
   }
+  return { pm, positional };
+}
+
+/**
+ * The project script an argument vector runs, whatever the form (review M8): `npm run x`, `npm run-script x`,
+ * `npm test`, `npm start`, `pnpm x`, `pnpm --filter a run x`, `yarn x`, `bun run x`. Null for anything else.
+ */
+export function scriptNameOf(argv: readonly string[], scripts: readonly { name: string }[]): string | null {
+  const call = managerCall(argv);
+  if (!call) return null;
+  const { pm, positional } = call;
   const [first, second] = positional;
   if (!first) return null;
   let name: string | null = null;
@@ -107,32 +129,58 @@ export function scriptNameOf(argv: readonly string[], scripts: readonly { name: 
   return name && scripts.some((s) => s.name === name) ? name : null;
 }
 
-/** Scripts a script runs in turn, by name (`npm run a && pnpm b`), followed to a fixed depth. */
-function referencedScripts(text: string, all: readonly ScriptInfo[], self: string): { name: string; text: string }[] {
+/** Every project script an argument vector makes the manager run: the one it names with its pre/post, or the
+ * lifecycle scripts of a built-in command (`npm ci` runs postinstall and prepare; `yarn` alone installs). */
+function scriptsRunBy(argv: readonly string[], all: readonly ScriptInfo[]): string[] {
+  const call = managerCall(argv);
+  if (!call) return [];
+  const name = scriptNameOf(argv, all);
+  const first = call.positional[0] ?? (call.pm === 'yarn' ? 'install' : undefined);
+  const names = name ? [`pre${name}`, name, `post${name}`] : first ? (LIFECYCLE[first] ?? []) : [];
+  return names.filter((n) => all.some((s) => s.name === n));
+}
+
+/** Scripts the given texts run in turn, by name (`npm run a && pnpm b`, `npm ci`), followed to a fixed depth. */
+function referencedScripts(texts: readonly string[], all: readonly ScriptInfo[], self: string): { name: string; text: string }[] {
   const out = new Map<string, string>();
   const visit = (t: string, depth: number) => {
     if (depth > 5) return;
     for (const part of t.split(/&&|\|\||;|\|/)) {
       const argv = part.trim().split(/\s+/);
-      const at = argv.findIndex((a) => MANAGERS.includes(a));
+      const at = argv.findIndex((a) => MANAGERS.includes(a.split('/').pop()!));
       if (at < 0) continue;
-      const name = scriptNameOf(argv.slice(at), all);
-      if (!name || name === self || out.has(name)) continue;
-      const s = all.find((x) => x.name === name)!;
-      out.set(name, s.text);
-      visit(s.text, depth + 1);
+      for (const name of scriptsRunBy(argv.slice(at), all)) {
+        if (name === self || out.has(name)) continue;
+        const s = all.find((x) => x.name === name)!;
+        out.set(name, s.text);
+        visit(s.text, depth + 1);
+      }
     }
   };
-  visit(text, 0);
+  for (const t of texts) visit(t, 0);
   return [...out].map(([name, t]) => ({ name, text: t })).sort((a, b) => (a.name < b.name ? -1 : 1));
 }
 
-/** The literal script and what the manager runs with it: pre/post (npm, Yarn 1) and the scripts it calls. */
+/** The literal script and what the manager runs with it: pre/post (npm, Yarn 1) and the scripts they call. */
 export function scriptSpec(pm: string, s: ScriptInfo, all: readonly ScriptInfo[]): NonNullable<CommandSpec['script']> {
   const prePost = pm === 'npm' || pm === 'yarn';
   const pre = prePost ? (all.find((x) => x.name === `pre${s.name}`)?.text ?? null) : null;
   const post = prePost ? (all.find((x) => x.name === `post${s.name}`)?.text ?? null) : null;
-  return { name: s.name, text: s.text, pre, post, composite: s.composite, referenced: referencedScripts(s.text, all, s.name) };
+  const texts = [s.text, pre, post].filter((t): t is string => t !== null);
+  return { name: s.name, text: s.text, pre, post, composite: s.composite, referenced: referencedScripts(texts, all, s.name) };
+}
+
+/**
+ * The script side of a command the user wrote (an override or a custom check): the project script it runs, or —
+ * for any other command that makes the manager run project scripts (`npm ci`, `sh -c "npm run x"`) — the command
+ * itself with those scripts, so they are judged and hashed too (re-review R2). Null when it runs none.
+ */
+export function commandScript(argv: readonly string[], all: readonly ScriptInfo[]): CommandSpec['script'] {
+  const name = scriptNameOf(argv, all);
+  if (name) return scriptSpec(argv[0]!.split('/').pop()!, all.find((x) => x.name === name)!, all);
+  const text = argv.join(' ');
+  const referenced = referencedScripts([text], all, '');
+  return referenced.length ? { name: argv.slice(0, 2).join(' ').slice(0, 200), text, pre: null, post: null, composite: false, referenced } : null;
 }
 
 /** The script and its pre/post texts when the manager runs them (npm and Yarn 1 do; pnpm, Yarn 2+ and bun do not). */

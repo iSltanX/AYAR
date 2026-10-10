@@ -96,7 +96,11 @@ export type MissingRequirement = z.infer<typeof MissingRequirement>;
 export const CommandSpec = z.strictObject({
   argv: Argv,
   cwd: RelPath,
-  /** For a project script: its literal text, with the pre/post scripts the manager runs automatically (C-09). */
+  /**
+   * For a project script: its literal text, with the pre/post scripts the manager runs automatically and the
+   * scripts it runs in turn (C-09). For another command that makes the manager run project scripts (`npm ci`
+   * runs postinstall), the command itself with those scripts in `referenced`.
+   */
   script: z
     .strictObject({
       name: z.string(),

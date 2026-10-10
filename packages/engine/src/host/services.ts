@@ -21,6 +21,11 @@ export interface EngineServices {
   projects: ProjectsService;
   /** C-07: the login environment and the toolchains. */
   environment: EnvironmentService;
+  /**
+   * C-18 after the fact [D-DEV4-07]: redacts the stored rows again with the current rules (new sensitive values,
+   * new user patterns). A failure is logged, never fatal: the rows stay as they were (re-review R4).
+   */
+  rescrubStored(): void;
 }
 
 export interface ServicesInput {
@@ -37,6 +42,14 @@ export interface ServicesInput {
 }
 
 export function createServices(o: ServicesInput): EngineServices {
+  const rescrubStored = () => {
+    try {
+      const r = rescrub(o.db, redaction.redactor());
+      if (r.rows) o.logger.log('info', 'stored rows redacted again with the current rules', { rows: r.rows });
+    } catch (e) {
+      o.logger.log('error', 'stored rows could not be redacted again', { error: e instanceof Error ? e.message.slice(0, 300) : String(e) });
+    }
+  };
   const settings = readSettings(o.db, ['redaction.userPatterns', 'redaction.sensitiveNames']);
   const redaction = new RedactionService(o.catalog, settings['redaction.userPatterns'] ?? [], settings['redaction.sensitiveNames'] ?? []);
   const profiles = new ProfileService({ db: o.db, catalog: o.catalog, hmacKey: o.hmacKey, ports: o.ports, redaction });
@@ -47,14 +60,11 @@ export function createServices(o: ServicesInput): EngineServices {
     logger: o.logger,
     catalog: o.catalog,
     shellOverride: o.testLoginShell ?? null,
-    onSensitiveValues: () => {
-      const r = rescrub(o.db, redaction.redactor());
-      if (r.rows) o.logger.log('info', 'stored rows redacted again with newly known sensitive values', { rows: r.rows });
-    },
+    onSensitiveValues: rescrubStored,
     settings: () => {
       const s = readSettings(o.db, ['environment.shell', 'environment.timeoutSeconds']);
       return { shell: s['environment.shell'] ?? null, timeoutSeconds: s['environment.timeoutSeconds'] ?? 10 };
     },
   });
-  return { redaction, profiles, projects, environment };
+  return { redaction, profiles, projects, environment, rescrubStored };
 }

@@ -1,8 +1,8 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "verifiedAt": "2026-10-10",
   "refused": [
-    { "id": "sudo", "regex": { "pattern": "(?:^|[\\s;&|()`'\"=/]|\\$\\()(?:sudo|doas)(?=\\s|$|['\"])", "flags": "" }, "label": "catalog.command.refused.sudo" }
+    { "id": "sudo", "regex": { "pattern": "(?:^|[\\s;&|()`'\"=]|\\$\\()(?:/[^\\s;&|()`'\"]*/)?(?:sudo|doas)(?=\\s|$|['\"])", "flags": "" }, "label": "catalog.command.refused.sudo" }
   ],
   "dangerous": [
     {

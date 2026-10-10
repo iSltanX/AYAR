@@ -72,9 +72,22 @@ export function parseGitConfig(text: string): Map<string, Map<string, string>> {
   return out;
 }
 
-/** An external git directory is accepted only where Git keeps linked work trees and submodules (review M2). */
-function acceptedGitdir(gitdir: string, root: string): boolean {
-  return gitdir === `${root}/.git` || gitdir.startsWith(`${root}/`) || /\/\.git\/(worktrees|modules)\/[^/]+(\/[^/]+)*$/.test(gitdir);
+/**
+ * The git directory a `.git` file names, judged by its real path (re-review R1: a link inside the root must not
+ * lead out of it). Accepted: inside the root; or, outside it, a linked work tree's or a submodule's folder under
+ * `…/.git/worktrees|modules/` that points back to this root — `gitdir` for a work tree, `core.worktree` for a
+ * module (review M2). Returns the real path, or null.
+ */
+async function acceptedGitdir(fs: DiscoveryFs, gitdir: string, root: string): Promise<string | null> {
+  const real = await fs.realpath(gitdir).catch(() => null);
+  if (!real) return null;
+  if (real === `${root}/.git` || real.startsWith(`${root}/`)) return real;
+  const m = /\/\.git\/(worktrees|modules)\/[^/]+(\/[^/]+)*$/.exec(real);
+  if (!m) return null;
+  const back = async (target: string | undefined) => (target ? await fs.realpath(posix.resolve(real, target)).catch(() => null) : null);
+  if (m[1] === 'worktrees') return (await back((await readText(fs, posix.join(real, 'gitdir')))?.trim())) === `${root}/.git` ? real : null;
+  const worktree = parseGitConfig((await readText(fs, posix.join(real, 'config'))) ?? '').get('core')?.get('worktree');
+  return (await back(worktree)) === root ? real : null;
 }
 
 async function locate(fs: DiscoveryFs, root: string): Promise<{ gitdir: string; commondir: string; linked: boolean } | null> {
@@ -86,8 +99,9 @@ async function locate(fs: DiscoveryFs, root: string): Promise<{ gitdir: string; 
   else if (st.isFile) {
     const line = ((await readText(fs, dotGit)) ?? '').split('\n').find((l) => l.startsWith('gitdir:'));
     if (!line) return null;
-    gitdir = posix.resolve(root, line.slice('gitdir:'.length).trim());
-    if (!acceptedGitdir(gitdir, root)) return null;
+    const accepted = await acceptedGitdir(fs, posix.resolve(root, line.slice('gitdir:'.length).trim()), root);
+    if (!accepted) return null;
+    gitdir = accepted;
   } else return null;
   const common = (await readText(fs, posix.join(gitdir, 'commondir')))?.trim();
   const candidate = common ? posix.resolve(gitdir, common) : gitdir;

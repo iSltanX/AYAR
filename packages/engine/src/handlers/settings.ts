@@ -16,6 +16,8 @@ export const settingsSet: CommandHandler = async (payload, ctx) => {
     const s = readSettings(ctx.db, ['redaction.userPatterns', 'redaction.sensitiveNames']);
     ctx.services.redaction.configure(s['redaction.userPatterns'] ?? [], s['redaction.sensitiveNames'] ?? []);
     await ctx.services.environment.reRegister();
+    // A new user pattern applies to what is already stored, too (re-review R3).
+    if (entry.key === 'redaction.userPatterns') ctx.services.rescrubStored();
   }
   return entry;
 };
