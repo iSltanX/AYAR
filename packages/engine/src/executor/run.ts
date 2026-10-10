@@ -723,12 +723,7 @@ export class RunService {
       if (!run) throw new CommandError('not_found', { reason: 'run' });
       const a = this.#active.get(target.runId);
       if (run.state === 'queued' && !a) {
-        // Still in the queue: it never starts.
-        this.#o.runGate.release(target.runId);
-        db.run("UPDATE check_runs SET state = 'finished', outcome = 'cancelled', outcome_reason = ?, finished_at = ? WHERE run_id = ? AND state <> 'finished'", JSON.stringify({ key: 'run.reason.cancelledByUser' }), this.#now(), target.runId);
-        db.run("UPDATE runs SET state = 'finished', finished_at = ?, cancel_reason = 'user', counts_json = ? WHERE id = ?", this.#now(), JSON.stringify(this.#counts(target.runId)), target.runId);
-        recordAudit(db, { id: newId(this.#o.ports.random, 'aud'), at: this.#o.ports.clock.now(), action: 'run.cancelled', projectId: run.project_id, details: { runId: target.runId, reason: 'user', queued: true } });
-        this.#emitRun(target.runId);
+        this.#cancelQueued(target.runId, run.project_id, 'user');
         return { accepted: true, state: 'finished' };
       }
       if (!a || TERMINAL_RUN.includes(run.state)) return { accepted: false, state: run.state };
@@ -754,6 +749,16 @@ export class RunService {
     }
     a.wake();
     return { accepted: true, state: started ? 'cancelling' : 'finished' };
+  }
+
+  /** A run still in the queue never starts: its checks «أُلغي», with why (by the user, or because the app quits). */
+  #cancelQueued(runId: string, projectId: string, reason: 'user' | 'app_quit'): void {
+    const { db } = this.#o;
+    this.#o.runGate.release(runId);
+    db.run("UPDATE check_runs SET state = 'finished', outcome = 'cancelled', outcome_reason = ?, finished_at = ? WHERE run_id = ? AND state <> 'finished'", JSON.stringify({ key: reason === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }), this.#now(), runId);
+    db.run("UPDATE runs SET state = 'finished', finished_at = ?, cancel_reason = ?, counts_json = ? WHERE id = ?", this.#now(), reason, JSON.stringify(this.#counts(runId)), runId);
+    recordAudit(db, { id: newId(this.#o.ports.random, 'aud'), at: this.#o.ports.clock.now(), action: 'run.cancelled', projectId, details: { runId, reason, queued: true } });
+    this.#emitRun(runId);
   }
 
   #requestCancel(a: Active, reason: 'user' | 'app_quit'): void {
@@ -783,7 +788,10 @@ export class RunService {
       checks += a.procs.size;
       this.#requestCancel(a, 'app_quit');
     }
-    for (const q of this.#o.runGate.snapshot().queue) this.cancel({ kind: 'run', runId: q });
+    for (const q of this.#o.runGate.snapshot().queue) {
+      const run = this.#o.db.get<{ state: string; project_id: string }>('SELECT state, project_id FROM runs WHERE id = ?', q);
+      if (run?.state === 'queued' && !this.#active.has(q)) this.#cancelQueued(q, run.project_id, 'app_quit');
+    }
     await Promise.all([...this.#queued.values()].map((p) => p.catch(() => {})));
     return { cancelledRuns: runs.length, cancelledChecks: checks };
   }

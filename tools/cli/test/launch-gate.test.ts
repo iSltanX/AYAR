@@ -154,4 +154,26 @@ describe('the launch gate (C-12 point 3, FR-55)', () => {
       expect(check(d, 'beh.unit@.').outcome).not.toBe('missing');
     });
   }, 60_000);
+
+  it('quitting ends a queued run «أُلغي» because the app quits, not as if the user cancelled it (S2)', async () => {
+    await withEngine(async (engine, dataDir) => {
+      const { projectId } = await addProject(engine, materialize('FX-PROC', 'good', join(root, 'fx')));
+      ok(await engine.invoke('profile.update', { projectId, patch: { custom: { wait: { argv: ['node', '-e', 'setTimeout(() => {}, 20000)'], cwd: '.', timeoutMin: 1, success: { exitCode: 0 } } } } }));
+      await approveAll(engine, projectId);
+      const a = await startRun(engine, (await plan(engine, projectId, { kind: 'check', instance: 'custom.wait@.' })).id);
+      const b = await startRun(engine, (await plan(engine, projectId, { kind: 'check', instance: 'custom.wait@.' })).id);
+      expect(b.state).toBe('queued');
+      await engine.waitForEvent('check.state', (e) => e.payload.runId === a.runId && e.payload.state === 'running', 20_000);
+      expect(ok(await engine.invoke('internal.prepareQuit', {}))).toMatchObject({ cancelledRuns: 1 });
+      const db = new DatabaseSync(join(dataDir, 'ayar.db'), { readOnly: true });
+      try {
+        const reason = (runId: string) => db.prepare('SELECT cancel_reason AS r FROM runs WHERE id = ?').get(runId);
+        expect(reason(a.runId)).toEqual({ r: 'app_quit' });
+        expect(reason(b.runId)).toEqual({ r: 'app_quit' });
+        expect(db.prepare('SELECT outcome, outcome_reason AS reason FROM check_runs WHERE run_id = ?').all(b.runId)).toEqual([{ outcome: 'cancelled', reason: '{"key":"run.reason.appQuit"}' }]);
+      } finally {
+        db.close();
+      }
+    });
+  }, 60_000);
 });

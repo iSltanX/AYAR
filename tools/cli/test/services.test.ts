@@ -98,4 +98,33 @@ describe('FR-21: companion services', () => {
     }
     expect(processesWithTokens(ledgerTokens(dataDir))).toEqual([]);
   }, 60_000);
+
+  it('keeps only the last megabyte of a chatty service in memory and in the evidence (S4)', async () => {
+    const dataDir = join(root, 'AYAR');
+    const engine = await connectEngine({ dataDir, env: { AYAR_TEST_LOGIN_SHELL: loginShell(root, { path: '/opt/homebrew/bin:/usr/bin:/bin' }) } });
+    try {
+      await engine.waitForEvent('engine.health');
+      const { projectId } = await addProject(engine, materialize('FX-PROC', 'good', join(root, 'fx')));
+      const chatty = "for (let i = 0; i < 60000; i++) console.log('x'.repeat(50) + i); console.log('all ready'); setInterval(() => {}, 1000)";
+      ok(await engine.invoke('profile.update', {
+        projectId,
+        patch: {
+          services: { chatty: { argv: ['node', '-e', chatty], cwd: '.', readyUrl: null, readyPattern: 'all ready', readyTimeoutSec: 30, ports: [] } },
+          custom: { uses: { argv: ['node', '-e', '1'], cwd: '.', timeoutMin: 1, success: { exitCode: 0 } } },
+          checks: { 'custom.uses@.': { services: ['chatty'] } },
+        },
+      }));
+      await approveAll(engine, projectId);
+      const d = await waitRun(engine, (await startRun(engine, (await plan(engine, projectId, { kind: 'check', instance: 'custom.uses@.' })).id)).runId, 60_000);
+      const c = check(d, 'custom.uses@.');
+      expect(c.raw).toMatchObject({ ended: 'exited', exitCode: 0 });
+      const log = readFileSync(join(dataDir, 'evidence', c.evidence.find((x) => x.relPath.endsWith('service-chatty.log'))!.relPath), 'utf8');
+      // About 3.4 MB were printed: the last megabyte is kept, and the log says how much was not.
+      expect(log.length).toBeLessThan(1.1 * 1024 * 1024);
+      expect(log).toMatch(/^\[… \d+ earlier lines not kept\]\n/);
+      expect(log).toContain('all ready');
+    } finally {
+      await engine.close();
+    }
+  }, 90_000);
 });

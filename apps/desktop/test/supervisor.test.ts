@@ -5,7 +5,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { EngineHealth } from '@ayar/protocol';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { EngineSupervisor, RESTART_DELAYS_MS, RESTART_WINDOW_MS, type EngineChild, type SupervisorOptions } from '../src/main/engine-supervisor.ts';
+import { QUIT_WAIT_MS } from '@ayar/engine';
+import { EngineSupervisor, PREPARE_QUIT_WAIT_MS, RESTART_DELAYS_MS, RESTART_WINDOW_MS, STOP_GRACE_MS, type EngineChild, type SupervisorOptions } from '../src/main/engine-supervisor.ts';
 import { realEngine, scriptedChild, stubbornChild } from './support/engine-child.ts';
 
 let root: string;
@@ -179,5 +180,14 @@ describe('engine supervisor (C-01)', () => {
     expect(await until(() => sup.state === 'failed')).toBe(true);
     expect(health.at(-1)).toMatchObject({ state: 'failed', reason: 'protocol_mismatch' });
     expect(spawned).toBe(1);
+  });
+});
+
+describe('quitting during a run (9.7, D-DEV5-08)', () => {
+  it('never kills the engine in the middle of its own short ending of a run', () => {
+    // The engine waits QUIT_WAIT_MS for the checks' SIGTERM, 2 s and SIGKILL; SIGKILL to the engine comes later.
+    expect(QUIT_WAIT_MS).toBeGreaterThan(2_000);
+    expect(STOP_GRACE_MS).toBeGreaterThan(QUIT_WAIT_MS);
+    expect(PREPARE_QUIT_WAIT_MS).toBeGreaterThan(2_000);
   });
 });

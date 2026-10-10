@@ -27,6 +27,15 @@ export class SleepGuard {
     this.#update();
   }
 
+  /**
+   * The supervisor's view of the engine (engine.health from the main process): an engine that is gone — restarting,
+   * failed for good, or stopped — runs nothing any more, so the blocker goes (it would otherwise be held forever
+   * when the engine crashes and is not restarted).
+   */
+  onEngineHealth(h: { source: string; state: string }): void {
+    if (h.source === 'supervisor' && ['restarting', 'failed', 'stopped'].includes(h.state)) this.reset();
+  }
+
   /** The engine restarted or stopped: nothing it ran is running any more. */
   reset(): void {
     this.#runs.clear();

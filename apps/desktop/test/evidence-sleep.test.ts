@@ -89,6 +89,20 @@ describe('FR-26: the sleep guard', () => {
     expect(b.log).toEqual(['start 1', 'stop 1']);
   });
 
+  it('lets go when the supervisor reports the engine gone (crashed, failed for good, or stopped)', () => {
+    for (const state of ['restarting', 'failed', 'stopped']) {
+      const b = blocker();
+      const g = new SleepGuard(b);
+      g.onRunState({ runId: 'r1', state: 'running', preventSleep: true });
+      g.onEngineHealth({ source: 'supervisor', state: 'ready' });
+      g.onEngineHealth({ source: 'engine', state: 'failed' }); // the engine's own report is not the supervisor's
+      expect(g.holding, state).toBe(true);
+      g.onEngineHealth({ source: 'supervisor', state });
+      expect(g.holding, state).toBe(false);
+      expect(b.log).toEqual(['start 1', 'stop 1']);
+    }
+  });
+
   it('does nothing for a run that does not ask, and lets go when the engine restarts', () => {
     const b = blocker();
     const g = new SleepGuard(b);

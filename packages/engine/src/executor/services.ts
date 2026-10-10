@@ -13,10 +13,14 @@ const POLL_MS = 250;
 /** The readiness pattern sees at most this much of a log line: a long line never stalls the engine on it. */
 const PATTERN_LINE_CHARS = 4096;
 
+/** A service's log kept in memory: its last part, at most this many characters (S4: never unbounded). */
+export const SERVICE_LOG_MAX_CHARS = 1024 * 1024;
+
 interface Running {
   proc: RunningProcess;
   ready: Promise<boolean>;
-  log: string[];
+  /** Its lines from `head` on are kept; the ones before were dropped (compacted now and then, never one by one). */
+  log: { lines: string[]; head: number; chars: number; dropped: number };
   users: number;
 }
 
@@ -85,9 +89,11 @@ export class CompanionServices {
     }
   }
 
-  /** The redacted log lines of a service so far (kept as evidence of the checks that used it). */
+  /** The redacted log of a service so far, its last megabyte (kept as evidence of the checks that used it). */
   logOf(id: string): string {
-    return this.#running.get(id)?.log.join('') ?? '';
+    const log = this.#running.get(id)?.log;
+    if (!log) return '';
+    return (log.dropped ? `[… ${log.dropped} earlier lines not kept]\n` : '') + log.lines.slice(log.head).join('');
   }
 
   async stopAll(mode: 'cancel' | 'quit'): Promise<void> {
@@ -99,7 +105,7 @@ export class CompanionServices {
 
   #start(s: CompanionService): Running {
     const { ports } = this.#o;
-    const log: string[] = [];
+    const log: Running['log'] = { lines: [], head: 0, chars: 0, dropped: 0 };
     const redactor = { out: this.#o.redaction.redactor().lineStream(), err: this.#o.redaction.redactor().lineStream() };
     const decoder = { out: new TextDecoder(), err: new TextDecoder() };
     let matched = false;
@@ -111,7 +117,16 @@ export class CompanionServices {
     }
     const sink = (k: 'out' | 'err') => (c: Uint8Array) => {
       for (const line of redactor[k].push(decoder[k].decode(c, { stream: true }))) {
-        if (log.length < 20_000) log.push(line);
+        log.lines.push(line);
+        log.chars += line.length;
+        while (log.chars > SERVICE_LOG_MAX_CHARS && log.head < log.lines.length - 1) {
+          log.chars -= log.lines[log.head++]!.length;
+          log.dropped++;
+        }
+        if (log.head > 4096 && log.head * 2 > log.lines.length) {
+          log.lines = log.lines.slice(log.head);
+          log.head = 0;
+        }
         if (!matched && pattern?.test(line.slice(0, PATTERN_LINE_CHARS))) matched = true;
       }
     };

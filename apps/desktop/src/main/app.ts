@@ -10,7 +10,7 @@ import { createFileLogger, ensureDataDir, nodeFileSystem, stderrLogger, systemCl
 import { resolveLanguage } from '@ayar/i18n';
 import { serveAppRequest } from './app-protocol.ts';
 import { spawnUtilityEngine } from './engine-utility.ts';
-import { EngineSupervisor } from './engine-supervisor.ts';
+import { EngineSupervisor, PREPARE_QUIT_WAIT_MS } from './engine-supervisor.ts';
 import { EVIDENCE_SCHEME, serveEvidence } from './evidence-protocol.ts';
 import { SleepGuard } from './sleep-guard.ts';
 import { EventPorts } from './events-port.ts';
@@ -105,6 +105,7 @@ async function run(): Promise<void> {
     logPath: join(dataDir, 'logs', 'engine.log'),
     onHealth: (payload) => {
       keepLast(healthLog, payload);
+      sleepGuard.onEngineHealth(payload);
       ports.broadcast({ topic: 'engine.health', stream: supervisorStream, seq: ++supervisorSeq, at: new Date().toISOString(), payload });
     },
     onEngineEvent: (e) => {
@@ -189,9 +190,10 @@ async function run(): Promise<void> {
     stopping = true;
     e.preventDefault();
     logger.log('info', 'quitting: stopping the engine');
-    // 9.7: an active run ends the short way first (its checks «أُلغي» because the app quits), then the engine stops.
+    // 9.7: an active run (and a setup command) ends the short way first (its checks «أُلغي» because the app quits),
+    // then the engine stops: SIGTERM, and SIGKILL only after STOP_GRACE_MS, longer than the engine's own wait.
     const quick = supervisor.request('internal.prepareQuit', {}).catch(() => null);
-    void Promise.race([quick, new Promise((r) => setTimeout(r, 6000))])
+    void Promise.race([quick, new Promise((r) => setTimeout(r, PREPARE_QUIT_WAIT_MS))])
       .then(() => supervisor.stop())
       .catch((err: unknown) => logger.log('error', 'engine stop failed', { error: String(err) }))
       .finally(() => {
