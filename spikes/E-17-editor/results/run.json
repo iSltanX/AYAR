@@ -1,0 +1,123 @@
+{
+  "at": "2026-10-10T09:53:40.099Z",
+  "detection": {
+    "xcode": {
+      "bundleId": "com.apple.dt.Xcode",
+      "mdfind": [
+        "/Applications/Xcode.app"
+      ],
+      "appPath": true,
+      "cli": [
+        "/usr/bin/xed"
+      ],
+      "version": "Xcode 27.0 · Build version 27A266a"
+    },
+    "vscode": {
+      "bundleId": "com.microsoft.VSCode",
+      "mdfind": [],
+      "appPath": false,
+      "cli": [],
+      "version": null
+    },
+    "cursor": {
+      "bundleId": "com.todesktop.230313mzl4w4u92",
+      "mdfind": [],
+      "appPath": false,
+      "cli": [],
+      "version": null
+    },
+    "zed": {
+      "bundleId": "dev.zed.Zed",
+      "mdfind": [],
+      "appPath": false,
+      "cli": [],
+      "version": null
+    }
+  },
+  "defaults": {
+    "exit": 0,
+    "map": {
+      "ts": "/Users/abutalal/.cache/ayar-dev2/editors/Visual Studio Code.app",
+      "md": "/Applications/Katib.app",
+      "py": "/Applications/Notepad Pro.app",
+      "json": "/Applications/Notepad Pro.app"
+    },
+    "err": ""
+  },
+  "templates": {
+    "default": {
+      "cmd": "open <file>",
+      "note": "التطبيق الافتراضي لنوع الملف (LaunchServices)؛ لا يحمل سطرًا. ومع -t محرر النصوص الافتراضي",
+      "ref": "man open"
+    },
+    "xcode": {
+      "cmd": "xed --line <N> <file>",
+      "note": "يحدد السطر بعد الفتح؛ -b يبقي Xcode في الخلفية",
+      "ref": "xed --help (Xcode 27: -l, --line <number> Select line <number> after opening file)"
+    },
+    "vscode": {
+      "cmd": "code --goto <file>:<line>[:<col>]",
+      "note": "أو code -g",
+      "ref": "https://code.visualstudio.com/docs/configure/command-line (--goto)"
+    },
+    "cursor": {
+      "cmd": "cursor --goto <file>:<line>[:<col>]",
+      "note": "واجهة سطر أوامر متوافقة مع VS Code",
+      "ref": "https://docs.cursor.com/… (cursor CLI مشتق من code)"
+    },
+    "zed": {
+      "cmd": "zed <file>:<line>[:<col>]",
+      "note": "الصيغة path:line:column في الوسيط نفسه",
+      "ref": "https://zed.dev/docs/getting-started (zed path:line:column)"
+    }
+  },
+  "trials": [
+    {
+      "name": "xed --line 3 -b sample.ts",
+      "exit": 0,
+      "ms": 2124,
+      "xcodeRunningBefore": true,
+      "xcodeRunningAfter": true,
+      "err": "",
+      "verified": "الإطلاق والخروج 0؛ أما تحديد السطر 3 فيحتاج النظر إلى الشاشة"
+    },
+    {
+      "name": "open -g sample.md",
+      "exit": 0,
+      "ms": 81,
+      "defaultApp": "/Applications/Katib.app",
+      "err": ""
+    },
+    {
+      "name": "VS Code 1.141.0 (منزَّل) · code --goto sample.ts:3:5",
+      "download": {
+        "url": "https://update.code.visualstudio.com/1.141.0/darwin-arm64/stable",
+        "already": true
+      },
+      "signature": "Executable=~/.cache/ayar-dev2/editors/Visual Studio Code.app\n… [اقتُطع] …\n rules=13 files=2591\nInternal requirements count=1 size=180\n",
+      "version": [
+        "1.141.0",
+        "2a59476c9bfcb90b3ddc372c36762471b7dfad1c",
+        "arm64"
+      ],
+      "versionExit": 0,
+      "goto": {
+        "cliExit": 0,
+        "ms": 1108,
+        "appRunningAfter": true
+      },
+      "closed": true
+    }
+  ],
+  "needsScreen": [
+    "Xcode: هل الملف sample.ts مفتوح والسطر 3 («السطر الثالث») محدد؟",
+    "open: هل فُتح sample.md في Katib.app؟",
+    "VS Code (المنزَّل): هل فُتح sample.ts والمؤشر عند السطر 3 العمود 5؟"
+  ],
+  "_probeDir": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e17-files-2Z0qNl",
+  "ownerRequest": {
+    "steps": 3,
+    "minutes": 2,
+    "text": "تحقق بصري (3 خطوات، نحو دقيقتين): Xcode: هل الملف sample.ts مفتوح والسطر 3 («السطر الثالث») محدد؟ · open: هل فُتح sample.md في Katib.app؟ · VS Code (المنزَّل): هل فُتح sample.ts والمؤشر عند السطر 3 العمود 5؟"
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "at": "2026-10-10T09:05:09.247Z",
+  "runs": [
+    {
+      "node": "/opt/homebrew/bin/node",
+      "version": "v24.18.1",
+      "variant": "good",
+      "exit": 0,
+      "ms": 149,
+      "junit": {
+        "bytes": 419,
+        "testsuites": true
+      },
+      "stdoutHead": "✔ يجمع عددين (0.518834ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 74.81725\n",
+      "stderr": ""
+    },
+    {
+      "node": "~/.nvm/versions/node/v20.20.2/bin/node",
+      "version": "v20.20.2",
+      "variant": "good",
+      "exit": 0,
+      "ms": 141,
+      "junit": {
+        "bytes": 292,
+        "testsuites": true
+      },
+      "stdoutHead": "✔ يجمع عددين (0.617ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 41.543708\n",
+      "stderr": ""
+    },
+    {
+      "node": "~/.nvm/versions/node/v24.14.0/bin/node",
+      "version": "v24.14.0",
+      "variant": "good",
+      "exit": 0,
+      "ms": 202,
+      "junit": {
+        "bytes": 420,
+        "testsuites": true
+      },
+      "stdoutHead": "✔ يجمع عددين (0.280375ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 51.916458\n",
+      "stderr": ""
+    },
+    {
+      "node": "~/.nvm/versions/node/v24.16.0/bin/node",
+      "version": "v24.16.0",
+      "variant": "good",
+      "exit": 0,
+      "ms": 74,
+      "junit": {
+        "bytes": 420,
+        "testsuites": true
+      },
+      "stdoutHead": "✔ يجمع عددين (0.278291ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 39.050834\n",
+      "stderr": ""
+    },
+    {
+      "node": "/opt/homebrew/bin/node",
+      "version": "v24.18.1",
+      "variant": "node-test--bad",
+      "exit": 1,
+      "ms": 144,
+      "junit": {
+        "bytes": 1439,
+        "testsuites": true
+      },
+      "stdoutHead": "✖ يجمع عددين (1.009875ms)\nℹ tests 1\nℹ suites 0\nℹ pass 0\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 75.464833\n\n✖ failing tests:\n\ntest at\n… [اقتُطع] …\n:385:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 5,\n    expected: 6,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
+      "stderr": ""
+    },
+    {
+      "node": "~/.nvm/versions/node/v20.20.2/bin/node",
+      "version": "v20.20.2",
+      "variant": "node-test--bad",
+      "exit": 1,
+      "ms": 58,
+      "junit": {
+        "bytes": 1489,
+        "testsuites": true
+      },
+      "stdoutHead": "✖ يجمع عددين (1.3835ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  5 !== 6\n  \n      at TestContext.<anonymous> (file\n… [اقتُطع] …\nl/process/task_queues:137:8) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 5,\n    expected: 6,\n    operator: 'strictEqual'\n  }\n",
+      "stderr": ""
+    },
+    {
+      "node": "~/.nvm/versions/node/v24.14.0/bin/node",
+      "version": "v24.14.0",
+      "variant": "node-test--bad",
+      "exit": 1,
+      "ms": 67,
+      "junit": {
+        "bytes": 1438,
+        "testsuites": true
+      },
+      "stdoutHead": "✖ يجمع عددين (0.547583ms)\nℹ tests 1\nℹ suites 0\nℹ pass 0\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 38.14325\n\n✖ failing tests:\n\ntest at \n… [اقتُطع] …\n:358:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 5,\n    expected: 6,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
+      "stderr": ""
+    },
+    {
+      "node": "~/.nvm/versions/node/v24.16.0/bin/node",
+      "version": "v24.16.0",
+      "variant": "node-test--bad",
+      "exit": 1,
+      "ms": 68,
+      "junit": {
+        "bytes": 1438,
+        "testsuites": true
+      },
+      "stdoutHead": "✖ يجمع عددين (0.815667ms)\nℹ tests 1\nℹ suites 0\nℹ pass 0\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 36.90725\n\n✖ failing tests:\n\ntest at \n… [اقتُطع] …\n:385:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 5,\n    expected: 6,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
+      "stderr": ""
+    },
+    {
+      "node": "/opt/homebrew/bin/node",
+      "version": "v24.18.1",
+      "variant": "node-test--no-inputs",
+      "exit": 0,
+      "ms": 74,
+      "junit": {
+        "bytes": 227,
+        "testsuites": true
+      },
+      "stdoutHead": "ℹ tests 0\nℹ suites 0\nℹ pass 0\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 6.995041\n",
+      "stderr": ""
+    },
+    {
+      "node": "~/.nvm/versions/node/v20.20.2/bin/node",
+      "version": "v20.20.2",
+      "variant": "node-test--no-inputs",
+      "exit": 0,
+      "ms": 27,
+      "junit": {
+        "bytes": 227,
+        "testsuites": true
+      },
+      "stdoutHead": "ℹ tests 0\nℹ suites 0\nℹ pass 0\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 2.809541\n",
+      "stderr": ""
+    },
+    {
+      "node": "~/.nvm/versions/node/v24.14.0/bin/node",
+      "version": "v24.14.0",
+      "variant": "node-test--no-inputs",
+      "exit": 0,
+      "ms": 35,
+      "junit": {
+        "bytes": 227,
+        "testsuites": true
+      },
+      "stdoutHead": "ℹ tests 0\nℹ suites 0\nℹ pass 0\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 5.341791\n",
+      "stderr": ""
+    },
+    {
+      "node": "~/.nvm/versions/node/v24.16.0/bin/node",
+      "version": "v24.16.0",
+      "variant": "node-test--no-inputs",
+      "exit": 0,
+      "ms": 37,
+      "junit": {
+        "bytes": 227,
+        "testsuites": true
+      },
+      "stdoutHead": "ℹ tests 0\nℹ suites 0\nℹ pass 0\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 5.544375\n",
+      "stderr": ""
+    }
+  ]
+}

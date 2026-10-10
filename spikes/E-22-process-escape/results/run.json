@@ -1,0 +1,273 @@
+{
+  "at": "2026-10-10T09:31:03.556Z",
+  "procargs": [
+    "pid=48768 exe=/bin/sleep bytes=34 argc=2 env_strings=0 AYAR_CHECK_TOKEN_present=0",
+    "pid=48769 exe=~/.nvm/versions/node/v24.16.0/bin/node bytes=964 argc=3 env_strings=185 AYAR_CHECK_TOKEN_present=1",
+    "pid=48770 exe=/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python bytes=1212 argc=3 env_strings=197 AYAR_CHECK_TOKEN_present=1",
+    "pid=48771 exe=/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python bytes=1796 argc=3 env_strings=195 AYAR_CHECK_TOKEN_present=1",
+    "pid=48772 exe=/bin/sleep bytes=29 argc=2 env_strings=0 AYAR_CHECK_TOKEN_present=0",
+    "pid=48773 exe=/bin/sleep bytes=29 argc=2 env_strings=0 AYAR_CHECK_TOKEN_present=0"
+  ],
+  "scenarios": [
+    {
+      "variant": "sigterm-grandchild",
+      "token": "ayr_chk_fc72a853b2aa9ddd",
+      "pgid": 48781,
+      "leaderExit": null,
+      "leaderMs": null,
+      "escalation": [
+        {
+          "sig": "SIGINT",
+          "sent": true,
+          "remainingAfter": [],
+          "ms": 303
+        }
+      ],
+      "leaderExitAfterEscalation": {
+        "code": 1,
+        "signal": null
+      },
+      "pipesClosedMs": 12023,
+      "pipesHeldOpenByOrphans": false,
+      "recordedPids": [
+        {
+          "pid": 48783,
+          "alive": false,
+          "comm": null,
+          "ppid": null,
+          "pgid": null,
+          "byToken": false,
+          "byGroup": false,
+          "byPpid1Heuristic": false
+        },
+        {
+          "pid": 48784,
+          "alive": false,
+          "comm": null,
+          "ppid": null,
+          "pgid": null,
+          "byToken": false,
+          "byGroup": false,
+          "byPpid1Heuristic": false
+        }
+      ],
+      "tokenScan": {
+        "hits": [],
+        "byNameCount": 0,
+        "errors": 0
+      },
+      "groupScan": [],
+      "ppid1Heuristic": [
+        "48830:/System/Library/PrivateFrameworks/UniversalAccess.framework/Versions/A/Resources/AXVisualSupportAgent.app/Contents/MacOS/AXVisualSupportAgent:7s",
+        "48866:(ODDIMetricsExten):0s"
+      ],
+      "newLaunchdLabels": [],
+      "testOutput": "\nInterrupted while running:\n\n⚠ test/sigterm-grandchild.test.js (test/sigterm-grandchild.test.js:1:1)\n",
+      "cleanup": {
+        "killedByTokenOrGroup": [],
+        "neededRecordedList": [],
+        "recordedAliveAfter": [],
+        "newPpid1AliveAfter": [
+          "48830:/System/Library/PrivateFrameworks/UniversalAccess.framework/Versions/A/Resources/AXVisualSupportAgent.app/Contents/MacOS/AXVisualSupportAgent"
+        ],
+        "labelsAfter": []
+      }
+    },
+    {
+      "variant": "setsid-detach",
+      "token": "ayr_chk_708e4deb6fec5217",
+      "pgid": 48884,
+      "leaderExit": {
+        "code": 0,
+        "signal": null
+      },
+      "leaderMs": 68,
+      "pipesClosedMs": 68,
+      "pipesHeldOpenByOrphans": false,
+      "groupAfterExit": [],
+      "recordedPids": [
+        {
+          "pid": 48886,
+          "alive": true,
+          "comm": "/Users/abutalal/.nvm/versions/node/v24.16.0/bin/node",
+          "ppid": 1,
+          "pgid": 48886,
+          "byToken": true,
+          "byGroup": false,
+          "byPpid1Heuristic": true
+        }
+      ],
+      "tokenScan": {
+        "hits": [
+          48886
+        ],
+        "byNameCount": 1,
+        "errors": 0
+      },
+      "groupScan": [],
+      "ppid1Heuristic": [
+        "48886:/Users/abutalal/.nvm/versions/node/v24.16.0/bin/node:1s"
+      ],
+      "newLaunchdLabels": [],
+      "testOutput": "✔ يترك عملية منفصلة بجلسة جديدة (0.9205ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 36.860209\n",
+      "cleanup": {
+        "killedByTokenOrGroup": [
+          48886
+        ],
+        "neededRecordedList": [],
+        "recordedAliveAfter": [],
+        "newPpid1AliveAfter": [],
+        "labelsAfter": []
+      }
+    },
+    {
+      "variant": "double-fork",
+      "token": "ayr_chk_c71a3cca343993a4",
+      "pgid": 48913,
+      "leaderExit": {
+        "code": 0,
+        "signal": null
+      },
+      "leaderMs": 118,
+      "pipesClosedMs": 118,
+      "pipesHeldOpenByOrphans": false,
+      "groupAfterExit": [],
+      "recordedPids": [
+        {
+          "pid": 48920,
+          "alive": true,
+          "comm": "/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python",
+          "ppid": 1,
+          "pgid": 48919,
+          "byToken": true,
+          "byGroup": false,
+          "byPpid1Heuristic": true
+        }
+      ],
+      "tokenScan": {
+        "hits": [
+          48920
+        ],
+        "byNameCount": 1,
+        "errors": 0
+      },
+      "groupScan": [],
+      "ppid1Heuristic": [
+        "48920:/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python:1s"
+      ],
+      "newLaunchdLabels": [],
+      "testOutput": "✔ يطلق شبحًا بتفرع مزدوج (41.576125ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 84.828833\n",
+      "cleanup": {
+        "killedByTokenOrGroup": [
+          48920
+        ],
+        "neededRecordedList": [],
+        "recordedAliveAfter": [],
+        "newPpid1AliveAfter": [],
+        "labelsAfter": []
+      }
+    },
+    {
+      "variant": "launchctl-submit",
+      "token": "ayr_chk_05ca41b2d5f90aa7",
+      "pgid": 48937,
+      "leaderExit": {
+        "code": 0,
+        "signal": null
+      },
+      "leaderMs": 83,
+      "pipesClosedMs": 83,
+      "pipesHeldOpenByOrphans": false,
+      "groupAfterExit": [],
+      "recordedPids": [],
+      "tokenScan": {
+        "hits": [],
+        "byNameCount": 0,
+        "errors": 0
+      },
+      "groupScan": [],
+      "ppid1Heuristic": [
+        "48930:/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app/Contents/MacOS/Microsoft Update Assistant:2s",
+        "48932:/System/Library/CoreServices/iconservicesagent:2s",
+        "48948:/bin/sleep:1s",
+        "48953:/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared:0s"
+      ],
+      "newLaunchdLabels": [
+        "com.apple.mdworker.shared.05000000-0400-0000-0000-000000000000",
+        "ayar.fx.proc.48945.1791624692"
+      ],
+      "testOutput": "✔ يسجل وظيفة launchd (10.187ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 50.6975\n",
+      "labelFromFile": "ayar.fx.proc.48945.1791624692",
+      "cleanup": {
+        "killedByTokenOrGroup": [],
+        "neededRecordedList": [],
+        "recordedAliveAfter": [],
+        "newPpid1AliveAfter": [
+          "48930:/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app/Contents/MacOS/Microsoft Update Assistant",
+          "48932:/System/Library/CoreServices/iconservicesagent",
+          "48953:/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared"
+        ],
+        "labelsAfter": []
+      }
+    },
+    {
+      "variant": "env-cleared-detach",
+      "token": "ayr_chk_3e416616b7d7b045",
+      "pgid": 48975,
+      "leaderExit": {
+        "code": 0,
+        "signal": null
+      },
+      "leaderMs": 77,
+      "pipesClosedMs": 77,
+      "pipesHeldOpenByOrphans": false,
+      "groupAfterExit": [],
+      "recordedPids": [
+        {
+          "pid": 48977,
+          "alive": true,
+          "comm": "/Users/abutalal/.nvm/versions/node/v24.16.0/bin/node",
+          "ppid": 1,
+          "pgid": 48977,
+          "byToken": false,
+          "byGroup": false,
+          "byPpid1Heuristic": true
+        }
+      ],
+      "tokenScan": {
+        "hits": [],
+        "byNameCount": 0,
+        "errors": 0
+      },
+      "groupScan": [],
+      "ppid1Heuristic": [
+        "48977:/Users/abutalal/.nvm/versions/node/v24.16.0/bin/node:1s"
+      ],
+      "newLaunchdLabels": [
+        "com.apple.mdworker.shared.05000000-0400-0000-0000-000000000000"
+      ],
+      "testOutput": "✔ يطلق عملية بلا بيئة منفصلة (2.592583ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 41.877208\n",
+      "cleanup": {
+        "killedByTokenOrGroup": [],
+        "neededRecordedList": [
+          48977
+        ],
+        "recordedAliveAfter": [],
+        "newPpid1AliveAfter": [],
+        "labelsAfter": []
+      }
+    }
+  ],
+  "noise": {
+    "windowS": 20,
+    "newPpid1": [],
+    "count": 0,
+    "totalUserProcesses": 450,
+    "ms": 20058
+  },
+  "finalCheck": {
+    "leftovers": [],
+    "ayarLaunchdLabels": [],
+    "clean": true
+  }
+}

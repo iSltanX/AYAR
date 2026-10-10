@@ -22,12 +22,5 @@
         "osv-mini-db"
       ]
     }
-  ],
-  "pending": [
-    {
-      "waits_for": "E-09",
-      "check": "sec.deps",
-      "reason": "يحتاج قاعدة OSV المصغرة من DEV-2"
-    }
   ]
 }

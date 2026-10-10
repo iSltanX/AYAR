@@ -4,8 +4,8 @@ track: dev
 number: 2
 stage: verification
 title: التحقق السابق للبناء — الأدوات والعمليات والمستودعات
-status: not-started
-status_date: 2026-10-09
+status: delivered
+status_date: 2026-10-10
 depends_on: [DEV-0, DEV-1]
 design_gates: []
 owner_gates: []
@@ -131,8 +131,8 @@ closing_commit:
 
 ## 11. حالة التقدم ونقطة الاستئناف
 
-- **الحالة:** لم تبدأ.
-- **آخر تحديث:** 2026-10-09.
-- **المنجز:** —
-- **آخر commit:** —
-- **نقطة الاستئناف:** المهمة 1 (قائمة التنزيلات).
+- **الحالة:** سُلّمت وتنتظر الدمج.
+- **آخر تحديث:** 2026-10-10.
+- **المنجز:** المهام الأربع عشرة كلها: سجل التنزيلات (`spikes/DEV-2-downloads.md`)، والقرارات الثلاثة عشر محسومة بالدليل في `spikes/E-xx-*/` وقيودها في `docs/tracking/env-decisions.md` (E-07 وE-08 وE-09 وE-10 وE-11 وE-12 وE-15 وE-16 وE-17 وE-20 وE-21 وE-22 وE-24)، والقاعدة المصغرة `fixtures/tools/osv-mini-db/` وإكمال `sec.deps` في `fixtures/SANITY.md`، وجدول رموز الخروج الفعلية `spikes/E-07-toolchains/results/exit-codes.md`، والمكتبة المشتركة `spikes/_lib-dev2/`. معايير الإغلاق (القسم 8) محققة كلها، والتسليم في `docs/handoffs/DEV-2.md`.
+- **آخر commit عمل:** e8ad6b3.
+- **نقطة الاستئناف:** لا شيء؛ الدمج والوسم للجلسة الرئيسية. وطلب اختياري للمالك (تحقق بصري لـ E-17) في ملف التسليم.

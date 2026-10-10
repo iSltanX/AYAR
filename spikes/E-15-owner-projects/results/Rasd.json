@@ -1,0 +1,750 @@
+{
+  "project": "Rasd",
+  "root": "/Volumes/iSltanXx/Projects/Brave/Rasd",
+  "scannedAt": "2026-10-10T09:38:28.979Z",
+  "entries": 2415,
+  "partial": false,
+  "warnings": [],
+  "outputDirs": [
+    {
+      "rel": "dist",
+      "sizeBytes": 2138062
+    }
+  ],
+  "symlinks": [],
+  "configFilesPresent": [
+    "package.json",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    "tsconfig.json",
+    "eslint.config.js",
+    "vite.config.ts",
+    "vitest.config.ts",
+    ".nvmrc",
+    ".gitattributes",
+    "README.md"
+  ],
+  "secretFilesByName": [
+    ".npmrc"
+  ],
+  "ayarDir": false,
+  "package": {
+    "name": "rasd",
+    "private": true,
+    "type": "module",
+    "packageManager": "pnpm@11.11.0",
+    "enginesNode": ">=24.0.0",
+    "workspaces": null,
+    "hasBin": false,
+    "hasExportsOrMain": false,
+    "depCount": 7,
+    "devDepCount": 25,
+    "scripts": [
+      {
+        "name": "dev",
+        "kind": "تشغيل",
+        "tool": "vite",
+        "composite": false,
+        "length": 4
+      },
+      {
+        "name": "build",
+        "kind": "فحص أنواع",
+        "tool": "pnpm",
+        "composite": true,
+        "length": 67
+      },
+      {
+        "name": "build:bundle",
+        "kind": "بناء",
+        "tool": "vite",
+        "composite": true,
+        "length": 36
+      },
+      {
+        "name": "build:content",
+        "kind": "بناء",
+        "tool": "vite",
+        "composite": false,
+        "length": 42
+      },
+      {
+        "name": "build:firefox",
+        "kind": "بناء",
+        "tool": "RASD_TARGET=firefox",
+        "composite": false,
+        "length": 41
+      },
+      {
+        "name": "build:all",
+        "kind": "بناء",
+        "tool": "pnpm",
+        "composite": true,
+        "length": 81
+      },
+      {
+        "name": "preview",
+        "kind": "تشغيل",
+        "tool": "vite",
+        "composite": false,
+        "length": 12
+      },
+      {
+        "name": "typecheck",
+        "kind": "فحص أنواع",
+        "tool": "tsc",
+        "composite": true,
+        "length": 105
+      },
+      {
+        "name": "lint",
+        "kind": "تدقيق",
+        "tool": "NODE_OPTIONS=--max-old-space-size=4096",
+        "composite": false,
+        "length": 64
+      },
+      {
+        "name": "lint:fix",
+        "kind": "تدقيق",
+        "tool": "NODE_OPTIONS=--max-old-space-size=4096",
+        "composite": false,
+        "length": 53
+      },
+      {
+        "name": "format",
+        "kind": "تنسيق",
+        "tool": "prettier",
+        "composite": false,
+        "length": 18
+      },
+      {
+        "name": "format:check",
+        "kind": "فحص أنواع",
+        "tool": "prettier",
+        "composite": false,
+        "length": 18
+      },
+      {
+        "name": "test",
+        "kind": "اختبار",
+        "tool": "vitest",
+        "composite": false,
+        "length": 10
+      },
+      {
+        "name": "test:watch",
+        "kind": "اختبار",
+        "tool": "vitest",
+        "composite": false,
+        "length": 6
+      },
+      {
+        "name": "test:coverage",
+        "kind": "اختبار",
+        "tool": "vitest",
+        "composite": false,
+        "length": 21
+      },
+      {
+        "name": "test:repeat",
+        "kind": "اختبار",
+        "tool": "node",
+        "composite": false,
+        "length": 28
+      },
+      {
+        "name": "test:e2e",
+        "kind": "اختبار",
+        "tool": "node",
+        "composite": false,
+        "length": 20
+      },
+      {
+        "name": "tokens:sync",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 28
+      },
+      {
+        "name": "fonts:sync",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 27
+      },
+      {
+        "name": "icons:sync",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 27
+      },
+      {
+        "name": "icons:brand",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 28
+      },
+      {
+        "name": "tokens:check",
+        "kind": "فحص أنواع",
+        "tool": "node",
+        "composite": false,
+        "length": 36
+      },
+      {
+        "name": "verify:tokens",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 30
+      },
+      {
+        "name": "fixtures:serve",
+        "kind": "تشغيل",
+        "tool": "node",
+        "composite": false,
+        "length": 31
+      },
+      {
+        "name": "verify:dist",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 28
+      },
+      {
+        "name": "verify:load",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 28
+      },
+      {
+        "name": "verify:lifecycle",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 33
+      },
+      {
+        "name": "verify:overlay",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 31
+      },
+      {
+        "name": "verify:picker",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 30
+      },
+      {
+        "name": "verify:measure",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 31
+      },
+      {
+        "name": "verify:palette",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 31
+      },
+      {
+        "name": "verify:colour",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 30
+      },
+      {
+        "name": "verify:editor",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 30
+      },
+      {
+        "name": "verify:library",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 31
+      },
+      {
+        "name": "verify:fullpage",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 32
+      },
+      {
+        "name": "verify:inspect",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 31
+      },
+      {
+        "name": "verify:popup",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 29
+      },
+      {
+        "name": "verify:issues",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 30
+      },
+      {
+        "name": "verify:capturing",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 33
+      },
+      {
+        "name": "verify:capture",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 31
+      },
+      {
+        "name": "verify:compare",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 31
+      },
+      {
+        "name": "verify:compare-diff",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 36
+      },
+      {
+        "name": "verify:activate",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 32
+      },
+      {
+        "name": "verify:gate",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 28
+      },
+      {
+        "name": "verify:export",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 30
+      },
+      {
+        "name": "verify:share",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 29
+      },
+      {
+        "name": "verify:accessibility",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 37
+      },
+      {
+        "name": "verify:visual",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 30
+      },
+      {
+        "name": "verify:memory",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 30
+      },
+      {
+        "name": "verify:lighthouse",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 34
+      },
+      {
+        "name": "verify:network",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 31
+      },
+      {
+        "name": "verify:wave",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 28
+      },
+      {
+        "name": "verify:firefox",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 31
+      },
+      {
+        "name": "firefox:load",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 36
+      },
+      {
+        "name": "firefox:popup",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 37
+      },
+      {
+        "name": "firefox:activate",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 40
+      },
+      {
+        "name": "firefox:measure",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 39
+      },
+      {
+        "name": "firefox:inspect",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 39
+      },
+      {
+        "name": "firefox:colour",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 38
+      },
+      {
+        "name": "firefox:capture",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 39
+      },
+      {
+        "name": "firefox:fullpage",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 40
+      },
+      {
+        "name": "firefox:editor",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 38
+      },
+      {
+        "name": "firefox:export",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 38
+      },
+      {
+        "name": "firefox:library",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 39
+      },
+      {
+        "name": "firefox:report",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 38
+      },
+      {
+        "name": "firefox:lifecycle",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 41
+      },
+      {
+        "name": "firefox:network",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 39
+      },
+      {
+        "name": "docs:lint",
+        "kind": "تدقيق",
+        "tool": "node",
+        "composite": false,
+        "length": 26
+      },
+      {
+        "name": "entrypoints:lint",
+        "kind": "تدقيق",
+        "tool": "node",
+        "composite": false,
+        "length": 33
+      },
+      {
+        "name": "design:shots",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 29
+      },
+      {
+        "name": "guards:sync",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 28
+      },
+      {
+        "name": "guards:check",
+        "kind": "فحص أنواع",
+        "tool": "node",
+        "composite": false,
+        "length": 36
+      },
+      {
+        "name": "guards:firefox-sync",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 31
+      },
+      {
+        "name": "guards:firefox-check",
+        "kind": "فحص أنواع",
+        "tool": "node",
+        "composite": false,
+        "length": 39
+      },
+      {
+        "name": "gate:a",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 23
+      },
+      {
+        "name": "zip",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 20
+      },
+      {
+        "name": "zip:firefox",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 37
+      },
+      {
+        "name": "zip:source",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 36
+      },
+      {
+        "name": "zip:all",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 33
+      },
+      {
+        "name": "launch:images",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 30
+      },
+      {
+        "name": "store:package",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 30
+      },
+      {
+        "name": "release:upgrade",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 32
+      },
+      {
+        "name": "check",
+        "kind": "فحص أنواع",
+        "tool": "pnpm",
+        "composite": true,
+        "length": 137
+      }
+    ],
+    "notableDeps": [
+      "@crxjs/vite-plugin",
+      "@playwright/test",
+      "@types/chrome",
+      "eslint",
+      "fast-check",
+      "prettier",
+      "typescript",
+      "vite",
+      "vitest"
+    ]
+  },
+  "lockfiles": [
+    "pnpm-lock.yaml"
+  ],
+  "runtimeFiles": {
+    ".nvmrc": "24.16.0"
+  },
+  "manifests": [
+    {
+      "rel": "artifacts/design/ext/manifest.json",
+      "manifest_version": 3,
+      "hasDefaultLocale": true,
+      "hasLocalesDir": true,
+      "permissions": 6,
+      "hostPermissions": null,
+      "isObsidian": false,
+      "hasCsp": true
+    },
+    {
+      "rel": "dist-firefox/manifest.json",
+      "manifest_version": 3,
+      "hasDefaultLocale": true,
+      "hasLocalesDir": true,
+      "permissions": 6,
+      "hostPermissions": null,
+      "isObsidian": false,
+      "hasCsp": true
+    }
+  ],
+  "typeSignals": {
+    "browserExtension": true,
+    "obsidianPlugin": false,
+    "tauri": false,
+    "cargoToml": [],
+    "electron": false,
+    "svelte": false,
+    "vite": true,
+    "wxt": false,
+    "esbuild": false
+  },
+  "tests": {
+    "unit": 353,
+    "e2eDir": 8,
+    "pytest": 0,
+    "stories": 0,
+    "rust": 0
+  },
+  "quality": {
+    "eslint": [
+      "eslint.config.js"
+    ],
+    "biome": [],
+    "prettier": [],
+    "tsconfig": [
+      "tsconfig.json"
+    ],
+    "knip": [],
+    "secretsConfig": []
+  },
+  "workflows": [
+    {
+      "file": "audit.yml",
+      "runSteps": 2,
+      "usesSecrets": false,
+      "usesExpressions": 0,
+      "nodeVersions": []
+    },
+    {
+      "file": "ci.yml",
+      "runSteps": 41,
+      "usesSecrets": false,
+      "usesExpressions": 47,
+      "nodeVersions": []
+    },
+    {
+      "file": "release.yml",
+      "runSteps": 4,
+      "usesSecrets": false,
+      "usesExpressions": 3,
+      "nodeVersions": []
+    }
+  ],
+  "references": {
+    "tokensFiles": [],
+    "cssRootVars": [
+      "artifacts/design/ext/assets/base.css",
+      "artifacts/design/ext/assets/tokens.css",
+      "dist-firefox/assets/base.css",
+      "dist-firefox/assets/tokens.css",
+      "public/assets/base.css"
+    ],
+    "tailwindTheme": false,
+    "openapi": [],
+    "locales": 7,
+    "i18nFiles": 0,
+    "rtlOrArabic": true,
+    "permissionsPolicy": [
+      "Docs/ADR/permissions.md",
+      "Docs/Store/permissions.md",
+      "artifacts/design/ext/assets/permission-policy-09xxaVtw.js"
+    ]
+  },
+  "gitAttributes": "8 سطر",
+  "hooksDirs": [],
+  "durationMs": 39,
+  "divergences": [
+    "manifest.json في موضع غير المواضع الأربعة المفترضة: artifacts/design/ext/manifest.json، dist-firefox/manifest.json",
+    "يطلب Node 24.16.0 (يُقارن بالمثبت في E-07)"
+  ],
+  "readOnlyProof": {
+    "filesInventoried": 35236,
+    "changedAfterDiscovery": [],
+    "ayarDirCreated": false
+  }
+}

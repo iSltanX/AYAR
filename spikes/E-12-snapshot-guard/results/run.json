@@ -1,0 +1,180 @@
+{
+  "at": "2026-10-10T09:24:34.949Z",
+  "cases": [
+    {
+      "tool": "vitest",
+      "name": "افتراضي (بلا أعلام، بلا CI)",
+      "cmd": "pnpm exec vitest run --reporter=default --reporter=json --outputFile.json=$R/vitest.json",
+      "exit": 0,
+      "ms": 1779,
+      "writes": {
+        "added": [
+          "test/__snapshots__/file.txt",
+          "test/__snapshots__/snap.test.js.snap"
+        ],
+        "changed": [
+          "test/snap.test.js"
+        ],
+        "removed": []
+      },
+      "zeroWrites": false,
+      "tail": "  Snapshots  3 written\n Test Files  2 passed (2)\n      Tests  4 passed (4)\nJSON report written to /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e12-r-je8Xm4/vitest.json"
+    },
+    {
+      "tool": "vitest",
+      "name": "--update=none (C-15)",
+      "cmd": "pnpm exec vitest run --reporter=default --reporter=json --outputFile.json=$R/vitest.json --update=none",
+      "exit": 1,
+      "ms": 303,
+      "writes": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "zeroWrites": true,
+      "tail": " ❯ test/snap.test.js (3 tests | 2 failed) 5ms\n  Snapshots  2 failed\n Test Files  1 failed | 1 passed (2)\n      Tests  2 failed | 2 passed (4)\nJSON report written to /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e12-r-Z4Qq15/vitest.json\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯\nError: Snapshot `لقطة ناقصة 1` mismatched\n      2| it('لقطة ناقصة', () => { expect({ a: 1, b: 'عربي' }).toMatchSnapshot()…"
+    },
+    {
+      "tool": "vitest",
+      "name": "CI=1 بلا أعلام (مقارنة)",
+      "cmd": "pnpm exec vitest run --reporter=default --reporter=json --outputFile.json=$R/vitest.json",
+      "exit": 1,
+      "ms": 297,
+      "writes": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "zeroWrites": true,
+      "tail": " ❯ test/snap.test.js (3 tests | 2 failed) 5ms\n  Snapshots  2 failed\n Test Files  1 failed | 1 passed (2)\n      Tests  2 failed | 2 passed (4)\nJSON report written to /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e12-r-BJyKLm/vitest.json\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯\nError: Snapshot `لقطة ناقصة 1` mismatched\n      2| it('لقطة ناقصة', () => { expect({ a: 1, b: 'عربي' }).toMatchSnapshot()…"
+    },
+    {
+      "tool": "vitest",
+      "name": "--update=none مع --update=false (هل يقبلهما)",
+      "cmd": "pnpm exec vitest run --reporter=default --reporter=json --outputFile.json=$R/vitest.json --update=false",
+      "exit": 0,
+      "ms": 294,
+      "writes": {
+        "added": [
+          "test/__snapshots__/file.txt",
+          "test/__snapshots__/snap.test.js.snap"
+        ],
+        "changed": [],
+        "removed": []
+      },
+      "zeroWrites": false,
+      "tail": "  Snapshots  2 written\n Test Files  2 passed (2)\n      Tests  4 passed (4)\nJSON report written to /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e12-r-ogbP5Q/vitest.json"
+    },
+    {
+      "tool": "jest",
+      "name": "افتراضي (بلا --ci، بلا CI)",
+      "cmd": "pnpm exec jest --json --outputFile=$R/jest.json",
+      "exit": 1,
+      "ms": 1083,
+      "writes": {
+        "added": [
+          "test/__snapshots__/snap.test.js.snap"
+        ],
+        "changed": [
+          "test/snap.test.js"
+        ],
+        "removed": []
+      },
+      "zeroWrites": false,
+      "tail": " › 2 snapshots written.\nSnapshot Summary\n › 2 snapshots written from 1 test suite.\n › 1 snapshot file obsolete from 1 test suite. To remove it, re-run jest with `-u`.\n   ↳   • test/__snapshots__/obsolete.test.js.snap\nTest Suites: 2 passed, 2 total\nTests:       3 passed, 3 total\nSnapshots:   1 file obsolete, 2 written, 2 total"
+    },
+    {
+      "tool": "jest",
+      "name": "--ci (C-15)",
+      "cmd": "pnpm exec jest --ci --json --outputFile=$R/jest.json",
+      "exit": 1,
+      "ms": 443,
+      "writes": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "zeroWrites": true,
+      "tail": "    expect(received).toMatchSnapshot()\n    Snapshot name: `لقطة ناقصة 1`\n    New snapshot was not written. The update flag must be explicitly passed to write a new snapshot.\n    This is likely because this test is run in a continuous integration (CI) environment in which snapshots are not written by default.\n    > 1 | test('لقطة ناقصة', () => { expect({ a: 1, b: 'عربي' }).toMatchSnapshot(); });\n      2 | test('لقطة مضمّنة ناقصة', () => { expect('قيمة').toMatchInlineSnapshot(`\"قيمة\"`); });\n      at Object.toMatchSnapshot (test/snap.test.js:1:56)\n › 1 snapshot failed."
+    },
+    {
+      "tool": "jest",
+      "name": "CI=1 بلا --ci (مقارنة)",
+      "cmd": "pnpm exec jest --json --outputFile=$R/jest.json",
+      "exit": 1,
+      "ms": 364,
+      "writes": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "zeroWrites": true,
+      "tail": "    expect(received).toMatchSnapshot()\n    Snapshot name: `لقطة ناقصة 1`\n    New snapshot was not written. The update flag must be explicitly passed to write a new snapshot.\n    This is likely because this test is run in a continuous integration (CI) environment in which snapshots are not written by default.\n    > 1 | test('لقطة ناقصة', () => { expect({ a: 1, b: 'عربي' }).toMatchSnapshot(); });\n      2 | test('لقطة مضمّنة ناقصة', () => { expect('قيمة').toMatchInlineSnapshot(`\"قيمة\"`); });\n      at Object.toMatchSnapshot (test/snap.test.js:1:56)\n › 1 snapshot failed."
+    },
+    {
+      "tool": "playwright",
+      "name": "افتراضي (بلا أعلام، بلا CI)",
+      "cmd": "pnpm exec playwright test --reporter=list,json --output=$R/pw-out",
+      "exit": 1,
+      "ms": 3783,
+      "writes": {
+        "added": [
+          "tests/snap.spec.js-snapshots/home-darwin.png",
+          "tests/snap.spec.js-snapshots/t-darwin.txt"
+        ],
+        "changed": [],
+        "removed": []
+      },
+      "zeroWrites": false,
+      "tail": "    Error: A snapshot doesn't exist at /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e12-FX-ADAPTERS-good-p4Ppjx/p/playwright/tests/snap.spec.js-snapshots/home-darwin.png, writing actual.\n      3 | test('لقطة نصية ناقصة', async () => { expect('نص').toMatchSnapshot('t.txt'); });\n    Expected: tests/snap.spec.js-snapshots/home-darwin.\n… [اقتُطع] …\nn't exist at /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e12-FX-ADAPTERS-good-p4Ppjx/p/playwright/tests/snap.spec.js-snapshots/t-darwin.txt, writing actual.\n    > 3 | test('لقطة نصية ناقصة', async () => { expect('نص').toMatchSnapshot('t.txt'); });\n    Expected: tests/snap.spec.js-snapshots/t-darwin.txt\n  2 failed\n  1 passed (3.2s)"
+    },
+    {
+      "tool": "playwright",
+      "name": "--update-snapshots=none (C-15)",
+      "cmd": "pnpm exec playwright test --reporter=list,json --output=$R/pw-out --update-snapshots=none",
+      "exit": 1,
+      "ms": 893,
+      "writes": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "zeroWrites": true,
+      "tail": "    Error: A snapshot doesn't exist at /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e12-FX-ADAPTERS-good-p4Ppjx/p/playwright/tests/snap.spec.js-snapshots/home-darwin.png.\n      3 | test('لقطة نصية ناقصة', async () => { expect('نص').toMatchSnapshot('t.txt'); });\n    Error: A snapshot doesn't exist at /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e12-FX-ADAPTERS-good-p4Ppjx/p/playwright/tests/snap.spec.js-snapshots/t-darwin.txt.\n    > 3 | test('لقطة نصية ناقصة', async () => { expect('نص').toMatchSnapshot('t.txt'); });\n  2 failed\n  1 passed (619ms)"
+    },
+    {
+      "tool": "playwright",
+      "name": "CI=1 بلا أعلام (مقارنة)",
+      "cmd": "pnpm exec playwright test --reporter=list,json --output=$R/pw-out",
+      "exit": 1,
+      "ms": 997,
+      "writes": {
+        "added": [
+          "tests/snap.spec.js-snapshots/home-darwin.png",
+          "tests/snap.spec.js-snapshots/t-darwin.txt"
+        ],
+        "changed": [],
+        "removed": []
+      },
+      "zeroWrites": false,
+      "tail": "    Error: A snapshot doesn't exist at /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e12-FX-ADAPTERS-good-p4Ppjx/p/playwright/tests/snap.spec.js-snapshots/home-darwin.png, writing actual.\n      3 | test('لقطة نصية ناقصة', async () => { expect('نص').toMatchSnapshot('t.txt'); });\n    Expected: tests/snap.spec.js-snapshots/home-darwin.\n… [اقتُطع] …\n't exist at /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e12-FX-ADAPTERS-good-p4Ppjx/p/playwright/tests/snap.spec.js-snapshots/t-darwin.txt, writing actual.\n    > 3 | test('لقطة نصية ناقصة', async () => { expect('نص').toMatchSnapshot('t.txt'); });\n    Expected: tests/snap.spec.js-snapshots/t-darwin.txt\n  2 failed\n  1 passed (720ms)"
+    },
+    {
+      "tool": "playwright",
+      "name": "--update-snapshots=missing (مقارنة: يكتب الناقص)",
+      "cmd": "pnpm exec playwright test --reporter=list,json --output=$R/pw-out --update-snapshots=missing",
+      "exit": 0,
+      "ms": 804,
+      "writes": {
+        "added": [
+          "tests/snap.spec.js-snapshots/home-darwin.png",
+          "tests/snap.spec.js-snapshots/t-darwin.txt"
+        ],
+        "changed": [],
+        "removed": []
+      },
+      "zeroWrites": false,
+      "tail": "A snapshot doesn't exist at /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e12-FX-ADAPTERS-good-p4Ppjx/p/playwright/tests/snap.spec.js-snapshots/home-darwin.png, writing actual.\nA snapshot doesn't exist at /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e12-FX-ADAPTERS-good-p4Ppjx/p/playwright/tests/snap.spec.js-snapshots/t-darwin.txt, writing actual.\n  3 passed (529ms)"
+    }
+  ]
+}

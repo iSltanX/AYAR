@@ -1,0 +1,89 @@
+{
+  "at": "2026-10-10T09:07:19.038Z",
+  "dbDir": "~/.cache/ayar-dev2/osv-db",
+  "steps": [
+    {
+      "name": "HEAD npm/all.zip",
+      "stdout": "last-modified: Fri, 09 Oct 2026 21:17:48 GMT\r\netag: \"2123b47ed4c009db5601e34fbcc690a9\"\r\ncontent-length: 218229513"
+    },
+    {
+      "name": "HEAD PyPI/all.zip",
+      "stdout": "last-modified: Sat, 10 Oct 2026 09:02:50 GMT\r\netag: \"7bbe256126c8584c69168e6e890f7fed\"\r\ncontent-length: 35964867"
+    },
+    {
+      "name": "download: scan source --download-offline-databases --offline-vulnerabilities",
+      "cmd": "osv-scanner scan source -r . --download-offline-databases --offline-vulnerabilities --no-call-analysis=all --format json --output /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e09-proj-o7zl1V/first.json",
+      "code": 0,
+      "ms": 26483,
+      "stdout": "",
+      "stderr": "Warning: --output has been deprecated in favor of --output-file\nScanning dir .\nStarting filesystem walk for root: /\nScanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e09-proj-o7zl1V/py/uv.lock file and found 19 packages\nScanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e09-proj-o7zl1V/js/package-lock.json file and found 1 package\nEnd status: 3 dirs visited, 7 inodes visited, 2 Extract calls, 1.650417ms elapsed, 1.651ms wall time\nLoaded PyPI local db from ~/.cache/ayar-dev2/osv-db/osv-scalibr/PyPI/all.zip\nLoaded npm local db from ~/.cache/ayar-dev2/osv-db/osv-scalibr/npm/all.zip\n"
+    },
+    {
+      "name": "unzip -l osv-scalibr/PyPI/all.zip",
+      "stdout": " 77485484                     26216 files\nArchive:  ~/.cache/ayar-dev2/osv-db/osv-scalibr/PyPI/all.zip\n  Length      Date    Time    Name\n---------  ---------- -----   ----\n    10085  00-00-1980 00:00   GHSA-226f-f24g-524w.json\n     3187  00-00-1980 00:00   GHSA-227r-w5j2-6243.json\n     6205  00-00-1980 00:00   GHSA-22c2-9gwg-mj59.json\n     2379  00-00-1980 00:00   GHSA-22cc-w7xm-rfhx.json\n    12732  00-00-1980 00:00   GHSA-22cj-m4wf-fv2c.json\n"
+    },
+    {
+      "name": "عيّنة سجل من osv-scalibr/PyPI/all.zip",
+      "stdout": "{\"schema_version\":\"1.9.0\",\"id\":\"GHSA-226f-f24g-524w\",\"published\":\"2026-06-17T14:10:56Z\",\"modified\":\"2026-07-13T16:42:55.257503767Z\",\"aliases\":[\"CVE-2026-54008\",\"PYSEC-2026-2690\"],\"summary\":\"Open WebUI: Redirect-Bypass SSRF in OAuth `_process_picture_url` (incomplete-fix sibling of CVE-2026-45401)\",\"details\":\"## Summary\\n\\n`backend/open_webui/utils/oauth.py::_process_picture_url` (v0.9.5, lines 1435-1470) calls `validate_url(picture_url)` on the initial URL only, then invokes `aiohttp.ClientSession.get(picture_url, ...)` without `allow_redirects=False`. aiohttp's default is `allow_redirects=True, max_redirects=10`; the function does not pass the project's `AIOHTTP_CLIENT_ALLOW_REDIRECTS` env constant either. An attacker with a valid OAuth IdP identity can therefore submit a public URL that 302-redirects to an internal address and read the internal response body via the attacker's own `profile_image_url` field.\\n\\nThis is the same redirect-bypass class as CVE-2026-45401 (GHSA-rh5x-h6pp-cjj6), on a 6th call site that the v0.9.5 patch missed. CVE-2026-45401's advisory body enumerates exactly five affected paths â€” `SafeWebBaseLoader._scrape`, `_fetch`, `get_content_from_url`, `load_url_image`, `get_image_base64_from_url` â€” none in `utils/oauth.py`.\\n\\n## Vulnerable code (v0.9.5)\\n\\n`backend/open_webui/utils/oauth.py`, lines 1435-1470:\\n\\n```python\\nasync def _process_picture_url(self, picture_url: str, access_token: str = None) -> str:\\n    if not picture_url:\\n     "
+    },
+    {
+      "name": "unzip -l osv-scalibr/npm/all.zip",
+      "stdout": "386193819                     230260 files\nArchive:  ~/.cache/ayar-dev2/osv-db/osv-scalibr/npm/all.zip\n  Length      Date    Time    Name\n---------  ---------- -----   ----\n     7919  00-00-1980 00:00   EEF-CVE-2026-56812.json\n     2599  00-00-1980 00:00   GHSA-2234-fmw7-43wr.json\n     4310  00-00-1980 00:00   GHSA-2238-xc5r-v9hj.json\n     1550  00-00-1980 00:00   GHSA-223g-f5mq-gw33.json\n     2915  00-00-1980 00:00   GHSA-223j-4rm8-mrmf.json\n"
+    },
+    {
+      "name": "عيّنة سجل من osv-scalibr/npm/all.zip",
+      "stdout": "{\"schema_version\":\"1.9.0\",\"id\":\"EEF-CVE-2026-56812\",\"published\":\"2026-07-07T15:22:46.933Z\",\"modified\":\"2026-09-24T21:30:06.586470584Z\",\"aliases\":[\"CVE-2026-56812\",\"GHSA-63mc-hw7g-86rr\"],\"summary\":\"Phoenix JavaScript presence client crashes on presence keys colliding with Object.prototype members in Presence.syncState/syncDiff\",\"details\":\"## Summary\\n\\nImproper Check for Unusual or Exceptional Conditions vulnerability in phoenixframework phoenix (Presence JavaScript client) allows an attacker with ordinary channel access to cause a persistent client-side denial of service against every viewer of a presence channel topic.\\n\\nThis vulnerability is associated with program files `assets/js/phoenix/presence.js` and program routines `Presence.syncState` and `Presence.syncDiff`.\\n\\nThe Phoenix JavaScript presence client checks whether a presence already exists with a bare truthiness test (`state[key]`) instead of an own-property check. Presence keys can be attacker-controlled, because applications track presences under a username or id supplied by the client. A user who joins a channel choosing a key that is an `Object.prototype` member name (`__proto__`, `constructor`, `toString`, `hasOwnProperty`, and similar) makes that lookup return JavaScript's built-in `Object.prototype` instead of `undefined`. Because the prototype is truthy, the code treats it as an existing presence and reads `.metas.map(...)` off it, which throws an uncaught `TypeError`.\\n\\nThe exception propagates out of t"
+    },
+    {
+      "name": "offline scan: --offline",
+      "cmd": "osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e09-proj-o7zl1V/offline.json",
+      "code": 0,
+      "ms": 5975,
+      "stdout": "",
+      "stderr": "Warning: --output has been deprecated in favor of --output-file\nScanning dir .\nStarting filesystem walk for root: /\nScanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e09-proj-o7zl1V/py/uv.lock file and found 19 packages\nScanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e09-proj-o7zl1V/js/package-lock.json file and found 1 package\nEnd status: 3 dirs visited, 8 inodes visited, 2 Extract calls, 4.2635ms elapsed, 4.264ms wall time\nLoaded PyPI local db from ~/.cache/ayar-dev2/osv-db/osv-scalibr/PyPI/all.zip\nLoaded npm local db from ~/.cache/ayar-dev2/osv-db/osv-scalibr/npm/all.zip\n"
+    },
+    {
+      "name": "offline scan: --offline-vulnerabilities (بلا --offline)",
+      "cmd": "osv-scanner scan source -r . --offline-vulnerabilities --no-call-analysis=all --format json --output /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e09-proj-o7zl1V/offline2.json",
+      "code": 0,
+      "ms": 5980,
+      "stdout": "",
+      "stderr": "Warning: --output has been deprecated in favor of --output-file\nScanning dir .\nStarting filesystem walk for root: /\nScanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e09-proj-o7zl1V/py/uv.lock file and found 19 packages\nScanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e09-proj-o7zl1V/js/package-lock.json file and found 1 package\nEnd status: 3 dirs visited, 9 inodes visited, 2 Extract calls, 1.6345ms elapsed, 1.635ms wall time\nLoaded PyPI local db from ~/.cache/ayar-dev2/osv-db/osv-scalibr/PyPI/all.zip\nLoaded npm local db from ~/.cache/ayar-dev2/osv-db/osv-scalibr/npm/all.zip\n"
+    },
+    {
+      "name": "offline scan مع HTTPS_PROXY وهمي (لا يجوز أن يتصل)",
+      "cmd": "osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e09-proj-o7zl1V/offline3.json",
+      "code": 0,
+      "ms": 5955,
+      "stdout": "",
+      "stderr": "Warning: --output has been deprecated in favor of --output-file\nScanning dir .\nStarting filesystem walk for root: /\nScanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e09-proj-o7zl1V/py/uv.lock file and found 19 packages\nScanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e09-proj-o7zl1V/js/package-lock.json file and found 1 package\nEnd status: 3 dirs visited, 10 inodes visited, 2 Extract calls, 1.578292ms elapsed, 1.578ms wall time\nLoaded PyPI local db from ~/.cache/ayar-dev2/osv-db/osv-scalibr/PyPI/all.zip\nLoaded npm local db from ~/.cache/ayar-dev2/osv-db/osv-scalibr/npm/all.zip\n"
+    },
+    {
+      "name": "report first.json",
+      "stdout": "sources=0 packages=0 withVulns=0 sample="
+    },
+    {
+      "name": "report offline.json",
+      "stdout": "sources=0 packages=0 withVulns=0 sample="
+    },
+    {
+      "name": "report offline3.json",
+      "stdout": "sources=0 packages=0 withVulns=0 sample="
+    }
+  ],
+  "layout": [
+    {
+      "path": "osv-scalibr/PyPI/all.zip",
+      "bytes": 35964867,
+      "sha256": "ef5b682c54ecf8e7b4c37dbe3f46c1c2d255973531581d18d9bfd0c166674f70",
+      "mtime": "2026-10-10T09:07:26.250Z"
+    },
+    {
+      "path": "osv-scalibr/npm/all.zip",
+      "bytes": 218229513,
+      "sha256": "802734dd469fb0c546c99702738cf621344d5ec8d5dfdf33f34ac746505eb160",
+      "mtime": "2026-10-10T09:07:42.356Z"
+    }
+  ],
+  "totalKB": 248240
+}

@@ -1,0 +1,187 @@
+{
+  "at": "2026-10-10T09:31:08.987Z",
+  "steps": [
+    {
+      "name": "بناء الظلي (ملفات فقط)",
+      "shadowFiles": [
+        "HEAD",
+        "config",
+        "objects",
+        "refs"
+      ],
+      "alternates": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e24-trapped-tzcOR3/repo/.git/objects",
+      "config": "[core]\n\tbare = true\n\trepositoryformatversion = 0\n"
+    },
+    {
+      "name": "ظلي (betterleaks)",
+      "scanner": "betterleaks",
+      "exit": 42,
+      "ms": 436,
+      "findings": [
+        {
+          "rule": "generic-api-key",
+          "file": "config/old-credentials.js",
+          "line": 2,
+          "commit": "29cc486a1a6f",
+          "secret": "REDACTED",
+          "fingerprint": "29cc486a1a6f1d21f0170b5e233bd5d1b9a6d317:config/old-credentials.js:generic-api-key:2"
+        }
+      ],
+      "gitCalls": [
+        "cwd=/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e24-shadow-iq83Vz/shadow.git args=ls-remote --quiet --get-url",
+        "cwd=/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T args=-C /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e24-shadow-iq83Vz/shadow.git log -p -U0 --full-history --all --diff-filter=tuxdb"
+      ],
+      "stderrTail": "12:31PM INF scanned ~749 bytes (749 bytes) in 381ms\n12:31PM WRN leaks found: 1\n",
+      "gitCallsOnTrapped": 0,
+      "markers": 0,
+      "trappedWrites": {
+        "added": [],
+        "changed": []
+      }
+    },
+    {
+      "name": "معتاد على النظيف (betterleaks)",
+      "scanner": "betterleaks",
+      "exit": 42,
+      "ms": 363,
+      "findings": [
+        {
+          "rule": "generic-api-key",
+          "file": "config/old-credentials.js",
+          "line": 2,
+          "commit": "29cc486a1a6f",
+          "secret": "REDACTED",
+          "fingerprint": "29cc486a1a6f1d21f0170b5e233bd5d1b9a6d317:config/old-credentials.js:generic-api-key:2"
+        }
+      ],
+      "gitCalls": [
+        "cwd=/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e24-clean-Bev9oS/repo args=ls-remote --quiet --get-url",
+        "cwd=/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T args=-C /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e24-clean-Bev9oS/repo log -p -U0 --full-history --all --diff-filter=tuxdb"
+      ],
+      "stderrTail": "12:31PM INF scanned ~749 bytes (749 bytes) in 355ms\n12:31PM WRN leaks found: 1\n"
+    },
+    {
+      "name": "مقارنة الظلي بالنظيف (betterleaks)",
+      "sameFindings": true,
+      "secretRedacted": true,
+      "oldSecretFound": true
+    },
+    {
+      "name": "ظلي (gitleaks)",
+      "scanner": "gitleaks",
+      "exit": 42,
+      "ms": 341,
+      "findings": [
+        {
+          "rule": "generic-api-key",
+          "file": "config/old-credentials.js",
+          "line": 2,
+          "commit": "29cc486a1a6f",
+          "secret": "REDACTED",
+          "fingerprint": "29cc486a1a6f1d21f0170b5e233bd5d1b9a6d317:config/old-credentials.js:generic-api-key:2"
+        }
+      ],
+      "gitCalls": [
+        "cwd=/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T args=-C /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e24-shadow-iq83Vz/shadow.git log -p -U0 --full-history --all --diff-filter=tuxdb",
+        "cwd=/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e24-shadow-iq83Vz/shadow.git args=ls-remote --quiet --get-url"
+      ],
+      "stderrTail": "12:31PM INF scanned ~749 bytes (749 bytes) in 299ms\n12:31PM WRN leaks found: 1\n",
+      "gitCallsOnTrapped": 0,
+      "markers": 0,
+      "trappedWrites": {
+        "added": [],
+        "changed": []
+      }
+    },
+    {
+      "name": "معتاد على النظيف (gitleaks)",
+      "scanner": "gitleaks",
+      "exit": 42,
+      "ms": 329,
+      "findings": [
+        {
+          "rule": "generic-api-key",
+          "file": "config/old-credentials.js",
+          "line": 2,
+          "commit": "29cc486a1a6f",
+          "secret": "REDACTED",
+          "fingerprint": "29cc486a1a6f1d21f0170b5e233bd5d1b9a6d317:config/old-credentials.js:generic-api-key:2"
+        }
+      ],
+      "gitCalls": [
+        "cwd=/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T args=-C /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e24-clean-Bev9oS/repo log -p -U0 --full-history --all --diff-filter=tuxdb",
+        "cwd=/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e24-clean-Bev9oS/repo args=ls-remote --quiet --get-url"
+      ],
+      "stderrTail": "12:31PM INF scanned ~749 bytes (749 bytes) in 321ms\n12:31PM WRN leaks found: 1\n"
+    },
+    {
+      "name": "مقارنة الظلي بالنظيف (gitleaks)",
+      "sameFindings": true,
+      "secretRedacted": true,
+      "oldSecretFound": true
+    },
+    {
+      "name": "git log -p على الظلي مباشرة",
+      "exit": 0,
+      "markers": 0,
+      "usedExternalDiff": false,
+      "outHead": "29cc486a1a6f1d21f0170b5e233bd5d1b9a6d317\n\ndiff --git a/src/app.js b/src/app.js\nnew file mode 100644\n\n… [اقتُطع] …\nrt function run(code) {\n+  return eval(code);\n+}\n+\n+export function add(a, b) {\n+  return a + b;\n+}\n"
+    },
+    {
+      "name": "معتاد على المفخخ نفسه (ضابط إيجابي، نسخة مستقلة)",
+      "scanner": "gitleaks",
+      "exit": 42,
+      "ms": 304,
+      "findings": [
+        {
+          "rule": "generic-api-key",
+          "file": "config/old-credentials.js",
+          "line": 2,
+          "commit": "29cc486a1a6f",
+          "secret": "REDACTED",
+          "fingerprint": "29cc486a1a6f1d21f0170b5e233bd5d1b9a6d317:config/old-credentials.js:generic-api-key:2"
+        }
+      ],
+      "gitCalls": [
+        "cwd=/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T args=-C /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e24-trapped-control-NLU9Pt/repo log -p -U0 --full-history --all --diff-filter=tuxdb",
+        "cwd=/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e24-trapped-control-NLU9Pt/repo args=ls-remote --quiet --get-url"
+      ],
+      "stderrTail": "12:31PM INF scanned ~749 bytes (749 bytes) in 296ms\n12:31PM WRN leaks found: 1\n",
+      "markers": [
+        "textconv.marker"
+      ],
+      "markersCount": 1
+    },
+    {
+      "name": "معتاد على المفخخ ببيئة المستخدم (بلا عزل)",
+      "scanner": "gitleaks",
+      "exit": 42,
+      "ms": 304,
+      "findings": [
+        {
+          "rule": "generic-api-key",
+          "file": "config/old-credentials.js",
+          "line": 2,
+          "commit": "29cc486a1a6f",
+          "secret": "REDACTED",
+          "fingerprint": "29cc486a1a6f1d21f0170b5e233bd5d1b9a6d317:config/old-credentials.js:generic-api-key:2"
+        }
+      ],
+      "gitCalls": [
+        "cwd=/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T args=-C /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e24-trapped-control-NLU9Pt/repo log -p -U0 --full-history --all --diff-filter=tuxdb",
+        "cwd=/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e24-trapped-control-NLU9Pt/repo args=ls-remote --quiet --get-url"
+      ],
+      "stderrTail": "12:31PM INF scanned ~749 bytes (749 bytes) in 296ms\n12:31PM WRN leaks found: 1\n",
+      "markersCount": 1
+    }
+  ],
+  "manifest": {
+    "traps": [
+      "0",
+      "1",
+      "2"
+    ],
+    "markersDir": "markers/"
+  },
+  "finalMarkersTrapped": []
+}

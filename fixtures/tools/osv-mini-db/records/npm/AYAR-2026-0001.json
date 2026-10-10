@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.9.0",
+  "id": "AYAR-2026-0001",
+  "published": "2026-10-10T00:00:00Z",
+  "modified": "2026-10-10T00:00:00Z",
+  "aliases": [],
+  "summary": "ثغرة تجريبية مصطنعة في ayar-vuln-fake (npm) لاختبار عِيَار؛ ليست ثغرة حقيقية",
+  "details": "سجل مصطنع في قاعدة OSV المصغرة لمشاريع الاختبار (DEV-2، E-09). الحزمة ayar-vuln-fake محلية في vendor/ ولا تُنشر. الإصدار 1.0.0 متأثر، و1.0.1 مُصلح.",
+  "affected": [
+    {
+      "package": { "ecosystem": "npm", "name": "ayar-vuln-fake", "purl": "pkg:npm/ayar-vuln-fake" },
+      "ranges": [ { "type": "SEMVER", "events": [ { "introduced": "0" }, { "fixed": "1.0.1" } ] } ],
+      "versions": [ "1.0.0" ],
+      "database_specific": { "severity": "HIGH" }
+    }
+  ],
+  "severity": [ { "type": "CVSS_V3", "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H" } ],
+  "references": [ { "type": "WEB", "url": "https://example.invalid/ayar/AYAR-2026-0001" } ],
+  "database_specific": { "severity": "HIGH", "ayar_fixture": true }
+}

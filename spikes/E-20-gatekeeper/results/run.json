@@ -1,0 +1,215 @@
+{
+  "at": "2026-10-10T09:35:31.000Z",
+  "tools": [
+    {
+      "name": "betterleaks 1.9.0 (gh release download)",
+      "bin": "~/.cache/ayar-dev2/betterleaks/bin/betterleaks",
+      "realpath": "~/.cache/ayar-dev2/betterleaks/bin/betterleaks",
+      "sizeMB": 22.1,
+      "quarantine": null,
+      "provenance": true,
+      "signature": "adhoc",
+      "flags": "0x20002(adhoc,linker-signed)",
+      "identifier": "a.out",
+      "teamId": "not set",
+      "authority": null,
+      "spctl": "3: ~/.cache/ayar-dev2/betterleaks/bin/betterleaks: rejected",
+      "runs": true,
+      "version": "1.9.0"
+    },
+    {
+      "name": "gitleaks 8.30.1 (gh release download، نسخة مُدارة)",
+      "bin": "~/.cache/ayar-dev2/gitleaks/bin/gitleaks",
+      "realpath": "~/.cache/ayar-dev2/gitleaks/bin/gitleaks",
+      "sizeMB": 20.3,
+      "quarantine": null,
+      "provenance": true,
+      "signature": "adhoc",
+      "flags": "0x20002(adhoc,linker-signed)",
+      "identifier": "a.out",
+      "teamId": "not set",
+      "authority": null,
+      "spctl": "3: ~/.cache/ayar-dev2/gitleaks/bin/gitleaks: rejected",
+      "runs": true,
+      "version": "8.30.1"
+    },
+    {
+      "name": "gitleaks 8.30.1 (Homebrew، للمقارنة)",
+      "bin": "/opt/homebrew/bin/gitleaks",
+      "realpath": "/opt/homebrew/Cellar/gitleaks/8.30.1/bin/gitleaks",
+      "sizeMB": 14.6,
+      "quarantine": null,
+      "provenance": true,
+      "signature": "adhoc",
+      "flags": "0x20002(adhoc,linker-signed)",
+      "identifier": "a.out",
+      "teamId": "not set",
+      "authority": null,
+      "spctl": "3: /opt/homebrew/Cellar/gitleaks/8.30.1/bin/gitleaks: rejected",
+      "runs": true,
+      "version": "8.30.1"
+    },
+    {
+      "name": "osv-scanner 2.6.0 (gh release download)",
+      "bin": "~/.cache/ayar-fixtures-toolchain/bin/osv-scanner",
+      "realpath": "~/.cache/ayar-fixtures-toolchain/bin/osv-scanner",
+      "sizeMB": 52.6,
+      "quarantine": null,
+      "provenance": true,
+      "signature": "adhoc",
+      "flags": "0x20002(adhoc,linker-signed)",
+      "identifier": "a.out",
+      "teamId": "not set",
+      "authority": null,
+      "spctl": "3: ~/.cache/ayar-fixtures-toolchain/bin/osv-scanner: rejected",
+      "runs": true,
+      "version": "osv-scanner version: 2.6.0"
+    },
+    {
+      "name": "lychee 0.24.2 (gh release download، tar.gz)",
+      "bin": "~/.cache/ayar-fixtures-toolchain/bin/lychee",
+      "realpath": "~/.cache/ayar-fixtures-toolchain/bin/lychee",
+      "sizeMB": 15.8,
+      "quarantine": null,
+      "provenance": true,
+      "signature": "adhoc",
+      "flags": "0x20002(adhoc,linker-signed)",
+      "identifier": "lychee",
+      "teamId": "not set",
+      "authority": null,
+      "spctl": "3: ~/.cache/ayar-fixtures-toolchain/bin/lychee: rejected",
+      "runs": true,
+      "version": "lychee 0.24.2"
+    },
+    {
+      "name": "cosign 3.1.3 (gh release download)",
+      "bin": "~/.cache/ayar-dev2/cosign/cosign",
+      "realpath": "~/.cache/ayar-dev2/cosign/cosign",
+      "sizeMB": 133.2,
+      "quarantine": null,
+      "provenance": true,
+      "signature": "adhoc",
+      "flags": "0x20002(adhoc,linker-signed)",
+      "identifier": "a.out",
+      "teamId": "not set",
+      "authority": null,
+      "spctl": "3: ~/.cache/ayar-dev2/cosign/cosign: rejected",
+      "runs": true,
+      "version": "  ______   ______        _______. __    _______ .__   __."
+    },
+    {
+      "name": "mise 2026.10.7 (gh release download، tar.gz)",
+      "bin": "~/.cache/ayar-dev2/mise/mise/bin/mise",
+      "realpath": "~/.cache/ayar-dev2/mise/mise/bin/mise",
+      "sizeMB": 121.4,
+      "quarantine": null,
+      "provenance": true,
+      "signature": null,
+      "flags": "0x10000(runtime)",
+      "identifier": "dev.jdx.mise",
+      "teamId": "4993Y37DX6",
+      "authority": "Developer ID Application: Jeffrey Dickey (4993Y37DX6)",
+      "spctl": "3: origin=Developer ID Application: Jeffrey Dickey (4993Y37DX6)",
+      "runs": true,
+      "version": "2026.10.7 macos-arm64 (2026-10-09)"
+    },
+    {
+      "name": "uv 0.13.0 (pip في بيئة معزولة)",
+      "bin": "~/.cache/ayar-fixtures-toolchain/py/bin/uv",
+      "realpath": "~/.cache/ayar-fixtures-toolchain/py/bin/uv",
+      "sizeMB": 27.8,
+      "quarantine": null,
+      "provenance": true,
+      "signature": null,
+      "flags": "0x10000(runtime)",
+      "identifier": "uv-4982e8affd08ef24",
+      "teamId": "2DC432GLL2",
+      "authority": "Developer ID Application: OpenAI OpCo, LLC (2DC432GLL2)",
+      "spctl": "3: origin=Developer ID Application: OpenAI OpCo, LLC (2DC432GLL2)",
+      "runs": true,
+      "version": "uv 0.13.0 (4ecd0eff2 2026-10-09 aarch64-apple-darwin)"
+    },
+    {
+      "name": "semgrep-core 1.180.0 (pip، داخل حزمة semgrep)",
+      "bin": "~/.cache/ayar-fixtures-toolchain/py/lib/python3.12/site-packages/semgrep/bin/semgrep-core",
+      "realpath": "~/.cache/ayar-fixtures-toolchain/py/lib/python3.12/site-packages/semgrep/bin/semgrep-core",
+      "sizeMB": 199.6,
+      "quarantine": null,
+      "provenance": true,
+      "signature": "adhoc",
+      "flags": "0x20002(adhoc,linker-signed)",
+      "identifier": "semgrep-core",
+      "teamId": "not set",
+      "authority": null,
+      "spctl": "3: ~/.cache/ayar-fixtures-toolchain/py/lib/python3.12/site-packages/semgrep/bin/semgrep-core: rejected",
+      "runs": true,
+      "version": "semgrep-core version: 1.180.0 (2d0a15ae8f)"
+    },
+    {
+      "name": "node 24.18.1 (Homebrew، للمقارنة)",
+      "bin": "/opt/homebrew/bin/node",
+      "realpath": "/opt/homebrew/Cellar/node@24/24.18.1/bin/node",
+      "sizeMB": 0,
+      "quarantine": null,
+      "provenance": true,
+      "signature": "adhoc",
+      "flags": "0x2(adhoc)",
+      "identifier": "node-55554944d3a11f9f80023188bb358c5e3a0ba737",
+      "teamId": "not set",
+      "authority": null,
+      "spctl": "3: /opt/homebrew/Cellar/node@24/24.18.1/bin/node: rejected",
+      "runs": true,
+      "version": "v24.18.1"
+    }
+  ],
+  "downloadQuarantine": [
+    {
+      "how": "Node https → fs.createWriteStream (طريقة C-11)",
+      "bytes": 999,
+      "quarantine": false,
+      "xattrs": [
+        "com.apple.provenance"
+      ]
+    },
+    {
+      "how": "curl -o",
+      "bytes": 999,
+      "quarantine": false,
+      "xattrs": [
+        "com.apple.provenance"
+      ]
+    }
+  ],
+  "quarantinedAssessment": [
+    {
+      "name": "gitleaks (ad-hoc linker-signed)",
+      "spctlBefore": "3: /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e20-q-tPHPLG/gitleaks: rejected",
+      "quarantineSet": "0083;6aca06ea;AYAR-E20;",
+      "spctlAfter": "3: /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e20-q-tPHPLG/gitleaks: rejected",
+      "strippedOk": true
+    },
+    {
+      "name": "osv-scanner",
+      "spctlBefore": "3: /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e20-q-tPHPLG/osv-scanner: rejected",
+      "quarantineSet": "0083;6aca06eb;AYAR-E20;",
+      "spctlAfter": "3: /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e20-q-tPHPLG/osv-scanner: rejected",
+      "strippedOk": true
+    }
+  ],
+  "chromium": {
+    "dir": "chromium-1248",
+    "sizeMB": 367,
+    "quarantine": false,
+    "signature": "adhoc",
+    "authority": null,
+    "teamId": "not set",
+    "flags": "0x20002(adhoc,linker-signed)",
+    "spctl": "1: ~/Library/Caches/ms-playwright/chromium-1248/chrome-mac-arm64/Google Chrome for Testing.app: code has no resources but signature indicates they must be present",
+    "runs": true,
+    "version": "Google Chrome for Testing 156.0.8078.4"
+  },
+  "system": {
+    "macOS": "27.0.1",
+    "gatekeeper": "assessments enabled"
+  }
+}

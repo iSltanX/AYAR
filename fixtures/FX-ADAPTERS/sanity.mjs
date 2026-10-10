@@ -16,7 +16,8 @@ const tools = {
   ruff: { setup: UV, cmd: '.venv/bin/ruff check --no-cache src', check: 'code.lint' },
   mypy: { setup: UV, cmd: '.venv/bin/python -m mypy --cache-dir=/dev/null', check: 'code.types' },
   semgrep: { cmd: 'semgrep scan --no-git-ignore --config rules/ayar-eval.yml --metrics=off --disable-version-check --quiet src', check: 'sec.sast' },
-  osv: { cmd: 'osv-scanner scan source -r . --offline', check: 'sec.deps' },
+  // قاعدة OSV المصغرة (E-09): تُبنى وقت التشغيل من fixtures/tools/osv-mini-db إلى المجلد المؤقت، وتُقرأ دون اتصال
+  osv: { cmd: 'node $FX_TOOLS/osv-mini-db/build.mjs --out "$TMPDIR/ayar-osv-mini-db" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY="$TMPDIR/ayar-osv-mini-db" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c', check: 'sec.deps' },
   gitleaks: { cmd: 'gitleaks dir . --config gitleaks.toml --redact=100 --no-banner --exit-code 42', check: 'sec.secrets.files' },
   lychee: { cmd: 'lychee --config lychee.toml README.md', check: 'code.refs.external', bg: 'node server.mjs' },
 };
@@ -87,6 +88,8 @@ const matrix = [
   T('semgrep', 'bad', 0, ['ayar-test.no-eval', 'src/a.js'], 'sec.sast: رمز 0 مع نتائج (ليس اجتيازًا)'),
   T('semgrep', 'config-error', 7, [], 'sec.sast: تعذّر (رمز 7)'),
   T('semgrep', 'no-inputs', 0, [], 'sec.sast: غير منطبق (لا ملفات، رمز 0)'),
+  T('osv', 'good', 0, ['found 1 package', '"results": \\[\\]'], 'sec.deps: اجتاز (left-pad وحدها؛ صفر ثغرات بقاعدة OSV المصغرة دون اتصال)'),
+  T('osv', 'bad', 1, ['AYAR-2026-0001', 'ayar-vuln-fake'], 'sec.deps: أخفق (رمز 1) — الثغرة التجريبية AYAR-2026-0001 في ayar-vuln-fake@1.0.0'),
   T('osv', 'no-lockfiles', 128, ['No package sources found'], 'sec.deps: ناقص (رمز 128)'),
   T('osv', 'config-error', 128, ['Error during extraction'], 'sec.deps: تعذّر (رمز 128 مع Error during extraction)'),
   T('gitleaks', 'good', 0, ['no leaks found'], 'sec.secrets.files: اجتاز'),
@@ -98,8 +101,6 @@ const matrix = [
   T('lychee', 'needs-review', 2, ['forbidden', '403'], 'code.refs.external: 403 يحتاج مراجعة'),
   T('lychee', 'config-error', 3, ['Failed to parse configuration file'], 'code.refs.external: تعذّر (رمز 3)'),
 ];
-const pendingOsv = (id, proves) => ({ id, pending: true, proves, reason: 'ينتظر E-09 (قاعدة OSV المصغرة في DEV-2)' });
-
 const variants = {};
 for (const m of matrix) {
   const t = tools[m.tool];
@@ -110,7 +111,4 @@ for (const m of matrix) {
     variant: m.kind === 'good' ? 'good' : name,
   };
 }
-variants['osv--bad'] = { cwd: 'osv', runs: [pendingOsv('osv', 'sec.deps: ثغرة تجريبية في ayar-vuln-fake@1.0.0')] };
-variants['good:osv'] = { cwd: 'osv', runs: [pendingOsv('osv', 'sec.deps: اجتاز (صفر ثغرات)')], variant: 'good' };
-
 export default { versions: { node: 'node --version', pnpm: 'pnpm --version', uv: 'uv --version', semgrep: 'semgrep --version', 'osv-scanner': 'osv-scanner --version | head -1', lychee: 'lychee --version', gitleaks: 'gitleaks version' }, variants, matrixRows: rows.length };

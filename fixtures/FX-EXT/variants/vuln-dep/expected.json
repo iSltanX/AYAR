@@ -15,17 +15,10 @@
       },
       "confidence": "مخالفة مثبتة",
       "origin": "المشروع",
-      "reason": "ثغرة تجريبية في ayar-vuln-fake@1.0.0 تُعرَّف في DEV-2",
+      "reason": "ثغرة تجريبية في ayar-vuln-fake@1.0.0: AYAR-2026-0001 في قاعدة OSV المصغرة (fixtures/tools/osv-mini-db)",
       "requires": [
         "osv-mini-db"
       ]
-    }
-  ],
-  "pending": [
-    {
-      "waits_for": "E-09",
-      "check": "sec.deps",
-      "reason": "يحتاج قاعدة OSV المصغرة؛ ولم يُتحقق بعد من أن OSV-Scanner يقرأ تبعية file: من pnpm-lock.yaml. إن لم يقرأها يُستبدل بمدخل قفل بسجل وهمي في DEV-2"
     }
   ]
 }

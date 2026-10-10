@@ -7,7 +7,7 @@
         "cmd": ".venv/bin/python -m mypy --cache-dir=/dev/null",
         "ok": true,
         "code": 0,
-        "ms": 2905,
+        "ms": 2287,
         "proves": "code.types: mypy strict بلا أخطاء",
         "problems": [],
         "evidence": false,
@@ -18,7 +18,7 @@
         "cmd": ".venv/bin/ruff check --no-cache --output-format concise .",
         "ok": true,
         "code": 0,
-        "ms": 364,
+        "ms": 373,
         "proves": "code.lint: Ruff بلا مخالفات",
         "problems": [],
         "evidence": false,
@@ -29,40 +29,44 @@
         "cmd": ".venv/bin/python -m pytest -p no:cacheprovider",
         "ok": true,
         "code": 0,
-        "ms": 1438,
+        "ms": 1431,
         "proves": "beh.unit: pytest يمر",
         "problems": [],
         "evidence": false,
-        "excerpt": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-HBfsYw/p/مشاريع تجريبية/مكتبة «النصوص»\nconfigfile: pyproject.toml\ntestpaths: tests\nplugins: hypothesis-6.168.5\ncollected 10 items\n\ntests/test_text.py ..........                                            [100%]\n\n============================== 10 passed in 0.59s =============================="
+        "excerpt": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-04UWwx/p/مشاريع تجريبية/مكتبة «النصوص»\nconfigfile: pyproject.toml\ntestpaths: tests\nplugins: hypothesis-6.168.5\ncollected 10 items\n\ntests/test_text.py ..........                                            [100%]\n\n============================== 10 passed in 0.59s =============================="
       },
       {
         "id": "build",
         "cmd": ".venv/bin/python -m build --no-isolation --outdir \"$TMPDIR/ayar-fx-py-dist\"",
         "ok": true,
         "code": 0,
-        "ms": 1111,
+        "ms": 988,
         "proves": "code.build: build --no-isolation ينتج sdist وwheel",
         "problems": [],
         "evidence": false,
-        "excerpt": "WARNING Both NO_COLOR and FORCE_COLOR environment variables are set, disabling color\n* Getting build dependencies for sdist...\nrunning egg_info\nwriting src/nusus.egg-info/PKG-INFO\nwriting dependency_links to src/nusus.egg-info/dependency_links.txt\nwriting top-level names to src/nusus.egg-info/top_level.txt\nreading manifest file 'src/nusus.egg-info/SOURCES.txt'\nwriting manifest file 'src/nusus.egg-info/SOURCES.txt'\n* Building sdist...\nrunning sdist\nrunning egg_info\nwriting src/nusus.egg-info/PKG-INFO\nwriting dependency_links to src/nusus.egg-info/dependency_links.txt\nwriting top-level names to \n… [اقتُطع] …\npts\ncreating build/bdist.macosx-26.0-arm64/wheel/nusus-1.0.0.dist-info/WHEEL\ncreating '/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-py-dist/.tmp-8rxq4gfi/nusus-1.0.0-py3-none-any.whl' and adding 'build/bdist.macosx-26.0-arm64/wheel' to it\nadding 'nusus/__init__.py'\nadding 'nusus/py.typed'\nadding 'nusus/text.py'\nadding 'nusus-1.0.0.dist-info/METADATA'\nadding 'nusus-1.0.0.dist-info/WHEEL'\nadding 'nusus-1.0.0.dist-info/top_level.txt'\nadding 'nusus-1.0.0.dist-info/RECORD'\nremoving build/bdist.macosx-26.0-arm64/wheel\nSuccessfully built nusus-1.0.0.tar.gz and nusus-1.0.0-py3-none-any.whl"
+        "excerpt": "WARNING Both NO_COLOR and FORCE_COLOR environment variables are set, disabling color\n* Getting build dependencies for sdist...\nrunning egg_info\nwriting src/nusus.egg-info/PKG-INFO\nwriting dependency_links to src/nusus.egg-info/dependency_links.txt\nwriting top-level names to src/nusus.egg-info/top_level.txt\nreading manifest file 'src/nusus.egg-info/SOURCES.txt'\nwriting manifest file 'src/nusus.egg-info/SOURCES.txt'\n* Building sdist...\nrunning sdist\nrunning egg_info\nwriting src/nusus.egg-info/PKG-INFO\nwriting dependency_links to src/nusus.egg-info/dependency_links.txt\nwriting top-level names to \n… [اقتُطع] …\npts\ncreating build/bdist.macosx-26.0-arm64/wheel/nusus-1.0.0.dist-info/WHEEL\ncreating '/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-py-dist/.tmp-kxxph_hu/nusus-1.0.0-py3-none-any.whl' and adding 'build/bdist.macosx-26.0-arm64/wheel' to it\nadding 'nusus/__init__.py'\nadding 'nusus/py.typed'\nadding 'nusus/text.py'\nadding 'nusus-1.0.0.dist-info/METADATA'\nadding 'nusus-1.0.0.dist-info/WHEEL'\nadding 'nusus-1.0.0.dist-info/top_level.txt'\nadding 'nusus-1.0.0.dist-info/RECORD'\nremoving build/bdist.macosx-26.0-arm64/wheel\nSuccessfully built nusus-1.0.0.tar.gz and nusus-1.0.0-py3-none-any.whl"
       },
       {
         "id": "secrets",
         "cmd": "gitleaks dir . --config $FX_TOOLS/gitleaks-fixtures.toml --redact=100 --no-banner --exit-code 42",
         "ok": true,
         "code": 0,
-        "ms": 64,
+        "ms": 65,
         "proves": "sec.secrets.files: لا تسريبات",
         "problems": [],
         "evidence": false,
-        "excerpt": "11:18AM INF scanned ~6200 bytes (6.20 KB) in 3.22ms\n11:18AM INF no leaks found"
+        "excerpt": "12:13PM INF scanned ~6200 bytes (6.20 KB) in 3.2ms\n12:13PM INF no leaks found"
       },
       {
         "id": "sec.deps",
+        "cmd": "node $FX_TOOLS/osv-mini-db/build.mjs --out \"$TMPDIR/ayar-osv-mini-db\" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY=\"$TMPDIR/ayar-osv-mini-db\" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c",
         "ok": true,
-        "pending": true,
-        "proves": "sec.deps: صفر ثغرات",
-        "reason": "ينتظر E-09 (قاعدة OSV المصغرة في DEV-2)"
+        "code": 0,
+        "ms": 74,
+        "proves": "sec.deps: صفر ثغرات (قاعدة OSV المصغرة دون اتصال)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Scanning dir .\nStarting filesystem walk for root: /\nScanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-04UWwx/p/مشاريع تجريبية/مكتبة «النصوص»/uv.lock file and found 19 packages\nEnd status: 7 dirs visited, 17 inodes visited, 1 Extract calls, 1.854625ms elapsed, 1.855ms wall time\nLoaded PyPI local db from /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-osv-mini-db/osv-scalibr/PyPI/all.zip\n{\n  \"results\": [],\n  \"experimental_config\": {\n    \"licenses\": {\n      \"summary\": false,\n      \"allowlist\": null\n    }\n  }\n}"
       },
       {
         "id": "arabic-path",
@@ -73,7 +77,7 @@
         "proves": "الجذر مسار عربي بمسافات وعلامات تنصيص",
         "problems": [],
         "evidence": true,
-        "excerpt": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-HBfsYw/p/مشاريع تجريبية/مكتبة «النصوص»"
+        "excerpt": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-04UWwx/p/مشاريع تجريبية/مكتبة «النصوص»"
       }
     ],
     "failing-test": [
@@ -189,7 +193,7 @@
         "cmd": ".venv/bin/python -m mypy --cache-dir=/dev/null",
         "ok": true,
         "code": 0,
-        "ms": 2220,
+        "ms": 2283,
         "proves": "code.types: mypy strict بلا أخطاء",
         "problems": [],
         "evidence": false,
@@ -200,7 +204,7 @@
         "cmd": ".venv/bin/ruff check --no-cache --output-format concise .",
         "ok": true,
         "code": 0,
-        "ms": 362,
+        "ms": 373,
         "proves": "code.lint: Ruff بلا مخالفات",
         "problems": [],
         "evidence": false,
@@ -211,18 +215,18 @@
         "cmd": ".venv/bin/python -m pytest -p no:cacheprovider",
         "ok": true,
         "code": 0,
-        "ms": 1375,
+        "ms": 1306,
         "proves": "beh.unit: يمر والتبعية مثبتة",
         "problems": [],
         "evidence": false,
-        "excerpt": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-Uu3ib0/p/مشاريع تجريبية/مكتبة «النصوص»\nconfigfile: pyproject.toml\ntestpaths: tests\nplugins: hypothesis-6.168.5\ncollected 10 items\n\ntests/test_text.py ..........                                            [100%]\n\n============================== 10 passed in 0.63s =============================="
+        "excerpt": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-YbI9sl/p/مشاريع تجريبية/مكتبة «النصوص»\nconfigfile: pyproject.toml\ntestpaths: tests\nplugins: hypothesis-6.168.5\ncollected 10 items\n\ntests/test_text.py ..........                                            [100%]\n\n============================== 10 passed in 0.60s =============================="
       },
       {
         "id": "dep-locked",
         "cmd": "grep -n -A2 'name = \"ayar-vuln-fake\"' uv.lock",
         "ok": true,
         "code": 0,
-        "ms": 5,
+        "ms": 6,
         "proves": "sec.deps: ayar-vuln-fake@1.0.0 في uv.lock",
         "problems": [],
         "evidence": true,
@@ -230,10 +234,14 @@
       },
       {
         "id": "sec.deps",
+        "cmd": "node $FX_TOOLS/osv-mini-db/build.mjs --out \"$TMPDIR/ayar-osv-mini-db\" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY=\"$TMPDIR/ayar-osv-mini-db\" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c",
         "ok": true,
-        "pending": true,
-        "proves": "sec.deps: ثغرة تجريبية في ayar-vuln-fake@1.0.0",
-        "reason": "ينتظر E-09 (قاعدة OSV المصغرة في DEV-2)"
+        "code": 1,
+        "ms": 68,
+        "proves": "sec.deps: أخفق (رمز 1) — AYAR-2026-0002 في ayar-vuln-fake@1.0.0 (تبعية directory من uv.lock)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Scanning dir .\nStarting filesystem walk for root: /\nScanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-YbI9sl/p/مشاريع تجريبية/مكتبة «النصوص»/uv.lock file and found 20 packages\nEnd status: 13 dirs visited, 26 inodes visited, 1 Extract calls, 3.374917ms elapsed, 3.375ms wall time\nLoaded PyPI local db from /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-osv-mini-db/osv-scalibr/PyPI/all.zip\n{\n  \"results\": [\n \n… [اقتُطع] …\n        \"severity\": [\n                {\n                  \"score\": \"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H\",\n                  \"type\": \"CVSS_V3\"\n                }\n              ],\n              \"summary\": \"ثغرة تجريبية مصطنعة في ayar-vuln-fake (PyPI) لاختبار عِيَار؛ ليست ثغرة حقيقية\"\n            }\n          ]\n        }\n      ]\n    }\n  ],\n  \"experimental_config\": {\n    \"licenses\": {\n      \"summary\": false,\n      \"allowlist\": null\n    }\n  }\n}"
       }
     ],
     "nfd-path": [

@@ -1,0 +1,96 @@
+{
+  "at": "2026-10-10T09:05:57.290Z",
+  "loginEnvCount": 72,
+  "hiddenNames": [
+    "CLAUDE_CODE_CHILD_SESSION",
+    "CLAUDE_CODE_HOST_SESSION_ID",
+    "CLAUDE_CODE_MESSAGING_TOKEN",
+    "CLAUDE_CODE_OAUTH_SCOPES",
+    "CLAUDE_CODE_SDK_HAS_HOST_AUTH_REFRESH",
+    "CLAUDE_CODE_SESSION_ATTENDED",
+    "CLAUDE_CODE_SESSION_ID",
+    "SSH_AUTH_SOCK",
+    "USE_LOCAL_OAUTH",
+    "USE_STAGING_OAUTH"
+  ],
+  "cases": [
+    {
+      "name": "pnpm install --frozen-lockfile (vitest)",
+      "full": {
+        "code": 0,
+        "ms": 144
+      },
+      "masked": {
+        "code": 0,
+        "ms": 62,
+        "stderr": ""
+      },
+      "same": true
+    },
+    {
+      "name": "vitest run",
+      "full": {
+        "code": 0,
+        "ms": 1105
+      },
+      "masked": {
+        "code": 0,
+        "ms": 293,
+        "stderr": ""
+      },
+      "same": true
+    },
+    {
+      "name": "uv sync --frozen (pytest)",
+      "full": {
+        "code": 0,
+        "ms": 100
+      },
+      "masked": {
+        "code": 0,
+        "ms": 13,
+        "stderr": ""
+      },
+      "same": true
+    },
+    {
+      "name": "pytest",
+      "full": {
+        "code": 0,
+        "ms": 262
+      },
+      "masked": {
+        "code": 0,
+        "ms": 204,
+        "stderr": ""
+      },
+      "same": true
+    },
+    {
+      "name": "git init + commit في مجلد مؤقت",
+      "full": {
+        "code": 0,
+        "ms": 30
+      },
+      "masked": {
+        "code": 0,
+        "ms": 25,
+        "stderr": ""
+      },
+      "same": true
+    },
+    {
+      "name": "ssh-add -l (يحتاج SSH_AUTH_SOCK)",
+      "full": {
+        "code": 1,
+        "ms": 28
+      },
+      "masked": {
+        "code": 2,
+        "ms": 4,
+        "stderr": "Could not open a connection to your authentication agent.\n"
+      },
+      "same": false
+    }
+  ]
+}

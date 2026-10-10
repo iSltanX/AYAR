@@ -1,0 +1,180 @@
+{
+  "at": "2026-10-10T09:03:20.994Z",
+  "cases": [
+    {
+      "name": "corepack pnpm --version · COREPACK_ENABLE_NETWORK=0",
+      "code": 1,
+      "signal": null,
+      "ms": 37,
+      "timedOut": false,
+      "out": "",
+      "err": "Network access disabled by the environment; can't reach https://registry.npmjs.org/pnpm/-/pnpm-9.15.4.tgz\n",
+      "note": "يجب أن يفشل فورًا دون تنزيل",
+      "corepackHomeDiff": {
+        "added": [],
+        "removed": [],
+        "changed": [],
+        "clean": true
+      }
+    },
+    {
+      "name": "corepack pnpm --version · COREPACK_ENABLE_STRICT=0 COREPACK_ENABLE_NETWORK=0",
+      "code": 1,
+      "signal": null,
+      "ms": 36,
+      "timedOut": false,
+      "out": "",
+      "err": "Network access disabled by the environment; can't reach https://registry.npmjs.org/pnpm/-/pnpm-9.15.4.tgz\n",
+      "corepackHomeDiff": {
+        "added": [],
+        "removed": [],
+        "changed": [],
+        "clean": true
+      }
+    },
+    {
+      "name": "pnpm --version داخل مشروع packageManager=pnpm@9.15.4 (الافتراضي)",
+      "code": 1,
+      "signal": null,
+      "ms": 36,
+      "timedOut": false,
+      "out": "",
+      "err": "! Corepack is about to download https://registry.npmjs.org/pnpm/-/pnpm-9.15.4.tgz\nNetwork access disabled by the environment; can't reach https://registry.npmjs.org/pnpm/-/pnpm-9.15.4.tgz\n",
+      "note": "pnpm 12 يدير نسخه بنفسه؛ يُراقب هل يحاول التنزيل"
+    },
+    {
+      "name": "pnpm --version · manage-package-manager-versions=false",
+      "code": 1,
+      "signal": null,
+      "ms": 37,
+      "timedOut": false,
+      "out": "",
+      "err": "! Corepack is about to download https://registry.npmjs.org/pnpm/-/pnpm-9.15.4.tgz\nNetwork access disabled by the environment; can't reach https://registry.npmjs.org/pnpm/-/pnpm-9.15.4.tgz\n"
+    },
+    {
+      "name": "pnpm --version · npm_config_manage_package_manager_versions=false",
+      "code": 1,
+      "signal": null,
+      "ms": 37,
+      "timedOut": false,
+      "out": "",
+      "err": "! Corepack is about to download https://registry.npmjs.org/pnpm/-/pnpm-9.15.4.tgz\nNetwork access disabled by the environment; can't reach https://registry.npmjs.org/pnpm/-/pnpm-9.15.4.tgz\n"
+    },
+    {
+      "name": "pnpm install --frozen-lockfile --offline داخل المشروع نفسه (manage=false)",
+      "code": 0,
+      "signal": null,
+      "ms": 1001,
+      "timedOut": false,
+      "out": "Already up to date\n\nDone in 215ms\n",
+      "err": "! Corepack is about to download https://registry.npmjs.org/pnpm/-/pnpm-9.15.4.tgz\n(node:41180) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+      "note": "المشروع بلا تبعيات: يثبت أن pnpm يعمل رغم اختلاف packageManager حين يُعطَّل التبديل"
+    },
+    {
+      "name": "nvm use (.nvmrc = 22.11.0، غير مثبتة)",
+      "code": 0,
+      "signal": null,
+      "ms": 87,
+      "timedOut": false,
+      "out": "Found '/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-dev2-FX-NOISY-good-A2O6S2/p/.nvmrc' with version <22.11.0>\nN/A: version \"v22.11.0\" is not yet installed.\n\nYou need to run `nvm install` to install and use the node version specified in `.nvmrc`.\nnvm_exit=3\n",
+      "err": "",
+      "note": "يجب ألا ينزّل شيئًا: nvm use لا يثبّت"
+    },
+    {
+      "name": "nvm version 24 (حل الاسم المستعار من الملفات)",
+      "code": 0,
+      "signal": null,
+      "ms": 231,
+      "timedOut": false,
+      "out": "v24.16.0\nv24.16.0\n~/.nvm/versions/node/v24.16.0/bin/node\n",
+      "err": ""
+    },
+    {
+      "name": "قراءة nvm من الملفات (بلا تشغيل nvm)",
+      "aliasDefault": "24",
+      "versions": [
+        "v20.20.2",
+        "v24.14.0",
+        "v24.16.0"
+      ],
+      "resolvedDefault": "v24.16.0",
+      "resolvedNvmrc": null
+    },
+    {
+      "name": "mise --version",
+      "code": 0,
+      "signal": null,
+      "ms": 609,
+      "timedOut": false,
+      "out": "2026.10.7 macos-arm64 (2026-10-09)\n",
+      "err": ""
+    },
+    {
+      "name": "mise exec -- node -v (nodejs 99.99.99 غير مثبتة) · التثبيت التلقائي معطل وOFFLINE",
+      "code": 1,
+      "signal": null,
+      "ms": 54,
+      "timedOut": false,
+      "out": "",
+      "err": "mise WARN  node@99.99.99 is not installed and auto-install is disabled, so mise looks for node on PATH instead. Install it with: mise install node@99.99.99\nmise ERROR \"node\" couldn't exec process: No such file or directory\nmise ERROR Version: 2026.10.7 macos-arm64 (2026-10-09)\nmise ERROR Run with --verbose or MISE_VERBOSE=1 for more information\n",
+      "note": "يجب أن يفشل دون تنزيل",
+      "homeDiff": {
+        "added": [
+          "cache/latest-version.releases-v1",
+          "state/incomplete-installs/.migrated"
+        ],
+        "removed": [],
+        "changed": [],
+        "clean": false
+      }
+    },
+    {
+      "name": "mise which node · التثبيت التلقائي معطل",
+      "code": 1,
+      "signal": null,
+      "ms": 17,
+      "timedOut": false,
+      "out": "",
+      "err": "mise ERROR node is not a mise bin. Perhaps you need to install it first.\nmise ERROR Version: 2026.10.7 macos-arm64 (2026-10-09)\nmise ERROR Run with --verbose or MISE_VERBOSE=1 for more information\n"
+    },
+    {
+      "name": "mise ls --current",
+      "code": 0,
+      "signal": null,
+      "ms": 14,
+      "timedOut": false,
+      "out": "node  99.99.99 (missing)  /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/mise-home-lBQBiv/proj/.tool-versions  99.99.99\n",
+      "err": ""
+    },
+    {
+      "name": "mise reshim ثم جرد مجلد shims",
+      "code": 0,
+      "signal": null,
+      "ms": 30,
+      "timedOut": false,
+      "out": "total 0\ndrwxr-xr-x@ 2 abutalal  staff  64 Oct 10 12:03 .\ndrwxr-xr-x@ 3 abutalal  staff  96 Oct 10 12:03 ..\n",
+      "err": "",
+      "shimsExist": true
+    },
+    {
+      "name": "mise exec -- node -v · الإعدادات الافتراضية + MISE_OFFLINE=1",
+      "code": 1,
+      "signal": null,
+      "ms": 34,
+      "timedOut": false,
+      "out": "",
+      "err": "mise by @jdx – installing 1 tool\nmise ✗ node@99.99.99  17ms · failed: offline mode is enabled\nmise ████████████████ 1/1 · installed 0 tools · 1 failed in 18ms\nmise ERROR Failed to install core:node@99.99.99: offline mode is enabled\nmise ERROR Version: 2026.10.7 macos-arm64 (2026-10-09)\nmise ERROR Run with --verbose or MISE_VERBOSE=1 for more information\n",
+      "homeDiff": {
+        "added": [
+          "cache/latest-version.releases-v1",
+          "cache/lockfiles/69d2362a29edf1c2",
+          "cache/lockfiles/6f39526a25a947e2",
+          "state/incomplete-installs/.migrated"
+        ],
+        "removed": [],
+        "changed": [],
+        "clean": false
+      }
+    }
+  ]
+}

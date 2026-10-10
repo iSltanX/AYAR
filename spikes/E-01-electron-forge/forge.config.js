@@ -17,6 +17,7 @@ const MODE_DIRS = {
   e04: '../E-04-signing-identity/mode',
   e05: '../E-05-privacy-scope/mode',
   e06: '../E-06-shell-env/mode',
+  e11: '../E-11-probe-host/mode',
   e23: '../E-23-window-buttons/mode',
 };
 

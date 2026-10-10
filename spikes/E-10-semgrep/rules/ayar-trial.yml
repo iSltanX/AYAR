@@ -1,0 +1,55 @@
+# حزمة قواعد تجريبية لقياس E-10 (ثماني قواعد، ليست حزمة عِيَار الفعلية التي تُكتب في DEV-6). قواعد ذاتية لا من سجل Semgrep (D-13).
+rules:
+  - id: ayar-trial.js-eval
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: "eval بقيمة غير ثابتة"
+    patterns:
+      - pattern: eval($X)
+      - pattern-not: eval("...")
+  - id: ayar-trial.js-function-constructor
+    languages: [javascript, typescript]
+    severity: WARNING
+    message: "new Function بقيمة غير ثابتة"
+    pattern: new Function(...)
+  - id: ayar-trial.js-innerhtml
+    languages: [javascript, typescript]
+    severity: WARNING
+    message: "كتابة innerHTML بقيمة غير ثابتة"
+    patterns:
+      - pattern: $EL.innerHTML = $X
+      - pattern-not: $EL.innerHTML = "..."
+  - id: ayar-trial.js-child-process-shell
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: "تنفيذ أمر صدفة بقيمة متغيرة"
+    pattern-either:
+      - pattern: require("child_process").exec($CMD, ...)
+      - pattern: exec(`...${$X}...`, ...)
+      - pattern: execSync(`...${$X}...`, ...)
+  - id: ayar-trial.py-subprocess-shell
+    languages: [python]
+    severity: ERROR
+    message: "subprocess مع shell=True"
+    pattern-either:
+      - pattern: subprocess.$F(..., shell=True, ...)
+      - pattern: subprocess.call($CMD, shell=True)
+  - id: ayar-trial.py-eval-exec
+    languages: [python]
+    severity: ERROR
+    message: "eval/exec بقيمة غير ثابتة"
+    pattern-either:
+      - pattern: eval($X)
+      - pattern: exec($X)
+  - id: ayar-trial.py-verify-false
+    languages: [python]
+    severity: ERROR
+    message: "تعطيل التحقق من الشهادات"
+    pattern: requests.$F(..., verify=False, ...)
+  - id: ayar-trial.py-yaml-load
+    languages: [python]
+    severity: WARNING
+    message: "yaml.load بلا Loader آمن"
+    patterns:
+      - pattern: yaml.load($X)
+      - pattern-not: yaml.load($X, Loader=yaml.SafeLoader)

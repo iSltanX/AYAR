@@ -128,12 +128,5 @@
         "osv-mini-db"
       ]
     }
-  ],
-  "pending": [
-    {
-      "waits_for": "E-09",
-      "check": "sec.deps",
-      "reason": "النتيجة المتوقعة تحتاج قاعدة OSV المصغرة التي تُصنع في DEV-2"
-    }
   ]
 }

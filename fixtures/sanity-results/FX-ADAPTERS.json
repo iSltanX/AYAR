@@ -784,27 +784,27 @@
     "osv--no-lockfiles": [
       {
         "id": "osv",
-        "cmd": "osv-scanner scan source -r . --offline",
+        "cmd": "node $FX_TOOLS/osv-mini-db/build.mjs --out \"$TMPDIR/ayar-osv-mini-db\" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY=\"$TMPDIR/ayar-osv-mini-db\" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c",
         "ok": true,
         "code": 128,
-        "ms": 231,
+        "ms": 62,
         "proves": "sec.deps: ناقص (رمز 128)",
         "problems": [],
         "evidence": true,
-        "excerpt": "Scanning dir .\nStarting filesystem walk for root: /\nEnd status: 1 dirs visited, 2 inodes visited, 0 Extract calls, 134.375µs elapsed, 135µs wall time\nNo package sources found, --help for usage information."
+        "excerpt": "Scanning dir .\nStarting filesystem walk for root: /\nEnd status: 1 dirs visited, 2 inodes visited, 0 Extract calls, 140µs elapsed, 140µs wall time\nNo package sources found, --help for usage information."
       }
     ],
     "osv--config-error": [
       {
         "id": "osv",
-        "cmd": "osv-scanner scan source -r . --offline",
+        "cmd": "node $FX_TOOLS/osv-mini-db/build.mjs --out \"$TMPDIR/ayar-osv-mini-db\" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY=\"$TMPDIR/ayar-osv-mini-db\" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c",
         "ok": true,
         "code": 128,
-        "ms": 39,
+        "ms": 61,
         "proves": "sec.deps: تعذّر (رمز 128 مع Error during extraction)",
         "problems": [],
         "evidence": true,
-        "excerpt": "Scanning dir .\nStarting filesystem walk for root: /\nEnd status: 1 dirs visited, 3 inodes visited, 1 Extract calls, 144.833µs elapsed, 145µs wall time\nError during extraction: (extracting as javascript/packagelockjson) private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-a8UjwG/p/osv/package-lock.json: could not extract: unexpected end of JSON input\nNo package sources found, --help for usage information."
+        "excerpt": "Scanning dir .\nStarting filesystem walk for root: /\nEnd status: 1 dirs visited, 3 inodes visited, 1 Extract calls, 156.916µs elapsed, 157µs wall time\nError during extraction: (extracting as javascript/packagelockjson) private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-YWNgQb/p/osv/package-lock.json: could not extract: unexpected end of JSON input\nNo package sources found, --help for usage information."
       }
     ],
     "good:gitleaks": [
@@ -914,19 +914,27 @@
     "osv--bad": [
       {
         "id": "osv",
+        "cmd": "node $FX_TOOLS/osv-mini-db/build.mjs --out \"$TMPDIR/ayar-osv-mini-db\" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY=\"$TMPDIR/ayar-osv-mini-db\" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c",
         "ok": true,
-        "pending": true,
-        "proves": "sec.deps: ثغرة تجريبية في ayar-vuln-fake@1.0.0",
-        "reason": "ينتظر E-09 (قاعدة OSV المصغرة في DEV-2)"
+        "code": 1,
+        "ms": 63,
+        "proves": "sec.deps: أخفق (رمز 1) — الثغرة التجريبية AYAR-2026-0001 في ayar-vuln-fake@1.0.0",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Scanning dir .\nStarting filesystem walk for root: /\nScanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-iangaC/p/osv/package-lock.json file and found 2 packages\nEnd status: 1 dirs visited, 3 inodes visited, 1 Extract calls, 210.083µs elapsed, 211µs wall time\nLoaded npm local db from /var/folders/39/08324w6s5t\n… [اقتُطع] …\nU/C:H/I:H/A:H\",\n                  \"type\": \"CVSS_V3\"\n                }\n              ],\n              \"summary\": \"ثغرة تجريبية مصطنعة في ayar-vuln-fake (npm) لاختبار عِيَار؛ ليست ثغرة حقيقية\"\n            }\n          ]\n        }\n      ]\n    }\n  ],\n  \"experimental_config\": {\n    \"licenses\": {\n      \"summary\": false,\n      \"allowlist\": null\n    }\n  }\n}"
       }
     ],
     "good:osv": [
       {
         "id": "osv",
+        "cmd": "node $FX_TOOLS/osv-mini-db/build.mjs --out \"$TMPDIR/ayar-osv-mini-db\" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY=\"$TMPDIR/ayar-osv-mini-db\" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c",
         "ok": true,
-        "pending": true,
-        "proves": "sec.deps: اجتاز (صفر ثغرات)",
-        "reason": "ينتظر E-09 (قاعدة OSV المصغرة في DEV-2)"
+        "code": 0,
+        "ms": 68,
+        "proves": "sec.deps: اجتاز (left-pad وحدها؛ صفر ثغرات بقاعدة OSV المصغرة دون اتصال)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Scanning dir .\nStarting filesystem walk for root: /\nScanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-LHxID0/p/osv/package-lock.json file and found 1 package\nEnd status: 1 dirs visited, 3 inodes visited, 1 Extract calls, 331.375µs elapsed, 331µs wall time\nLoaded npm local db from /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-osv-mini-db/osv-scalibr/npm/all.zip\n{\n  \"results\": [],\n  \"experimental_config\": {\n    \"licenses\": {\n      \"summary\": false,\n      \"allowlist\": null\n    }\n  }\n}"
       }
     ]
   },
