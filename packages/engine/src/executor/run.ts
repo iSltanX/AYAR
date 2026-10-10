@@ -489,6 +489,8 @@ export class RunService {
     active.procs.delete(e.checkRunId);
     const outEnd = await out.end();
     const errEnd = await err.end();
+    // The services' logs so far are this check's evidence (FR-21), taken before a service stops with its last user.
+    const serviceLogs = spec.services.map((s) => [s.id, active.services!.logOf(s.id)] as const);
     await active.services!.release(spec.services);
 
     // Evidence: the logs (already redacted as they were written), the services' logs, the side effects, the raw
@@ -499,10 +501,7 @@ export class RunService {
     };
     await add('stdout.log', 'log', undefined, { counts: outEnd.counts, truncated: outEnd.truncated });
     await add('stderr.log', 'log', undefined, { counts: errEnd.counts, truncated: errEnd.truncated });
-    for (const s of spec.services) {
-      const text = active.services!.logOf(s.id);
-      if (text) await add(`service-${s.id}.log`, 'service_log', new TextEncoder().encode(text));
-    }
+    for (const [id, text] of serviceLogs) if (text) await add(`service-${id}.log`, 'service_log', new TextEncoder().encode(text));
     let sideEffects: SideEffects | null = null;
     if (before) {
       const after = await this.#snapshot(ctx.projectId, ctx.root, false, false, before);
