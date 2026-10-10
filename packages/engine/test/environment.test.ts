@@ -232,8 +232,12 @@ describe('toolchains (C-07 point 3, E-07, G-49, G-DEV2-01)', () => {
     const base = { tool: 'x', realPath: null, viaCorepack: false, shellFunction: false, version: null, versionSource: null, required: null, satisfies: null, installed: [], proposedPath: null, terminalVersion: null, status: 'unknown' as const, probe: null };
     const started = Date.now();
     const outside = tempRoot('ayar-DEV-4-probe-project-');
-    const out = await probeVersions(nodeProcessControl, [{ ...base, tool: 'node', path: ok, required: { spec: '24', from: 'nvmrc' } }, { ...base, tool: 'hang', path: hang }], { projectRoot: outside.dir, neutralCwd: root, untrusted: false, env: { PATH: '/usr/bin:/bin' }, realpath: (p) => nodeFileSystem.realpath(p) });
-    outside.cleanup();
+    let out: Awaited<ReturnType<typeof probeVersions>>;
+    try {
+      out = await probeVersions(nodeProcessControl, [{ ...base, tool: 'node', path: ok, required: { spec: '24', from: 'nvmrc' } }, { ...base, tool: 'hang', path: hang }], { projectRoot: outside.dir, neutralCwd: root, untrusted: false, env: { PATH: '/usr/bin:/bin' }, realpath: (p) => nodeFileSystem.realpath(p) });
+    } finally {
+      outside.cleanup();
+    }
     expect(Date.now() - started).toBeLessThan(9000);
     expect(out[0]).toMatchObject({ version: '24.16.0', versionSource: 'probe', satisfies: true, status: 'ok', probe: { ok: true } });
     expect(out[1]).toMatchObject({ status: 'unknown', probe: { ok: false, error: 'timeout' } });
