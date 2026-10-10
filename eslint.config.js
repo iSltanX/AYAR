@@ -40,6 +40,8 @@ export default defineConfig(
       'docs/**',
       'tools/dashboard/**',
       'tools/waves/**',
+      // مجلدات عمل التطبيق المتداخلة، مستثناة من Git أيضًا
+      '.claude/**',
     ],
   },
   ...tseslint.configs.recommendedTypeChecked,
