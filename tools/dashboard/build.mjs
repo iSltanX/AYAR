@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// يولّد صفحة المراحل والموجات من مصادرها الوحيدة، أينما شُغّل داخل المستودع:
+// يولّد صفحة الموجات من مصادرها الوحيدة، أينما شُغّل داخل المستودع. محورها الموجة الحالية:
+// مراحلها وحالاتها، وما يعمل بالتوازي، وما يحتاج قرار المالك، وأمر واحد لبدئها أو متابعتها.
 // - المعتمد من الفرع main: واجهات ملفات المراحل، وجدول الموجات (docs/waves/README.md)،
 //   وجدول قرارات المالك، وسجل التقدم، ووسوم الإغلاق.
 // - الحي من فروع phase/<ID> ومجلدات العمل: حالة كل مرحلة جارية أو مسلَّمة، ونظافة مجلدها.
@@ -150,7 +151,7 @@ function readWaves(text) {
   for (const line of block[1].split('\n')) {
     const cells = line.split('|').slice(1, -1).map((c) => c.trim());
     if (cells.length !== 5 || !/^\d+$/.test(cells[0])) continue;
-    const [num, phasesCell, starts, closes, mergeOwner] = cells;
+    const [num, phasesCell, starts, closes, mergeOwner] = cells.map((c) => c.replace(/`/g, ''));
     waves.push({ number: Number(num), phaseIds: phasesCell.match(/(?:DEV|DES)-\d+/g) ?? [], starts, closes, mergeOwner });
   }
   return waves;
@@ -211,6 +212,7 @@ function live(p) {
     dirty: wt ? (git(['--no-optional-locks', '-C', wt.path, 'status', '--porcelain']) ?? '') !== '' : false,
     handoff: git(['cat-file', '-e', `${branch}:docs/handoffs/${p.id}.md`]) !== null,
     status: branchPhase?.status,
+    ownerRequest: branchPhase?.owner_request || undefined,
     statusDate: (() => {
       const d = branchPhase?.status_date;
       if (d && !ISO_DATE.test(d)) warnings.push(`${branch}: status_date ليس بصيغة YYYY-MM-DD (${d})، فاستُخدم تاريخ main`);
@@ -226,7 +228,7 @@ const view = phases.map((p) => {
   const waitingDeps = p.depends_on.filter((id) => !isClosed(id));
   const waitingDesign = p.design_gates.filter((id) => !isClosed(id));
   const waitingOwner = p.owner_gates.filter((id) => !decisions[id]?.resolved);
-  // مجلد جُهّز ولم يبدأ فيه عمل، ثم تقدم main: تحدّثه جلسة التنسيق قبل فتح جلسته
+  // مجلد جُهّز ولم يبدأ فيه عمل، ثم تقدم main: تحدّثه الجلسة الرئيسية قبل تكليف وكيله
   const stale = l.exists && l.ahead === 0 && !l.dirty && (l.status ?? 'not-started') === 'not-started' && l.behind > 0;
   let state;
   let statusDate = p.status_date;
@@ -274,59 +276,96 @@ const view = phases.map((p) => {
     ahead: l.ahead ?? 0,
     dirty: Boolean(l.dirty),
     handoff: Boolean(l.handoff),
-    command: p.track === 'dev' ? `ابدأ مرحلة التطوير ${p.number}` : `ابدأ مرحلة التصميم ${p.number}`,
-    resume: p.track === 'dev' ? `تابع مرحلة التطوير ${p.number}` : `تابع مرحلة التصميم ${p.number}`,
-    setup: l.exists
-      ? `git -C ${primary} worktree add ${wtBase}/${p.id} phase/${p.id}`
-      : `git -C ${primary} worktree add ${wtBase}/${p.id} -b phase/${p.id} ${REF}`,
+    ownerRequest: (l.exists && !stale ? l.ownerRequest : undefined) ?? (p.owner_request || ''),
     file: p.file,
     closingCommit: p.closing_commit || '',
   };
 });
 const viewById = new Map(view.map((v) => [v.id, v]));
 
-// ما يصير متاحًا حين يُدمج ما سُلّم
-const closedOrDelivered = (id) => ['closed', 'delivered'].includes(viewById.get(id)?.state);
-for (const v of view) {
-  v.unlockedByMerge =
-    ['waiting', 'needs-design'].includes(v.state) &&
-    [...v.dependsOn, ...v.designGates].every(closedOrDelivered) &&
-    [...v.waitingDeps, ...v.waitingDesign].some((id) => viewById.get(id).state === 'delivered');
-}
-
-const ACTIVE = ['in-progress', 'awaiting-owner', 'blocked', 'prepared', 'delivered', 'unverified'];
+// الموجة الحالية: أول موجة فيها مرحلة لم تُغلق. والأمر الواحد لها: «ابدأ» إن لم يبدأ فيها شيء، وإلا «تابع»
+const STARTED = ['in-progress', 'awaiting-owner', 'blocked', 'delivered', 'unverified', 'closed'];
+const RUNNABLE = ['available', 'prepared', 'in-progress'];
 const waveView = waves.map((w) => {
   const items = w.phaseIds.map((id) => viewById.get(id));
-  let state;
-  if (items.every((v) => v.state === 'closed')) state = 'closed';
-  else if (items.some((v) => ACTIVE.includes(v.state))) state = 'active';
-  else if (items.some((v) => ['available', 'needs-decision'].includes(v.state) || v.unlockedByMerge)) state = 'ready';
-  else state = 'waiting';
-  return { ...w, state, command: `ابدأ الموجة ${w.number}` };
+  return {
+    number: w.number,
+    phaseIds: w.phaseIds,
+    starts: w.starts,
+    closes: w.closes,
+    closed: items.every((v) => v.state === 'closed'),
+    ready: items.filter((v) => ['available', 'prepared'].includes(v.state)).map((v) => v.id),
+  };
 });
+const cur = waveView.find((w) => !w.closed) ?? null;
 
-// الخطوة التالية للمالك
-const actions = [];
-const prepared = view.filter((v) => v.state === 'prepared');
-if (prepared.length) actions.push({ kind: 'open', ids: prepared.map((v) => v.id) });
-const toPrepare = view.filter((v) => ['available', 'needs-decision'].includes(v.state) || v.unlockedByMerge);
-const toMerge = view.filter((v) => ['delivered', 'unverified'].includes(v.state));
-if (toPrepare.length || toMerge.length) {
-  const lastWave = Math.max(...waves.map((w) => w.number));
-  const wave = toPrepare.length
-    ? Math.min(...toPrepare.map((v) => v.wave))
-    : Math.min(Math.max(...toMerge.map((v) => v.wave)) + 1, lastWave);
-  actions.push({ kind: 'wave', wave, command: `ابدأ الموجة ${wave}`, merges: toMerge.map((v) => v.id), prepares: toPrepare.filter((v) => v.wave <= wave).map((v) => v.id) });
+const decisionBrief = (id) => ({ id, question: decisions[id].question, recommendation: decisions[id].recommendation });
+let current = null;
+if (cur) {
+  const items = cur.phaseIds.map((id) => viewById.get(id));
+  const open = items.filter((v) => v.state !== 'closed');
+  const started = items.some((v) => STARTED.includes(v.state));
+  let state;
+  if (open.some((v) => ['in-progress', 'delivered', 'unverified'].includes(v.state))) state = 'running';
+  else if (open.some((v) => v.state === 'awaiting-owner')) state = 'needs-owner';
+  else if (open.length && open.every((v) => v.state === 'blocked')) state = 'blocked';
+  else state = started ? 'running' : 'not-started';
+
+  // ما يحتاج المالك الآن، وما سيُطلب منه أثناء الموجة
+  const now = [];
+  const later = [];
+  const decisionItem = (bucket, id, phase, when) => {
+    const found = bucket.find((x) => x.kind === 'decision' && x.id === id);
+    if (found) found.phases.push(phase);
+    else bucket.push({ kind: 'decision', ...decisionBrief(id), when, phases: [phase] });
+  };
+  for (const v of open) {
+    if (v.state === 'awaiting-owner') now.push({ kind: 'answer', phase: v.id, text: v.ownerRequest });
+    if (v.state === 'blocked') now.push({ kind: 'blocker', phase: v.id, text: v.ownerRequest });
+    for (const id of v.waitingOwner) decisionItem(now, id, v.id, 'before');
+    for (const id of v.openInputs) decisionItem(later, id, v.id, 'during');
+    if (v.track === 'design' && v.state !== 'awaiting-owner') later.push({ kind: 'approval', phase: v.id });
+  }
+
+  const next = waveView.find((w) => w.number > cur.number);
+  current = {
+    number: cur.number,
+    state,
+    command: `${started ? 'تابع' : 'ابدأ'} الموجة ${cur.number}`,
+    // كل ما بقي في الموجة معطّل: يمكن بدء التالية بما لا يعتمد على المعطّل
+    alt: state === 'blocked' && next?.ready.length ? { command: `ابدأ الموجة ${next.number}`, ready: next.ready } : null,
+    starts: cur.starts,
+    closes: cur.closes,
+    phaseIds: cur.phaseIds,
+    parallel: open.filter((v) => RUNNABLE.includes(v.state)).map((v) => v.id),
+    afterDecision: open.filter((v) => v.state === 'needs-decision').map((v) => v.id),
+    now,
+    later,
+  };
 }
-const withOwner = view.filter((v) => ['awaiting-owner', 'blocked'].includes(v.state));
-if (withOwner.length) actions.push({ kind: 'owner', ids: withOwner.map((v) => v.id) });
 
-const openDecisions = Object.values(decisions)
+// قرارات مفتوحة تخص موجات لاحقة، بأقرب موجة تحتاجها
+const laterDecisions = Object.values(decisions)
   .filter((d) => !d.resolved)
-  .map((d) => ({
-    ...d,
-    gates: view.filter((v) => v.ownerGates.includes(d.id) || v.ownerInputs.includes(d.id)).map((v) => ({ id: v.id, beforeStart: v.ownerGates.includes(d.id) })),
-  }));
+  .map((d) => {
+    const gates = view
+      .filter((v) => v.state !== 'closed' && (v.ownerGates.includes(d.id) || v.ownerInputs.includes(d.id)))
+      .map((v) => ({ id: v.id, wave: v.wave, beforeStart: v.ownerGates.includes(d.id) }));
+    return { ...decisionBrief(d.id), neededIn: d.neededIn, gates, wave: gates.length ? Math.min(...gates.map((g) => g.wave)) : null };
+  })
+  .filter((d) => !cur || d.wave === null || d.wave > cur.number)
+  .sort((a, b) => (a.wave ?? 99) - (b.wave ?? 99));
+
+// تنبيهات تحتاج انتباه المالك أو الجلسة الرئيسية
+const notices = [];
+const primaryClean = (git(['--no-optional-locks', '-C', primary, 'status', '--porcelain']) ?? '') === '';
+if (worktrees[0].branch !== REF || !primaryClean) {
+  notices.push({ kind: 'primary', text: worktrees[0].branch !== REF ? `المجلد الأصلي على الفرع ${worktrees[0].branch ?? 'دون فرع'} لا على ${REF}` : 'في المجلد الأصلي تغييرات غير ملتزمة' });
+}
+for (const v of view) {
+  if (v.state === 'unverified') notices.push({ kind: 'unverified', phase: v.id });
+  if (v.unmerged) notices.push({ kind: 'unmerged', phase: v.id, count: v.unmerged });
+}
 
 const progressDates = [...(show(REF, 'docs/tracking/progress.md') ?? '').matchAll(/^## (\d{4}-\d{2}-\d{2})/gm)].map((m) => m[1]);
 const dates = [...view.map((v) => v.statusDate), ...progressDates].filter(Boolean).sort();
@@ -335,17 +374,14 @@ const data = {
   generatedAt: new Date().toISOString(),
   ref: REF,
   commit: git(['rev-parse', '--short', REF]),
-  coordinator: {
-    path: primary,
-    branch: worktrees[0].branch,
-    onRef: worktrees[0].branch === REF,
-    clean: (git(['--no-optional-locks', '-C', primary, 'status', '--porcelain']) ?? '') === '',
-  },
-  stages: STAGES,
-  waves: waveView,
+  primary: { path: primary, branch: worktrees[0].branch, clean: primaryClean },
+  worktreeBase: wtBase,
+  totals: { phases: view.length, closed: view.filter((v) => v.state === 'closed').length },
+  current,
+  waves: waveView.map((w) => ({ ...w, state: w.closed ? 'closed' : w.number === cur?.number ? 'current' : 'later' })),
   phases: view,
-  actions,
-  openDecisions,
+  laterDecisions,
+  notices,
   links: {
     repo: 'https://github.com/iSltanX/AYAR',
     figma: 'https://www.figma.com/design/UXkPakdqRuHDVTs78DO4uC/AYAR',
@@ -354,7 +390,13 @@ const data = {
 
 for (const w of warnings) console.error(`تنبيه: ${w}`);
 if (checkOnly) {
-  console.log(`المصادر سليمة: ${countAr(view.length, 'مرحلة واحدة', 'مرحلتان', 'مراحل', 'مرحلة')} في ${countAr(waves.length, 'موجة واحدة', 'موجتين', 'موجات', 'موجة')}، و${countAr(openDecisions.length, 'قرار واحد', 'قراران', 'قرارات', 'قرارًا')} تنتظر المالك.`);
+  const openCount = Object.values(decisions).filter((d) => !d.resolved).length;
+  console.log(`المصادر سليمة: ${countAr(view.length, 'مرحلة واحدة', 'مرحلتان', 'مراحل', 'مرحلة')} في ${countAr(waves.length, 'موجة واحدة', 'موجتين', 'موجات', 'موجة')}، و${countAr(openCount, 'قرار واحد', 'قراران', 'قرارات', 'قرارًا')} تنتظر المالك.`);
+  if (current) {
+    console.log(`الموجة الحالية: ${current.number} (${current.state})، وأمرها «${current.command}». المراحل: ${current.phaseIds.map((id) => `${id} ${viewById.get(id).state}`).join('، ')}.`);
+    if (current.now.length) console.log(`يحتاج المالك الآن: ${current.now.map((x) => x.id ?? x.phase).join('، ')}.`);
+  } else console.log('كل الموجات مغلقة.');
+  for (const n of notices) console.log(`تنبيه: ${n.text ?? `${n.phase} ${n.kind}`}`);
   process.exit(0);
 }
 

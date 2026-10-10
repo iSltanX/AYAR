@@ -1,11 +1,12 @@
 <title>مراحل عِيَار</title>
-<meta name="description" content="موجات التصميم والتطوير لتطبيق عِيَار AYAR وحالاتها الحية، مولّدة من المستودع.">
+<meta name="description" content="الموجة الحالية لتطبيق عِيَار AYAR: مراحلها، وما يعمل بالتوازي، وما يحتاج قرار المالك، وأمرها. مولّدة من المستودع.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Cairo:wght@500;600;700;800&display=swap">
 <style>
-/* التخطيط: عمود قراءة واحد. الرأس والأعداد، ثم «الخطوة التالية» بأوامرها الجاهزة، ثم القرارات، ثم الموجات بالترتيب:
-   لكل موجة شريطان متجاوران (تصميم | تطوير) يلتقيان عند نقاط الاعتماد. الهوية أحادية بحبر عِيَار وورقه، والألوان للدلالة فقط (D-16). */
+/* التخطيط: عمود قراءة واحد. مسطرة الموجات (عِيَار أداة قياس، فالتقدم يُقرأ على مسطرة)، ثم لوحة الموجة الحالية وحدها
+   بإطار: أمرها، وما يعمل معًا، وما يحتاجك، ومراحلها في مسارين. ثم الموجات التالية والمغلقة مطوية. الهوية أحادية بحبر عِيَار
+   وورقه، والألوان للدلالة فقط (D-16). */
 :root {
   --paper: #F7F4EC;
   --surface: #FFFDF8;
@@ -76,181 +77,217 @@
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.75; }
-.page { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 44px; }
-h1, h2, h3, h4, .label, .num, button, .chip, .pid, .ref { font-family: var(--font-display); }
+.page { max-width: 1120px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 40px; }
+h1, h2, h3, h4, .label, .num, button, .chip, .pid, .ref, summary { font-family: var(--font-display); }
 h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
 p { margin: 0; }
+ul, ol { margin: 0; }
 a { color: inherit; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
 a:hover { text-decoration-color: var(--ink); }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: var(--radius-control); }
 .ltr { direction: ltr; unicode-bidi: isolate; font-family: var(--font-mono); font-size: 0.84em; overflow-wrap: anywhere; }
 .muted { color: var(--muted); }
+.small { font-size: 13px; }
 
-/* الرأس والأعداد */
-.masthead { display: grid; gap: 16px; }
+/* الرأس */
+.masthead { display: grid; gap: 12px; }
 .brand { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
 .brand .name { font-family: var(--font-display); font-weight: 800; font-size: 40px; line-height: 1.2; }
 .brand .latin { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.12em; font-size: 15px; color: var(--muted); }
-.masthead h1 { font-size: 24px; font-weight: 700; line-height: 1.4; }
-.lede { color: var(--ink-2); max-width: 70ch; }
+.lede { color: var(--ink-2); max-width: 68ch; }
 .meta { color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 4px 18px; }
-.tally { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); border-block: 1px solid var(--line); }
-.tally > div { padding-block: 14px; padding-inline: 16px; display: grid; gap: 2px; border-inline-start: 1px solid var(--line); }
-.tally > div:first-child { border-inline-start: 0; padding-inline-start: 0; }
-.num { font-weight: 700; font-size: 30px; line-height: 1.2; }
-.tally .label { font-size: 13px; font-weight: 600; color: var(--muted); }
-.tally .sub { font-size: 12.5px; color: var(--muted); }
 
-/* الأقسام */
-.section { display: grid; gap: 16px; }
-.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.section-head h2 { font-size: 19px; font-weight: 700; }
-.section-head p { color: var(--muted); font-size: 13px; }
+/* مسطرة الموجات */
+.ruler-wrap { display: grid; gap: 8px; }
+.ruler { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(var(--count, 11), minmax(0, 1fr)); border-bottom: 1px solid var(--line-strong); }
+.ruler a { display: grid; justify-items: center; gap: 4px; padding-block: 6px 8px; text-decoration: none; color: var(--muted); border-inline-start: 1px solid var(--line); font-family: var(--font-display); font-weight: 600; font-size: 13px; font-variant-numeric: tabular-nums; }
+.ruler li:first-child a { border-inline-start: 0; }
+.ruler .bar { width: calc(100% - 8px); height: 10px; border-radius: 2px; background: var(--sunken); border: 1px solid var(--line); }
+.ruler [data-state="closed"] .bar { background: var(--ink); border-color: var(--ink); }
+.ruler [data-state="closed"] a { color: var(--ink-2); }
+.ruler [data-state="current"] .bar { background: repeating-linear-gradient(135deg, var(--ink) 0 3px, transparent 3px 7px); border-color: var(--ink); }
+.ruler [data-state="current"] a { color: var(--ink); font-weight: 800; }
+.ruler a:hover { color: var(--ink); }
+.ruler-caption { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 13px; color: var(--muted); }
+.ruler-caption strong { color: var(--ink); font-family: var(--font-display); }
 
-/* الشارات */
-.chip { display: inline-flex; align-items: center; gap: 6px; min-height: 24px; padding-inline: 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600; white-space: nowrap; border: 1px solid transparent; }
-.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
-.s-closed { background: var(--ok-bg); color: var(--ok); }
-.s-closed::before { content: "✓"; background: none; width: auto; height: auto; font-size: 12px; }
-.s-in-progress, .s-active { background: var(--run-bg); color: var(--run); }
-.s-prepared, .s-ready { border-color: var(--ink); color: var(--ink); }
-.s-prepared::before, .s-ready::before { background: transparent; border: 1.5px solid currentColor; width: 6px; height: 6px; }
-.s-delivered { background: var(--sunken); border-color: var(--line-strong); color: var(--ink); }
-.s-delivered::before { content: "⇣"; background: none; width: auto; height: auto; font-size: 12px; }
-.s-available { border-color: var(--line-strong); color: var(--ink-2); }
-.s-awaiting-owner, .s-needs-decision { background: var(--review-bg); color: var(--review); }
-.s-blocked, .s-unverified { background: var(--warn-bg); color: var(--warn); }
-.s-needs-design, .s-waiting { background: var(--sunken); color: var(--muted); }
-.track { font-size: 12px; font-weight: 600; color: var(--muted); }
-
-/* الأزرار */
-.btn { min-height: 32px; padding-inline: 12px; border-radius: var(--radius-control); font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; max-width: 100%; }
-.btn-primary { background: var(--ink); color: var(--paper); border: 1px solid var(--ink); }
-.btn-primary:hover { opacity: 0.88; }
-.btn-quiet { background: transparent; color: var(--ink-2); border: 1px solid var(--line-strong); }
-.btn-quiet:hover { border-color: var(--ink); color: var(--ink); }
-.btn .cmd { font-family: var(--font-body); font-weight: 400; opacity: 0.85; font-size: 12.5px; }
-.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-
-/* الخطوة التالية */
-.next { display: grid; gap: 12px; }
-.step { background: var(--surface); border: 1px solid var(--ink); border-radius: var(--radius-card); padding: 16px 18px; display: grid; gap: 10px; }
-.step h3 { font-size: 16px; font-weight: 700; }
-.step .where { font-size: 13.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
-.step ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
-.step li { display: grid; gap: 6px; padding-top: 10px; border-top: 1px solid var(--line); }
-.step li:first-child { border-top: 0; padding-top: 0; }
+/* التنبيهات */
+.notices { display: grid; gap: 8px; }
 .warnbox { background: var(--warn-bg); color: var(--warn); border-radius: var(--radius-card); padding: 12px 16px; font-size: 14px; }
 
-/* القرارات */
-.decisions { display: grid; gap: 10px; }
-.decision { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: baseline; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card); }
-.decision .ref { grid-row: span 3; align-self: start; }
-.decision .q { font-weight: 700; }
-.decision .rec, .decision .wh { font-size: 13.5px; color: var(--ink-2); min-width: 0; }
-.decision .wh { color: var(--muted); }
-.ref { font-weight: 600; font-size: 12.5px; direction: ltr; unicode-bidi: isolate; text-decoration: none; padding-inline: 6px; border-radius: 4px; background: var(--sunken); color: var(--ink-2); white-space: nowrap; }
-.ref.done { color: var(--ok); }
-.ref.open { background: var(--review-bg); color: var(--review); }
-
-/* الموجات */
-.waves { display: grid; gap: 14px; }
-.wave { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card); overflow: hidden; scroll-margin-top: 20px; }
-.wave[data-state="active"], .wave[data-state="ready"] { border-color: var(--ink); }
-.wave > summary { list-style: none; cursor: pointer; padding: 14px 18px; display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; }
-.wave > summary::-webkit-details-marker { display: none; }
-.wave > summary::after { content: "⌄"; margin-inline-start: auto; color: var(--muted); font-size: 18px; line-height: 1; }
-.wave[open] > summary::after { content: "⌃"; }
-.wave-title { font-family: var(--font-display); font-weight: 700; font-size: 17px; }
-.wave-ids { display: flex; flex-wrap: wrap; gap: 4px; }
-.wave-body { border-top: 1px solid var(--line); padding: 16px 18px 18px; display: grid; gap: 16px; }
-.conds { display: grid; gap: 4px; margin: 0; font-size: 13.5px; }
-.conds div { display: grid; grid-template-columns: 9.5em 1fr; gap: 10px; }
+/* لوحة الموجة الحالية */
+.current { background: var(--surface); border: 1.5px solid var(--ink); border-radius: var(--radius-card); padding: 24px; display: grid; gap: 24px; }
+.current-head { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 20px; }
+.current-head .title { display: grid; gap: 0; }
+.eyebrow { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: 0.02em; }
+.current-head .big { font-family: var(--font-display); font-weight: 800; font-size: 34px; line-height: 1.25; }
+.conds { display: grid; gap: 2px; margin: 0; font-size: 13.5px; flex: 1 1 min(280px, 100%); min-width: 0; }
+.conds div { display: grid; grid-template-columns: 6.5em 1fr; gap: 10px; }
 .conds dt { font-family: var(--font-display); font-weight: 600; color: var(--muted); }
 .conds dd { margin: 0; color: var(--ink-2); min-width: 0; }
-.lanes { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); align-items: start; }
+
+.command { display: grid; gap: 10px; padding-block: 18px; border-block: 1px solid var(--line); }
+.cmd-btn { justify-self: start; display: inline-flex; align-items: center; gap: 14px; flex-wrap: wrap; max-width: 100%; min-height: 56px; padding: 10px 20px; border-radius: var(--radius-control); background: var(--ink); color: var(--paper); border: 1px solid var(--ink); cursor: pointer; text-align: start; }
+.cmd-btn:hover { opacity: 0.9; }
+.cmd-btn .text { font-family: var(--font-display); font-weight: 800; font-size: 22px; line-height: 1.3; }
+.cmd-btn .hint { font-family: var(--font-display); font-weight: 600; font-size: 13px; padding-inline-start: 14px; border-inline-start: 1px solid currentColor; opacity: 0.8; }
+.cmd-btn.secondary { min-height: 40px; padding: 6px 14px; background: transparent; color: var(--ink); border-color: var(--line-strong); }
+.cmd-btn.secondary .text { font-size: 16px; }
+.command .where { font-size: 14px; color: var(--ink-2); max-width: 72ch; }
+.command .state-note { font-size: 13.5px; color: var(--muted); }
+.command .alt { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+
+.panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 16px 28px; align-items: start; }
+.panel { display: grid; gap: 10px; min-width: 0; }
+.panel h3 { font-size: 16px; font-weight: 700; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.panel h3 .count { font-size: 13px; font-weight: 600; color: var(--muted); }
+.panel h4 { font-size: 13px; font-weight: 700; color: var(--muted); }
+.items { list-style: none; padding: 0; display: grid; gap: 8px; }
+.items li { display: grid; gap: 2px; padding: 10px 12px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-control); min-width: 0; }
+.items li.now { border-color: var(--review); }
+.items .row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+.items .row strong { font-family: var(--font-display); font-weight: 600; }
+.items .sub { font-size: 13px; color: var(--ink-2); }
+.items .sub.dim { color: var(--muted); }
+.empty { font-size: 14px; color: var(--muted); }
+
+.lanes { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); align-items: start; }
 .lane { display: grid; gap: 10px; min-width: 0; }
 .lane h4 { font-size: 13px; font-weight: 700; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 6px; }
 
 /* بطاقة المرحلة */
-.phase { border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--paper); padding: 14px; display: grid; gap: 9px; min-width: 0; scroll-margin-top: 20px; }
-.phase[data-state="prepared"], .phase[data-state="available"] { border-color: var(--ink); }
+.phase { border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--paper); padding: 14px; display: grid; gap: 6px; min-width: 0; scroll-margin-top: 20px; }
 .phase:target { box-shadow: 0 0 0 2px var(--focus); }
 .phase-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .pid { font-weight: 700; font-size: 13px; color: var(--muted); direction: ltr; unicode-bidi: isolate; }
 .phase h5 { margin: 0; font-family: var(--font-display); font-size: 15.5px; font-weight: 600; line-height: 1.55; }
-.facts { display: grid; gap: 3px; margin: 0; font-size: 13px; }
-.facts div { display: grid; grid-template-columns: 6.5em 1fr; gap: 8px; align-items: baseline; }
+.phase .status { font-size: 13.5px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 4px; align-items: baseline; }
+.phase .status.warn { color: var(--warn); }
+
+/* التفاصيل الاختيارية */
+.tech > summary { cursor: pointer; font-size: 12.5px; font-weight: 600; color: var(--muted); width: fit-content; list-style: none; display: inline-flex; gap: 6px; align-items: center; min-height: 28px; }
+.tech > summary::-webkit-details-marker { display: none; }
+.tech > summary::before { content: "+"; font-weight: 700; width: 1em; text-align: center; }
+.tech[open] > summary::before { content: "−"; }
+.tech > summary:hover { color: var(--ink); }
+.tech-body { display: grid; gap: 10px; padding-top: 8px; border-top: 1px solid var(--line); margin-top: 4px; font-size: 13px; }
+.facts { display: grid; gap: 3px; margin: 0; }
+.facts div { display: grid; grid-template-columns: 7em 1fr; gap: 8px; align-items: baseline; }
 .facts dt { font-family: var(--font-display); font-weight: 600; color: var(--muted); }
 .facts dd { margin: 0; color: var(--ink-2); min-width: 0; display: flex; flex-wrap: wrap; gap: 4px; align-items: baseline; }
-.why { font-size: 12.5px; color: var(--muted); }
-.note { font-size: 13px; color: var(--ink-2); }
-.note.warn { color: var(--warn); }
-.details { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 10px; font-size: 13.5px; }
-.details h6 { margin: 0 0 3px; font-family: var(--font-display); font-size: 12.5px; font-weight: 700; color: var(--muted); }
-.details ul { margin: 0; padding-inline-start: 18px; display: grid; gap: 2px; }
-.iconbtn { min-width: 28px; min-height: 28px; padding-inline: 6px; border-radius: var(--radius-control); border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; font-size: 12px; font-family: var(--font-display); font-weight: 600; }
+.tech-body h6 { margin: 0 0 2px; font-family: var(--font-display); font-size: 12.5px; font-weight: 700; color: var(--muted); }
+.tech-body ul { padding-inline-start: 18px; display: grid; gap: 2px; color: var(--ink-2); }
+.tech-body .note { color: var(--warn); }
+
+/* الشارات والمراجع */
+.chip { display: inline-flex; align-items: center; gap: 6px; min-height: 24px; padding-inline: 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600; white-space: nowrap; border: 1px solid transparent; }
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
+.s-closed, .w-closed { background: var(--ok-bg); color: var(--ok); }
+.s-closed::before, .w-closed::before { content: "✓"; background: none; width: auto; height: auto; font-size: 12px; }
+.s-in-progress, .w-running { background: var(--run-bg); color: var(--run); }
+.s-prepared, .s-available, .w-not-started { border-color: var(--ink); color: var(--ink); }
+.s-prepared::before, .s-available::before, .w-not-started::before { background: transparent; border: 1.5px solid currentColor; width: 6px; height: 6px; }
+.s-delivered { background: var(--sunken); border-color: var(--line-strong); color: var(--ink); }
+.s-awaiting-owner, .s-needs-decision, .w-needs-owner { background: var(--review-bg); color: var(--review); }
+.s-blocked, .s-unverified, .w-blocked { background: var(--warn-bg); color: var(--warn); }
+.s-needs-design, .s-waiting, .w-later { background: var(--sunken); color: var(--muted); }
+.ref { font-weight: 600; font-size: 12.5px; direction: ltr; unicode-bidi: isolate; text-decoration: none; padding-inline: 6px; border-radius: 4px; background: var(--sunken); color: var(--ink-2); white-space: nowrap; }
+a.ref:hover { color: var(--ink); }
+.ref.done { color: var(--ok); }
+.ref.open { background: var(--review-bg); color: var(--review); }
+.iconbtn { min-width: 28px; min-height: 28px; padding-inline: 6px; border-radius: var(--radius-control); border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; font-size: 12px; font-weight: 600; }
 .iconbtn:hover { color: var(--ink); border-color: var(--ink); }
 
+/* الموجات الأخرى */
+.section { display: grid; gap: 14px; }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.section-head h2 { font-size: 19px; font-weight: 700; }
+.section-head p { color: var(--muted); font-size: 13px; }
+.waves { display: grid; gap: 10px; }
+.wave { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card); scroll-margin-top: 20px; min-width: 0; }
+.wave > summary { list-style: none; cursor: pointer; padding: 12px 16px; display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap; }
+.wave > summary::-webkit-details-marker { display: none; }
+.wave > summary::after { content: "⌄"; margin-inline-start: auto; color: var(--muted); font-size: 18px; line-height: 1; }
+.wave[open] > summary::after { content: "⌃"; }
+.wave-title { font-weight: 700; font-size: 16px; }
+.wave-ids { display: flex; flex-wrap: wrap; gap: 4px; }
+.wave-ready { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.wave-body { border-top: 1px solid var(--line); padding: 14px 16px 16px; display: grid; gap: 14px; }
+.closed-waves .wave-body { gap: 18px; }
+.closed-wave { display: grid; gap: 10px; scroll-margin-top: 20px; }
+.closed-wave h4 { font-size: 14px; font-weight: 700; }
+
 /* كيف تعمل */
-.howto { display: grid; gap: 10px; background: var(--sunken); border-radius: var(--radius-card); padding: 18px 20px; font-size: 14px; }
-.howto h2 { font-size: 16px; }
-.howto ol { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; }
+.howto { display: grid; gap: 12px; background: var(--sunken); border-radius: var(--radius-card); padding: 20px 22px; font-size: 14px; }
+.howto h2 { font-size: 17px; }
+.howto ol { padding-inline-start: 20px; display: grid; gap: 6px; max-width: 76ch; }
+.commands { display: grid; gap: 6px; margin: 0; }
+.commands div { display: grid; grid-template-columns: 11em 1fr; gap: 10px; align-items: baseline; }
+.commands dt { font-family: var(--font-display); font-weight: 700; }
+.commands dd { margin: 0; color: var(--ink-2); min-width: 0; }
 .links { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--muted); }
-.toggle { font-size: 13px; color: var(--ink-2); display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
 
 /* رسالة النسخ */
 .toast { position: fixed; inset-inline: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); margin-inline: auto; max-width: 460px; background: var(--ink); color: var(--paper); border-radius: var(--radius-card); padding: 12px 16px; font-size: 14px; display: grid; gap: 8px; }
-.toast input { font: inherit; padding: 6px 8px; border-radius: var(--radius-control); border: 1px solid var(--line-strong); background: var(--paper); color: var(--ink); width: 100%; direction: ltr; }
+.toast input { font: inherit; padding: 6px 8px; border-radius: var(--radius-control); border: 1px solid var(--line-strong); background: var(--paper); color: var(--ink); width: 100%; }
 
 @media (max-width: 560px) {
-  .page { padding-block: 28px 56px; gap: 36px; }
+  .page { padding-block: 28px 56px; gap: 32px; }
   .brand .name { font-size: 32px; }
-  .tally > div { border-inline-start: 0; padding-inline: 0; }
-  .conds div, .facts div { grid-template-columns: 1fr; gap: 0; }
-  .lanes { grid-template-columns: 1fr; }
+  .current { padding: 18px 16px; }
+  .current-head .big { font-size: 28px; }
+  .cmd-btn .text { font-size: 19px; }
+  .cmd-btn .hint { border-inline-start: 0; padding-inline-start: 0; }
+  .conds div, .facts div, .commands div { grid-template-columns: 1fr; gap: 0; }
+  .ruler a { font-size: 11.5px; }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .phase, .wave { transition: border-color 160ms ease-out; }
+  .cmd-btn, .iconbtn, .wave { transition: opacity 160ms ease-out, border-color 160ms ease-out, color 160ms ease-out; }
 }
 </style>
 
 <main class="page" dir="rtl" lang="ar">
   <header class="masthead">
     <div class="brand"><span class="name">عِيَار</span><span class="latin">AYAR</span></div>
-    <h1>الموجات والمراحل</h1>
-    <p class="lede">المراحل التي لا يعتمد بعضها على بعض تسير معًا في موجة، كل مرحلة في مجلد عمل مستقل. جلسة التنسيق تدمج ما سُلّم وتجهّز الموجة التالية، وأنت تفتح جلسة لكل مرحلة وتلصق أمرها. الأزرار هنا تنسخ فقط ولا تشغّل شيئًا.</p>
+    <p class="lede">تتعامل مع جلسة واحدة. ترسل لها أمر الموجة، فتوزّع مراحلها المستقلة على وكلاء يعملون معًا، وتدمج كل ما ينجح في فحوصه، وتتوقف حين تحتاج قرارك. الأزرار هنا تنسخ فقط ولا تشغّل شيئًا.</p>
     <div class="meta" id="meta"></div>
   </header>
 
-  <section class="tally" id="tally" aria-label="ملخص الحالة"></section>
-
-  <section class="section" aria-labelledby="next-h">
-    <div class="section-head"><h2 id="next-h">الخطوة التالية</h2><p>ما يمكن فعله الآن، بأوامره الجاهزة للنسخ</p></div>
-    <div class="next" id="next"></div>
+  <section class="ruler-wrap" aria-label="الموجات بالترتيب">
+    <ol class="ruler" id="ruler"></ol>
+    <div class="ruler-caption" id="ruler-caption"></div>
   </section>
 
-  <section class="section" aria-labelledby="dec-h">
-    <div class="section-head"><h2 id="dec-h">قرارات تنتظرك</h2><p>كل قرار بالمرحلة التي يلزم فيها، وتوصية الخطة أو ما اعتمدته مؤقتًا</p></div>
-    <div class="decisions" id="decisions"></div>
-  </section>
+  <div class="notices" id="notices" hidden></div>
 
-  <section class="section" aria-labelledby="waves-h">
-    <div class="section-head">
-      <h2 id="waves-h">الموجات</h2>
-      <label class="toggle"><input type="checkbox" id="show-closed"> أظهر الموجات المغلقة</label>
-    </div>
-    <div class="waves" id="waves"></div>
+  <section class="current" id="current" aria-labelledby="current-h"></section>
+
+  <section class="section" aria-labelledby="later-h" id="later-section">
+    <div class="section-head"><h2 id="later-h">الموجات التالية</h2><p>تبدأ كل موجة بأمرها بعد إغلاق ما قبلها. افتح موجة لترى مراحلها</p></div>
+    <div class="waves" id="later"></div>
   </section>
 
   <section class="howto" aria-labelledby="how-h">
-    <h2 id="how-h">كيف تعمل</h2>
+    <h2 id="how-h">كيف تعمل الموجة</h2>
     <ol>
-      <li><strong>جلسة التنسيق:</strong> افتح جلسة على المجلد الأصلي <span class="ltr" id="coord-path"></span> وأرسل «ابدأ الموجة X». تتحقق من التسليمات، وتدمج، وتفحص التكامل، وتدفع، وتجهّز مجلدات المراحل المتاحة.</li>
-      <li><strong>جلسة لكل مرحلة:</strong> في تبويب Code ابدأ جلسة جديدة واختر مجلد المرحلة نفسه (دون خيار إنشاء worktree جديد)، واختر النموذج المقترح إن شئت، والصق أمر البدء.</li>
-      <li><strong>عند التسليم:</strong> كل مرحلة تتوقف بعد ملف تسليمها. عد إلى جلسة التنسيق وأرسل أمر الموجة التالية، أو أعد أمر الموجة نفسها لدمج ما سُلّم.</li>
+      <li>ترسل أمر الموجة في الجلسة الرئيسية.</li>
+      <li>تسألك الجلسة دفعة واحدة عن أي قرار يلزم قبل البدء، ثم تكلّف وكيلًا بكل مرحلة جاهزة، كل وكيل في مجلد عمل مستقل.</li>
+      <li>تتوقف لتسألك حين يلزم اعتمادك أو إذنك، أو حين يثبت عائق. والوكلاء الآخرون يواصلون عملهم.</li>
+      <li>كل مرحلة تُسلَّم تتحقق منها الجلسة آليًا، وتدمجها، وتفحص التكامل، وتغلقها، وتدفعها إلى GitHub، دون أمر منك.</li>
+      <li>في النهاية تسلّمك خلاصة الموجة، وتتوقف قبل الموجة التالية.</li>
     </ol>
-    <p class="muted">الصفحة مولّدة من فرع <span class="ltr">main</span> ومن فروع المراحل الحية، ولا تُحرَّر يدويًا. يولّدها المنسّق بالأمر <span class="ltr">/opt/homebrew/bin/node tools/dashboard/build.mjs</span> ثم ينشرها على الرابط نفسه. والمرجع الكامل: <span class="ltr">docs/waves/README.md</span>.</p>
+    <dl class="commands">
+      <div><dt>«ابدأ الموجة X»</dt><dd>يبدأ الموجة. ولا يكرر ما أُنجز إن أُرسل مرة أخرى.</dd></div>
+      <div><dt>«تابع الموجة X»</dt><dd>يكمل موجة بدأت، بعد جوابك أو بعد انقطاع الجلسة.</dd></div>
+      <div><dt>«ما الحالة؟»</dt><dd>جواب بالموجة الحالية وما ينتظرك، دون تنفيذ شيء.</dd></div>
+    </dl>
+    <details class="tech">
+      <summary>تفاصيل تقنية</summary>
+      <div class="tech-body">
+        <dl class="facts" id="tech-facts"></dl>
+        <p class="muted">الصفحة مولّدة من فرع <span class="ltr">main</span> ومن فروع المراحل الحية، ولا تُحرَّر يدويًا. تولّدها الجلسة الرئيسية بعد كل تغيير في حالة مرحلة، وتنشرها على الرابط نفسه. والمرجع الكامل: <span class="ltr">docs/waves/README.md</span>.</p>
+      </div>
+    </details>
     <div class="links" id="links"></div>
   </section>
 </main>
@@ -263,17 +300,24 @@ const DATA = /*__AYAR_DATA__*/null;
 const PHASE_STATES = {
   'closed': 'مغلقة',
   'unverified': 'مغلقة دون وسم',
-  'delivered': 'سُلّمت · تنتظر الدمج',
-  'in-progress': 'جارية',
-  'prepared': 'مجهّزة · افتح جلستها',
-  'available': 'متاحة · تنتظر أمر الموجة',
-  'awaiting-owner': 'بانتظارك',
+  'delivered': 'سُلّمت · تُدمج',
+  'in-progress': 'قيد العمل',
+  'prepared': 'جاهزة',
+  'available': 'جاهزة',
+  'awaiting-owner': 'تنتظر جوابك',
   'needs-decision': 'تنتظر قرارك',
   'blocked': 'معطّلة',
   'needs-design': 'تنتظر تصميمًا معتمدًا',
   'waiting': 'تنتظر مرحلة سابقة',
 };
-const WAVE_STATES = { closed: 'مغلقة', active: 'جارية', ready: 'جاهزة للبدء', waiting: 'تنتظر' };
+const WAVE_STATES = { 'not-started': 'لم تبدأ', running: 'جارية', 'needs-owner': 'تنتظرك', blocked: 'معطّلة' };
+const WAVE_NOTES = {
+  'not-started': 'لم يبدأ فيها شيء بعد.',
+  running: 'إن أُغلقت الجلسة أو انقطعت، أرسل الأمر نفسه فتكمل من حيث توقفت.',
+  'needs-owner': 'أجب عمّا تسألك عنه الجلسة (في «يحتاج قرارك»). وإن لم تكن الجلسة مفتوحة، فأرسل الأمر بعد جوابك.',
+  blocked: 'كل ما بقي فيها معطّل بعائق مثبت، ولا يُكمل قبل فكّه.',
+};
+const TRACKS = [['design', 'التصميم'], ['dev', 'التطوير']];
 
 function h(tag, attrs, ...children) {
   const el = document.createElement(tag);
@@ -287,30 +331,27 @@ function h(tag, attrs, ...children) {
   for (const c of children.flat(Infinity)) if (c !== null && c !== undefined && c !== false && c !== '') el.append(c.nodeType ? c : document.createTextNode(String(c)));
   return el;
 }
+const list = (items, sep = ' ') => items.map((x, i) => [i ? sep : '', x]);
 
 const dateFmt = new Intl.DateTimeFormat('ar-u-nu-latn-ca-gregory', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 const stampFmt = new Intl.DateTimeFormat('ar-u-nu-latn-ca-gregory', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-const fmtDate = (iso) => {
-  if (!iso) return '—';
-  try { return dateFmt.format(new Date(iso + 'T00:00:00Z')); } catch { return iso; }
-};
-const fmtStamp = (iso) => {
-  try { return stampFmt.format(new Date(iso)); } catch { return iso ?? '—'; }
-};
+const fmtDate = (iso) => { if (!iso) return '—'; try { return dateFmt.format(new Date(iso + 'T00:00:00Z')); } catch { return iso; } };
+const fmtStamp = (iso) => { try { return stampFmt.format(new Date(iso)); } catch { return iso ?? '—'; } };
+
 const byId = new Map(DATA.phases.map((p) => [p.id, p]));
-const openDecisionIds = new Set(DATA.openDecisions.map((d) => d.id));
+const CUR = DATA.current;
 
 let toastTimer;
 function toast(message, fallback) {
   const t = document.getElementById('toast');
   t.replaceChildren(h('span', { text: message }));
+  t.hidden = false;
   if (fallback) {
     const input = h('input', { id: 'copy-fallback', value: fallback, readonly: true, 'aria-label': 'النص المطلوب نسخه' });
     t.append(input);
-    t.hidden = false;
     input.focus();
     input.select();
-  } else t.hidden = false;
+  }
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { t.hidden = true; }, fallback ? 9000 : 2600);
 }
@@ -322,206 +363,259 @@ function copy(text, what) {
     else fail();
   } catch { fail(); }
 }
-const copyBtn = (label, text, what, primary) =>
-  h('button', { class: `btn ${primary ? 'btn-primary' : 'btn-quiet'}`, type: 'button', title: text, onclick: () => copy(text, what) }, label);
-const cmdBtn = (text, what) =>
-  h('button', { class: 'btn btn-primary', type: 'button', 'aria-label': `انسخ: ${text}`, onclick: () => copy(text, `الأمر «${text}»`) }, 'انسخ', h('span', { class: 'cmd', text: `«${text}»` }));
 const pathBtn = (path) => h('button', { class: 'iconbtn', type: 'button', title: 'انسخ المسار', 'aria-label': `انسخ المسار ${path}`, onclick: () => copy(path, 'المسار') }, 'نسخ');
+const chip = (cls, label) => h('span', { class: `chip ${cls}`, text: label });
 
-const chip = (cls, label) => h('span', { class: `chip s-${cls}`, text: label });
 let reveal = () => {};
 function phaseRef(id) {
   const p = byId.get(id);
   const done = p && p.state === 'closed';
   return h('a', { class: `ref${done ? ' done' : ''}`, href: `#${id}`, title: p ? `${p.title} · ${PHASE_STATES[p.state]}` : id, text: done ? `${id} ✓` : id, onclick: (e) => { e.preventDefault(); reveal(id); } });
 }
-const decisionRef = (id) => (openDecisionIds.has(id) ? h('a', { class: 'ref open', href: `#decision-${id}`, text: id }) : h('span', { class: 'ref done', text: `${id} ✓` }));
-const list = (items, sep = ' ') => items.map((x, i) => [i ? sep : '', x]);
+const decisionRef = (id) => h('span', { class: 'ref open', text: id });
 
-function phaseCard(p) {
+// سطر الحالة بكلمات بسيطة، وما ينتظره إن كان ينتظر شيئًا
+function statusLine(p, inCurrent) {
+  const s = p.state;
+  if (s === 'closed') return ['أُغلقت ودُمجت في ', fmtDate(p.statusDate)];
+  if (s === 'unverified') return ['مغلقة في ملفها دون وسم إغلاق، فلا تبدأ بها المراحل التي تعتمد عليها حتى تتحقق منها الجلسة الرئيسية.'];
+  if (s === 'delivered') return ['سلّمها وكيلها، والجلسة الرئيسية تتحقق منها ثم تدمجها.'];
+  if (s === 'in-progress') return ['يعمل عليها وكيلها في مجلدها.'];
+  if (s === 'awaiting-owner') return [p.ownerRequest || 'تنتظر جوابك عن سؤال أو اعتماد تعرضه عليك الجلسة الرئيسية.'];
+  if (s === 'blocked') return [p.ownerRequest || 'معطّلة بعائق مثبت، وسببه وما يلزم لفكّه في سجل العوائق.'];
+  if (s === 'prepared' || s === 'available') return [inCurrent ? 'تبدأ مع أمر الموجة.' : 'تبعياتها مغلقة، وتبدأ مع موجتها.'];
+  if (s === 'needs-decision') return ['تبدأ بعد قرارك في ', list(p.waitingOwner.map(decisionRef))];
+  if (s === 'needs-design') return ['تنتظر اعتماد ', list(p.waitingDesign.map(phaseRef))];
+  return ['تنتظر إغلاق ', list([...p.waitingDeps, ...p.waitingDesign].map(phaseRef))];
+}
+
+function techDetails(p) {
   const facts = [];
   const add = (label, ...content) => facts.push(h('div', null, h('dt', { text: label }), h('dd', null, ...content)));
   if (!['closed', 'unverified'].includes(p.state)) {
-    add('المجلد', h('span', { class: 'ltr', text: p.folder }), pathBtn(p.folder), p.folderExists ? null : h('span', { class: 'muted', text: '(لم يُجهَّز)' }));
-    add('الفرع', h('span', { class: 'ltr', text: p.branch }), p.ahead ? h('span', { class: 'muted', text: `${p.ahead} commits` }) : null, p.dirty ? h('span', { class: 'muted', text: '· تغييرات غير ملتزمة' }) : null);
+    add('المجلد', h('span', { class: 'ltr', text: p.folder }), pathBtn(p.folder), p.folderExists ? null : h('span', { class: 'muted', text: '(تنشئه الجلسة الرئيسية)' }));
+    add('الفرع', h('span', { class: 'ltr', text: p.branch }), p.ahead ? h('span', { class: 'muted', text: `· ${p.ahead} commits` }) : null, p.dirty ? h('span', { class: 'muted', text: '· تغييرات غير ملتزمة' }) : null);
   }
-  add('النموذج', p.model ? `${p.model} · جهد ${p.effort}` : h('span', { class: 'muted', text: 'بدأت قبل نظام الموجات' }));
+  add('النموذج', p.model ? `${p.model} · جهد ${p.effort}` : h('span', { class: 'muted', text: 'نُفّذت قبل نظام الموجات' }));
+  if (p.modelReason) add('سببه', p.modelReason);
   if (p.dependsOn.length) add('تعتمد على', list(p.dependsOn.map(phaseRef)));
   if (p.designGates.length) add('تصميم معتمد', list(p.designGates.map(phaseRef)));
-  if (p.ownerGates.length) add('قرارك قبلها', list(p.ownerGates.map(decisionRef)));
-  if (p.openInputs.length) add('يُطلب أثناءها', list(p.openInputs.map(decisionRef)));
+  if (p.ownerGates.length) add('قرارك قبلها', list(p.ownerGates.map((id) => h('span', { class: `ref${p.waitingOwner.includes(id) ? ' open' : ' done'}`, text: p.waitingOwner.includes(id) ? id : `${id} ✓` }))));
+  if (p.ownerInputs.length) add('قرارك أثناءها', list(p.ownerInputs.map((id) => h('span', { class: `ref${p.openInputs.includes(id) ? ' open' : ' done'}`, text: p.openInputs.includes(id) ? id : `${id} ✓` }))));
   const opens = DATA.phases.filter((x) => x.designGates.includes(p.id)).map((x) => x.id);
   if (opens.length) add('تفتح للتطوير', list(opens.map(phaseRef)));
+  add('الملف', h('a', { class: 'ltr', href: `${DATA.links.repo}/blob/main/${p.file}`, target: '_blank', rel: 'noopener', text: p.file }));
+  if (p.closingCommit) add('commit الإغلاق', h('span', { class: 'ltr', text: p.closingCommit }));
 
   const notes = [];
-  if (p.stale) notes.push(h('p', { class: 'note', text: 'مجلدها موجود لكنه على main أقدم من الحالي. تحدّثه جلسة التنسيق عند أمر الموجة، ثم تفتح جلسته.' }));
-  if (p.unlockedByMerge) notes.push(h('p', { class: 'note', text: 'تصير متاحة حين تدمج جلسة التنسيق ما سُلّم من تبعياتها.' }));
-  if (p.state === 'delivered') notes.push(h('p', { class: 'note', text: p.handoff ? 'ملف التسليم موجود. تدمجها جلسة التنسيق عند أمر الموجة التالية.' : 'حالتها «سُلّمت» لكن ملف التسليم غير موجود بعد.' }));
-  if (p.state === 'unverified') notes.push(h('p', { class: 'note warn', text: `مغلقة في ملفها دون وسم ${p.id}-closed في Git، فلا تُفتح بها تبعياتها حتى يتحقق منها المنسّق ويَسِمها.` }));
-  if (p.returned) notes.push(h('p', { class: 'note warn', text: 'أعادها المنسّق بعائق مفتوح في docs/tracking/blockers.md. تابعها في مجلدها بأمر «تابع»، بعد دمج main في فرعها.' }));
-  if (p.unmerged) notes.push(h('p', { class: 'note warn', text: `على فرعها ${p.unmerged} commits لم تُدمج في main.` }));
+  if (p.stale) notes.push('مجلدها جُهّز على نسخة أقدم من main. تحدّثه الجلسة الرئيسية قبل تكليف وكيلها.');
+  if (p.returned) notes.push('أُعيدت بعائق مفتوح في سجل العوائق، وتتابعها الجلسة الرئيسية بعد فكّه.');
+  if (p.unmerged) notes.push(`على فرعها ${p.unmerged} commits لم تُدمج في main.`);
 
-  const detailsId = `details-${p.id}`;
-  const details = h('div', { class: 'details', id: detailsId, hidden: true },
-    h('div', null, h('h6', { text: 'الهدف' }), h('p', { text: p.goal })),
-    p.modelReason ? h('div', null, h('h6', { text: 'لماذا هذا النموذج' }), h('p', { text: p.modelReason })) : null,
-    p.scope.length ? h('div', null, h('h6', { text: 'نطاق الكتابة' }), h('p', null, list(p.scope.map((s) => h('span', { class: 'ltr', text: s })), '، '))) : null,
-    p.start.length ? h('div', null, h('h6', { text: 'متطلبات البدء' }), h('ul', null, p.start.map((s) => h('li', { text: s })))) : null,
-    p.outputs.length ? h('div', null, h('h6', { text: 'المخرجات' }), h('ul', null, p.outputs.map((s) => h('li', { text: s })))) : null,
-    !['closed', 'unverified'].includes(p.state) ? h('div', null, h('h6', { text: 'أمر التجهيز (تنفّذه جلسة التنسيق عادة)' }), h('p', null, h('span', { class: 'ltr', text: p.setup }))) : null,
-    h('p', { class: 'muted' }, `آخر تغيير للحالة: ${fmtDate(p.statusDate)}`, p.closingCommit ? ' · commit ' : '', p.closingCommit ? h('span', { class: 'ltr', text: p.closingCommit }) : '', ' · ', h('a', { class: 'ltr', href: `${DATA.links.repo}/blob/main/${p.file}`, target: '_blank', rel: 'noopener', text: p.file })),
-  );
-  const more = h('button', {
-    class: 'btn btn-quiet', type: 'button', 'aria-expanded': 'false', 'aria-controls': detailsId,
-    onclick: (e) => {
-      const open = details.hidden;
-      details.hidden = !open;
-      e.currentTarget.setAttribute('aria-expanded', String(open));
-      e.currentTarget.textContent = open ? 'أخفِ التفاصيل' : 'التفاصيل';
-    },
-  }, 'التفاصيل');
-
-  const actions = [];
-  const ready = ['prepared', 'in-progress', 'awaiting-owner', 'blocked'].includes(p.state);
-  if (p.state === 'prepared') actions.push(cmdBtn(p.command));
-  else if (ready) actions.push(cmdBtn(p.resume));
-  else if (!['closed', 'delivered'].includes(p.state)) actions.push(h('button', { class: 'btn btn-quiet', type: 'button', title: 'يُرسل بعد أن تجهّز جلسة التنسيق مجلدها', onclick: () => copy(p.command, `الأمر «${p.command}»`) }, 'انسخ أمر البدء'));
-  if (!p.folderExists && !['closed', 'unverified'].includes(p.state)) actions.push(copyBtn('انسخ أمر التجهيز', p.setup, 'أمر التجهيز'));
-  actions.push(more);
-
-  return h('article', { class: 'phase', id: p.id, 'data-state': p.state },
-    h('div', { class: 'phase-top' }, h('span', { class: 'pid', text: p.id }), chip(p.state, PHASE_STATES[p.state])),
-    h('h5', { text: p.title }),
-    h('dl', { class: 'facts' }, facts),
-    p.modelReason ? h('p', { class: 'why', text: p.modelReason }) : null,
-    notes,
-    h('div', { class: 'actions' }, actions),
-    details,
+  return h('details', { class: 'tech' },
+    h('summary', null, 'التفاصيل التقنية'),
+    h('div', { class: 'tech-body' },
+      h('dl', { class: 'facts' }, facts),
+      h('div', null, h('h6', { text: 'الهدف' }), h('p', { text: p.goal })),
+      p.outputs.length ? h('div', null, h('h6', { text: 'المخرجات' }), h('ul', null, p.outputs.map((s) => h('li', { text: s })))) : null,
+      p.scope.length ? h('div', null, h('h6', { text: 'نطاق الكتابة' }), h('p', null, list(p.scope.map((s) => h('span', { class: 'ltr', text: s })), '، '))) : null,
+      notes.map((n) => h('p', { class: 'note', text: n })),
+    ),
   );
 }
 
-function waveCard(w, openByDefault) {
-  const items = w.phaseIds.map((id) => byId.get(id));
-  const lanes = [['design', 'التصميم'], ['dev', 'التطوير']]
+function phaseCard(p, inCurrent) {
+  const warn = ['blocked', 'unverified'].includes(p.state);
+  return h('article', { class: 'phase', id: p.id, 'data-state': p.state, tabindex: '-1' },
+    h('div', { class: 'phase-top' }, h('span', { class: 'pid', text: p.id }), chip(`s-${p.state}`, PHASE_STATES[p.state])),
+    h('h5', { text: p.title }),
+    h('p', { class: `status${warn ? ' warn' : ''}` }, statusLine(p, inCurrent)),
+    techDetails(p),
+  );
+}
+
+function lanes(ids, inCurrent) {
+  const items = ids.map((id) => byId.get(id));
+  return h('div', { class: 'lanes' }, TRACKS
     .map(([track, label]) => [label, items.filter((p) => p.track === track)])
     .filter(([, ps]) => ps.length)
-    .map(([label, ps]) => h('div', { class: 'lane' }, h('h4', { text: label }), ps.map(phaseCard)));
-  return h('details', { class: 'wave', id: `wave-${w.number}`, 'data-state': w.state, open: openByDefault },
+    .map(([label, ps]) => h('div', { class: 'lane' }, h('h4', { text: label }), ps.map((p) => phaseCard(p, inCurrent)))));
+}
+
+function needItem(x, isNow) {
+  if (x.kind === 'decision') {
+    return h('li', { class: isNow ? 'now' : null },
+      h('div', { class: 'row' }, decisionRef(x.id), h('strong', { text: x.question })),
+      h('p', { class: 'sub', text: `التوصية: ${x.recommendation}` }),
+      h('p', { class: 'sub dim' }, x.when === 'before' ? 'يلزم قبل بدء ' : 'يُطلب أثناء ', list(x.phases.map(phaseRef), '، ')),
+    );
+  }
+  const p = byId.get(x.phase);
+  if (x.kind === 'approval') {
+    return h('li', null,
+      h('div', { class: 'row' }, phaseRef(p.id), h('strong', { text: `اعتماد «${p.title}»` })),
+      h('p', { class: 'sub dim', text: 'تعرض عليك الجلسة لقطاتها وروابطها في Figma قبل إغلاقها، ولا تُغلق دون موافقتك الصريحة.' }),
+    );
+  }
+  const fallback = x.kind === 'blocker' ? 'عائق مثبت، وسببه وما يلزم لفكّه في سجل العوائق.' : 'سؤال أو اعتماد تعرضه عليك الجلسة الرئيسية.';
+  return h('li', { class: 'now' },
+    h('div', { class: 'row' }, phaseRef(p.id), h('strong', { text: x.kind === 'blocker' ? `${p.title} معطّلة` : p.title })),
+    h('p', { class: 'sub', text: x.text || fallback }),
+  );
+}
+
+function renderCurrent() {
+  const el = document.getElementById('current');
+  if (!CUR) {
+    el.replaceChildren(
+      h('div', { class: 'current-head' }, h('div', { class: 'title' }, h('span', { class: 'eyebrow', text: 'الموجات' }), h('h2', { class: 'big', id: 'current-h', text: 'اكتملت كل الموجات' }))),
+      h('p', { class: 'muted', text: 'كل المراحل مغلقة ومدموجة ومَوسومة.' }),
+    );
+    return;
+  }
+  const parallel = CUR.parallel.map((id) => byId.get(id));
+  el.replaceChildren(
+    h('div', { class: 'current-head' },
+      h('div', { class: 'title' },
+        h('span', { class: 'eyebrow', text: 'الموجة الحالية' }),
+        h('h2', { class: 'big', id: 'current-h', text: `الموجة ${CUR.number}` }),
+      ),
+      chip(`w-${CUR.state}`, WAVE_STATES[CUR.state]),
+      h('dl', { class: 'conds' },
+        h('div', null, h('dt', { text: 'تبدأ حين' }), h('dd', { text: CUR.starts })),
+        h('div', null, h('dt', { text: 'تُغلق حين' }), h('dd', { text: CUR.closes })),
+      ),
+    ),
+    h('div', { class: 'command' },
+      h('button', { class: 'cmd-btn', type: 'button', id: 'copy-command', 'aria-label': `انسخ الأمر: ${CUR.command}`, onclick: () => copy(CUR.command, `الأمر «${CUR.command}»`) },
+        h('span', { class: 'text', text: `«${CUR.command}»` }), h('span', { class: 'hint', text: 'انسخ الأمر' })),
+      h('p', { class: 'where', text: 'أرسله في الجلسة الرئيسية: جلسة Claude Code على مجلد المشروع الأصلي. تتولى بعده كل شيء حتى خلاصة الموجة، وتتوقف حين تحتاجك.' }),
+      h('p', { class: 'state-note', text: WAVE_NOTES[CUR.state] }),
+      CUR.alt ? h('div', { class: 'alt' },
+        h('p', { class: 'state-note' }, 'أو ابدأ الموجة التالية بما لا يعتمد على المعطّل (', list(CUR.alt.ready.map(phaseRef), '، '), '):'),
+        h('button', { class: 'cmd-btn secondary', type: 'button', onclick: () => copy(CUR.alt.command, `الأمر «${CUR.alt.command}»`) }, h('span', { class: 'text', text: `«${CUR.alt.command}»` }), h('span', { class: 'hint', text: 'انسخ' })),
+      ) : null,
+    ),
+    h('div', { class: 'panels' },
+      h('div', { class: 'panel' },
+        h('h3', null, 'يعمل بالتوازي', parallel.length ? h('span', { class: 'count', text: parallel.length === 1 ? 'وكيل واحد' : parallel.length === 2 ? 'وكيلان، كلٌّ في مجلده' : `${parallel.length} وكلاء، كلٌّ في مجلده` }) : null),
+        parallel.length
+          ? h('ul', { class: 'items' }, parallel.map((p) => h('li', null,
+              h('div', { class: 'row' }, phaseRef(p.id), h('strong', { text: p.title })),
+              h('p', { class: 'sub dim', text: `${p.track === 'design' ? 'تصميم في Figma' : 'تطوير في المستودع'} · ${PHASE_STATES[p.state]}` }),
+            )))
+          : h('p', { class: 'empty', text: 'لا مرحلة تعمل الآن أو تنتظر البدء.' }),
+        CUR.afterDecision.length ? h('p', { class: 'muted small' }, 'وبعد قرارك: ', list(CUR.afterDecision.map(phaseRef), '، ')) : null,
+      ),
+      h('div', { class: 'panel' },
+        h('h3', null, 'يحتاج قرارك'),
+        h('h4', { text: 'الآن' }),
+        CUR.now.length ? h('ul', { class: 'items' }, CUR.now.map((x) => needItem(x, true))) : h('p', { class: 'empty', text: 'لا شيء الآن.' }),
+        CUR.later.length ? [h('h4', { text: 'سيُطلب أثناء الموجة' }), h('ul', { class: 'items' }, CUR.later.map((x) => needItem(x, false)))] : null,
+      ),
+    ),
+    lanes(CUR.phaseIds, true),
+  );
+}
+
+function waveSummaryIds(w) {
+  return h('span', { class: 'wave-ids' }, w.phaseIds.map((id) => {
+    const p = byId.get(id);
+    return h('span', { class: `ref${p.state === 'closed' ? ' done' : ''}`, text: p.state === 'closed' ? `${id} ✓` : id });
+  }));
+}
+
+function renderOthers() {
+  const laterEl = document.getElementById('later');
+  const later = DATA.waves.filter((w) => w.state === 'later');
+  const closed = DATA.waves.filter((w) => w.state === 'closed');
+  const nodes = later.map((w) => h('details', { class: 'wave', id: `wave-${w.number}` },
     h('summary', null,
       h('span', { class: 'wave-title', text: `الموجة ${w.number}` }),
-      chip(w.state, WAVE_STATES[w.state]),
-      h('span', { class: 'wave-ids' }, items.map((p) => h('span', { class: `ref${p.state === 'closed' ? ' done' : ''}`, text: p.state === 'closed' ? `${p.id} ✓` : p.id }))),
+      waveSummaryIds(w),
+      w.ready.length ? h('span', { class: 'wave-ready' }, 'جاهز منها: ', list(w.ready.map((id) => h('span', { class: 'ref', text: id })), '، ')) : null,
     ),
     h('div', { class: 'wave-body' },
       h('dl', { class: 'conds' },
         h('div', null, h('dt', { text: 'تبدأ حين' }), h('dd', { text: w.starts })),
         h('div', null, h('dt', { text: 'تُغلق حين' }), h('dd', { text: w.closes })),
-        h('div', null, h('dt', { text: 'مسؤول الدمج' }), h('dd', { text: w.mergeOwner })),
       ),
-      w.number > 0 ? h('div', { class: 'actions' }, cmdBtn(w.command), h('span', { class: 'muted', text: 'يُرسل في جلسة التنسيق على المجلد الأصلي' })) : null,
-      h('div', { class: 'lanes' }, lanes),
+      lanes(w.phaseIds, false),
     ),
-  );
+  ));
+  if (DATA.laterDecisions.length) {
+    nodes.push(h('details', { class: 'wave', id: 'later-decisions' },
+      h('summary', null, h('span', { class: 'wave-title', text: 'قرارات تُطلب في موجات لاحقة' }), h('span', { class: 'wave-ready', text: `${DATA.laterDecisions.length}` })),
+      h('div', { class: 'wave-body' }, h('ul', { class: 'items' }, DATA.laterDecisions.map((d) => h('li', null,
+        h('div', { class: 'row' }, decisionRef(d.id), h('strong', { text: d.question })),
+        h('p', { class: 'sub', text: `التوصية: ${d.recommendation}` }),
+        h('p', { class: 'sub dim' }, d.gates.length
+          ? list(d.gates.map((g) => [`الموجة ${g.wave}: `, g.beforeStart ? 'قبل بدء ' : 'أثناء ', phaseRef(g.id)]), '، ')
+          : `يلزم في: ${d.neededIn}`),
+      )))),
+    ));
+  }
+  if (closed.length) {
+    nodes.push(h('details', { class: 'wave closed-waves', id: 'closed-waves' },
+      h('summary', null, h('span', { class: 'wave-title', text: 'الموجات المغلقة' }), h('span', { class: 'wave-ids' }, closed.map((w) => h('span', { class: 'ref done', text: `${w.number} ✓` })))),
+      h('div', { class: 'wave-body' }, closed.map((w) => h('div', { class: 'closed-wave', id: `wave-${w.number}` },
+        h('h4', { text: `الموجة ${w.number}` }),
+        lanes(w.phaseIds, false),
+      ))),
+    ));
+  }
+  laterEl.replaceChildren(...nodes);
+  document.getElementById('later-section').hidden = !nodes.length;
 }
 
 function render() {
-  const P = DATA.phases;
-  const count = (fn) => P.filter(fn).length;
-  const coord = DATA.coordinator;
-
   document.getElementById('meta').replaceChildren(
     h('span', null, 'آخر تغيير للحالة: ', fmtDate(DATA.updated)),
     h('span', null, 'وُلّدت: ', fmtStamp(DATA.generatedAt)),
-    h('span', null, 'من ', h('span', { class: 'ltr', text: `${DATA.ref} ${DATA.commit}` }), ' وفروع المراحل الحية'),
   );
 
-  const current = DATA.waves.find((w) => w.state !== 'closed');
-  const tallies = [
-    ['الموجة الحالية', current ? String(current.number) : '—', current ? WAVE_STATES[current.state] : 'كل الموجات مغلقة'],
-    ['المراحل', String(P.length), `${count((p) => p.track === 'dev')} تطوير · ${count((p) => p.track === 'design')} تصميم`],
-    ['مغلقة', String(count((p) => p.state === 'closed')), 'مدموجة ومَوسومة'],
-    ['جارية أو مجهّزة', String(count((p) => ['in-progress', 'prepared', 'awaiting-owner', 'blocked'].includes(p.state))), 'في مجلداتها'],
-    ['تنتظر الدمج', String(count((p) => p.state === 'delivered')), 'سلّمها منفّذها'],
-    ['قرارات تنتظرك', String(DATA.openDecisions.length), 'قبل مراحلها أو أثناءها'],
-  ];
-  document.getElementById('tally').replaceChildren(...tallies.map(([label, n, sub]) => h('div', null, h('span', { class: 'label', text: label }), h('span', { class: 'num', text: n }), h('span', { class: 'sub', text: sub }))));
+  const ruler = document.getElementById('ruler');
+  ruler.style.setProperty('--count', String(DATA.waves.length));
+  ruler.replaceChildren(...DATA.waves.map((w) => h('li', { 'data-state': w.state },
+    h('a', { href: w.state === 'current' ? '#current' : `#wave-${w.number}`, title: `الموجة ${w.number}: ${w.phaseIds.join('، ')}`, 'aria-current': w.state === 'current' ? 'step' : null, onclick: (e) => { e.preventDefault(); reveal(w.state === 'current' ? 'current' : `wave-${w.number}`); } },
+      h('span', { class: 'bar', 'aria-hidden': 'true' }), h('span', { text: String(w.number) })))));
+  const closedWaves = DATA.waves.filter((w) => w.state === 'closed').length;
+  document.getElementById('ruler-caption').replaceChildren(
+    h('span', null, h('strong', { text: `${DATA.totals.closed} من ${DATA.totals.phases}` }), ' مرحلة مغلقة'),
+    h('span', null, h('strong', { text: `${closedWaves} من ${DATA.waves.length}` }), ' موجة مغلقة'),
+    CUR ? h('span', null, 'الحالية: ', h('strong', { text: `الموجة ${CUR.number}` })) : null,
+  );
 
-  const next = [];
-  if (!coord.onRef || !coord.clean) {
-    next.push(h('div', { class: 'warnbox', text: `المجلد الأصلي ${coord.path} ${!coord.onRef ? `على الفرع ${coord.branch ?? 'دون فرع'} لا على ${DATA.ref}` : 'فيه تغييرات غير ملتزمة'}. لا تبدأ جلسة التنسيق فيه حتى يعود نظيفًا على ${DATA.ref}.` }));
-  }
-  for (const a of DATA.actions) {
-    if (a.kind === 'wave') {
-      next.push(h('div', { class: 'step' },
-        h('h3', { text: `أرسل «${a.command}» في جلسة التنسيق` }),
-        h('p', { class: 'where' }, 'المكان: جلسة على المجلد الأصلي ', h('span', { class: 'ltr', text: coord.path }), pathBtn(coord.path)),
-        a.merges.length ? h('p', { class: 'note' }, 'ستتحقق من تسليم ', list(a.merges.map(phaseRef), '، '), ' وتدمجها وتفحص التكامل وتدفع.') : null,
-        a.prepares.length ? h('p', { class: 'note' }, 'ستجهّز مجلدات ', list(a.prepares.map(phaseRef), '، '), ' (أو تحدّثها إن وُجدت دون عمل)، وتسألك عن أي قرار يلزم قبل البدء.') : null,
-        h('div', { class: 'actions' }, cmdBtn(a.command)),
-      ));
-    } else if (a.kind === 'open') {
-      next.push(h('div', { class: 'step' },
-        h('h3', { text: 'افتح جلسة لكل مرحلة مجهّزة' }),
-        h('ul', null, a.ids.map((id) => {
-          const p = byId.get(id);
-          return h('li', null,
-            h('p', { class: 'where' }, h('strong', { text: `${p.id} · ${p.title}` })),
-            h('p', { class: 'where' }, 'المجلد: ', h('span', { class: 'ltr', text: p.folder }), pathBtn(p.folder)),
-            h('p', { class: 'where' }, `النموذج: ${p.model} · جهد ${p.effort}`),
-            h('div', { class: 'actions' }, cmdBtn(p.command)),
-          );
-        })),
-      ));
-    } else if (a.kind === 'owner') {
-      next.push(h('div', { class: 'step' },
-        h('h3', { text: 'مراحل تنتظرك' }),
-        h('ul', null, a.ids.map((id) => { const p = byId.get(id); return h('li', null, h('p', { class: 'where' }, phaseRef(id), ` ${p.title} · ${PHASE_STATES[p.state]}`), h('p', { class: 'where' }, 'في جلسة على ', h('span', { class: 'ltr', text: p.folder })), h('div', { class: 'actions' }, cmdBtn(p.resume))); })),
-      ));
-    }
-  }
-  if (!DATA.actions.length) next.push(h('p', { class: 'muted', text: 'لا خطوة مطلوبة منك الآن: المراحل الجارية تعمل في جلساتها.' }));
-  document.getElementById('next').replaceChildren(...next);
-
-  document.getElementById('decisions').replaceChildren(...(DATA.openDecisions.length ? DATA.openDecisions.map((d) =>
-    h('div', { class: 'decision', id: `decision-${d.id}` },
-      h('span', { class: 'ref open', text: d.id }),
-      h('span', { class: 'q', text: d.question }),
-      h('span', { class: 'rec', text: `التوصية: ${d.recommendation}` }),
-      h('span', { class: 'wh' }, 'يلزم في: ', d.gates.length ? list(d.gates.map((g) => [phaseRef(g.id), g.beforeStart ? ' (قبل البدء)' : ' (أثناءها)']), '، ') : d.neededIn),
-    )) : [h('p', { class: 'muted', text: 'لا قرارات مفتوحة.' })]));
-
-  const wavesEl = document.getElementById('waves');
-  const showClosed = document.getElementById('show-closed');
-  try { showClosed.checked = localStorage.getItem('ayar-show-closed') === '1'; } catch {}
-  const draw = () => {
-    const firstOpen = DATA.waves.find((w) => w.state !== 'closed')?.number;
-    wavesEl.replaceChildren(...DATA.waves
-      .filter((w) => showClosed.checked || w.state !== 'closed')
-      .map((w) => waveCard(w, w.number === firstOpen || (w.state === 'active'))));
-  };
-  showClosed.addEventListener('change', () => {
-    try { localStorage.setItem('ayar-show-closed', showClosed.checked ? '1' : '0'); } catch {}
-    draw();
+  const notices = DATA.notices.map((n) => {
+    if (n.kind === 'primary') return h('div', { class: 'warnbox', text: `${n.text}. ستتوقف الجلسة الرئيسية عند أمر الموجة حتى يعود المجلد نظيفًا على ${DATA.ref}.` });
+    if (n.kind === 'unverified') return h('div', { class: 'warnbox' }, phaseRef(n.phase), ' مغلقة في ملفها دون وسم إغلاق. تتحقق منها الجلسة الرئيسية وتَسِمها عند أمر الموجة.');
+    return h('div', { class: 'warnbox' }, phaseRef(n.phase), ` مغلقة، وعلى فرعها ${n.count} commits لم تُدمج.`);
   });
-  draw();
+  const noticesEl = document.getElementById('notices');
+  noticesEl.replaceChildren(...notices);
+  noticesEl.hidden = !notices.length;
 
-  document.getElementById('coord-path').textContent = coord.path;
+  renderCurrent();
+  renderOthers();
+
+  const facts = document.getElementById('tech-facts');
+  const add = (label, ...content) => facts.append(h('div', null, h('dt', { text: label }), h('dd', null, ...content)));
+  add('المجلد الأصلي', h('span', { class: 'ltr', text: DATA.primary.path }), pathBtn(DATA.primary.path));
+  add('مجلدات المراحل', h('span', { class: 'ltr', text: `${DATA.worktreeBase}/<ID>` }), h('span', { class: 'muted', text: 'على الفرع phase/<ID>' }));
+  add('المصدر', h('span', { class: 'ltr', text: `${DATA.ref} ${DATA.commit}` }));
+  add('المولّد', h('span', { class: 'ltr', text: '/opt/homebrew/bin/node tools/dashboard/build.mjs' }));
   document.getElementById('links').replaceChildren(
     h('a', { href: DATA.links.repo, target: '_blank', rel: 'noopener', text: 'المستودع على GitHub' }),
     h('a', { href: DATA.links.figma, target: '_blank', rel: 'noopener', text: 'ملف التصميم في Figma' }),
   );
 
   reveal = (id) => {
-    let target = document.getElementById(id);
-    if (!target && byId.has(id)) {
-      showClosed.checked = true;
-      draw();
-      target = document.getElementById(id);
-    }
+    const target = document.getElementById(id);
     if (!target) return;
-    target.closest('details')?.setAttribute('open', '');
-    target.scrollIntoView({ block: 'center' });
-    target.focus?.();
+    for (let d = target.closest('details'); d; d = d.parentElement?.closest('details')) d.open = true;
+    if (target.tagName === 'DETAILS') target.open = true;
+    target.scrollIntoView({ block: 'start' });
+    if (target.matches('article, section')) target.focus?.({ preventScroll: true });
   };
   if (location.hash) reveal(location.hash.slice(1));
 }
