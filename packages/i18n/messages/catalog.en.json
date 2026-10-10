@@ -255,5 +255,7 @@
   "catalog.rule.guard.reference-changed.title": "An approved reference changed",
   "catalog.rule.state.changed.title": "The state changed during the scan",
   "catalog.rule.claim.unproven.title": "A model claim not proven locally",
-  "catalog.rule.review.expired.title": "A review that expired"
+  "catalog.rule.review.expired.title": "A review that expired",
+  "catalog.rule.test.warnings.title": "Test warnings over the limit",
+  "catalog.rule.mutation.score-below.title": "Mutation score below the threshold"
 }

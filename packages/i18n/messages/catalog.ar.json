@@ -255,5 +255,7 @@
   "catalog.rule.guard.reference-changed.title": "مرجع معتمد تغيّر",
   "catalog.rule.state.changed.title": "تغيرت الحالة أثناء الفحص",
   "catalog.rule.claim.unproven.title": "ادعاء نموذج لم يثبت محليًا",
-  "catalog.rule.review.expired.title": "مراجعة انتهت صلاحيتها"
+  "catalog.rule.review.expired.title": "مراجعة انتهت صلاحيتها",
+  "catalog.rule.test.warnings.title": "تحذيرات الاختبارات فوق الحد",
+  "catalog.rule.mutation.score-below.title": "درجة الطفرات دون العتبة"
 }

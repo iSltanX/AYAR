@@ -240,7 +240,8 @@
         "test.failed",
         "test.collection-error",
         "test.snapshot-missing",
-        "test.flaky"
+        "test.flaky",
+        "test.warnings"
       ]
     },
     "beh.integration": {
@@ -250,7 +251,8 @@
         "test.failed",
         "test.collection-error",
         "test.snapshot-missing",
-        "test.flaky"
+        "test.flaky",
+        "test.warnings"
       ]
     },
     "beh.e2e": {
@@ -284,14 +286,16 @@
       "rules": [
         "test.failed",
         "test.collection-error",
-        "test.flaky"
+        "test.flaky",
+        "test.warnings"
       ]
     },
     "beh.mutation": {
       "code": "MUTN",
       "suspected": "needs_review",
       "rules": [
-        "mutant.survived"
+        "mutant.survived",
+        "mutation.score-below"
       ]
     },
     "perf.web": {
@@ -1014,6 +1018,22 @@
       "proof": "suspected",
       "anchor": "text",
       "level": null
+    },
+    {
+      "id": "test.warnings",
+      "version": "1.0.0",
+      "severity": "low",
+      "proof": "proven",
+      "anchor": "text",
+      "level": "warning"
+    },
+    {
+      "id": "mutation.score-below",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "text",
+      "level": "error"
     }
   ],
   "suspectedToolRules": {

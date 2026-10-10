@@ -188,6 +188,8 @@ export const InvocationTemplate = z.strictObject({
   repeat: z.int().min(1).max(50),
   /** Prepared by AYAR in the instance's folder before the launch. */
   prepare: z.array(z.enum(['semgrep-rules', 'git-shadow', 'nogit'])),
+  /** What `{targets}` expands to: the inventory's files with these extensions, absolute, in batches of at most `batchBytes`. */
+  targets: z.strictObject({ extensions: z.array(z.string().regex(/^\.[a-z0-9]+$/)).min(1), batchBytes: z.int().min(4096).max(1024 * 1024) }).nullable(),
   /** The reports it asks the tool for, by name inside {reports}; empty when none can be asked for. */
   reports: z.array(z.string().regex(/^[A-Za-z0-9._-]+$/)),
   /** Where the adapter reads its findings from when a tool writes them to its output (Biome, Knip, pyright, tsc). */
