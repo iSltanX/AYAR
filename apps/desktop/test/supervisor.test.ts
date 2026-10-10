@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { EngineHealth } from '@ayar/protocol';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { EngineSupervisor, RESTART_DELAYS_MS, RESTART_WINDOW_MS, type SupervisorOptions } from '../src/main/engine-supervisor.ts';
+import { EngineSupervisor, RESTART_DELAYS_MS, RESTART_WINDOW_MS, type EngineChild, type SupervisorOptions } from '../src/main/engine-supervisor.ts';
 import { realEngine, scriptedChild, stubbornChild } from './support/engine-child.ts';
 
 let root: string;
@@ -94,7 +94,7 @@ describe('engine supervisor (C-01)', () => {
       now: () => (t += 2000), // every crash looks 2 s after the previous one: outside a 1 s window
     });
     sup.start();
-    await until(() => health.filter((h) => h.state === 'restarting').length >= 5, 30_000);
+    expect(await until(() => health.filter((h) => h.state === 'restarting').length >= 5, 30_000)).toBe(true);
     expect(sup.state).not.toBe('failed');
     expect(health.filter((h) => h.state === 'restarting').every((h) => h.attempt === 1)).toBe(true);
   });
@@ -118,6 +118,52 @@ describe('engine supervisor (C-01)', () => {
     const t0 = Date.now();
     await sup.stop();
     expect(Date.now() - t0).toBeLessThan(2000);
+  });
+
+  it('treats a handshake that never comes as a crash, and restarts', async () => {
+    let spawned = 0;
+    const { sup, health } = make({
+      spawn: () => {
+        spawned++;
+        return scriptedChild(() => undefined); // never answers hello
+      },
+      handshakeTimeoutMs: 100,
+      delaysMs: [20, 20, 20],
+    });
+    sup.start();
+    expect(await until(() => sup.state === 'failed')).toBe(true);
+    expect(spawned).toBe(4);
+    expect(health.filter((h) => h.state === 'restarting')).toHaveLength(3);
+  });
+
+  it('a spawn that throws follows the restart policy instead of crashing the main process', async () => {
+    let calls = 0;
+    const { sup, health } = make({
+      spawn: () => {
+        calls++;
+        throw new Error('EAGAIN');
+      },
+      delaysMs: [10, 10, 10],
+    });
+    sup.start();
+    expect(await until(() => sup.state === 'failed')).toBe(true);
+    expect(calls).toBe(4);
+    expect(health.at(-1)).toMatchObject({ state: 'failed', reason: 'engine_failed' });
+  });
+
+  it('stop() returns even when the child never reports its exit', async () => {
+    const never: EngineChild = {
+      pid: undefined,
+      transport: { send() {}, onMessage() {}, onClose() {}, close() {} },
+      exited: new Promise(() => {}),
+      kill() {},
+    };
+    const { sup } = make({ spawn: () => never, stopGraceMs: 100, handshakeTimeoutMs: 60_000 });
+    sup.start();
+    const t0 = Date.now();
+    await sup.stop();
+    expect(Date.now() - t0).toBeLessThan(1000);
+    expect(sup.state).toBe('stopped');
   });
 
   it('does not restart an engine that speaks another protocol major (D-29)', async () => {

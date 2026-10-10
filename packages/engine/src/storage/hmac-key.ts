@@ -15,6 +15,8 @@ export const TEST_HMAC_KEY: Uint8Array = new Uint8Array(createHash('sha256').upd
 export interface HmacKey {
   source: HmacKeySource;
   key: Uint8Array;
+  /** True when this load created the key file (first run, or the file was missing). */
+  created: boolean;
   /** First 16 hex digits of SHA-256(key): names the key in evidence without revealing it. */
   fingerprint: string;
 }
@@ -28,10 +30,11 @@ export function hmacHex(key: HmacKey, data: Uint8Array | string): string {
 }
 
 export async function loadHmacKey(fs: FileSystem, layout: DataLayout, source: HmacKeySource, random: Random, uid: number): Promise<HmacKey> {
-  if (source === 'test') return { source, key: TEST_HMAC_KEY, fingerprint: keyFingerprint(TEST_HMAC_KEY) };
+  if (source === 'test') return { source, key: TEST_HMAC_KEY, fingerprint: keyFingerprint(TEST_HMAC_KEY), created: false };
   let st = await fs.lstat(layout.hmacKey);
+  let created = false;
   if (!st) {
-    const created = await fs.writeFileExclusive(layout.hmacKey, random.bytes(HMAC_KEY_BYTES), FILE_MODE);
+    created = await fs.writeFileExclusive(layout.hmacKey, random.bytes(HMAC_KEY_BYTES), FILE_MODE);
     if (created) await fs.chmod(layout.hmacKey, FILE_MODE); // the umask may have narrowed it further; make it exact
     st = await fs.lstat(layout.hmacKey);
   }
@@ -41,5 +44,5 @@ export async function loadHmacKey(fs: FileSystem, layout: DataLayout, source: Hm
   const key = await fs.readFile(layout.hmacKey);
   // A key of another length is never replaced silently: earlier fingerprints would stop matching.
   if (key.length !== HMAC_KEY_BYTES) throw new StorageError('internal', 'the HMAC key file has the wrong length', { reason: 'hmac_key_length', length: key.length });
-  return { source, key, fingerprint: keyFingerprint(key) };
+  return { source, key, fingerprint: keyFingerprint(key), created };
 }

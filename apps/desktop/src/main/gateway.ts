@@ -55,7 +55,17 @@ export class Gateway {
     this.#o = o;
   }
 
+  /** Never throws: an unexpected failure (a dialog, the clipboard) becomes a coded `internal` answer. */
   async invoke(raw: unknown): Promise<InvokeResult<unknown>> {
+    try {
+      return await this.#invoke(raw);
+    } catch (e) {
+      this.#o.log?.('error', 'gateway failure', { error: e instanceof Error ? e.message : String(e) });
+      return fail(protocolError('internal'));
+    }
+  }
+
+  async #invoke(raw: unknown): Promise<InvokeResult<unknown>> {
     const req = InvokeRequest.safeParse(raw);
     if (!req.success) return fail(protocolError('invalid_message', { issues: describeIssues(req.error) }));
     const { command } = req.data;
@@ -82,7 +92,8 @@ export class Gateway {
     const grants: Grants = {};
     for (const req of def.grants) {
       const token = (payload as Record<string, unknown>)[req.field];
-      const grant = this.#o.tokens.consume(token, req.kind);
+      // A path token is redeemed only by the command its dialog was opened for (the purposes are those names).
+      const grant = this.#o.tokens.consume(token, req.kind, req.kind === 'confirmation' ? null : command);
       if (!grant) return fail(protocolError('token_invalid', { command, field: req.field }));
       if (req.kind === 'confirmation' && grant.kind === 'confirmation') {
         if (grant.command !== command || grant.target !== confirmationTarget(req.targetField, payload)) {
@@ -109,19 +120,19 @@ export class Gateway {
         if (picked === null) return { ok: true, result: { cancelled: true } };
         const real = await system.checkFolder(picked);
         if (real === null) return fail(protocolError('not_found', { reason: 'not_a_directory' }));
-        return { ok: true, result: { selectionToken: tokens.issue({ kind: 'selection', path: real }) } };
+        return { ok: true, result: { selectionToken: tokens.issue({ kind: 'selection', path: real }, purpose) } };
       }
       case 'dialog.pickDestination': {
         const { purpose, suggestedName } = payload as CommandPayload<'dialog.pickDestination'>;
         const picked = await system.pickDestination(purpose, suggestedName);
         if (picked === null) return { ok: true, result: { cancelled: true } };
-        return { ok: true, result: { destinationToken: tokens.issue({ kind: 'destination', path: picked }) } };
+        return { ok: true, result: { destinationToken: tokens.issue({ kind: 'destination', path: picked }, purpose) } };
       }
       case 'dialog.pickSource': {
         const { purpose } = payload as CommandPayload<'dialog.pickSource'>;
         const picked = await system.pickSource(purpose);
         if (picked === null) return { ok: true, result: { cancelled: true } };
-        return { ok: true, result: { sourceToken: tokens.issue({ kind: 'source', path: picked }) } };
+        return { ok: true, result: { sourceToken: tokens.issue({ kind: 'source', path: picked }, purpose) } };
       }
       case 'confirm.issue': {
         const { command: target, target: id } = payload as CommandPayload<'confirm.issue'>;

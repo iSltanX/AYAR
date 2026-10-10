@@ -18,7 +18,7 @@ const ready: ServiceState = {
     logger,
     events: new EventBus({ stream: 'engine-abcdef', clock: fakeClock(), send: () => {} }),
     runGate: new RunGate(),
-    hmacKey: { source: 'test', key: new Uint8Array(32), fingerprint: 'x' },
+    hmacKey: { source: 'test', key: new Uint8Array(32), fingerprint: 'x', created: false },
   },
 };
 const cmd = (command: string, payload: unknown, grants = {}) => ({ kind: 'command' as const, id: 7, command: command as never, payload, grants });

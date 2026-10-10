@@ -86,6 +86,10 @@ async function run(): Promise<void> {
   const supervisorStream = `supervisor-${randomBytes(9).toString('base64url')}`;
   let supervisorSeq = 0;
   const healthLog: EngineHealth[] = [];
+  const keepLast = <T>(list: T[], item: T, max = 100) => {
+    list.push(item);
+    if (list.length > max) list.splice(0, list.length - max);
+  };
   const deliver = (e: ParsedEvent): DeliveredEvent => ({ topic: e.topic, stream: e.stream, seq: e.seq, at: e.at, payload: e.payload });
 
   const supervisor = new EngineSupervisor({
@@ -93,18 +97,18 @@ async function run(): Promise<void> {
     config: { dataDir, hmacKeySource: 'file', appVersion: app.getVersion() },
     logPath: join(dataDir, 'logs', 'engine.log'),
     onHealth: (payload) => {
-      healthLog.push(payload);
+      keepLast(healthLog, payload);
       ports.broadcast({ topic: 'engine.health', stream: supervisorStream, seq: ++supervisorSeq, at: new Date().toISOString(), payload });
     },
     onEngineEvent: (e) => {
-      if (e.topic === 'engine.health') healthLog.push(e.payload as EngineHealth);
+      if (e.topic === 'engine.health') keepLast(healthLog, e.payload as EngineHealth);
       ports.broadcast(deliver(e));
     },
     onConnected: () => ports.renewAll(),
     log: (level, message, fields) => logger.log(level, message, fields),
   });
 
-  const tokens = new TokenRegistry({ randomBytes: (n) => new Uint8Array(randomBytes(n)), now: () => performance.now() });
+  const tokens = new TokenRegistry({ randomBytes: (n) => new Uint8Array(randomBytes(n)), clock: { wall: () => Date.now(), mono: () => performance.now() } });
   const gateway = new Gateway({
     engine: supervisor,
     system: electronSystemServices(() => mainWindow),
@@ -131,16 +135,20 @@ async function run(): Promise<void> {
   ipcMain.on(IPC.eventsPortRequest, (event) => {
     if (isTrusted(event)) ports.attach(event.sender);
   });
+  let cspLogged = 0;
   ipcMain.on(IPC.cspViolation, (event, raw: unknown) => {
     if (!isTrusted(event)) return;
     const v = CspViolation.safeParse(raw);
     if (!v.success) return;
-    diagnostics.cspViolations.push(v.data);
-    logger.log('error', 'CSP violation', v.data);
+    keepLast(diagnostics.cspViolations, v.data);
+    // Logged, but not without limit: a flood must not rotate the real log lines away.
+    cspLogged++;
+    if (cspLogged <= 50) logger.log('error', 'CSP violation', v.data);
+    else if (cspLogged % 1000 === 0) logger.log('error', 'CSP violations continue', { total: cspLogged });
   });
 
   const openWindow = () => {
-    const win = createMainWindow(paths.preload, (reason) => logger.log('error', 'window failed to load', { reason }));
+    const win = createMainWindow(paths.preload, !app.isPackaged, (message, fields) => logger.log('error', message, fields));
     const id = win.webContents.id;
     trusted.add(id);
     win.on('closed', () => {

@@ -7,12 +7,12 @@ import { TokenRegistry } from '../src/main/tokens.ts';
 
 type Call = { command: CommandName; payload: unknown; grants: Grants | undefined };
 
-function setup(o: { engine?: (c: Call) => InvokeResult<unknown>; picked?: string | null; folder?: string | null } = {}) {
+function setup(o: { engine?: (c: Call) => InvokeResult<unknown>; picked?: string | null; folder?: string | null; dialogThrows?: boolean } = {}) {
   const calls: Call[] = [];
   const clipboard: string[] = [];
   let now = 0;
   let seed = 0;
-  const tokens = new TokenRegistry({ randomBytes: (n) => new Uint8Array(n).fill(++seed % 250), now: () => now });
+  const tokens = new TokenRegistry({ randomBytes: (n) => new Uint8Array(n).fill(++seed % 250), clock: { wall: () => 1_800_000_000_000 + now, mono: () => now } });
   const health: EngineHealth = { source: 'engine', state: 'ready', reason: null, attempt: null, retryInMs: null, logPath: '/x/engine.log', schemaVersion: 1, hmacKeySource: 'file' };
   const engine: EngineLink = {
     request: (command, payload, grants) => {
@@ -24,7 +24,7 @@ function setup(o: { engine?: (c: Call) => InvokeResult<unknown>; picked?: string
     restart: () => false,
   };
   const system: SystemServices = {
-    pickFolder: () => Promise.resolve(o.picked === undefined ? '/Users/me/project' : o.picked),
+    pickFolder: () => (o.dialogThrows ? Promise.reject(new Error('dialog crashed at /Users/me/secret')) : Promise.resolve(o.picked === undefined ? '/Users/me/project' : o.picked)),
     pickDestination: () => Promise.resolve('/Users/me/out.md'),
     pickSource: () => Promise.resolve('/Users/me/profile.json'),
     writeClipboard: (t) => {
@@ -91,6 +91,22 @@ describe('gateway: path tokens (D-29: the UI never sends a path)', () => {
     const { sourceToken } = ok(await gw.invoke({ command: 'dialog.pickSource', payload: { purpose: 'profile.import' } })) as { sourceToken: string };
     advance(5 * 60_000 + 1);
     expect(await gw.invoke({ command: 'profile.import', payload: { projectId: 'p1', sourceToken } })).toMatchObject({ ok: false, error: { code: 'token_invalid' } });
+  });
+
+  it('binds a path token to the purpose of its dialog', async () => {
+    const { gw, calls } = setup();
+    const { destinationToken } = ok(await gw.invoke({ command: 'dialog.pickDestination', payload: { purpose: 'report.export', suggestedName: 'r.md' } })) as { destinationToken: string };
+    expect(await gw.invoke({ command: 'profile.export', payload: { projectId: 'p1', destinationToken } })).toMatchObject({ ok: false, error: { code: 'token_invalid' } });
+    const { selectionToken } = ok(await gw.invoke({ command: 'dialog.pickFolder', payload: { purpose: 'project.relocate' } })) as { selectionToken: string };
+    expect(await gw.invoke({ command: 'project.add', payload: { selectionToken } })).toMatchObject({ ok: false, error: { code: 'token_invalid' } });
+    const again = ok(await gw.invoke({ command: 'dialog.pickFolder', payload: { purpose: 'project.relocate' } })) as { selectionToken: string };
+    await gw.invoke({ command: 'project.relocate', payload: { projectId: 'p1', selectionToken: again.selectionToken } });
+    expect(calls.map((c) => c.command)).toEqual(['project.relocate']);
+  });
+
+  it('answers a coded internal error, without the raw message, when a system dialog fails', async () => {
+    const r = await setup({ dialogThrows: true }).gw.invoke({ command: 'dialog.pickFolder', payload: { purpose: 'project.add' } });
+    expect(r).toEqual({ ok: false, error: { code: 'internal', messageKey: 'errors.internal', details: {} } });
   });
 
   it('refuses a suggested file name that is a path', async () => {

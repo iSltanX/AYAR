@@ -6,16 +6,23 @@ import { IPC, type DeliveredEvent } from '@ayar/protocol';
 
 export class EventPorts {
   readonly #ports = new Map<number, { contents: WebContents; port: MessagePortMain }>();
+  readonly #watched = new Set<number>();
 
   /** Sends a fresh port to this window, closing the one it had. */
   attach(contents: WebContents): void {
     this.#ports.get(contents.id)?.port.close();
     const { port1, port2 } = new MessageChannelMain();
     this.#ports.set(contents.id, { contents, port: port1 });
-    contents.once('destroyed', () => {
-      if (this.#ports.get(contents.id)?.port === port1) this.#ports.delete(contents.id);
-      port1.close();
-    });
+    if (!this.#watched.has(contents.id)) {
+      // One listener per window, however many times its port is renewed.
+      const id = contents.id;
+      this.#watched.add(id);
+      contents.once('destroyed', () => {
+        this.#ports.get(id)?.port.close();
+        this.#ports.delete(id);
+        this.#watched.delete(id);
+      });
+    }
     contents.postMessage(IPC.eventsPort, null, [port2]);
   }
 

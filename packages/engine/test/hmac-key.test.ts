@@ -27,6 +27,8 @@ describe('HMAC key (C-18 source)', () => {
     const b = await loadHmacKey(fs, layout, 'file', nodeRandom, uid);
     expect(Buffer.from(b.key).equals(Buffer.from(a.key))).toBe(true);
     expect(a.source).toBe('file');
+    expect(a.created).toBe(true);
+    expect(b.created).toBe(false);
     expect(a.fingerprint).toBe(keyFingerprint(a.key));
     expect(a.fingerprint).not.toBe(keyFingerprint(TEST_HMAC_KEY));
   });

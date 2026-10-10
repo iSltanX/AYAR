@@ -105,6 +105,9 @@ export function startEngine(o: StartEngineOptions): EngineHandle {
       logger.attach(file);
       try {
         hmacKey = await loadHmacKey(ports.fs, result.layout, hello.config.hmacKeySource, ports.random, ports.processes.currentUid());
+        // A new key next to an existing database: fingerprints recorded with the old key no longer match.
+        const hadDatabase = result.steps.some((s) => s.step === 'db.open' && s.detail.exists === true);
+        if (hmacKey.created && hadDatabase) logger.log('warn', 'HMAC key was missing and has been recreated: earlier HMAC fingerprints will not match', { fingerprint: hmacKey.fingerprint });
       } catch (e) {
         degraded = e instanceof StorageError ? e.code : 'internal';
         logger.log('error', 'hmac key unavailable', { error: degraded });

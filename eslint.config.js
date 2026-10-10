@@ -62,7 +62,7 @@ export default defineConfig(
   },
   // 1. No electron anywhere under packages/.
   {
-    files: ['packages/**/*.ts', 'packages/**/*.js', 'packages/**/*.mjs', 'packages/**/*.cjs'],
+    files: ['packages/**/*.{ts,mts,cts,tsx,js,mjs,cjs,jsx}'],
     rules: {
       'no-restricted-imports': ['error', { paths: ELECTRON_PATHS, patterns: ELECTRON_PATTERNS }],
       'no-restricted-syntax': ['error', ...ELECTRON_SYNTAX],
@@ -70,14 +70,14 @@ export default defineConfig(
   },
   // 2. Node-free packages (their sources; tests may use Node).
   {
-    files: ['packages/protocol/src/**/*.ts', 'packages/i18n/src/**/*.ts'],
+    files: ['packages/protocol/src/**/*.{ts,mts,cts,tsx}', 'packages/i18n/src/**/*.{ts,mts,cts,tsx}'],
     rules: {
       'no-restricted-imports': ['error', { paths: ELECTRON_PATHS, patterns: [...ELECTRON_PATTERNS, ...NODE_PATTERNS] }],
     },
   },
   // 3. The renderer: neither electron nor Node.
   {
-    files: ['apps/desktop/src/renderer/**/*.ts', 'apps/desktop/src/renderer/**/*.svelte'],
+    files: ['apps/desktop/src/renderer/**/*.{ts,mts,cts,tsx,js,mjs,svelte}'],
     rules: {
       'no-restricted-imports': ['error', { paths: ELECTRON_PATHS, patterns: [...ELECTRON_PATTERNS, ...NODE_PATTERNS] }],
       'no-restricted-syntax': ['error', ...ELECTRON_SYNTAX],

@@ -69,6 +69,19 @@ export class EngineSupervisor {
     this.#launch();
   }
 
+  /** Never throws: a spawn failure counts as a crash, so it follows the restart policy. */
+  #launch(): void {
+    try {
+      this.#launchOnce();
+    } catch (e) {
+      this.#o.log?.('error', 'engine spawn failed', { error: e instanceof Error ? e.message : String(e) });
+      const failed: EngineChild = { pid: undefined, transport: { send() {}, onMessage() {}, onClose() {}, close() {} }, exited: Promise.resolve('spawn_failed'), kill() {} };
+      this.#child = failed;
+      this.#client = null;
+      queueMicrotask(() => this.#onExit(failed, 'spawn_failed'));
+    }
+  }
+
   /** The current state as engine.health: the engine's own report while it runs, the supervisor's otherwise. */
   status(): EngineHealth {
     if (this.#state === 'ready' && this.#lastHealth) return this.#lastHealth;
@@ -92,31 +105,33 @@ export class EngineSupervisor {
     return true;
   }
 
-  /** SIGTERM, then SIGKILL after the grace period (C-01). */
+  /** SIGTERM, then SIGKILL after the grace period (C-01); never waits more than twice the grace period. */
   async stop(): Promise<void> {
     if (this.#timer) clearTimeout(this.#timer);
     this.#timer = null;
     const child = this.#child;
     this.#state = 'stopping';
     if (child) {
+      const wait = (ms: number) =>
+        new Promise<boolean>((resolve) => {
+          const t = setTimeout(() => resolve(false), ms);
+          void child.exited.then(() => {
+            clearTimeout(t);
+            resolve(true);
+          });
+        });
       child.kill('SIGTERM');
-      let killTimer: ReturnType<typeof setTimeout> | null = null;
-      const killed = new Promise<void>((resolve) => {
-        killTimer = setTimeout(() => {
-          this.#o.log?.('warn', 'engine ignored SIGTERM: SIGKILL', { pid: child.pid ?? null });
-          child.kill('SIGKILL');
-          resolve();
-        }, this.#o.stopGraceMs);
-      });
-      await Promise.race([child.exited, killed]);
-      await child.exited;
-      if (killTimer) clearTimeout(killTimer);
+      if (!(await wait(this.#o.stopGraceMs))) {
+        this.#o.log?.('warn', 'engine ignored SIGTERM: SIGKILL', { pid: child.pid ?? null });
+        child.kill('SIGKILL');
+        if (!(await wait(this.#o.stopGraceMs))) this.#o.log?.('error', 'engine did not exit after SIGKILL', { pid: child.pid ?? null });
+      }
     }
     this.#state = 'stopped';
     this.#emit(this.#health('stopped', null));
   }
 
-  #launch(): void {
+  #launchOnce(): void {
     this.#state = this.#attempts.length ? 'restarting' : 'starting';
     const child = this.#o.spawn();
     this.#child = child;
@@ -143,7 +158,11 @@ export class EngineSupervisor {
         if (this.#child !== child || this.#state === 'stopping') return;
         this.#state = 'ready';
         this.#o.log?.('info', 'engine connected', { pid: welcome.engine.pid, stream: welcome.engine.stream });
-        this.#o.onConnected?.(welcome);
+        try {
+          this.#o.onConnected?.(welcome);
+        } catch (e) {
+          this.#o.log?.('error', 'onConnected failed', { error: e instanceof Error ? e.message : String(e) });
+        }
       },
       (e: unknown) => {
         clearTimeout(timer);
