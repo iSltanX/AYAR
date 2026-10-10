@@ -52,8 +52,13 @@ const toRow = (r: DbProfile): ProfileRow => ({
   createdAt: r.created_at,
 });
 
+/**
+ * The hash of what the profile says — settings and effective specs — without the snapshot it was computed from:
+ * a new discovery that changes nothing does not make a new version (C-09 point 5: the version rises with a change).
+ */
 export function contentHash(content: ProfileContent): string {
-  return createHash('sha256').update(canonicalJson(content)).digest('hex');
+  const { snapshotId: _snapshot, ...rest } = content;
+  return createHash('sha256').update(canonicalJson(rest)).digest('hex');
 }
 
 export function latestProfile(db: Db, projectId: string): ProfileRow | null {
