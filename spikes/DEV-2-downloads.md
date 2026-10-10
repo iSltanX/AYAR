@@ -1,0 +1,21 @@
+# DEV-2 — سجل التنزيلات (ORG-09، D-13)
+
+كل ما تنزّله تجارب DEV-2، بإصدار مثبت ومصدر رسمي وبصمة، وموضعه **خارج المستودع**. لا «latest» في أي سطر، ولا يُثبَّت شيء على مستوى النظام (لا `brew install`، ولا `/Applications`، ولا تطبيق افتراضي). الصندوق المشترك من DEV-1 هو `~/.cache/ayar-fixtures-toolchain` (D-DEV1-06)، وما يخص DEV-2 وحدها تحت `~/.cache/ayar-dev2/`.
+
+| # | الأداة والإصدار | المصدر الرسمي | التحقق | المكان | الحجم | التجربة | الحالة |
+|---|---|---|---|---|---|---|---|
+| 1 | Betterleaks **1.9.0** (`betterleaks_1.9.0_darwin_arm64.tar.gz`) | GitHub Releases `betterleaks/betterleaks` (v1.9.0، 2026-09-29) | SHA-256 من `checksums.txt`، وتوقيع sigstore للملف `checksums.txt.sigstore.json` بـ cosign | `~/.cache/ayar-dev2/betterleaks/` | 9.4 م.ب | E-08، E-20، E-24 | انظر `spikes/E-08-secret-scanner/results/download.txt` |
+| 2 | cosign **3.1.3** (`cosign-darwin-arm64`) | GitHub Releases `sigstore/cosign` (v3.1.3، 2026-08-06) | SHA-256 من `cosign_checksums.txt` (التوقيع الذاتي للملف دائري، يُذكر ولا يُعتمد) | `~/.cache/ayar-dev2/cosign/` | 140 م.ب | E-08 (التحقق من توقيعات Betterleaks)، E-20 | انظر `spikes/E-08-secret-scanner/results/download.txt` |
+| 3 | Gitleaks **8.30.1** (`gitleaks_8.30.1_darwin_arm64.tar.gz`) | GitHub Releases `gitleaks/gitleaks` (v8.30.1، 2026-03-21) | SHA-256 من `gitleaks_8.30.1_checksums.txt` (لا توقيع منشور) | `~/.cache/ayar-dev2/gitleaks/` | 7.9 م.ب | E-20 (نسخة مُدارة؛ ونسخة النظام من Homebrew تُستخدم في E-08) | انظر `spikes/E-20-gatekeeper/results/` |
+| 4 | قاعدتا OSV دون اتصال: `npm/all.zip` و`PyPI/all.zip` | `https://osv-vulnerabilities.storage.googleapis.com/<ecosystem>/all.zip` عبر `osv-scanner --download-offline-databases` | لا بصمة منشورة؛ تُسجَّل البصمة والتاريخ (`Last-Modified`) عند التنزيل | `~/.cache/ayar-dev2/osv-db/` | 218 + 36 م.ب | E-09 | انظر `spikes/E-09-osv-offline/results/` |
+| 5 | Lighthouse **13.5.0** (npm، 2026-09-18) وتبعياتها | npm registry | بصمات `package-lock.json` | `~/.cache/ayar-dev2/lighthouse/` | نحو 40 م.ب | E-21 | انظر `spikes/E-21-web-perf/results/` |
+| 6 | pngjs **7.0.0** وpixelmatch **8.0.0** | npm registry | بصمات `package-lock.json` | `~/.cache/ayar-fixtures-toolchain/node/` (يضافان إلى صندوق DEV-1) | أقل من 1 م.ب | E-11 (مقارنة ثبات اللقطات) | انظر `spikes/E-11-probe-host/results/` |
+| 7 | mise **v2026.10.7** (`mise-v2026.10.7-macos-arm64.tar.gz`) | GitHub Releases `jdx/mise` | SHA-256 من `SHASUMS256.txt` | `~/.cache/ayar-dev2/mise/` | 43 م.ب | E-07 (shims في مجلد مؤقت، ومنع التثبيت التلقائي) | انظر `spikes/E-07-toolchains/results/` |
+| 8 | Poetry **2.5.1** | PyPI عبر pip في بيئة معزولة | بصمات PyPI التي يتحقق منها pip | `~/.cache/ayar-dev2/poetry-venv/` | نحو 60 م.ب | E-07 (`poetry run`) | انظر `spikes/E-07-toolchains/results/` |
+| 9 | Semgrep **1.180.0** في بيئة Python معزولة جديدة (قياس زمن التثبيت المُدار وحجمه) | PyPI عبر pip | بصمات PyPI التي يتحقق منها pip | `~/.cache/ayar-dev2/semgrep-venv/` (مؤقت للقياس) | نحو 300 م.ب | E-10 | انظر `spikes/E-10-semgrep/results/` |
+| 10 | Electron **44.7.0** وForge **8.0.1** و`@electron/fuses` 2.1.3 لتطبيق التجارب المشترك | npm registry وذاكرة Electron (`~/Library/Caches/electron`، نُزّل في DEV-0 ببصمته) | `package-lock.json` و`checksums.json` المضمن في حزمة electron | `spikes/E-01-electron-forge/node_modules/` (مستثنى من Git) | 300 م.ب | E-11 | انظر `spikes/E-11-probe-host/results/` |
+| 11 | Visual Studio Code **1.141.0** (`VSCode-darwin-arm64.zip`) — اختياري بموجب E-17 | `https://update.code.visualstudio.com/1.141.0/darwin-arm64/stable` | SHA-256 يُسجَّل عند التنزيل (الموقع لا ينشر بصمة لهذا المسار) | `~/.cache/ayar-dev2/editors/` دون نسخه إلى `/Applications` ودون جعله افتراضيًا | نحو 130 م.ب | E-17 (تجربة قالب `--goto`) | انظر `spikes/E-17-editor/results/` |
+
+**ما لا يُنزَّل:** Betterleaks 2.0.0-rc (مرشح غير مستقر، E-08)، وTrivy وCodeQL (D-13)، وCursor وZed (يُكتفى بمراجعهما الرسمية لأن VS Code يمثّل القالب نفسه؛ E-17).
+
+**الأدوات الموجودة سلفًا وتُستخدم كما هي:** صندوق DEV-1 (uv 0.13.0، وsemgrep 1.180.0، وosv-scanner 2.6.0، وlychee 0.24.2، وplaywright-core 1.64.0، وaxe-core 4.14.0، وChromium 156.0.8078.4)، وgitleaks 8.30.1 من Homebrew، وNode 24.18.1 (Homebrew) و24.16.0 و24.14.0 و20.20.2 (nvm)، وpnpm 12.8.1، وbun 1.3.14، وpython3.12.13 (Homebrew)، وXcode 27.0.
