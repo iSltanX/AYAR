@@ -35,9 +35,10 @@ export type FindingLocation = z.infer<typeof FindingLocation>;
 /**
  * C-15 «بصمة الاكتشاف»: what the anchor is made of, by kind. `code` and `secret` are computed by the engine from
  * the state snapshot (the normalized line with its neighbours; an HMAC of the value, in memory); the others carry
- * their value: a test's full name, `package@version#id` for a dependency, a permission's name, a state key.
+ * their value: a test's full name, `package@version#id` for a dependency, a permission's name, a manifest key, a
+ * rendered state's key; `text` is the normalized message, for a finding with no place of its own.
  */
-export const ANCHOR_KINDS = ['code', 'secret', 'test', 'dependency', 'permission', 'state', 'text'] as const;
+export const ANCHOR_KINDS = ['code', 'secret', 'test', 'dependency', 'permission', 'key', 'state', 'text'] as const;
 export const FindingAnchor = z.strictObject({ kind: z.enum(ANCHOR_KINDS), value: z.string().max(4096) });
 export type FindingAnchor = z.infer<typeof FindingAnchor>;
 

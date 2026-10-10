@@ -1,0 +1,483 @@
+{
+  "$comment": "D-13 and 10.3 sec.sast: AYAR's own Semgrep rules (the registry's rules may not be distributed, S-35), versioned. The adapter writes them into the instance's temporary folder as a rules file (JSON is YAML) and runs `semgrep scan --config <that file>`; no `--config auto`, no autofix. metadata.ayar.category: «forbidden» — a match is a proven violation (أخفق); «suspect» — a match needs a review (يحتاج مراجعة). Each rule has its test project: packages/catalog/test/semgrep/<rule id>.<ext>, with `ruleid:` and `ok:` annotations, run by `semgrep --test`.",
+  "version": "1.0.0",
+  "verifiedAt": "2026-10-11",
+  "engine": "semgrep 1.180.0",
+  "rules": [
+    {
+      "id": "ayar.js.eval-dynamic",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "ERROR",
+      "message": "eval() runs a value that is not a constant: whatever reaches it runs as code.",
+      "patterns": [
+        {
+          "pattern-either": [
+            {
+              "pattern": "eval($X)"
+            },
+            {
+              "pattern": "window.eval($X)"
+            },
+            {
+              "pattern": "globalThis.eval($X)"
+            }
+          ]
+        },
+        {
+          "pattern-not": "eval(\"...\")"
+        },
+        {
+          "pattern-not": "window.eval(\"...\")"
+        },
+        {
+          "pattern-not": "globalThis.eval(\"...\")"
+        }
+      ],
+      "metadata": {
+        "ayar": {
+          "category": "forbidden",
+          "version": "1.0.0"
+        },
+        "cwe": "CWE-95"
+      }
+    },
+    {
+      "id": "ayar.js.function-constructor",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "ERROR",
+      "message": "The Function constructor builds code from a value that is not a constant.",
+      "patterns": [
+        {
+          "pattern-either": [
+            {
+              "pattern": "new Function(..., $BODY)"
+            },
+            {
+              "pattern": "Function(..., $BODY)"
+            }
+          ]
+        },
+        {
+          "pattern-not": "new Function(..., \"...\")"
+        },
+        {
+          "pattern-not": "Function(..., \"...\")"
+        }
+      ],
+      "metadata": {
+        "ayar": {
+          "category": "forbidden",
+          "version": "1.0.0"
+        },
+        "cwe": "CWE-95"
+      }
+    },
+    {
+      "id": "ayar.js.html-injection",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "WARNING",
+      "message": "HTML is written from a value that is not a constant (innerHTML, outerHTML, insertAdjacentHTML, document.write): check that it cannot carry markup from outside.",
+      "patterns": [
+        {
+          "pattern-either": [
+            {
+              "pattern": "$EL.innerHTML = $X"
+            },
+            {
+              "pattern": "$EL.innerHTML += $X"
+            },
+            {
+              "pattern": "$EL.outerHTML = $X"
+            },
+            {
+              "pattern": "$EL.insertAdjacentHTML($POS, $X)"
+            },
+            {
+              "pattern": "document.write($X)"
+            },
+            {
+              "pattern": "document.writeln($X)"
+            }
+          ]
+        },
+        {
+          "pattern-not": "$EL.innerHTML = \"...\""
+        },
+        {
+          "pattern-not": "$EL.innerHTML += \"...\""
+        },
+        {
+          "pattern-not": "$EL.outerHTML = \"...\""
+        },
+        {
+          "pattern-not": "$EL.insertAdjacentHTML($POS, \"...\")"
+        },
+        {
+          "pattern-not": "document.write(\"...\")"
+        },
+        {
+          "pattern-not": "document.writeln(\"...\")"
+        }
+      ],
+      "metadata": {
+        "ayar": {
+          "category": "suspect",
+          "version": "1.0.0"
+        },
+        "cwe": "CWE-79"
+      }
+    },
+    {
+      "id": "ayar.js.react-dangerous-html",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "WARNING",
+      "message": "dangerouslySetInnerHTML with a value that is not a constant: check that it cannot carry markup from outside.",
+      "patterns": [
+        {
+          "pattern": "<$EL dangerouslySetInnerHTML={{__html: $X}} />"
+        },
+        {
+          "pattern-not": "<$EL dangerouslySetInnerHTML={{__html: \"...\"}} />"
+        }
+      ],
+      "metadata": {
+        "ayar": {
+          "category": "suspect",
+          "version": "1.0.0"
+        },
+        "cwe": "CWE-79"
+      }
+    },
+    {
+      "id": "ayar.js.child-process-shell",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "ERROR",
+      "message": "A shell command is built from a value that is not a constant (child_process exec, or spawn with shell: true).",
+      "patterns": [
+        {
+          "pattern-either": [
+            {
+              "patterns": [
+                {
+                  "pattern-either": [
+                    {
+                      "pattern-inside": "$CP = require('$MOD');\n...\n"
+                    },
+                    {
+                      "pattern-inside": "import $CP from '$MOD';\n...\n"
+                    },
+                    {
+                      "pattern-inside": "import * as $CP from '$MOD';\n...\n"
+                    }
+                  ]
+                },
+                {
+                  "pattern-either": [
+                    {
+                      "pattern": "$CP.exec($CMD, ...)"
+                    },
+                    {
+                      "pattern": "$CP.execSync($CMD, ...)"
+                    },
+                    {
+                      "pattern": "$CP.spawn($CMD, $ARGS, {..., shell: true, ...})"
+                    },
+                    {
+                      "pattern": "$CP.spawnSync($CMD, $ARGS, {..., shell: true, ...})"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "patterns": [
+                {
+                  "pattern-either": [
+                    {
+                      "pattern-inside": "import { ..., $FN, ... } from '$MOD';\n...\n"
+                    },
+                    {
+                      "pattern-inside": "const { ..., $FN, ... } = require('$MOD');\n...\n"
+                    }
+                  ]
+                },
+                {
+                  "metavariable-regex": {
+                    "metavariable": "$FN",
+                    "regex": "^(exec|execSync|spawn|spawnSync)$"
+                  }
+                },
+                {
+                  "pattern": "$FN($CMD, ...)"
+                },
+                {
+                  "pattern-not": "spawn($CMD, $ARGS)"
+                },
+                {
+                  "pattern-not": "spawnSync($CMD, $ARGS)"
+                },
+                {
+                  "pattern-not": "spawn($CMD, $ARGS, {..., shell: false, ...})"
+                }
+              ]
+            },
+            {
+              "pattern": "require('$MOD').exec($CMD, ...)"
+            },
+            {
+              "pattern": "require('$MOD').execSync($CMD, ...)"
+            }
+          ]
+        },
+        {
+          "metavariable-regex": {
+            "metavariable": "$MOD",
+            "regex": "^(node:)?child_process$"
+          }
+        },
+        {
+          "pattern-not": "$X.$F(\"...\", ...)"
+        },
+        {
+          "pattern-not": "$F(\"...\", ...)"
+        }
+      ],
+      "metadata": {
+        "ayar": {
+          "category": "forbidden",
+          "version": "1.0.0"
+        },
+        "cwe": "CWE-78"
+      }
+    },
+    {
+      "id": "ayar.js.tls-reject-unauthorized",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "ERROR",
+      "message": "TLS certificate verification is turned off (rejectUnauthorized: false).",
+      "pattern": "{..., rejectUnauthorized: false, ...}",
+      "metadata": {
+        "ayar": {
+          "category": "forbidden",
+          "version": "1.0.0"
+        },
+        "cwe": "CWE-295"
+      }
+    },
+    {
+      "id": "ayar.js.node-tls-env",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "ERROR",
+      "message": "NODE_TLS_REJECT_UNAUTHORIZED is set to 0: every TLS certificate is accepted.",
+      "pattern-either": [
+        {
+          "pattern": "process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'"
+        },
+        {
+          "pattern": "process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0"
+        },
+        {
+          "pattern": "process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'"
+        }
+      ],
+      "metadata": {
+        "ayar": {
+          "category": "forbidden",
+          "version": "1.0.0"
+        },
+        "cwe": "CWE-295"
+      }
+    },
+    {
+      "id": "ayar.py.eval-dynamic",
+      "languages": [
+        "python"
+      ],
+      "severity": "ERROR",
+      "message": "eval() or exec() runs a value that is not a constant: whatever reaches it runs as code.",
+      "patterns": [
+        {
+          "pattern-either": [
+            {
+              "pattern": "eval($X, ...)"
+            },
+            {
+              "pattern": "exec($X, ...)"
+            }
+          ]
+        },
+        {
+          "pattern-not": "eval(\"...\", ...)"
+        },
+        {
+          "pattern-not": "exec(\"...\", ...)"
+        }
+      ],
+      "metadata": {
+        "ayar": {
+          "category": "forbidden",
+          "version": "1.0.0"
+        },
+        "cwe": "CWE-95"
+      }
+    },
+    {
+      "id": "ayar.py.subprocess-shell-true",
+      "languages": [
+        "python"
+      ],
+      "severity": "ERROR",
+      "message": "subprocess with shell=True runs a command built from a value that is not a constant.",
+      "patterns": [
+        {
+          "pattern": "subprocess.$FUNC($CMD, ..., shell=True, ...)"
+        },
+        {
+          "pattern-not": "subprocess.$FUNC(\"...\", ..., shell=True, ...)"
+        }
+      ],
+      "metadata": {
+        "ayar": {
+          "category": "forbidden",
+          "version": "1.0.0"
+        },
+        "cwe": "CWE-78"
+      }
+    },
+    {
+      "id": "ayar.py.os-system-dynamic",
+      "languages": [
+        "python"
+      ],
+      "severity": "ERROR",
+      "message": "os.system() or os.popen() runs a shell command built from a value that is not a constant.",
+      "patterns": [
+        {
+          "pattern-either": [
+            {
+              "pattern": "os.system($CMD)"
+            },
+            {
+              "pattern": "os.popen($CMD, ...)"
+            }
+          ]
+        },
+        {
+          "pattern-not": "os.system(\"...\")"
+        },
+        {
+          "pattern-not": "os.popen(\"...\", ...)"
+        }
+      ],
+      "metadata": {
+        "ayar": {
+          "category": "forbidden",
+          "version": "1.0.0"
+        },
+        "cwe": "CWE-78"
+      }
+    },
+    {
+      "id": "ayar.py.tls-verify-disabled",
+      "languages": [
+        "python"
+      ],
+      "severity": "ERROR",
+      "message": "TLS certificate verification is turned off (verify=False, an unverified SSL context).",
+      "pattern-either": [
+        {
+          "pattern": "requests.$FUNC(..., verify=False, ...)"
+        },
+        {
+          "pattern": "httpx.$FUNC(..., verify=False, ...)"
+        },
+        {
+          "pattern": "ssl._create_unverified_context(...)"
+        }
+      ],
+      "metadata": {
+        "ayar": {
+          "category": "forbidden",
+          "version": "1.0.0"
+        },
+        "cwe": "CWE-295"
+      }
+    },
+    {
+      "id": "ayar.py.pickle-load",
+      "languages": [
+        "python"
+      ],
+      "severity": "WARNING",
+      "message": "pickle loads data that may come from outside: unpickling it can run code.",
+      "pattern-either": [
+        {
+          "pattern": "pickle.load(...)"
+        },
+        {
+          "pattern": "pickle.loads(...)"
+        },
+        {
+          "pattern": "pickle.Unpickler(...)"
+        }
+      ],
+      "metadata": {
+        "ayar": {
+          "category": "suspect",
+          "version": "1.0.0"
+        },
+        "cwe": "CWE-502"
+      }
+    },
+    {
+      "id": "ayar.py.yaml-unsafe-load",
+      "languages": [
+        "python"
+      ],
+      "severity": "WARNING",
+      "message": "YAML is loaded with a loader that can build arbitrary objects.",
+      "pattern-either": [
+        {
+          "pattern": "yaml.unsafe_load(...)"
+        },
+        {
+          "pattern": "yaml.load(..., Loader=yaml.Loader, ...)"
+        },
+        {
+          "pattern": "yaml.load(..., Loader=yaml.UnsafeLoader, ...)"
+        },
+        {
+          "pattern": "yaml.load(..., Loader=yaml.FullLoader, ...)"
+        }
+      ],
+      "metadata": {
+        "ayar": {
+          "category": "suspect",
+          "version": "1.0.0"
+        },
+        "cwe": "CWE-502"
+      }
+    }
+  ]
+}

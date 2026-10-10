@@ -1,5 +1,5 @@
 // The built-in catalog data, as shipped. One JSON file per section of checks, plus the criteria, sections, AI
-// templates, sources, C-18 patterns, the command policy, the knowledge base kb/1 and the card types. Nothing here is trusted until loadCatalog() has
+// templates, sources, C-18 patterns, the command policy, the knowledge base kb/1 and the card types, AYAR's rules and its Semgrep rules (DEV-6). Nothing here is trusted until loadCatalog() has
 // validated it (C-08: at build and at load).
 import manifest from '../data/catalog.json' with { type: 'json' };
 import behavior from '../data/checks/behavior.json' with { type: 'json' };
@@ -28,6 +28,8 @@ import kbTerms from '../data/kb/terms.json' with { type: 'json' };
 import kbTools from '../data/kb/tools.json' with { type: 'json' };
 import kbVerification from '../data/kb/verification.json' with { type: 'json' };
 import redaction from '../data/redaction.json' with { type: 'json' };
+import rules from '../data/rules.json' with { type: 'json' };
+import semgrep from '../data/semgrep.json' with { type: 'json' };
 import sections from '../data/sections.json' with { type: 'json' };
 import sources from '../data/sources.json' with { type: 'json' };
 
@@ -59,5 +61,7 @@ export function builtinCatalogData(): unknown {
       itemChecks: kbItemChecks,
     },
     cards,
+    rules,
+    semgrep,
   });
 }

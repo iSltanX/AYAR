@@ -23,7 +23,7 @@ describe('built-in catalog (10.3, 11.6)', () => {
   const { catalog, stale } = load();
 
   it('loads, with a version and a content hash', () => {
-    expect(catalog.version).toBe('1.0.0');
+    expect(catalog.version).toBe('1.1.0');
     expect(catalog.hash).toMatch(/^[0-9a-f]{64}$/);
     expect(stale).toEqual([]);
   });
@@ -102,6 +102,7 @@ describe('built-in catalog (10.3, 11.6)', () => {
     for (const e of catalog.redaction.sensitiveNames.exceptions) keys.add(e.reason);
     for (const r of catalog.commandPolicy.refused) keys.add(r.label);
     for (const d of catalog.commandPolicy.dangerous) keys.add(d.label);
+    for (const c of catalog.checks) for (const r of catalog.rules.forCheck(c.id)!.rules) keys.add(`catalog.rule.${r}.title`);
     const ar = MESSAGES.ar as Record<string, string>;
     const en = MESSAGES.en as Record<string, string>;
     for (const k of keys) {
