@@ -58,6 +58,8 @@ export interface RunServiceOptions {
   supervisor: ProcessSupervisor;
   hooks?: readonly RunnerHook[];
   classify?: Classifier;
+  /** K4: a setup action of this project is running (its dependencies half installed): no run starts meanwhile. */
+  setupActive?: (projectId: string) => boolean;
 }
 
 interface RunRow {
@@ -187,6 +189,8 @@ export class RunService {
     const profile = latestProfile(db, plan.projectId);
     if (!profile || profile.version !== plan.profileVersion || profile.contentHash !== plan.profileHash) throw new CommandError('plan_stale', { reason: 'profile_changed' });
     await this.#o.projects.view(plan.projectId);
+    // Checked in the same turn as the run is written (the setup service checks runs the same way): never both.
+    if (this.#o.setupActive?.(plan.projectId)) throw new CommandError('busy', { reason: 'setup_running' });
     const runId = newId(ports.random, 'run');
     const preventSleep = readSettings(db, ['run.preventSleep'])['run.preventSleep'] ?? true;
     const prev = plan.previousRunId ? new Map(db.all<{ id: string; check_id: string; component: string; attempt: number }>('SELECT id, check_id, component, attempt FROM check_runs WHERE run_id = ?', plan.previousRunId).map((r) => [`${r.check_id}@${r.component}`, r])) : new Map();

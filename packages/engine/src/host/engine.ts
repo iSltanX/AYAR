@@ -218,10 +218,11 @@ export function startEngine(o: StartEngineOptions): EngineHandle {
         logger.flush();
         ports.exit(code);
       };
-      // 9.7: a run still active when the engine is told to stop ends the short way (SIGTERM, 2 s, SIGKILL and
-      // the sweep); the wait leaves room for the SIGKILL. What it cannot finish, the next boot marks «انقطع».
-      if (services?.runs.hasActive()) {
-        const quick = services.runs.prepareQuit().catch(() => null);
+      // 9.7: a run (or a setup command) still active when the engine is told to stop ends the short way (SIGTERM,
+      // 2 s, SIGKILL and the sweep); the wait leaves room for the SIGKILL. What it cannot finish, the next boot
+      // marks «انقطع» (and reaps by the ledger).
+      if (services && (services.runs.hasActive() || services.setup.hasActive())) {
+        const quick = Promise.all([services.runs.prepareQuit(), services.setup.prepareQuit()]).catch(() => null);
         void Promise.race([quick, new Promise((r) => setTimeout(r, QUIT_WAIT_MS))]).finally(finish);
       } else finish();
     },

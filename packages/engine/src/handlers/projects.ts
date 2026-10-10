@@ -29,8 +29,9 @@ export const projectRelocate: CommandHandler = (payload, ctx) => ctx.services.pr
 
 export const projectRemove: CommandHandler = async (payload, ctx) => {
   const { projectId } = payload as CommandPayload<'project.remove'>;
-  // A project whose run is active or waiting is not removed under it.
+  // A project whose run is active or waiting, or whose setup action is running, is not removed under it.
   if (ctx.services.runs.busy(projectId)) throw new CommandError('busy', { reason: 'run_active' });
+  if (ctx.services.setup.busyFor(projectId)) throw new CommandError('busy', { reason: 'setup_running' });
   await ctx.services.projects.remove(projectId);
   // FR-02: its evidence folder and the contents only its snapshots used; the repository is never touched.
   await ctx.services.evidence.afterProjectRemoved(projectId);

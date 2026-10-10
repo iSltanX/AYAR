@@ -39,4 +39,8 @@ export const groupsList: CommandHandler = (payload, ctx) => ({ groups: ctx.servi
 export const groupsDelete: CommandHandler = (payload, ctx) => ({ deleted: ctx.services.planner.deleteGroup((payload as CommandPayload<'groups.delete'>).groupId) });
 
 /** internal.prepareQuit (host only): the short ending of the active run before the app quits (9.7, C-01). */
-export const internalPrepareQuit: CommandHandler = (_payload, ctx) => ctx.services.runs.prepareQuit();
+export const internalPrepareQuit: CommandHandler = async (_payload, ctx) => {
+  // The runs and a running setup action end together, the short way (9.7, C-12 point 11).
+  const [runs, cancelledSetups] = await Promise.all([ctx.services.runs.prepareQuit(), ctx.services.setup.prepareQuit()]);
+  return { ...runs, cancelledSetups };
+};

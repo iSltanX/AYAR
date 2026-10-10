@@ -105,6 +105,6 @@ export function createServices(o: ServicesInput): EngineServices {
   let runs: RunService | null = null;
   const setup = new SetupService({ db: o.db, catalog: o.catalog, ports: o.ports, layout: o.layout, logger: o.logger, events: o.events, profiles, projects, environment, tools, redaction, supervisor, runActive: (p) => runs?.busy(p) ?? false });
   const planner = new PlannerService({ db: o.db, catalog: o.catalog, ports: o.ports, profiles, setup });
-  runs = new RunService({ db: o.db, catalog: o.catalog, ports: o.ports, layout: o.layout, logger: o.logger, events: o.events, runGate: o.runGate, planner, projects, environment, redaction, evidence, tools, supervisor });
+  runs = new RunService({ db: o.db, catalog: o.catalog, ports: o.ports, layout: o.layout, logger: o.logger, events: o.events, runGate: o.runGate, planner, projects, environment, redaction, evidence, tools, supervisor, setupActive: (p) => setup.busyFor(p) });
   return { redaction, profiles, projects, environment, evidence, tools, setup, planner, runs, rescrubStored };
 }

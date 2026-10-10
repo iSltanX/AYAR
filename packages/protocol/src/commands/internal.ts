@@ -37,7 +37,8 @@ export const internalCommands = {
   /**
    * 9.7 «إغلاق التطبيق أثناء التشغيل» (C-01, protocol 1.2 [D-DEV5-01]): before it stops the engine, the main
    * process asks it to end the active run the short way — SIGTERM to every check's group, 2 s, SIGKILL and the
-   * token sweep — with the running checks «أُلغي» because the app is quitting. Resolves when that is done.
+   * token sweep — with the running checks «أُلغي» because the app is quitting; and a running setup command
+   * («ثبّت التبعيات», the OSV download) the same way (C-12 point 11, T12). Resolves when that is done.
    */
   'internal.prepareQuit': defineCommand({
     ...base,
@@ -45,6 +46,6 @@ export const internalCommands = {
     since: '1.2',
     implementedIn: 'DEV-5',
     payload: z.strictObject({}),
-    result: z.strictObject({ cancelledRuns: z.int().nonnegative(), cancelledChecks: z.int().nonnegative() }),
+    result: z.strictObject({ cancelledRuns: z.int().nonnegative(), cancelledChecks: z.int().nonnegative(), cancelledSetups: z.int().nonnegative() }),
   }),
 };

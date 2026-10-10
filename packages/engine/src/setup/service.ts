@@ -23,7 +23,7 @@ import { recordAudit } from '../storage/audit.ts';
 import type { DataLayout } from '../storage/data-dir.ts';
 import type { Db } from '../storage/db.ts';
 import { readSettings } from '../storage/settings.ts';
-import type { ProcessSupervisor } from '../executor/process.ts';
+import type { ProcessSupervisor, RunningProcess } from '../executor/process.ts';
 import type { ToolsService } from '../tools/service.ts';
 import type { Catalog } from '@ayar/catalog';
 import { evaluateInstances, type ActionSeed, type InstanceReadiness } from './readiness.ts';
@@ -77,6 +77,12 @@ export interface SetupServiceOptions {
 export class SetupService {
   readonly #o: SetupServiceOptions;
   #busy: string | null = null;
+  /** The project of the action running now (K4: no run starts and the project is not removed under it). */
+  #busyProject: string | null = null;
+  /** Its supervised command, when it has one («ثبّت التبعيات», the OSV download): stopped the short way on quit. */
+  #proc: RunningProcess | null = null;
+  #job: Promise<unknown> | null = null;
+  #quitting = false;
 
   constructor(o: SetupServiceOptions) {
     this.#o = o;
@@ -280,14 +286,43 @@ export class SetupService {
     const action = await this.#refresh(actionId);
     if (!grantDigest || grantDigest !== this.#digest(action)) throw new CommandError('confirmation_mismatch', { reason: 'preview_digest' });
     if (this.#busy) throw new CommandError('busy', { reason: 'setup_running' });
+    if (this.#quitting) throw new CommandError('busy', { reason: 'quitting' });
     if (this.#o.runActive(action.projectId!)) throw new CommandError('busy', { reason: 'run_active' });
-    // Taken in the same turn as the check: a second confirmation (a double click) finds it busy (one at a time).
+    // Taken in the same turn as the check: a second confirmation (a double click), or a run of the same project,
+    // finds it busy (one at a time; RunService.start and project.remove ask busyFor).
     this.#busy = actionId;
+    this.#busyProject = action.projectId;
+    const job = this.#execute(action, actionId);
+    this.#job = job;
     try {
-      return await this.#execute(action, actionId);
+      return await job;
     } finally {
       this.#busy = null;
+      this.#busyProject = null;
+      this.#job = null;
     }
+  }
+
+  /** A setup action of this project is running now. */
+  busyFor(projectId: string): boolean {
+    return this.#busyProject === projectId;
+  }
+
+  hasActive(): boolean {
+    return this.#busy !== null;
+  }
+
+  /**
+   * 9.7, C-12 point 11 and T12 at quit: a setup command still running («ثبّت التبعيات», the OSV download) ends the
+   * short way (SIGTERM, 2 s, SIGKILL and the token sweep) and its action is recorded «أُلغي»; nothing new starts.
+   * Resolves with how many actions were running.
+   */
+  async prepareQuit(): Promise<number> {
+    this.#quitting = true;
+    if (!this.#busy) return 0;
+    this.#proc?.stop('quit');
+    await this.#job?.catch(() => {});
+    return 1;
   }
 
   async #execute(action: SetupAction, actionId: string): Promise<SetupExecuteResult> {
@@ -341,9 +376,9 @@ export class SetupService {
       state = 'failed';
       reasons.push({ key: e instanceof CommandError && e.error.code === 'busy' ? 'setup.failed.busy' : 'setup.failed.internal' });
     }
-    // 9.4 point 4: readiness from the tool itself, whatever the installer said. If it cannot be read now, the
-    // action is still recorded as it ended; readiness is read again when next asked.
-    const after = await this.instances(action.projectId!, { probe: true })
+    // 9.4 point 4: readiness from the tool itself, whatever the installer said. If it cannot be read now (or the
+    // app is quitting), the action is still recorded as it ended; readiness is read again when next asked.
+    const after = this.#quitting ? [] : await this.instances(action.projectId!, { probe: true })
       .then((r) => r.items.filter((i) => action.instances.includes(i.instance)))
       .catch((e: unknown) => {
         this.#o.logger.log('error', 'readiness after setup could not be read', { actionId, error: e instanceof Error ? e.message.slice(0, 300) : String(e) });
@@ -402,7 +437,9 @@ export class SetupService {
       onStdout: sink('out'),
       onStderr: sink('err'),
     });
-    const r = await proc.done;
+    this.#proc = proc;
+    if (this.#quitting) proc.stop('quit');
+    const r = await proc.done.finally(() => (this.#proc = null));
     for (const k of ['out', 'err'] as const) {
       const rest = [...redactors[k].push(decoders[k].decode()), ...redactors[k].end()];
       if (rest.length) await writer.write(new TextEncoder().encode(rest.join('')));
