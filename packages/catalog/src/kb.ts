@@ -155,12 +155,41 @@ export const KbItemChecks = z.strictObject({
 });
 
 export const CardTypeDef = z.strictObject({ id: Slug, name: Text, nextStep: z.enum(['direct', 'model', 'review']), isTest: z.boolean() });
+const Lines = z.array(Text).min(1);
+/** 12.8 «قالب البطاقة», verbatim where the plan gives it; the lines it leaves to the implementation are marked in D-DEV8-09. */
+export const CardTemplate = z.strictObject({
+  heading: Text,
+  meta: Text,
+  sections: z.strictObject({ name: Text, why: Text, behavior: Text, context: Text, steps: Text, acceptance: Text, constraints: Text, verify: Text }),
+  behaviorLine: Text,
+  expectedLine: Text,
+  contextLine: Text,
+  acceptanceTest: Lines,
+  acceptanceSetup: Lines,
+  acceptanceReview: Lines,
+  constraints: Lines,
+  verifyLine: Text,
+  noCheckLine: Text,
+  priorities: z.strictObject({ '1': Text, '2': Text, '3': Text }),
+  nextSteps: z.strictObject({ model: Text, direct: Text, review: Text }),
+  sources: z.strictObject({ advisorItem: Text, check: Text }),
+  ownerDecidesExpected: Text,
+  ownerDecides: Text,
+  noneKnown: Text,
+  draftId: Text,
+  setupSteps: z.strictObject({ missing_configuration: Lines, missing: Lines, missing_tests: Lines }),
+  checkBehavior: z.strictObject({ missing_configuration: Text, missing: Text, missing_tests: Text }),
+  profileLocation: Text,
+});
+export type CardTemplate = z.infer<typeof CardTemplate>;
+
 export const CardsData = z.strictObject({
   version: SemVer,
   verifiedAt: IsoDate,
   nameFormat: z.literal('{type}: {behavior} — {location}'),
   types: z.array(CardTypeDef).length(16),
   generic: CardTypeDef,
+  template: CardTemplate,
 });
 export type CardsData = z.infer<typeof CardsData>;
 

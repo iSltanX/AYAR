@@ -69,13 +69,20 @@ export const TaskCard = z.strictObject({
   /** 12.7: تعالجها مباشرة (direct)، تحتاج نموذجًا (model)، تحتاج مراجعتك (review). */
   nextStep: z.enum(['direct', 'model', 'review']),
   source: z.strictObject({ kind: z.enum(['advisorItem', 'check']), ref: z.string() }),
+  /** `{النوع}: {السلوك} — {الموضع}`. */
   name: z.string(),
+  /** The «السلوك أو الفعل المطلوب» part of the name. */
+  subject: z.string(),
   why: z.string(),
   /** «بمعطى… عند… يجب…»: null parts are the owner's to fill. */
   behavior: z.strictObject({ given: z.string().nullable(), when: z.string().nullable(), must: z.string().nullable() }),
   /** Null: «يحدده المالك قبل كتابة الاختبار». AYAR never invents the oracle (12.8). */
   expected: z.string().nullable(),
   location: z.string().nullable(),
+  /** C-06: the project's test framework and a few existing tests to imitate. */
+  context: z.strictObject({ framework: z.string().nullable(), examples: z.array(z.string()) }),
+  /** Which parts are the user's own words: they stay literal in the text (28.14 `malicious-text`). */
+  userSupplied: z.strictObject({ subject: z.boolean(), location: z.boolean() }),
   steps: z.array(z.string()),
   verify: z.array(z.string()),
   /** C-20: a knowledge item with no AYAR check behind it. */
