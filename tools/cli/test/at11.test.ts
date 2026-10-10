@@ -125,7 +125,9 @@ describe('AT-11: cancelling ends the tree, within 15 s, and says what it could n
       const jobAlive = execFileSync('/bin/launchctl', ['list'], { encoding: 'utf8' }).includes(label);
       if (escaped.length || jobAlive) {
         expect(unit.notes).toContain('run.note.escapeSuspected');
-        expect(unit.raw?.leftovers.escapeSuspected).toEqual(expect.arrayContaining([...(jobAlive ? [{ kind: 'launchd_job', name: label }] : []), ...(escaped.length ? [expect.objectContaining({ kind: 'launchd_child' })] : [])]));
+        const named = unit.raw?.leftovers.escapeSuspected ?? [];
+        if (jobAlive) expect(named).toContainEqual({ kind: 'launchd_job', name: label });
+        if (escaped.length) expect(named.some((x) => x.kind === 'launchd_child')).toBe(true);
       }
       expect(unit.raw?.leftovers.tokenKilled).toBeGreaterThanOrEqual(2);
       // The partial log is kept, and «أعد غير المكتمل» is there for the cancelled check.
