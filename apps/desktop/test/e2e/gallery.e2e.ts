@@ -121,8 +121,14 @@ describe('accessibility (AT-40 part, NFR-04)', () => {
       const panels = await run.page.evaluate(() => {
         const out: { panel: string; count: number }[] = [];
         for (const panel of document.querySelectorAll('[data-panel]')) {
+          // A native radio group is one tab stop: its checked radio, or its first one when none is checked.
+          const radioStop = (el: HTMLElement) => {
+            if (!(el instanceof HTMLInputElement) || el.type !== 'radio' || !el.name) return true;
+            const group = [...panel.querySelectorAll<HTMLInputElement>(`input[type="radio"][name="${CSS.escape(el.name)}"]:not(:disabled)`)];
+            return group.some((r) => r.checked) ? el.checked : el === group[0];
+          };
           const tabbable = [...panel.querySelectorAll<HTMLElement>('a[href], button, input, select, textarea, [tabindex]')].filter(
-            (el) => !el.matches(':disabled') && el.tabIndex >= 0 && el.getClientRects().length > 0 && !el.closest('[inert]'),
+            (el) => !el.matches(':disabled') && el.tabIndex >= 0 && el.getClientRects().length > 0 && !el.closest('[inert]') && radioStop(el),
           );
           tabbable.forEach((el, i) => el.setAttribute('data-tab-order', String(i)));
           if (tabbable.length) out.push({ panel: panel.getAttribute('data-panel')!, count: tabbable.length });
@@ -181,9 +187,9 @@ describe('accessibility (AT-40 part, NFR-04)', () => {
 });
 
 describe('mirroring (AT-28 part, 16.5, D-DES2-02)', () => {
-  const transforms = (lang: 'ar' | 'en') =>
+  const transforms = (lang: 'ar' | 'en'): Promise<Record<string, string>> =>
     run.page.$$eval(`[data-panel$="/${lang}/light"] [data-symbol]`, (els) =>
-      Object.fromEntries(els.map((e) => [e.getAttribute('data-symbol'), getComputedStyle(e).transform])),
+      Object.fromEntries(els.map((e) => [e.getAttribute('data-symbol') ?? '', getComputedStyle(e).transform])),
     );
 
   it('mirrors only the skipped symbol in Arabic, and nothing in English', async () => {
@@ -199,6 +205,24 @@ describe('mirroring (AT-28 part, 16.5, D-DES2-02)', () => {
   });
 });
 
+describe('reduced motion (16.6, D-DES2-11)', () => {
+  it('spins running and cancelling, and shows their static forms under reduced motion', async () => {
+    await showGallery(run.page, { lang: 'ar', theme: 'light', section: 'S-01' });
+    const state = () =>
+      run.page.$$eval('[data-panel="S-01/ar/light"] [data-symbol="running"]', (els) =>
+        els.map((e) => ({
+          moving: getComputedStyle(e.querySelector('.motion')!).display !== 'none',
+          still: getComputedStyle(e.querySelector('.still')!).display !== 'none',
+          animation: getComputedStyle(e.querySelector('.spin')!).animationName,
+        })),
+      );
+    expect((await state()).every((s) => s.moving && !s.still && /spin/.test(s.animation))).toBe(true);
+    await run.page.emulateMedia({ reducedMotion: 'reduce' });
+    expect((await state()).every((s) => !s.moving && s.still)).toBe(true);
+    await run.page.emulateMedia({ reducedMotion: 'no-preference' });
+  });
+});
+
 describe('fonts actually rendered (16.4, E-01, D-DES1-09)', () => {
   it('renders labels in Cairo, body text in Almarai, and code in the system monospace with Arabic in Almarai', async () => {
     await showGallery(run.page, { lang: 'ar', theme: 'light', section: 'S-01' });
@@ -206,15 +230,21 @@ describe('fonts actually rendered (16.4, E-01, D-DES1-09)', () => {
     await cdp.send('DOM.enable');
     await cdp.send('CSS.enable');
     const fontsOf = async (selector: string) => {
-      const { root } = (await cdp.send('DOM.getDocument', { depth: -1 })) as { root: { nodeId: number } };
-      const { nodeId } = (await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector })) as { nodeId: number };
-      const { fonts } = (await cdp.send('CSS.getPlatformFontsForNode', { nodeId })) as { fonts: { familyName: string; glyphCount: number }[] };
+      const { root } = await cdp.send('DOM.getDocument', { depth: -1 });
+      const { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector });
+      const { fonts } = await cdp.send('CSS.getPlatformFontsForNode', { nodeId });
       return fonts.map((f) => f.familyName);
     };
     expect(await fontsOf('[data-panel="S-01/ar/light"] [data-result="passed"] .label')).toEqual(['Cairo']);
     expect(await fontsOf('[data-panel="S-01/ar/light"] figcaption')).toEqual(['Almarai']);
     const mono = await fontsOf('[data-section="S-01"] h2 code');
     expect(mono.some((f) => /^(Menlo|SF Mono)/.test(f))).toBe(true);
+    // An Arabic path: Latin from the system monospace, Arabic from Almarai (D-DES1-09), never Courier New.
+    await showGallery(run.page, { lang: 'ar', theme: 'light', section: 'C-11' });
+    const arabicPath = await fontsOf('[data-panel="C-11/ar/light"] [data-demo="Path pill/arabic-folders"] .path bdi');
+    expect(arabicPath).toContain('Almarai');
+    expect(arabicPath.some((f) => /Courier/.test(f))).toBe(false);
+    console.log(`fonts: label Cairo, body Almarai, mono ${mono.join('+')}, Arabic path ${arabicPath.join('+')}`);
     await cdp.detach();
   });
 });
