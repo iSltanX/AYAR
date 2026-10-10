@@ -4,7 +4,7 @@ track: design
 number: 5
 stage: design
 title: بقية الشاشات والرحلات العشر وإرشادات المطور
-status: delivered
+status: closed
 status_date: 2026-10-11
 depends_on: [DES-4]
 design_gates: []
@@ -23,7 +23,7 @@ outputs:
   - صفحة Flows بالرحلات العشر تفاعلية
   - صفحة Guidelines وCover النهائي
   - قائمة §14 مستوفاة واعتماد المالك النهائي
-closing_commit:
+closing_commit: b19ae42
 ---
 
 # DES-5 — بقية الشاشات والرحلات العشر وإرشادات المطور
