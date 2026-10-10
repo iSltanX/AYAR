@@ -13,7 +13,7 @@ owner_inputs: []
 model: Claude Opus 5.5
 effort: high
 model_reason: شاشات مربوطة بأحداث حية وتطابق تصميمًا معتمدًا
-scope: [apps/desktop/renderer/, apps/desktop/main/, apps/desktop/preload/, packages/i18n/, packages/protocol/]
+scope: [apps/desktop/renderer/, apps/desktop/main/, apps/desktop/preload/, packages/i18n/, packages/protocol/, pnpm-lock.yaml, package-lock.json]
 goal: بناء الشاشات الثماني الأساسية من التصميم المعتمد وربطها بالمحرك — المشاريع، والاكتشاف، واعتماد الملف، ونظرة عامة، وخطة الفحص الكامل، والمتابعة الحية، والنتائج، وتقرير «للنموذج» — حتى تكتمل الرحلة J1 وJ10 داخل التطبيق.
 start:
   - DEV-9 مغلقة (المحرك كامل)

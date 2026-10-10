@@ -3,7 +3,8 @@
 //
 // الاستخدام (من أي مجلد داخل المستودع):
 //   /opt/homebrew/bin/node tools/waves/verify.mjs DEV-3
-// يخرج بـ 0 إن نجح كل فحص إلزامي، و1 إن أخفق أحدها. والتنبيهات للمراجعة ولا تُفشل.
+// يخرج بـ 0 إن كانت جاهزة للدمج، و1 إن أخفق فحص إلزامي، و3 إن كان التسليم سليمًا لمرحلة معطّلة (لا تُدمج).
+// والتنبيهات للمراجعة ولا تُفشل.
 
 import { execFileSync } from 'node:child_process';
 
@@ -27,6 +28,7 @@ function git(args, opts = {}) {
 }
 
 const results = [];
+let handoff = null;
 const pass = (msg) => results.push(['نجح', msg]);
 const fail = (msg) => results.push(['أخفق', msg]);
 const warn = (msg) => results.push(['تنبيه', msg]);
@@ -66,7 +68,7 @@ if (!phase) fail(`ملف المرحلة غير موجود على الفرع`);
 
 // 3. ملف التسليم
 const handoffText = git(['show', `${branch}:${handoffPath}`]);
-const handoff = frontMatter(handoffText);
+handoff = frontMatter(handoffText);
 if (!handoff) {
   fail(`لا ملف تسليم ${handoffPath} على الفرع، أو واجهته غير صالحة`);
 } else {
@@ -93,9 +95,15 @@ if (!handoff) {
   const tests = handoffText.split('## الفحوص')[1]?.split('\n## ')[0] ?? '';
   const rows = tests.split('\n').filter((l) => /^\|/.test(l) && !/^\|\s*-/.test(l) && !/الفحص\s*\|\s*الأمر/.test(l));
   if (!rows.length || rows.every((r) => /\|\s*…\s*\|/.test(r))) fail('جدول الفحوص في التسليم فارغ');
-  else pass(`جدول الفحوص: ${rows.length} صفًا`);
-  if (handoff.status === 'delivered' && rows.some((r) => /\|\s*(أخفق|فشل)\b/.test(r))) {
-    fail('في جدول الفحوص نتيجة «فشل» وحالة التسليم delivered');
+  else pass(`صفوف جدول الفحوص: ${rows.length}`);
+  // عمود النتيجة هو الثالث: «نجح» وحدها تقبل التسليم، و«لم يُشغَّل» تنبيه بسببه، وأي قيمة أخرى إخفاق
+  for (const row of rows) {
+    const cells = row.split('|').slice(1, -1).map((c) => c.trim());
+    const result = cells[2] ?? '';
+    if (handoff.status !== 'delivered' || /^…$/.test(result)) continue;
+    if (/^نجح/.test(result)) continue;
+    if (/^لم يُ?شغَّ?ل/.test(result)) warn(`فحص لم يُشغَّل: ${cells[0]} (${result})`);
+    else fail(`نتيجة فحص ليست «نجح» في تسليم delivered: ${cells[0]} → ${result}`);
   }
 
   // 6. اعتماد التصميم
@@ -114,12 +122,13 @@ else pass('الخطة دون تعديل');
 
 // 8. نظافة مجلد العمل
 const worktrees = git(['worktree', 'list', '--porcelain']) ?? '';
-const wt = worktrees.split('\n\n').find((block) => block.includes(`branch refs/heads/${branch}`));
+const wt = worktrees.split('\n\n').find((block) => block.split('\n').includes(`branch refs/heads/${branch}`));
 const wtPath = wt?.match(/^worktree (.*)$/m)?.[1];
 if (!wtPath) warn('لا مجلد عمل مربوط بالفرع');
 else {
-  const dirty = git(['-C', wtPath, 'status', '--porcelain']);
-  if (dirty) fail(`في مجلد العمل ${wtPath} تغييرات غير ملتزمة`);
+  const dirty = git(['--no-optional-locks', '-C', wtPath, 'status', '--porcelain']);
+  if (dirty === null) fail(`تعذّرت قراءة حالة مجلد العمل ${wtPath}`);
+  else if (dirty) fail(`في مجلد العمل ${wtPath} تغييرات غير ملتزمة`);
   else pass(`مجلد العمل نظيف: ${wtPath}`);
 }
 
@@ -146,6 +155,15 @@ report();
 function report() {
   for (const [kind, msg] of results) console.log(`${kind === 'نجح' ? '✓' : kind === 'تنبيه' ? '!' : '✗'} ${kind}: ${msg}`);
   const failed = results.filter(([k]) => k === 'أخفق').length;
-  console.log(failed ? `\nالنتيجة: ${id} غير جاهزة للدمج (${failed} إخفاق).` : `\nالنتيجة: ${id} جاهزة للدمج.`);
-  process.exit(failed ? 1 : 0);
+  if (failed) {
+    console.log(`\nالنتيجة: ${id} غير جاهزة للدمج (إخفاقات: ${failed}).`);
+    process.exit(1);
+  }
+  if (handoff?.status === 'blocked') {
+    // رمز 3: تسليم سليم الصيغة لمرحلة معطّلة. ينقل المنسّق عوائقها إلى blockers.md ولا يدمجها
+    console.log(`\nالنتيجة: ${id} معطّلة. لا تُدمج: انقل عوائقها إلى docs/tracking/blockers.md وأبلغ المالك.`);
+    process.exit(3);
+  }
+  console.log(`\nالنتيجة: ${id} جاهزة للدمج.`);
+  process.exit(0);
 }

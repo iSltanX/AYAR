@@ -13,7 +13,7 @@ owner_inputs: []
 model: Claude Opus 5.5
 effort: xhigh
 model_reason: الاكتشاف دون تنفيذ والإخفاء: خطأ الأمان هنا مكلف، والعقود تُستهلك في كل ما بعدها
-scope: [packages/catalog/, packages/engine/, packages/protocol/, packages/i18n/, tools/cli/, fixtures/, docs/dependencies.md]
+scope: [packages/catalog/, packages/engine/, packages/protocol/, packages/i18n/, tools/cli/, fixtures/, pnpm-lock.yaml, package-lock.json]
 goal: من اختيار المجلد إلى ملف معايير معتمد — تعريفات الفحوص، وإخفاء الأسرار، وسجل المشاريع، والاكتشاف دون تنفيذ، وحل البيئة، واقتراح الملف واعتماده — كلها في المحرك ومختبرة عبر tools/cli.
 start:
   - DEV-3 مغلقة (البروتوكول والتخزين والمضيف)

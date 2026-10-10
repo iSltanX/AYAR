@@ -13,7 +13,7 @@ owner_inputs: []
 model: Claude Fable 5.1
 effort: xhigh
 model_reason: إدارة العمليات والإلغاء والمهل والتعافي أصعب أجزاء المحرك وأكثرها حالات حدية
-scope: [packages/engine/, packages/protocol/, packages/i18n/, tools/cli/, apps/desktop/main/, fixtures/, docs/dependencies.md]
+scope: [packages/engine/, packages/protocol/, packages/i18n/, tools/cli/, apps/desktop/main/, fixtures/, pnpm-lock.yaml, package-lock.json]
 goal: من ملف معتمد إلى نتائج خام محفوظة — الجاهزية والتجهيز الصريح، والخطة دون تكرار، وتشغيل كل فحص في مجموعة عمليات معزولة مع الإلغاء والمهل والتعافي، ولقطات الحالة والأدلة والاحتفاظ.
 start:
   - DEV-4 مغلقة

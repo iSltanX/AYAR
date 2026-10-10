@@ -18,7 +18,13 @@ import { fileURLToPath } from 'node:url';
 const args = process.argv.slice(2);
 const opt = (name, fallback) => {
   const i = args.indexOf(name);
-  return i >= 0 && args[i + 1] ? args[i + 1] : fallback;
+  if (i < 0) return fallback;
+  const value = args[i + 1];
+  if (!value || value.startsWith('--')) {
+    console.error(`الخيار ${name} يحتاج قيمة.`);
+    process.exit(2);
+  }
+  return value;
 };
 const checkOnly = args.includes('--check');
 const REF = opt('--ref', 'main');
@@ -61,6 +67,8 @@ const STAGES = {
   release: 'الإصدار',
 };
 const errors = [];
+const warnings = [];
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 function parseFrontMatter(text, file) {
   const match = text?.match(/^---\n([\s\S]*?)\n---\n/);
@@ -110,6 +118,7 @@ function readPhases(ref) {
       for (const key of REQUIRED) if (!p[key]) errors.push(`${file}: الحقل ${key} ناقص`);
       if (p.status && !STATUSES.has(p.status)) errors.push(`${file}: حالة غير معروفة: ${p.status}`);
       if (p.stage && !STAGES[p.stage]) errors.push(`${file}: مجموعة عرض غير معروفة: ${p.stage}`);
+      if (p.status_date && !ISO_DATE.test(p.status_date)) errors.push(`${file}: status_date ليس بصيغة YYYY-MM-DD: ${p.status_date}`);
       p.number = Number(p.number);
       p.file = file;
       phases.push(p);
@@ -156,6 +165,9 @@ const phases = readPhases(REF);
 const waves = readWaves(show(REF, 'docs/waves/README.md'));
 const decisions = readOwnerDecisions(show(REF, 'docs/tracking/decisions.md')) ?? {};
 if (!Object.keys(decisions).length) errors.push('docs/tracking/decisions.md: جدول قرارات المالك غير موجود بين علامتيه');
+const blockersText = show(REF, 'docs/tracking/blockers.md') ?? '';
+const openBlockers = (blockersText.split('## العوائق المحلولة')[0].split('## العوائق المفتوحة')[1] ?? '');
+const blockedOnMain = new Set([...openBlockers.matchAll(/المرحلة:\s*((?:DEV|DES)-\d+)/g)].map((m) => m[1]));
 const byId = new Map(phases.map((p) => [p.id, p]));
 const tags = new Set((git(['tag', '-l', '*-closed']) ?? '').split('\n').filter(Boolean));
 
@@ -196,14 +208,19 @@ function live(p) {
     worktree: wt?.path ?? null,
     ahead: Number(git(['rev-list', '--count', `${REF}..${branch}`]) ?? 0),
     behind: Number(git(['rev-list', '--count', `${branch}..${REF}`]) ?? 0),
-    dirty: wt ? (git(['-C', wt.path, 'status', '--porcelain']) ?? '') !== '' : false,
+    dirty: wt ? (git(['--no-optional-locks', '-C', wt.path, 'status', '--porcelain']) ?? '') !== '' : false,
     handoff: git(['cat-file', '-e', `${branch}:docs/handoffs/${p.id}.md`]) !== null,
     status: branchPhase?.status,
-    statusDate: branchPhase?.status_date,
+    statusDate: (() => {
+      const d = branchPhase?.status_date;
+      if (d && !ISO_DATE.test(d)) warnings.push(`${branch}: status_date ليس بصيغة YYYY-MM-DD (${d})، فاستُخدم تاريخ main`);
+      return d && ISO_DATE.test(d) ? d : undefined;
+    })(),
   };
 }
 
-const isClosed = (id) => byId.get(id)?.status === 'closed';
+// المغلقة حقًا: حالتها closed على main ولها وسم الإغلاق (AGENTS.md 3.1، البند 4)
+const isClosed = (id) => byId.get(id)?.status === 'closed' && tags.has(`${id}-closed`);
 const view = phases.map((p) => {
   const l = live(p);
   const waitingDeps = p.depends_on.filter((id) => !isClosed(id));
@@ -213,10 +230,11 @@ const view = phases.map((p) => {
   const stale = l.exists && l.ahead === 0 && !l.dirty && (l.status ?? 'not-started') === 'not-started' && l.behind > 0;
   let state;
   let statusDate = p.status_date;
-  if (p.status === 'closed') state = 'closed';
+  if (p.status === 'closed') state = isClosed(p.id) ? 'closed' : 'unverified';
   else if (l.exists && !stale) {
     statusDate = l.statusDate ?? statusDate;
-    if (l.status === 'delivered' || l.status === 'closed') state = 'delivered';
+    if ((l.status === 'delivered' || l.status === 'closed') && blockedOnMain.has(p.id)) state = 'blocked';
+    else if (l.status === 'delivered' || l.status === 'closed') state = 'delivered';
     else if (['in-progress', 'awaiting-owner', 'blocked'].includes(l.status)) state = l.status;
     else state = l.ahead > 0 || l.dirty ? 'in-progress' : 'prepared';
   } else if (!waitingDeps.length && !waitingDesign.length && !waitingOwner.length) state = 'available';
@@ -251,14 +269,18 @@ const view = phases.map((p) => {
     folder: l.worktree ?? `${wtBase}/${p.id}`,
     folderExists: Boolean(l.worktree),
     stale,
+    returned: blockedOnMain.has(p.id),
+    unmerged: p.status === 'closed' && l.exists ? l.ahead : 0,
     ahead: l.ahead ?? 0,
     dirty: Boolean(l.dirty),
     handoff: Boolean(l.handoff),
     command: p.track === 'dev' ? `ابدأ مرحلة التطوير ${p.number}` : `ابدأ مرحلة التصميم ${p.number}`,
-    setup: `git -C ${primary} worktree add ${wtBase}/${p.id} -b phase/${p.id} ${REF}`,
+    resume: p.track === 'dev' ? `تابع مرحلة التطوير ${p.number}` : `تابع مرحلة التصميم ${p.number}`,
+    setup: l.exists
+      ? `git -C ${primary} worktree add ${wtBase}/${p.id} phase/${p.id}`
+      : `git -C ${primary} worktree add ${wtBase}/${p.id} -b phase/${p.id} ${REF}`,
     file: p.file,
     closingCommit: p.closing_commit || '',
-    unverifiedClose: p.status === 'closed' && !tags.has(`${p.id}-closed`),
   };
 });
 const viewById = new Map(view.map((v) => [v.id, v]));
@@ -272,7 +294,7 @@ for (const v of view) {
     [...v.waitingDeps, ...v.waitingDesign].some((id) => viewById.get(id).state === 'delivered');
 }
 
-const ACTIVE = ['in-progress', 'awaiting-owner', 'blocked', 'prepared', 'delivered'];
+const ACTIVE = ['in-progress', 'awaiting-owner', 'blocked', 'prepared', 'delivered', 'unverified'];
 const waveView = waves.map((w) => {
   const items = w.phaseIds.map((id) => viewById.get(id));
   let state;
@@ -288,13 +310,13 @@ const actions = [];
 const prepared = view.filter((v) => v.state === 'prepared');
 if (prepared.length) actions.push({ kind: 'open', ids: prepared.map((v) => v.id) });
 const toPrepare = view.filter((v) => ['available', 'needs-decision'].includes(v.state) || v.unlockedByMerge);
-const toMerge = view.filter((v) => v.state === 'delivered');
+const toMerge = view.filter((v) => ['delivered', 'unverified'].includes(v.state));
 if (toPrepare.length || toMerge.length) {
   const lastWave = Math.max(...waves.map((w) => w.number));
   const wave = toPrepare.length
     ? Math.min(...toPrepare.map((v) => v.wave))
     : Math.min(Math.max(...toMerge.map((v) => v.wave)) + 1, lastWave);
-  actions.push({ kind: 'wave', wave, command: `ابدأ الموجة ${wave}`, merges: toMerge.map((v) => v.id), prepares: toPrepare.map((v) => v.id) });
+  actions.push({ kind: 'wave', wave, command: `ابدأ الموجة ${wave}`, merges: toMerge.map((v) => v.id), prepares: toPrepare.filter((v) => v.wave <= wave).map((v) => v.id) });
 }
 const withOwner = view.filter((v) => ['awaiting-owner', 'blocked'].includes(v.state));
 if (withOwner.length) actions.push({ kind: 'owner', ids: withOwner.map((v) => v.id) });
@@ -317,7 +339,7 @@ const data = {
     path: primary,
     branch: worktrees[0].branch,
     onRef: worktrees[0].branch === REF,
-    clean: (git(['-C', primary, 'status', '--porcelain']) ?? '') === '',
+    clean: (git(['--no-optional-locks', '-C', primary, 'status', '--porcelain']) ?? '') === '',
   },
   stages: STAGES,
   waves: waveView,
@@ -330,6 +352,7 @@ const data = {
   },
 };
 
+for (const w of warnings) console.error(`تنبيه: ${w}`);
 if (checkOnly) {
   console.log(`المصادر سليمة: ${countAr(view.length, 'مرحلة واحدة', 'مرحلتان', 'مراحل', 'مرحلة')} في ${countAr(waves.length, 'موجة واحدة', 'موجتين', 'موجات', 'موجة')}، و${countAr(openDecisions.length, 'قرار واحد', 'قراران', 'قرارات', 'قرارًا')} تنتظر المالك.`);
   process.exit(0);
@@ -341,5 +364,6 @@ if (!template.includes('/*__AYAR_DATA__*/null')) {
   process.exit(1);
 }
 mkdirSync(dirname(out), { recursive: true });
-writeFileSync(out, template.replace('/*__AYAR_DATA__*/null', JSON.stringify(data).replace(/</g, '\\u003c')));
+const json = JSON.stringify(data).replace(/</g, '\\u003c');
+writeFileSync(out, template.replace('/*__AYAR_DATA__*/null', () => json));
 console.log(`كُتبت الصفحة: ${out} (${countAr(view.length, 'مرحلة واحدة', 'مرحلتان', 'مراحل', 'مرحلة')}، و${countAr(waves.length, 'موجة واحدة', 'موجتان', 'موجات', 'موجة')}، من ${REF} ${data.commit}).`);

@@ -119,7 +119,7 @@ a:hover { text-decoration-color: var(--ink); }
 .s-delivered::before { content: "⇣"; background: none; width: auto; height: auto; font-size: 12px; }
 .s-available { border-color: var(--line-strong); color: var(--ink-2); }
 .s-awaiting-owner, .s-needs-decision { background: var(--review-bg); color: var(--review); }
-.s-blocked { background: var(--warn-bg); color: var(--warn); }
+.s-blocked, .s-unverified { background: var(--warn-bg); color: var(--warn); }
 .s-needs-design, .s-waiting { background: var(--sunken); color: var(--muted); }
 .track { font-size: 12px; font-weight: 600; color: var(--muted); }
 
@@ -262,6 +262,7 @@ const DATA = /*__AYAR_DATA__*/null;
 
 const PHASE_STATES = {
   'closed': 'مغلقة',
+  'unverified': 'مغلقة دون وسم',
   'delivered': 'سُلّمت · تنتظر الدمج',
   'in-progress': 'جارية',
   'prepared': 'مجهّزة · افتح جلستها',
@@ -289,7 +290,13 @@ function h(tag, attrs, ...children) {
 
 const dateFmt = new Intl.DateTimeFormat('ar-u-nu-latn-ca-gregory', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 const stampFmt = new Intl.DateTimeFormat('ar-u-nu-latn-ca-gregory', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-const fmtDate = (iso) => (iso ? dateFmt.format(new Date(iso + 'T00:00:00Z')) : '—');
+const fmtDate = (iso) => {
+  if (!iso) return '—';
+  try { return dateFmt.format(new Date(iso + 'T00:00:00Z')); } catch { return iso; }
+};
+const fmtStamp = (iso) => {
+  try { return stampFmt.format(new Date(iso)); } catch { return iso ?? '—'; }
+};
 const byId = new Map(DATA.phases.map((p) => [p.id, p]));
 const openDecisionIds = new Set(DATA.openDecisions.map((d) => d.id));
 
@@ -334,7 +341,7 @@ const list = (items, sep = ' ') => items.map((x, i) => [i ? sep : '', x]);
 function phaseCard(p) {
   const facts = [];
   const add = (label, ...content) => facts.push(h('div', null, h('dt', { text: label }), h('dd', null, ...content)));
-  if (p.state !== 'closed') {
+  if (!['closed', 'unverified'].includes(p.state)) {
     add('المجلد', h('span', { class: 'ltr', text: p.folder }), pathBtn(p.folder), p.folderExists ? null : h('span', { class: 'muted', text: '(لم يُجهَّز)' }));
     add('الفرع', h('span', { class: 'ltr', text: p.branch }), p.ahead ? h('span', { class: 'muted', text: `${p.ahead} commits` }) : null, p.dirty ? h('span', { class: 'muted', text: '· تغييرات غير ملتزمة' }) : null);
   }
@@ -350,7 +357,9 @@ function phaseCard(p) {
   if (p.stale) notes.push(h('p', { class: 'note', text: 'مجلدها موجود لكنه على main أقدم من الحالي. تحدّثه جلسة التنسيق عند أمر الموجة، ثم تفتح جلسته.' }));
   if (p.unlockedByMerge) notes.push(h('p', { class: 'note', text: 'تصير متاحة حين تدمج جلسة التنسيق ما سُلّم من تبعياتها.' }));
   if (p.state === 'delivered') notes.push(h('p', { class: 'note', text: p.handoff ? 'ملف التسليم موجود. تدمجها جلسة التنسيق عند أمر الموجة التالية.' : 'حالتها «سُلّمت» لكن ملف التسليم غير موجود بعد.' }));
-  if (p.unverifiedClose) notes.push(h('p', { class: 'note warn', text: `مغلقة في ملفها دون وسم ${p.id}-closed في Git.` }));
+  if (p.state === 'unverified') notes.push(h('p', { class: 'note warn', text: `مغلقة في ملفها دون وسم ${p.id}-closed في Git، فلا تُفتح بها تبعياتها حتى يتحقق منها المنسّق ويَسِمها.` }));
+  if (p.returned) notes.push(h('p', { class: 'note warn', text: 'أعادها المنسّق بعائق مفتوح في docs/tracking/blockers.md. تابعها في مجلدها بأمر «تابع»، بعد دمج main في فرعها.' }));
+  if (p.unmerged) notes.push(h('p', { class: 'note warn', text: `على فرعها ${p.unmerged} commits لم تُدمج في main.` }));
 
   const detailsId = `details-${p.id}`;
   const details = h('div', { class: 'details', id: detailsId, hidden: true },
@@ -359,7 +368,7 @@ function phaseCard(p) {
     p.scope.length ? h('div', null, h('h6', { text: 'نطاق الكتابة' }), h('p', null, list(p.scope.map((s) => h('span', { class: 'ltr', text: s })), '، '))) : null,
     p.start.length ? h('div', null, h('h6', { text: 'متطلبات البدء' }), h('ul', null, p.start.map((s) => h('li', { text: s })))) : null,
     p.outputs.length ? h('div', null, h('h6', { text: 'المخرجات' }), h('ul', null, p.outputs.map((s) => h('li', { text: s })))) : null,
-    p.state !== 'closed' ? h('div', null, h('h6', { text: 'أمر التجهيز (تنفّذه جلسة التنسيق عادة)' }), h('p', null, h('span', { class: 'ltr', text: p.setup }))) : null,
+    !['closed', 'unverified'].includes(p.state) ? h('div', null, h('h6', { text: 'أمر التجهيز (تنفّذه جلسة التنسيق عادة)' }), h('p', null, h('span', { class: 'ltr', text: p.setup }))) : null,
     h('p', { class: 'muted' }, `آخر تغيير للحالة: ${fmtDate(p.statusDate)}`, p.closingCommit ? ' · commit ' : '', p.closingCommit ? h('span', { class: 'ltr', text: p.closingCommit }) : '', ' · ', h('a', { class: 'ltr', href: `${DATA.links.repo}/blob/main/${p.file}`, target: '_blank', rel: 'noopener', text: p.file })),
   );
   const more = h('button', {
@@ -374,9 +383,10 @@ function phaseCard(p) {
 
   const actions = [];
   const ready = ['prepared', 'in-progress', 'awaiting-owner', 'blocked'].includes(p.state);
-  if (ready) actions.push(cmdBtn(p.command));
+  if (p.state === 'prepared') actions.push(cmdBtn(p.command));
+  else if (ready) actions.push(cmdBtn(p.resume));
   else if (!['closed', 'delivered'].includes(p.state)) actions.push(h('button', { class: 'btn btn-quiet', type: 'button', title: 'يُرسل بعد أن تجهّز جلسة التنسيق مجلدها', onclick: () => copy(p.command, `الأمر «${p.command}»`) }, 'انسخ أمر البدء'));
-  if (!p.folderExists && p.state !== 'closed') actions.push(copyBtn('انسخ أمر التجهيز', p.setup, 'أمر التجهيز'));
+  if (!p.folderExists && !['closed', 'unverified'].includes(p.state)) actions.push(copyBtn('انسخ أمر التجهيز', p.setup, 'أمر التجهيز'));
   actions.push(more);
 
   return h('article', { class: 'phase', id: p.id, 'data-state': p.state },
@@ -421,7 +431,7 @@ function render() {
 
   document.getElementById('meta').replaceChildren(
     h('span', null, 'آخر تغيير للحالة: ', fmtDate(DATA.updated)),
-    h('span', null, 'وُلّدت: ', stampFmt.format(new Date(DATA.generatedAt))),
+    h('span', null, 'وُلّدت: ', fmtStamp(DATA.generatedAt)),
     h('span', null, 'من ', h('span', { class: 'ltr', text: `${DATA.ref} ${DATA.commit}` }), ' وفروع المراحل الحية'),
   );
 
@@ -429,7 +439,7 @@ function render() {
   const tallies = [
     ['الموجة الحالية', current ? String(current.number) : '—', current ? WAVE_STATES[current.state] : 'كل الموجات مغلقة'],
     ['المراحل', String(P.length), `${count((p) => p.track === 'dev')} تطوير · ${count((p) => p.track === 'design')} تصميم`],
-    ['مغلقة', String(count((p) => p.state === 'closed')), 'مدموجة بوسمها'],
+    ['مغلقة', String(count((p) => p.state === 'closed')), 'مدموجة ومَوسومة'],
     ['جارية أو مجهّزة', String(count((p) => ['in-progress', 'prepared', 'awaiting-owner', 'blocked'].includes(p.state))), 'في مجلداتها'],
     ['تنتظر الدمج', String(count((p) => p.state === 'delivered')), 'سلّمها منفّذها'],
     ['قرارات تنتظرك', String(DATA.openDecisions.length), 'قبل مراحلها أو أثناءها'],
@@ -465,7 +475,7 @@ function render() {
     } else if (a.kind === 'owner') {
       next.push(h('div', { class: 'step' },
         h('h3', { text: 'مراحل تنتظرك' }),
-        h('p', { class: 'note' }, list(a.ids.map((id) => [phaseRef(id), ` ${PHASE_STATES[byId.get(id).state]}`]), '، '), '. تابعها في جلستها بالأمر «تابع مرحلة … N».'),
+        h('ul', null, a.ids.map((id) => { const p = byId.get(id); return h('li', null, h('p', { class: 'where' }, phaseRef(id), ` ${p.title} · ${PHASE_STATES[p.state]}`), h('p', { class: 'where' }, 'في جلسة على ', h('span', { class: 'ltr', text: p.folder })), h('div', { class: 'actions' }, cmdBtn(p.resume))); })),
       ));
     }
   }

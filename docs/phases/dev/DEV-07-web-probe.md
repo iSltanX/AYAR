@@ -13,7 +13,7 @@ owner_inputs: []
 model: Claude Opus 5.5
 effort: xhigh
 model_reason: متصفح ومصفوفة لقطات وإتاحة: تكامل واسع بعد أن حسمت E-11 الغموض
-scope: [packages/probe/, packages/engine/, packages/catalog/, packages/protocol/, packages/i18n/, apps/desktop/main/, fixtures/, docs/dependencies.md]
+scope: [packages/probe/, packages/engine/, packages/catalog/, packages/protocol/, packages/i18n/, apps/desktop/main/, fixtures/, pnpm-lock.yaml, package-lock.json]
 goal: فحوص التصميم والإتاحة والاتجاه والحالات والإضافات والأداء على صفحات تُعرض فعلًا في Chromium الخاص بـ Playwright، بمراجع معلنة وصور مرجعية لا تُعتمد إلا صراحة.
 start:
   - DEV-6 مغلقة
