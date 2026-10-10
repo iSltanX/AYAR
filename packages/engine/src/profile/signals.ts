@@ -93,6 +93,7 @@ export function computeRefs(facts: readonly Fact[], declared: ProfileReferences)
     baselines: d('baselines'),
     recoveryCommand: d('recoveryCommand'),
     reviewScope: d('reviewScope'),
+    outputs: d('outputs'),
   };
 }
 

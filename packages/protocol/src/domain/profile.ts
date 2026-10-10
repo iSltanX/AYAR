@@ -19,7 +19,8 @@ export const ProfileContext = z.strictObject({
 });
 export type ProfileContext = z.infer<typeof ProfileContext>;
 
-export const REFERENCE_KINDS = ['tokens', 'fonts', 'renderTarget', 'states', 'budgets', 'permissionsPolicy', 'baselines', 'recoveryCommand', 'reviewScope'] as const;
+/** `outputs` (protocol 1.2, DEV-5): paths the project's checks are allowed to write (FR-36: declared outputs are set apart). */
+export const REFERENCE_KINDS = ['tokens', 'fonts', 'renderTarget', 'states', 'budgets', 'permissionsPolicy', 'baselines', 'recoveryCommand', 'reviewScope', 'outputs'] as const;
 export const ReferenceKindSchema = z.enum(REFERENCE_KINDS);
 export type ReferenceKindName = (typeof REFERENCE_KINDS)[number];
 /** References the user writes (paths inside the project, lists, budgets); each check reads its own (DEV-6, DEV-7). */
@@ -31,6 +32,42 @@ export const Argv = z.array(z.string().max(4096).refine((a) => !a.includes('\0')
 /** Explicit, non-secret variables of a check (C-07 point 5): a sensitive name is refused at validation. */
 export const EnvName = z.string().regex(/^[A-Za-z_][A-Za-z0-9_]*$/).max(128);
 
+/** A companion service's name in the profile (FR-21). */
+export const ServiceName = z.string().regex(/^[a-z][a-z0-9-]{0,39}$/);
+/** Only this machine: a readiness request never leaves it (15.3, C-14). */
+const LOOPBACK = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d{1,5})?(\/|$)/;
+
+/**
+ * FR-21, C-12 point 10 (protocol 1.2, DEV-5): a companion service the profile declares (a development server, a
+ * test database). It is a project command: approved with every instance that uses it (its argv is part of their
+ * spec), refused in «مشروع غير موثوق». It is started before its dependants, ready when its URL on this machine
+ * answers or its log matches the pattern within the timeout, and stopped after them.
+ */
+export const ServiceDecl = z
+  .strictObject({
+    argv: Argv,
+    cwd: RelPath,
+    readyUrl: z.string().max(2048).regex(LOOPBACK, 'a readiness URL on this machine').nullable(),
+    readyPattern: z.string().min(1).max(512).nullable(),
+    readyTimeoutSec: z.int().min(1).max(600),
+    /** Ports it listens on: a lock each (C-10 point 7, `port:<n>`). */
+    ports: z.array(z.int().min(1).max(65535)).max(8),
+  })
+  .refine((s) => s.readyUrl !== null || s.readyPattern !== null, 'a service needs a readiness URL or a log pattern');
+export type ServiceDecl = z.infer<typeof ServiceDecl>;
+
+/** A service as an instance's spec carries it: the declaration with its name. */
+export const CompanionService = z.strictObject({
+  id: ServiceName,
+  argv: Argv,
+  cwd: RelPath,
+  readyUrl: z.string().nullable(),
+  readyPattern: z.string().nullable(),
+  readyTimeoutSec: z.int().min(1).max(600),
+  ports: z.array(z.int().min(1).max(65535)),
+});
+export type CompanionService = z.infer<typeof CompanionService>;
+
 export const CheckOverride = z.strictObject({
   enabled: z.boolean().optional(),
   required: z.boolean().optional(),
@@ -39,6 +76,8 @@ export const CheckOverride = z.strictObject({
   argv: Argv.optional(),
   cwd: RelPath.optional(),
   timeoutMin: z.int().min(1).max(24 * 60).optional(),
+  /** FR-24: the optional idle timeout, in seconds (no output and no processor activity); protocol 1.2. */
+  idleTimeoutSec: z.int().min(10).max(24 * 3600).nullable().optional(),
   warningsPolicy: z.enum(['ignore', 'warn', 'fail']).optional(),
   flakyPolicy: z.enum(['flaky', 'fail']).optional(),
   thresholds: JsonObject.optional(),
@@ -47,6 +86,8 @@ export const CheckOverride = z.strictObject({
   explicitEnv: z.record(EnvName, z.string().max(4096)).optional(),
   /** An explicit tool path (a matching version from a version manager, C-07 point 3): enters the approval. */
   toolPath: AbsolutePath.nullable().optional(),
+  /** FR-21 (protocol 1.2): the profile's companion services this instance needs, by name. */
+  services: z.array(ServiceName).max(8).optional(),
 });
 export type CheckOverride = z.infer<typeof CheckOverride>;
 
@@ -75,6 +116,8 @@ export const ProfilePatch = z.strictObject({
   references: z.partialRecord(ReferenceKindSchema, JsonValue.nullable()).optional(),
   checks: z.record(InstanceKey, CheckOverride.nullable()).optional(),
   custom: z.record(CustomName, CustomCheck.nullable()).optional(),
+  /** FR-21 (protocol 1.2): companion services; null removes one. */
+  services: z.record(ServiceName, ServiceDecl.nullable()).optional(),
 });
 export type ProfilePatch = z.infer<typeof ProfilePatch>;
 
@@ -148,6 +191,10 @@ export const CheckSpec = z.strictObject({
   /** custom.<name>: its success criterion, part of the spec. */
   customSuccess: JsonValue.nullable(),
   timeoutMin: z.int().positive(),
+  /** FR-24: the idle timeout in seconds, or null (none); protocol 1.2. */
+  idleTimeoutSec: z.int().positive().nullable(),
+  /** FR-21 (protocol 1.2): the companion services it needs, resolved from the profile (part of the spec). */
+  services: z.array(CompanionService),
   resourceClass: z.string(),
   warningsPolicy: z.enum(['ignore', 'warn', 'fail']),
   flakyPolicy: z.enum(['flaky', 'fail']),
@@ -192,6 +239,8 @@ export const ProfileView = z.strictObject({
   context: ProfileContext,
   references: ProfileReferences,
   custom: z.record(z.string(), CustomCheck),
+  /** FR-21 (protocol 1.2): the declared companion services. */
+  services: z.record(z.string(), ServiceDecl),
   checks: z.array(CheckSpec),
   pending: ChangeSet,
   approvals: z.array(z.strictObject({ instance: InstanceKey, specHash: z.string(), approvedAt: IsoTimestamp, profileVersion: z.int().positive() })),
@@ -210,6 +259,8 @@ export const ExportedProfile = z.strictObject({
   references: ProfileReferences,
   checks: z.record(InstanceKey, ExportedCheck),
   custom: z.record(CustomName, CustomCheck),
+  /** FR-21 (protocol 1.2): optional, so a file exported before 1.2 still imports. */
+  services: z.record(ServiceName, ServiceDecl).optional(),
 });
 export type ExportedProfile = z.infer<typeof ExportedProfile>;
 

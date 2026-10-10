@@ -5,7 +5,7 @@
 // included check, while a check conditional on that reference stays optional); dangers (FR-56); and the
 // specHash, computed from discovery and profile data alone (D-08), so it exists before anything runs.
 import type { Catalog, CheckDefinition, ReferenceKind } from '@ayar/catalog';
-import type { CheckOverride, CheckSpec, CustomCheck, DiscoveryComponent, Fact, JsonValue, MissingRequirement, ProfileContext, ProfileReferences, Reason } from '@ayar/protocol';
+import type { CheckOverride, CheckSpec, CompanionService, CustomCheck, DiscoveryComponent, Fact, JsonValue, MissingRequirement, ProfileContext, ProfileReferences, Reason, ServiceDecl } from '@ayar/protocol';
 import { canonicalJson } from '@ayar/catalog';
 import { commandScript, proposeCommand, scriptNameOf, scriptsOfFacts } from './commands.ts';
 import { argvText, compilePolicy, judgeCommand, type CompiledPolicy } from './policy.ts';
@@ -17,6 +17,8 @@ export interface ProfileSettings {
   references: ProfileReferences;
   overrides: Record<string, CheckOverride>;
   custom: Record<string, CustomCheck>;
+  /** FR-21 (protocol 1.2): companion services by name; instances name the ones they need. */
+  services: Record<string, ServiceDecl>;
   /** FR-55 (G-20): the «مشروع غير موثوق» flag, owned here (C-09) and enforced by C-10 and C-12 (DEV-5). Local only. */
   untrusted: boolean;
 }
@@ -24,7 +26,7 @@ export interface ProfileSettings {
 export const EMPTY_CONTEXT: ProfileContext = { audience: null, worstConsequence: null, persistentData: null, permissions: null, stage: null, uiLanguages: null };
 
 export function emptySettings(): ProfileSettings {
-  return { schema: 'ayar-profile/1', context: { ...EMPTY_CONTEXT }, references: {}, overrides: {}, custom: {}, untrusted: false };
+  return { schema: 'ayar-profile/1', context: { ...EMPTY_CONTEXT }, references: {}, overrides: {}, custom: {}, services: {}, untrusted: false };
 }
 
 export interface ProposalInput {
@@ -85,6 +87,9 @@ export function specMaterial(spec: Omit<CheckSpec, 'specHash' | 'reasons'>): unk
     references: spec.referenceValues,
     custom: spec.customSuccess,
     timeoutMin: spec.timeoutMin,
+    // Added in protocol 1.2: only when set, so the specs of 1.1 keep their hashes (and their approvals).
+    ...(spec.idleTimeoutSec !== null ? { idleTimeoutSec: spec.idleTimeoutSec } : {}),
+    ...(spec.services.length ? { services: spec.services } : {}),
     thresholds: spec.thresholds,
     sideEffects: spec.sideEffects,
     network: spec.network,
@@ -231,10 +236,21 @@ function specFor(
     }
   }
 
-  // FR-56: judged on the command line and, for a script, its literal text with its pre/post scripts.
-  const verdict = command
-    ? judgeCommand(policy, [argvText(command.argv), ...command.argv, command.script?.text, command.script?.pre, command.script?.post, ...(command.script?.referenced.map((r) => r.text) ?? [])])
-    : { refused: [], danger: [] };
+  // FR-21: the companion services this instance needs, resolved by name (an unknown name is refused at validation).
+  const services: CompanionService[] = applicable
+    ? [...new Set(override?.services ?? [])].sort().flatMap((id) => {
+        const d = input.settings.services[id];
+        return d ? [{ id, argv: [...d.argv], cwd: d.cwd, readyUrl: d.readyUrl, readyPattern: d.readyPattern, readyTimeoutSec: d.readyTimeoutSec, ports: [...d.ports] }] : [];
+      })
+    : [];
+
+  // FR-56: judged on the command line and, for a script, its literal text with its pre/post scripts, and on the
+  // commands of its companion services (project commands too).
+  const judged = [
+    ...(command ? [argvText(command.argv), ...command.argv, command.script?.text, command.script?.pre, command.script?.post, ...(command.script?.referenced.map((r) => r.text) ?? [])] : []),
+    ...services.flatMap((s) => [argvText(s.argv), ...s.argv]),
+  ];
+  const verdict = judged.length ? judgeCommand(policy, judged) : { refused: [], danger: [] };
 
   const custom = customEntry?.custom ?? null;
   const base: Omit<CheckSpec, 'specHash' | 'reasons'> = {
@@ -258,6 +274,8 @@ function specFor(
     referenceValues: Object.fromEntries(usedRefs.map((k) => [k, (referenceValue(k, input.settings.references, facts) ?? null) as JsonValue])),
     customSuccess: custom ? (custom.success) : null,
     timeoutMin: override?.timeoutMin ?? custom?.timeoutMin ?? input.catalog.timeoutMinutes(def),
+    idleTimeoutSec: override?.idleTimeoutSec ?? null,
+    services,
     resourceClass: def.resourceClass,
     warningsPolicy: override?.warningsPolicy ?? 'warn',
     flakyPolicy: override?.flakyPolicy ?? 'flaky',

@@ -115,10 +115,30 @@ describe('gateway: path tokens (D-29: the UI never sends a path)', () => {
   });
 });
 
+/** A setup.execute result that keeps the contract of protocol 1.2 (SetupExecuteResult). */
+const SETUP_DONE = {
+  action: {
+    id: 'act-1',
+    projectId: 'p1',
+    kind: 'install_dependencies',
+    instances: [],
+    title: { key: 'setup.action.installDependencies' },
+    target: { tool: 'npm', version: null, requiredSpec: null, ecosystem: 'npm', component: '.' },
+    preview: { command: ['npm', 'ci'], cwd: '.', network: { host: 'registry.npmjs.org', url: 'https://registry.npmjs.org/' }, sizeBytes: null, writes: [{ location: 'project', path: 'node_modules' }], runsScripts: true, warnings: [] },
+    state: 'done',
+    resultReasons: [],
+    confirmedAt: null,
+    finishedAt: null,
+  },
+  readiness: [],
+  log: null,
+  install: null,
+};
+
 describe('gateway: confirmations', () => {
   it('binds a preview to a single-use token for exactly that action and digest', async () => {
     const { gw, calls } = setup({
-      engine: (c) => (c.command === 'setup.preview' ? { ok: true, result: { target: 'act-1', digest: 'sha256:abc', preview: { writes: ['node_modules'] } } } : { ok: true, result: { done: true } }),
+      engine: (c) => (c.command === 'setup.preview' ? { ok: true, result: { target: 'act-1', digest: 'sha256:abc', preview: { writes: ['node_modules'] } } } : { ok: true, result: SETUP_DONE }),
     });
     const preview = ok(await gw.invoke({ command: 'setup.preview', payload: { actionId: 'act-1' } })) as { confirmationToken: string };
     expect(preview).toMatchObject({ target: 'act-1', digest: 'sha256:abc', confirmationToken: expect.stringMatching(/^cfm_/) as unknown });

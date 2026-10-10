@@ -2,11 +2,11 @@
 // and the translated menus.
 import { ERROR_CODES } from '@ayar/protocol';
 import { MESSAGES } from '@ayar/i18n';
-import { mkdtempSync, realpathSync, writeFileSync, mkdirSync } from 'node:fs';
+import { mkdtempSync, realpathSync, rmSync, writeFileSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import fc from 'fast-check';
-import { describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it } from 'vitest';
 import { resolveAppFile, serveAppRequest } from '../src/main/app-protocol.ts';
 import { menuTemplate } from '../src/main/menu.ts';
 import { CSP, isTrustedSender, SECURE_WEB_PREFERENCES } from '../src/main/security.ts';
@@ -43,6 +43,8 @@ describe('app protocol (15.2 «المحتوى»)', () => {
   mkdirSync(join(root, 'assets'));
   writeFileSync(join(root, 'index.html'), '<!doctype html>');
   writeFileSync(join(root, 'assets', 'a.js'), '');
+  // G-WAVE2-01: the folder goes with the tests, so `npm test` leaves nothing in $TMPDIR.
+  afterAll(() => rmSync(root, { recursive: true, force: true }));
 
   it.each([
     ['app://ayar/index.html', join(root, 'index.html')],

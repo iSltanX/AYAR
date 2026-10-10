@@ -31,6 +31,18 @@ export const ERROR_CODES = [
   'profile_invalid',
   'stale_change_set',
   'preview_required',
+  // DEV-5 (protocol 1.2): plans, runs, setup and managed tools.
+  /** The selection cannot be planned: a required check excluded, an unknown instance, nothing applicable. */
+  'plan_invalid',
+  /** The plan was frozen by a run, or the profile changed since it was built: plan again. */
+  'plan_stale',
+  /** FR-55: a project command in «مشروع غير موثوق». */
+  'untrusted_project',
+  /** A downloaded tool failed its hash or signature check: deleted, with a security alert (C-11, T6). */
+  'tool_rejected',
+  'network_failed',
+  'setup_failed',
+  'disk_full',
 ] as const;
 
 export const ErrorCode = z.enum(ERROR_CODES);

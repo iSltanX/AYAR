@@ -45,6 +45,8 @@
 | `run.cancel` | C-12 | engine | renderer | — | DEV-5 |
 | `run.rerun` | C-10 | engine | renderer | — | DEV-5 |
 | `run.continueRound` | C-10 | engine | renderer | — | DEV-5 |
+| `runs.list` | C-17 | engine | renderer | — | DEV-5 |
+| `run.get` | C-17 | engine | renderer | — | DEV-5 |
 | `runs.keep` | C-17 | engine | renderer | — | DEV-5 |
 | `runs.delete` | C-17 | engine | renderer | confirmation | DEV-5 |
 | `groups.save` | C-10 | engine | renderer | — | DEV-5 |
@@ -84,6 +86,8 @@
 | `engine.restart` | C-01 | main | renderer | — | DEV-3 |
 | `internal.clipboardText` | C-21 | engine | host | — | DEV-9 |
 | `internal.recordCopy` | C-17 | engine | host | — | DEV-9 |
+| `internal.evidencePath` | C-17 | engine | host | — | DEV-5 |
+| `internal.prepareQuit` | C-12 | engine | host | — | DEV-5 |
 
 ## ملكية الأحداث
 
@@ -101,6 +105,7 @@
 | `finding.provisional` | C-15 | DEV-6 |
 | `finding.final` | C-16 | DEV-6 |
 | `engine.health` | C-04 | DEV-3 |
+| `setup.progress` | C-11 | DEV-5 |
 
 ## اتحاد مصفوفة الواجهات (G-18)
 

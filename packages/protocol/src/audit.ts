@@ -14,6 +14,21 @@ export const AUDIT_ACTIONS = [
   'profile.approved',
   'profile.exported',
   'profile.imported',
+  // DEV-5 (protocol 1.2): setup actions (FR-17 «يُسجَّل في التدقيق»), managed tools (FR-50), runs and groups.
+  'setup.confirmed',
+  'setup.executed',
+  'setup.failed',
+  'tool.installed',
+  'tool.installRejected',
+  'tool.verified',
+  'tool.removed',
+  'tool.versionAccepted',
+  'run.started',
+  'run.cancelled',
+  'run.kept',
+  'run.deleted',
+  'group.saved',
+  'group.deleted',
 ] as const;
 export const AuditAction = z.enum(AUDIT_ACTIONS);
 export type AuditAction = z.infer<typeof AuditAction>;

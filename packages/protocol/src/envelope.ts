@@ -97,8 +97,31 @@ function invalid(code: 'invalid_message' | 'invalid_payload' | 'unknown_command'
 
 const kindOf = (raw: unknown): unknown => (typeof raw === 'object' && raw !== null ? (raw as { kind?: unknown }).kind : undefined);
 
+/**
+ * G-DEV4-02: the deepest nesting a message may have before any schema touches it. Validation of a recursive
+ * field (z.json()) walks the value; a payload nested far deeper than any contract needs would exhaust the stack
+ * of the engine, and a crashed engine restarts (C-04). The bound is checked iteratively, so it cannot.
+ */
+export const MAX_MESSAGE_DEPTH = 64;
+
+/** The nesting depth of a JSON-like value, iteratively; stops early once `limit` is passed. */
+export function messageDepth(value: unknown, limit = MAX_MESSAGE_DEPTH): number {
+  let max = 0;
+  const stack: [unknown, number][] = [[value, 1]];
+  while (stack.length) {
+    const [v, d] = stack.pop()!;
+    if (v === null || typeof v !== 'object') continue;
+    if (d > max) max = d;
+    if (max > limit) return max;
+    const children = Array.isArray(v) ? v : Object.values(v as Record<string, unknown>);
+    for (const x of children) stack.push([x, d + 1]);
+  }
+  return max;
+}
+
 /** Validates a command's payload against the registry. */
 export function parseCommandPayload(command: CommandName, payload: unknown): { ok: true; payload: unknown } | { ok: false; error: ProtocolError } {
+  if (messageDepth(payload) > MAX_MESSAGE_DEPTH) return { ok: false, error: protocolError('invalid_payload', { command, reason: 'too_deep', limit: MAX_MESSAGE_DEPTH }) };
   const r = COMMANDS[command].payload.safeParse(payload);
   if (!r.success) return { ok: false, error: protocolError('invalid_payload', { command, issues: describeIssues(r.error) }) };
   return { ok: true, payload: r.data };
@@ -106,6 +129,13 @@ export function parseCommandPayload(command: CommandName, payload: unknown): { o
 
 /** Engine side: validates what a host sent. A command's id is reported even when the rest is invalid. */
 export function parseHostMessage(raw: unknown): Parsed<HostMessage> & { id?: number } {
+  // The envelope itself is shallow; a message nested deeper than the limit is refused before any schema walks it.
+  // A command's payload is measured on its own by parseCommandPayload, so its error names the payload.
+  const envelope = kindOf(raw) === 'command' && !Array.isArray(raw) ? { ...(raw as Record<string, unknown>), payload: null } : raw;
+  if (messageDepth(envelope, MAX_MESSAGE_DEPTH + 2) > MAX_MESSAGE_DEPTH + 2) {
+    const id = typeof raw === 'object' && raw !== null && typeof (raw as { id?: unknown }).id === 'number' ? (raw as { id: number }).id : undefined;
+    return { ...invalid('invalid_message', { reason: 'too_deep', limit: MAX_MESSAGE_DEPTH }), ...(id !== undefined ? { id } : {}) };
+  }
   switch (kindOf(raw)) {
     case 'hello': {
       const r = Hello.safeParse(raw);

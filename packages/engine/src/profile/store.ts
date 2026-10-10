@@ -42,11 +42,16 @@ interface DbProfile {
   created_at: string;
 }
 
+/** A version saved before protocol 1.2 lacks the fields 1.2 added to the specs: they read as unset. */
+function upgrade(content: ProfileContent): ProfileContent {
+  return { ...content, services: content.services ?? {}, checks: content.checks.map((c) => ({ ...c, idleTimeoutSec: c.idleTimeoutSec ?? null, services: c.services ?? [] })) };
+}
+
 const toRow = (r: DbProfile): ProfileRow => ({
   id: r.id,
   projectId: r.project_id,
   version: r.version,
-  content: JSON.parse(r.content_json) as ProfileContent,
+  content: upgrade(JSON.parse(r.content_json) as ProfileContent),
   contentHash: r.content_hash,
   source: r.source,
   createdAt: r.created_at,
@@ -121,6 +126,8 @@ const DIFF_FIELDS: [string, (s: CheckSpec) => unknown][] = [
   ['referenceValues', (s) => s.referenceValues],
   ['customSuccess', (s) => s.customSuccess],
   ['timeoutMin', (s) => s.timeoutMin],
+  ['idleTimeoutSec', (s) => s.idleTimeoutSec ?? null],
+  ['services', (s) => (s.services?.length ? s.services : null)],
   ['thresholds', (s) => s.thresholds],
   ['sideEffects', (s) => s.sideEffects],
   ['network', (s) => s.network],

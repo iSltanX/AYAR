@@ -1,23 +1,30 @@
-// Run and check events (C-12). The state vocabularies of 7.5 are fixed with RunPlan in DEV-5 (minor version).
+// Run and check events (C-12). The state vocabularies of 7.5 are fixed with RunPlan in protocol 1.2 (DEV-5,
+// G-DEV3-04); run.state carries the run view, check.state the check execution view, so the UI never guesses.
 import { Id, IsoTimestamp } from '../common.ts';
+import { CheckRunView, RunView } from '../domain/runs.ts';
 import { z } from '../zod.ts';
 import { defineEvent } from './define.ts';
 
 const base = { owner: 'C-12', since: '1.0', implementedIn: 'DEV-5' } as const;
 
 export const runEvents = {
-  'run.state': defineEvent({ ...base, payload: z.looseObject({ runId: Id, state: z.string().min(1) }) }),
-  'check.state': defineEvent({ ...base, payload: z.looseObject({ runId: Id, checkRunId: Id, state: z.string().min(1) }) }),
+  'run.state': defineEvent({ ...base, payload: RunView }),
+  'check.state': defineEvent({ ...base, payload: CheckRunView }),
   // 6.5: the step, the total when known, the last activity and the processor.
   'check.progress': defineEvent({
     ...base,
-    payload: z.looseObject({
+    payload: z.strictObject({
       runId: Id,
       checkRunId: Id,
       step: z.int().nonnegative(),
       total: z.int().nonnegative().nullable(),
       lastActivityAt: IsoTimestamp,
+      /** CPU of the process group as a percentage («المعالج نشط 85%»), or null before the first sample. */
       processor: z.string().nullable(),
+      /** Milliseconds since the last output line (9.6 point 6: «لا خرج منذ 2:10»). */
+      silentMs: z.int().nonnegative(),
+      /** 9.6 point 5: what could be counted from the output so far (lines of output in DEV-5; adapters refine it). */
+      linesSeen: z.int().nonnegative(),
     }),
   }),
   // References to log segments, rate-limited by the engine's event bus (C-04 aggregation).

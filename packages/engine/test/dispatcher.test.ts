@@ -39,7 +39,21 @@ describe('dispatcher', () => {
   });
 
   it('refuses setup.execute without a valid confirmation grant (C-04)', async () => {
-    const d = make({ 'setup.execute': () => ({ done: true }) });
+    // A result that keeps the contract of protocol 1.2 (SetupExecuteResult), so only the grant decides.
+    const action = {
+      id: 'a1',
+      projectId: 'p1',
+      kind: 'install_tool',
+      instances: [],
+      title: { key: 'setup.action.installTool' },
+      target: { tool: 'x', version: '1.0.0', requiredSpec: null, ecosystem: null, component: null },
+      preview: { command: null, cwd: null, network: null, sizeBytes: null, writes: [], runsScripts: null, warnings: [] },
+      state: 'done',
+      resultReasons: [],
+      confirmedAt: null,
+      finishedAt: null,
+    };
+    const d = make({ 'setup.execute': () => ({ action, readiness: [], log: null, install: null }) });
     const payload = { actionId: 'a1', confirmationToken: token };
     expect((await d.dispatch(cmd('setup.execute', payload))).response).toMatchObject({ ok: false, error: { code: 'grant_missing' } });
     const wrong = { confirmationToken: { kind: 'confirmation', command: 'setup.execute', target: 'a2', digest: 'd' } };

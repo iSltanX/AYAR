@@ -40,6 +40,19 @@ export const SETTINGS = {
   'discovery.maxDepth': { schema: z.int().min(1).max(64), default: 12 },
   'discovery.maxEntries': { schema: z.int().min(1000).max(1_000_000), default: 100_000 },
   'discovery.maxConfigBytes': { schema: z.int().min(1024).max(64 * 1024 * 1024), default: 2 * 1024 * 1024 },
+  // DEV-5 (protocol 1.2): the executor (C-12) and the evidence store (C-17).
+  /** FR-26: ask the main process to prevent system sleep while a run is active. */
+  'run.preventSleep': { schema: z.boolean(), default: true },
+  /** C-12 point 1: how many light and medium checks run at once (heavy and very heavy run alone, G-34). */
+  'run.parallel': { schema: z.int().min(1).max(4), default: 2 },
+  /** C-12 point 2: snapshot the project around every check to record its side effects (FR-36). */
+  'run.sideEffects': { schema: z.boolean(), default: true },
+  /** 10.2 rule 5: checks that need the network run only when it is allowed; otherwise «ناقص: يحتاج شبكة». */
+  'run.allowNetwork': { schema: z.boolean(), default: false },
+  /** C-17 «الاحتفاظ»: runs kept per project besides the pinned ones and what rounds need (E-19 calibrates it). */
+  'evidence.retainRuns': { schema: z.int().min(1).max(500), default: 20 },
+  /** C-17 «خصوصية»: keep the text of project files in the content store for diffs; off keeps hashes only. */
+  'evidence.storeContent': { schema: z.boolean(), default: true },
 } as const;
 
 export type SettingKey = keyof typeof SETTINGS;
@@ -59,6 +72,12 @@ export const SettingValuesSchema = z.strictObject({
   'discovery.maxDepth': SETTINGS['discovery.maxDepth'].schema,
   'discovery.maxEntries': SETTINGS['discovery.maxEntries'].schema,
   'discovery.maxConfigBytes': SETTINGS['discovery.maxConfigBytes'].schema,
+  'run.preventSleep': SETTINGS['run.preventSleep'].schema,
+  'run.parallel': SETTINGS['run.parallel'].schema,
+  'run.sideEffects': SETTINGS['run.sideEffects'].schema,
+  'run.allowNetwork': SETTINGS['run.allowNetwork'].schema,
+  'evidence.retainRuns': SETTINGS['evidence.retainRuns'].schema,
+  'evidence.storeContent': SETTINGS['evidence.storeContent'].schema,
 });
 
 export const SettingEntry = z.discriminatedUnion('key', [
@@ -71,6 +90,12 @@ export const SettingEntry = z.discriminatedUnion('key', [
   z.strictObject({ key: z.literal('discovery.maxDepth'), value: SETTINGS['discovery.maxDepth'].schema }),
   z.strictObject({ key: z.literal('discovery.maxEntries'), value: SETTINGS['discovery.maxEntries'].schema }),
   z.strictObject({ key: z.literal('discovery.maxConfigBytes'), value: SETTINGS['discovery.maxConfigBytes'].schema }),
+  z.strictObject({ key: z.literal('run.preventSleep'), value: SETTINGS['run.preventSleep'].schema }),
+  z.strictObject({ key: z.literal('run.parallel'), value: SETTINGS['run.parallel'].schema }),
+  z.strictObject({ key: z.literal('run.sideEffects'), value: SETTINGS['run.sideEffects'].schema }),
+  z.strictObject({ key: z.literal('run.allowNetwork'), value: SETTINGS['run.allowNetwork'].schema }),
+  z.strictObject({ key: z.literal('evidence.retainRuns'), value: SETTINGS['evidence.retainRuns'].schema }),
+  z.strictObject({ key: z.literal('evidence.storeContent'), value: SETTINGS['evidence.storeContent'].schema }),
 ]);
 export type SettingEntry = z.infer<typeof SettingEntry>;
 
@@ -85,6 +110,12 @@ export function settingDefaults(): SettingValues {
     'discovery.maxDepth': SETTINGS['discovery.maxDepth'].default,
     'discovery.maxEntries': SETTINGS['discovery.maxEntries'].default,
     'discovery.maxConfigBytes': SETTINGS['discovery.maxConfigBytes'].default,
+    'run.preventSleep': SETTINGS['run.preventSleep'].default,
+    'run.parallel': SETTINGS['run.parallel'].default,
+    'run.sideEffects': SETTINGS['run.sideEffects'].default,
+    'run.allowNetwork': SETTINGS['run.allowNetwork'].default,
+    'evidence.retainRuns': SETTINGS['evidence.retainRuns'].default,
+    'evidence.storeContent': SETTINGS['evidence.storeContent'].default,
   };
 }
 

@@ -25,5 +25,12 @@
   "errors.not_a_directory": "The selected path is not a folder.",
   "errors.profile_invalid": "The standards profile was rejected because it breaks a rule; the current profile is unchanged.",
   "errors.stale_change_set": "What needs approval changed since it was shown. Review the updated differences, then approve.",
-  "errors.preview_required": "The file is not written before you preview the differences. Show the preview, then export."
+  "errors.preview_required": "The file is not written before you preview the differences. Show the preview, then export.",
+  "errors.plan_invalid": "The plan cannot be built from this selection ({reason}).",
+  "errors.plan_stale": "The standards profile changed, or a run already started from this plan. Plan again.",
+  "errors.untrusted_project": "The project is in “untrusted” mode, so its commands do not run.",
+  "errors.tool_rejected": "The downloaded tool was rejected: its hash or signature does not match the one pinned in AYAR, and the file was deleted.",
+  "errors.network_failed": "The network could not be reached. Try again by hand.",
+  "errors.setup_failed": "The setup could not be completed. Its log has the details.",
+  "errors.disk_full": "The disk is full, so work stopped safely."
 }
