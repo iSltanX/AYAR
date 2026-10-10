@@ -4,7 +4,7 @@ track: dev
 number: 1
 stage: verification
 title: مشاريع الاختبار ذات العيوب المزروعة
-status: delivered
+status: closed
 status_date: 2026-10-10
 depends_on: []
 design_gates: []
@@ -23,7 +23,7 @@ outputs:
   - مولّد FX-MALICIOUS خارج المستودع
   - مشاريع المحولات ومساعدات AT-26 وAT-35 وAT-36
   - مخطط fixture-expect/1 ومدقق له
-closing_commit:
+closing_commit: e24bb31
 ---
 
 # DEV-1 — مشاريع الاختبار ذات العيوب المزروعة
