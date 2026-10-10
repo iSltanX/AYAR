@@ -11,7 +11,7 @@
 | المواصفة | [docs/plan/AYAR-figma-prompt.md](../plan/AYAR-figma-prompt.md)، مع القرارين D-48 وD-49 |
 | المنفّذ | Claude عبر Figma MCP (انظر [CLAUDE.md](../../CLAUDE.md))، أو مصمم بشري يتسلم ملف المرحلة والبرومبت |
 
-## 2. الحالة الفعلية للملف (تحديث DES-2، 2026-10-10)
+## 2. الحالة الفعلية للملف (تحديث DES-3، 2026-10-10)
 
 **التدقيق الأولي (DES-1 المهمة 1، 2026-10-10، قراءة فقط):** طابق الملف ما سجله تدقيق 2026-10-09 حرفيًا: صفحتان فقط (`0:1` و`13:2`)، ولا متغيرات ولا أنماط. وعدد عقد الأرشيف 5336 (7 عقد عليا)، وعقد الهوية 420. وهذان الرقمان خط الأساس لفحص «لم يتغير».
 
@@ -22,12 +22,12 @@
 | 3 | `Foundations` | `49:1053` | `51:2` المقدمة، و`51:10` Primitives، و`52:2` Semantic، و`52:177` Status، و`53:2` جدول التباين، و`54:2` توفيق G-03، و`55:2` الطباعة، و`56:2` التخطيط والحركة | معتمدة (DES-1، 2026-10-10) |
 | 4 | `Status System` | `49:1054` | تسعة إطارات `S-00`…`S-08` من `74:668` إلى `84:4530`: العائلات الخمس، والنتائج الاثنتا عشرة، ودورة التنفيذ، والجاهزية، ووسوم الاكتشاف، وفحوص النموذج والحالات الأخرى، والحكم وبطاقة النقاء، ودائرة التدريج، وأدلة التمييز والتباين. وقسم المكتبة `84:7055` بتسع مجموعات مكوّنات (الجدول أدناه) | معتمدة (DES-2، 2026-10-10) |
 | 5 | `Icons` | `49:1055` | ستة إطارات `I-00`…`I-05` (`81:4` و`81:138` و`81:775` و`82:277` و`82:417` و`82:1200`): رموز الحالات، ومراجعة حجم 12، والبناء، وقواعد Lucide وأيقونات الوسوم، والانعكاس. وقسم المكتبة `84:7054`: مجموعة `Status symbol` `67:394` (51 متغيرًا)، وأيقونات الوسوم `68:4` (34)، ورموز الأحكام `68:182` (3)، وأمثلة Lucide العامة `68:196` (16) | معتمدة (DES-2، 2026-10-10) |
-| 6 | `Components` | `49:1056` | فارغة | DES-3 |
+| 6 | `Components` | `49:1056` | `C-00` نظرة عامة وفهرس واتفاقية التسمية، ثم إطارات `C-0B` و`C-01` إلى `C-29` (المكوّنات الرئيسية ولوحة «داكن» تحت كل إطار)، و`C-icons` أيقونات Lucide المضافة. المكتبة في الجدول أدناه | بانتظار اعتماد المالك (DES-3) |
 | 7 | `Screens — AR Light` | `49:1057` | فارغة | DES-4 وDES-5 |
 | 8 | `Screens — AR Dark` | `49:1058` | فارغة | DES-4 وDES-5 |
 | 9 | `Screens — EN Light` | `49:1059` | فارغة | DES-4 وDES-5 |
 | 10 | `Flows` | `49:1060` | فارغة | DES-5 |
-| 11 | `Guidelines` | `49:1061` | فارغة | DES-5 |
+| 11 | `Guidelines` | `49:1061` | `G-00` (`118:16695`): مسودة اتفاقية تسمية المكونات من DES-3، وتكمل DES-5 الصفحة | DES-5 |
 | 12 | `ARCHIVE — Explorations` | `0:1` | ثلاثة اتجاهات أولية (REFERENCE وEVIDENCE وVERIFICATION) لكل منها 10 إطارات من المفهوم إلى التطبيقات، ثم التقييم والمقارنة والاختيار، ثم أرشيف جلسات استكشاف النقّار. نُقلت الصفحة من أول القائمة إلى آخرها، ومحتواها لم يتغير (5336 عقدة) | **أرشيف لا يُمس** |
 
 **ما في الهوية المعتمدة** (من التدقيق، للإحالة):
@@ -65,6 +65,62 @@
 
 مصدر الفحوص: [DES-2/status-check.mjs](DES-2/status-check.mjs) يحسب ثنائيات DES-2 من `DES-1/tokens.json` ويطابقها مع قيم Figma ([figma-values.json](DES-2/figma-values.json))، ويكتب [checks.md](DES-2/checks.md). وفحص Figma الآلي في [figma-audit.json](DES-2/figma-audit.json)، وصور المراجعة ومحاكاة عمى الألوان في [DES-2/review/](DES-2/review/) و[DES-2/cvd/](DES-2/cvd/).
 
+**مكتبة DES-3 في الملف** (صفحة Components، 62 مجموعة مكوّنات و471 متغيرًا، كلها مربوطة بمتغيرات DES-1 وأنماطها، وتستخدم مكتبة DES-2 نسخًا متداخلة):
+
+| المكوّن (§9) | المجموعة | المعرّف | الخصائص | المتغيرات |
+|---|---|---|---|---|
+| أساس | `Button` | `98:310` | `Kind` (primary، secondary، quiet، destructive) × `State` × `Direction`؛ `Icon`، `Icon glyph` | 40 |
+| أساس | `Icon button` | `98:343` | `State`؛ `Icon glyph` (بلا Direction: تُبدَّل الأيقونة الاتجاهية عند الاستخدام) | 5 |
+| 1 | `Title bar` | `102:1666` | `Direction` × `Controls` (left، right) | 4 |
+| 1 | `Window frame` | `102:2570` | `Direction` × `Controls`؛ `Run bar`، `Inspector` | 4 |
+| 2 | `Sidebar` | `101:1355` | `Direction` | 2 |
+| 2 | `Nav item` | `101:885` | `State` (default، hover، pressed، focus، selected، disabled) × `Direction`؛ `Badge`، `Icon glyph` | 12 |
+| 2 | `Nav badge` | `101:783` | `Kind` (failures، missing) | 2 |
+| 2 | `Nav group header` | `101:893` | `Direction` | 2 |
+| 2 | `Project switcher` | `101:987` | `State` (default، hover، pressed، focus) × `Direction` | 8 |
+| 3 | `Run bar` | `102:1452` | `Status` (running، cancelling) × `Direction` | 4 |
+| 4، 5، 8 | مكتبة DES-2 | انظر جدولها أعلاه | — | — |
+| 6 | `Check row` | `104:4196` | `Status` (queued، running، final، running-expanded) × `State` (default، hover، selected، focus) × `Direction`؛ `Silence note` | 26 |
+| 7 | `Finding row` | `103:4015` | `State` × `Direction`؛ `Provisional` | 8 |
+| 9 | `Section card` | `106:3951` | `Variant` (default، integrity، model-checks) × `Direction` | 6 |
+| 10 | `Progress` | `106:4127` | `Kind` (count، percent، indeterminate) × `Direction`؛ `Estimate` | 6 |
+| 11 | `Path pill` | `108:5579` | `Content` (latin، arabic-folders) × `State` (default، hover، focus) × `Direction` | 12 |
+| 12 | `Command block` | `108:5868` | `State` × `Direction`؛ `Runs code`، `Writes`، `Network` | 6 |
+| 13 | `Log viewer` | `108:6245` | `Follow` (on، off) × `Direction` | 4 |
+| 14 | `Image diff viewer` | `109:6265` | `Mode` (side-by-side، overlay، slider) × `Direction` | 6 |
+| 15 | `Capture tile` | `109:6740` | `Variant` (default، sensitive) × `State` × `Direction` | 12 |
+| 16 | `Inspector` | `111:7922` | `Content` (check، check-reviewed، finding، finding-needs-model، log) × `Direction` | 10 |
+| 17 | `Table` · `Table header cell` · `Table group row` | `112:8213` · `112:7887` · `112:7977` | `Kind` × `Direction` · `State` (default، hover، sorted-asc، sorted-desc، focus) × `Direction` · `Expanded` × `State` × `Direction` | 2 · 10 · 12 |
+| 18 | `Search field` · `Text field` | `99:234` · `99:268` | `State` (default، hover، focus، filled، disabled) × `Direction` | 10 · 10 |
+| 18 | `Select` | `99:342` | `State` × `Direction` | 10 |
+| 18 | `Switch` | `99:428` | `On` × `State` (default، hover، focus، disabled) × `Direction`؛ `Label` | 16 |
+| 18 | `Checkbox` | `100:399` | `Checked` (false، true، mixed) × `State` × `Direction`؛ `Label` | 30 |
+| 18 | `Segment` · `Segmented control` | `100:453` · `100:483` | `Selected` × `State` × `Direction` · `Options` (2، 3) × `Direction` | 16 · 4 |
+| 18 | `Tab` · `Tabs` | `100:549` · `100:607` | `Selected` × `State` × `Direction` · `Kind` (inspector، results) × `Direction` | 12 · 4 |
+| 18 | `Argument editor` | `100:889` | `State` (default، focus) × `Direction` | 4 |
+| 19 | `Sheet/Setup preview` · `Sheet/Approval diff` · `Sheet/Export report` · `Sheet/Re-run` | `114:8794` · `114:8898` · `114:9070` · `114:9290` | `Direction`؛ والتصدير `Variant` (default، evidence-bundle)، والإعادة `Variant` (failed، incomplete) | 2 · 2 · 4 · 4 |
+| 19 | `Sheet/Save group` · `Sheet/Permission explanation` · `Sheet/Setup panel` · `Sheet/Scoring details` | `115:8941` · `115:8989` · `115:9207` · `115:9403` | `Direction` | 2 لكل منها |
+| 19 | `Sheet/Baseline approval` · `Sheet/Human review` · `Sheet/Cancel confirmation` | `116:9091` · `116:9241` · `116:9269` | `Direction`؛ والمراجعة `Variant` (check، model-claim) | 2 · 4 · 2 |
+| 19 | `Native alert/Destructive confirmation` | `116:9399` | `Kind` (remove-project، delete-runs، remove-tool، purge-data) × `Direction`: نصوص النافذة الأصلية (D-DEV3-15) | 8 |
+| 19 | `Radio` | `114:8652` | `Selected` × `State` (default، hover، focus، disabled) × `Direction` | 16 |
+| 20 | `Banner` · `Toast` | `117:9737` · `117:9781` | `Kind` × `Direction` | 4 · 6 |
+| 21 | `Empty state` | `113:8501` | `Kind` (projects، no-runs، no-cards، no-model-needs، no-matching-findings) × `Direction` | 10 |
+| 21 | `Term` · `Term tooltip` | `113:8529` · `113:8539` | `State` × `Direction` · `Direction` | 6 · 2 |
+| 21 | `Context menu` · `Menu item` · `Menu separator` | `113:8383` · `113:8290` · `113:8293` | `Kind` (check-row، finding-row) × `Direction` · `State` (default، highlighted، disabled) × `Direction`؛ `Shortcut` · مكوّن مفرد | 4 · 6 · 1 |
+| 22 | `Selection bar` | `112:8451` | `Kind` (checks، findings) × `Direction` | 4 |
+| 23 | `Run menu` | `113:8766` | `Direction` | 2 |
+| 24 | `Copy for model button` · `Copy for model bar` | `110:6568` · `110:6710` | `State` × `Direction` · `Context` (results، inspector، card-preview، instructions-preview) × `Direction`؛ `Tabs` | 10 · 8 |
+| 25 | `Next step card` | `110:6954` | `Kind` (handle-directly، needs-model، needs-model-inspector، needs-review، nothing-required) × `Direction` | 10 |
+| 26 | `Cost tag` | `103:2611` | `Cost` (local، network، model) × `Direction` | 6 |
+| 27 | `Model check need card` | `117:9922` | `Variant` (ready، missing-input) × `Direction` | 4 |
+| 28 | `Instructions preview` | `117:10063` | `Direction` | 2 |
+| 29 | `Model claim row` | `117:10396` | `Variant` (with-local-check، no-local-check، decided-card، decided-not-issue) × `State` (default، hover، focus) × `Direction` | 16 |
+| أيقونات | `Lucide/16/…` (49) و`Lucide/20/…` (4) | الإطار `97:4` | lucide-static 1.48.0، خط 1.5، بلون text/primary (currentColor) | 53 |
+
+**اتفاقية التسمية** (مسودة في `C-00` و`G-00`، وDEV-10 يولّد الشيفرة منها): اسم المجموعة بالإنجليزية بحرف أول كبير كما في DES-2، والعائلات بـ «/» (`Sheet/Setup preview`)، وفي الشيفرة PascalCase (`SheetSetupPreview`). `Direction=RTL|LTR` في كل مكوّن له نص أو اتجاه، ويأتي في الشيفرة من سمة `dir` لا من خاصية. `State=default|hover|pressed|focus|disabled` ومعها selected وfilled وhighlighted وsorted-asc وsorted-desc حيث تنطبق؛ وhover وpressed وfocus حالات CSS، وselected وdisabled خصائص. والخصائص الأخرى بأسماء PascalCase وقيم kebab صغيرة. والمنطقية بكلمات (`Icon`، `Label`، `Run bar`…)، والتبديل `Icon glyph`. وأسماء الطبقات kebab-case تقرؤها الشيفرة (`label`، `icon`، `status`، `copy-for-model`، `focus-ring`، `selected-bar`…)، والنص يُتجاوز باسم الطبقة بلا خصائص نص (D-DES2-10).
+
+مصدر الفحوص: [DES-3/component-check.mjs](DES-3/component-check.mjs) يحسب تباين الثنائيات المصدَّرة من Figma ([figma-pairs.json](DES-3/figma-pairs.json)) في الوضعين ويكتب [checks.md](DES-3/checks.md)، والتدقيق الآلي في [figma-audit.json](DES-3/figma-audit.json).
+
 ## 3. المراحل والاعتمادات
 
 | المرحلة | ما تنتجه | تفتح للتطوير | الحالة | تاريخ الاعتماد | ملاحظات المالك |
@@ -72,7 +128,7 @@
 | (قبل التنظيم) | الهوية: الرمز، والأيقونة، والتراكيب | — | معتمدة (D-48) | 2026-10-09 | «معتمد نقار الخشب» |
 | [DES-1](../phases/design/DES-1-foundations.md) | تنظيم الملف، وإكمال الهوية، والأسس | DEV-10 (مع DES-2 وDES-3) | معتمدة | 2026-10-10 | «معتمد، بجواب المالك للجلسة الرئيسية». دون تعديلات، بعد عرض اللقطات العشر النهائية ورابط Figma. وقرارات G-03 وmono والتباين حسمتها الجلسة الرئيسية بتفويض المالك (ORG-13) |
 | [DES-2](../phases/design/DES-2-status-icons.md) | نظام الحالات والرموز ودائرة العيار | DEV-10 (مع DES-1 وDES-3) | معتمدة | 2026-10-10 | «معتمد»: المالك صراحةً، عبر الجلسة الرئيسية، دون تعديلات، على الحالة عند `13e017b`، بعد عرض النقاط الأربع (زوج ناقص وغير منطبق بحجم 12، وخطوط «مبدئي»، وبطاقة «قديم»، وتعبئة «غير منطبق» في الفاتح) واللقطات S-01 وI-01 وI-02 وS-04 وS-06 وS-07. وقرارات D-DES2-02 و05 و06 أكدتها الجلسة الرئيسية بتفويض المالك (ORG-13) |
-| [DES-3](../phases/design/DES-3-components.md) | المكونات التسعة والعشرون | DEV-10 | لم تبدأ | — | — |
+| [DES-3](../phases/design/DES-3-components.md) | المكونات التسعة والعشرون | DEV-10 (مع DES-1 وDES-2) | بانتظار اعتماد المالك | — | — |
 | [DES-4](../phases/design/DES-4-core-screens.md) | الشاشات 1–8 | DEV-11 | لم تبدأ | — | — |
 | [DES-5](../phases/design/DES-5-remaining-screens-flows.md) | الشاشات 9–22، والرحلات، والإرشادات | DEV-12 | لم تبدأ | — | — |
 
@@ -134,3 +190,34 @@
 | DES-2 | `Icons` | Lucide وأيقونات الوسوم | `82:417` | `approved/DES-2/I-04-lucide.png` |
 | DES-2 | `Icons` | الانعكاس | `82:1200` | `approved/DES-2/I-05-mirroring.png` |
 | DES-2 | `Icons` | قسم المكتبة: `Status symbol` `67:394`، وأيقونات الوسوم `68:4`، ورموز الأحكام `68:182`، وأمثلة Lucide `68:196` | `84:7054` | `approved/DES-2/L-icons-library.png` |
+| DES-3 | `Components` | C-00 · نظرة عامة وفهرس واتفاقية التسمية | `118:10133` | `approved/DES-3/C-00-overview.png` |
+| DES-3 | `Components` | C-0B · عناصر التحكم الأساسية (الأزرار وزر الأيقونة) | `98:4` | `approved/DES-3/C-0B-base-controls.png` |
+| DES-3 | `Components` | C-01 · إطار النافذة والشريط العلوي | `102:1510` | `approved/DES-3/C-01-window-frame.png` |
+| DES-3 | `Components` | C-02 · الشريط الجانبي | `101:767` | `approved/DES-3/C-02-sidebar.png` |
+| DES-3 | `Components` | C-03 · شريط التشغيل | `102:1316` | `approved/DES-3/C-03-run-bar.png` |
+| DES-3 | `Components` | C-04 · C-05 · C-08 · مكوّنات الحالات من DES-2 كما تُستخدم | `107:3937` | `approved/DES-3/C-04-05-08-status-components.png` |
+| DES-3 | `Components` | C-06 · صف الفحص | `103:2672` | `approved/DES-3/C-06-check-row.png` |
+| DES-3 | `Components` | C-07 · صف الاكتشاف | `103:3805` | `approved/DES-3/C-07-finding-row.png` |
+| DES-3 | `Components` | C-09 · بطاقة القسم | `106:3659` | `approved/DES-3/C-09-section-card.png` |
+| DES-3 | `Components` | C-10 · التقدم | `106:4063` | `approved/DES-3/C-10-progress.png` |
+| DES-3 | `Components` | C-11 · حبة المسار | `108:5471` | `approved/DES-3/C-11-path-pill.png` |
+| DES-3 | `Components` | C-12 · كتلة الأمر | `108:5630` | `approved/DES-3/C-12-command-block.png` |
+| DES-3 | `Components` | C-13 · عارض السجل | `108:6031` | `approved/DES-3/C-13-log-viewer.png` |
+| DES-3 | `Components` | C-14 · عارض فروق الصور | `109:5955` | `approved/DES-3/C-14-image-diff-viewer.png` |
+| DES-3 | `Components` | C-15 · بلاطة اللقطة | `109:6412` | `approved/DES-3/C-15-capture-tile.png` |
+| DES-3 | `Components` | C-16 · المفتش | `111:6802` | `approved/DES-3/C-16-inspector.png` |
+| DES-3 | `Components` | C-17 · الجداول | `112:7799` | `approved/DES-3/C-17-tables.png` |
+| DES-3 | `Components` | C-18 · عناصر الإدخال | `99:144` | `approved/DES-3/C-18-inputs.png` |
+| DES-3 | `Components` | C-19 · النوافذ المنبثقة والتأكيد الأصلي | `114:8568` | `approved/DES-3/C-19-sheets.png` |
+| DES-3 | `Components` | C-20 · الأشرطة والرسائل | `117:9685` | `approved/DES-3/C-20-banners-toasts.png` |
+| DES-3 | `Components` | C-21 · الحالات الفارغة والتلميحات وقوائم السياق | `113:8252` | `approved/DES-3/C-21-empty-tooltips-menus.png` |
+| DES-3 | `Components` | C-22 · شريط التحديد | `112:8395` | `approved/DES-3/C-22-selection-bar.png` |
+| DES-3 | `Components` | C-23 · قائمة «شغّل» | `113:8662` | `approved/DES-3/C-23-run-menu.png` |
+| DES-3 | `Components` | C-24 · «لك» و«للنموذج» وزر النسخ الوحيد | `110:6488` | `approved/DES-3/C-24-copy-for-model.png` |
+| DES-3 | `Components` | C-25 · بطاقة «ماذا أفعل الآن» | `110:6810` | `approved/DES-3/C-25-next-step-card.png` |
+| DES-3 | `Components` | C-26 · وسم التكلفة | `103:2539` | `approved/DES-3/C-26-cost-tag.png` |
+| DES-3 | `Components` | C-27 · بطاقة احتياج فحص نموذج | `117:9822` | `approved/DES-3/C-27-model-check-need-card.png` |
+| DES-3 | `Components` | C-28 · معاينة ملف التعليمات | `117:9969` | `approved/DES-3/C-28-instructions-preview.png` |
+| DES-3 | `Components` | C-29 · صف ادعاء النموذج | `117:10108` | `approved/DES-3/C-29-model-claim-row.png` |
+| DES-3 | `Components` | C-icons · أيقونات Lucide المضافة | `97:4` | `approved/DES-3/C-icons-lucide-additions.png` |
+| DES-3 | `Guidelines` | G-00 · مسودة اتفاقية التسمية | `118:16695` | `approved/DES-3/G-00-component-naming.png` |
