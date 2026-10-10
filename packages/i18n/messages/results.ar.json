@@ -69,5 +69,21 @@
   "results.instructions.content": "ملف التعليمات",
   "results.claim.noLocalCheck": "لا فحص مقابل",
   "results.claim.decidedCard": "القرار: حُوّل إلى بطاقة {card}",
-  "results.claim.decidedNotIssue": "القرار: ليس مشكلة · {date}"
+  "results.claim.decidedNotIssue": "القرار: ليس مشكلة · {date}",
+  "results.inspector.label": "المفتش",
+  "results.inspector.definition": "التعريف",
+  "results.inspector.why": "السبب",
+  "results.inspector.limits": "الحدود",
+  "results.inspector.command": "الأمر",
+  "results.inspector.lastResult": "آخر نتيجة",
+  "results.inspector.review": "المراجعة",
+  "results.inspector.date": "التاريخ",
+  "results.inspector.originalResult": "النتيجة الآلية الأصلية:",
+  "results.inspector.expected": "المتوقع",
+  "results.inspector.actual": "الفعلي",
+  "results.inspector.reproduce": "الإعادة بالأمر",
+  "results.inspector.rule": "القاعدة ومصدرها",
+  "results.inspector.firstSeen": "أول ظهور",
+  "results.inspector.logTitle": "سطر السجل {line} · {check}",
+  "results.inspector.actions": "إجراءات الاكتشاف"
 }
