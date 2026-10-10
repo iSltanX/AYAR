@@ -10,6 +10,10 @@ depends_on: [DEV-6]
 design_gates: []
 owner_gates: []
 owner_inputs: []
+model: Claude Opus 5.5
+effort: xhigh
+model_reason: متصفح ومصفوفة لقطات وإتاحة: تكامل واسع بعد أن حسمت E-11 الغموض
+scope: [packages/probe/, packages/engine/, packages/catalog/, packages/protocol/, packages/i18n/, apps/desktop/main/, fixtures/, docs/dependencies.md]
 goal: فحوص التصميم والإتاحة والاتجاه والحالات والإضافات والأداء على صفحات تُعرض فعلًا في Chromium الخاص بـ Playwright، بمراجع معلنة وصور مرجعية لا تُعتمد إلا صراحة.
 start:
   - DEV-6 مغلقة
@@ -103,11 +107,11 @@ closing_commit:
 ```text
 أنت تنفّذ المرحلة DEV-7 من مشروع عِيَار AYAR: مسبار الويب وفحوص العرض الحي.
 1) اقرأ AGENTS.md، ثم docs/phases/dev/DEV-07-web-probe.md، ثم قراءاته الضرورية، وقراري E-11 وE-21.
-2) تحقق قبل البدء (DEV-6 مغلقة). أنشئ الفرع phase/DEV-7.
+2) تحقق قبل البدء (DEV-6 مغلقة). وتأكد أنك في مجلد العمل AYAR-wt/DEV-7 على الفرع phase/DEV-7 (docs/waves/README.md 3).
 3) لا معيار جماليًا بلا مرجع، ولا اعتماد صورة مرجعية تلقائيًا، ولا صورة لحالة «حساسة».
 4) الشبكة محلية فقط في المسبار، والطلب الخارجي يُمنع ويُسجَّل.
 5) commit لكل مهمة، وحدّث نقطة الاستئناف، وشغّل فحوص القسم 7 حتى تنجح أو BLOCKED بالدليل.
-6) أغلق بمعايير القسم 8، وادمج ووسم وادفع، وسلّم بالقالب وتوقف.
+6) عند تحقق معايير القسم 8: سلّم وفق AGENTS.md 3.4 (ملف docs/handoffs/DEV-7.md، وstatus: delivered)، ثم توقف. الدمج والوسم والدفع لجلسة التنسيق.
 ```
 
 ## 11. حالة التقدم ونقطة الاستئناف
