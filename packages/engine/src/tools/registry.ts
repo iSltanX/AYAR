@@ -236,7 +236,17 @@ export function isStale(def: ManagedToolDef, now: Date, staleAfterDays: number):
   return now.getTime() - Date.parse(`${def.verifiedAt}T00:00:00Z`) > staleAfterDays * 86_400_000;
 }
 
-/** The tools each check may use, by catalog runner id (the adapters of DEV-6 invoke them). */
+/**
+ * DEV-6 (D-DEV6-03): tools AYAR uses from the system inside the range its adapter was tested with (C-11 point 1),
+ * and does not install yet. Semgrep: E-10 settled a managed install (an isolated Python environment from a
+ * requirements file pinned by its 915 hashes, about 258 MB), which needs an install kind of its own in C-11 beyond
+ * the single pinned file of these entries (G-DEV6-01); until then a Semgrep 1.x from 1.180.0 on the login PATH is
+ * used, and without one sec.sast is «يحتاج تجهيزًا» with no action.
+ */
+export const SYSTEM_ONLY_TOOLS: readonly (Pick<ManagedToolDef, 'key' | 'versionArgs' | 'versionPattern'> & { system: NonNullable<ManagedToolDef['system']> })[] = [
+  { key: 'semgrep', versionArgs: ['--version'], versionPattern: '^(\\d+\\.\\d+\\.\\d+)', system: { names: ['semgrep'], min: '1.180.0', belowMajor: 2 } },
+];
+
 export function machineArch(): 'arm64' | 'x64' {
   return process.arch === 'arm64' ? 'arm64' : 'x64';
 }

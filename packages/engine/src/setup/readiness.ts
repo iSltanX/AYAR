@@ -46,6 +46,11 @@ export interface ReadinessInput {
   osvDbs: ReadonlySet<string>;
   /** G-25: tool versions the user accepted once for this project: `tool\0requiredSpec\0version`. */
   accepted: ReadonlySet<string>;
+  /**
+   * DEV-6: is the browser of the project's own Playwright installed (the revision its playwright-core names, in
+   * Playwright's cache)? beh.e2e and perf.compat run the project's tests with it; the probe's browser is DEV-7's.
+   */
+  projectBrowser?: (component: string) => Promise<boolean>;
 }
 
 const rec = (v: unknown): Record<string, unknown> => (v !== null && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {});
@@ -162,7 +167,10 @@ export async function evaluateInstances(i: ReadinessInput): Promise<InstanceRead
         if (!(await locate('osv-scanner'))) need({ key: 'setup.reason.toolMissing', params: { tool: 'osv-scanner' } }, { kind: 'install_tool', tool: 'osv-scanner' });
         for (const eco of projectEcos) if (!i.osvDbs.has(eco)) need({ key: 'setup.reason.osvDbMissing', params: { ecosystem: eco } }, { kind: 'download_osv_db', ecosystem: eco });
       }
-      if (def?.requirements.some((r) => r.kind === 'dataAsset' && r.asset === 'browser')) need({ key: 'setup.reason.browserMissing' });
+      if (def?.requirements.some((r) => r.kind === 'dataAsset' && r.asset === 'browser')) {
+        const projectsOwn = def.runner.kind === 'adapter' && def.runner.ids.includes('playwright');
+        if (!projectsOwn || !(await i.projectBrowser?.(spec.component))) need({ key: 'setup.reason.browserMissing' });
+      }
 
       // A project command: its runtime, its program, its dependencies.
       if (spec.command) {

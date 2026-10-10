@@ -7,6 +7,7 @@
 import type { Catalog, CheckDefinition, ReferenceKind } from '@ayar/catalog';
 import type { CheckOverride, CheckSpec, CompanionService, CustomCheck, DiscoveryComponent, Fact, JsonValue, MissingRequirement, ProfileContext, ProfileReferences, Reason, ServiceDecl } from '@ayar/protocol';
 import { canonicalJson } from '@ayar/catalog';
+import { adapterFor } from '@ayar/adapters';
 import { commandScript, proposeCommand, scriptNameOf, scriptsOfFacts } from './commands.ts';
 import { argvText, compilePolicy, judgeCommand, type CompiledPolicy } from './policy.ts';
 import { computeRefs, computeSignals, effectiveAudience, evaluate, factsOf, unmet, type EvalEnv } from './signals.ts';
@@ -90,6 +91,10 @@ export function specMaterial(spec: Omit<CheckSpec, 'specHash' | 'reasons'>): unk
     // Added in protocol 1.2: only when set, so the specs of 1.1 keep their hashes (and their approvals).
     ...(spec.idleTimeoutSec !== null ? { idleTimeoutSec: spec.idleTimeoutSec } : {}),
     ...(spec.services.length ? { services: spec.services } : {}),
+    // Protocol 1.3 (DEV-6): what the adapter will run, literally (C-15). Only when there is one, so the specs of
+    // the analyzers and of what has no adapter keep their hashes; a change of the adapters' flags or version asks
+    // for the approval again.
+    ...(spec.invocation ? { invocation: spec.invocation } : {}),
     thresholds: spec.thresholds,
     sideEffects: spec.sideEffects,
     network: spec.network,
@@ -269,7 +274,7 @@ function specFor(
     runner: { kind: def.runner.kind, ids: [...def.runner.ids] },
     command,
     tool,
-    invocation: null,
+    invocation: null as CheckSpec['invocation'],
     env: { explicit: { ...(override?.explicitEnv ?? {}) }, allowSensitive: [...(override?.allowSensitive ?? [])].sort() },
     references: usedRefs,
     referenceValues: Object.fromEntries(usedRefs.map((k) => [k, (referenceValue(k, input.settings.references, facts) ?? null) as JsonValue])),
@@ -288,8 +293,27 @@ function specFor(
     danger: verdict.danger,
     refused: verdict.refused,
   };
+  // C-15 buildInvocation: the adapter's final command as a template the approval shows literally; or why no
+  // adapter can run this tool («تعذّر» at the launch, said here first).
+  if (applicable && (def.runner.kind === 'adapter' || def.runner.kind === 'custom')) {
+    const choice = adapterFor(base, { configs: toolConfigs(facts, rootFacts) });
+    if (choice?.adapter) {
+      base.invocation = choice.template;
+      if (choice.template.suggestion) reasons.push({ key: 'adapter.reason.compositeScript', params: { tool: choice.adapter.tool } });
+    } else if (choice) reasons.push(choice.reason);
+  }
   const specHash = input.hash(canonicalJson(specMaterial(base)));
   return { ...base, reasons, specHash };
+}
+
+/** The project's own configuration file of each quality tool (discovery's quality.tool), the component's first. */
+function toolConfigs(own: readonly Fact[], root: readonly Fact[]): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const f of [...root, ...own].filter((x) => x.key === 'quality.tool')) {
+    const v = rec(f.value);
+    if (typeof v.name === 'string' && typeof v.config === 'string') out[v.name] = v.config;
+  }
+  return out;
 }
 
 /** The instances that need an approval before they may run: applicable, enabled, included, and not refused. */

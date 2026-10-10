@@ -1,0 +1,23 @@
+{
+  "analyzer.reason.noManifest": "ناقص: لا ملف manifest.json للإضافة",
+  "analyzer.reason.manifestNotBuilt": "ناقص: يُولَّد manifest بالبناء ولم يوجد في {path}؛ شغّل البناء أولًا",
+  "analyzer.reason.manifestUnparsable": "تعذّر: لم يُقرأ {path} ({detail})",
+  "analyzer.reason.noPolicy": "ناقص إعداد: لا سياسة أذونات معلنة",
+  "analyzer.reason.policyUnparsable": "تعذّر: لم تُقرأ سياسة الأذونات {path} ({detail})",
+  "analyzer.reason.noTokens": "ناقص إعداد: لا مرجع رموز تصميم معلن",
+  "analyzer.reason.tokensUnreadable": "تعذّر: لم يُقرأ مرجع الرموز {path}",
+  "analyzer.reason.tokensUnparsable": "تعذّر: لم يُفهم مرجع الرموز {path} ({detail})",
+  "analyzer.reason.tokensFormat": "تعذّر: صيغة مرجع الرموز {path} غير مدعومة",
+  "analyzer.reason.noFonts": "ناقص إعداد: لا خطوط معلنة",
+  "analyzer.reason.noRtl": "غير منطبق: لا واجهة باتجاه من اليمين إلى اليسار",
+  "analyzer.reason.noBudgets": "ناقص إعداد: لا ميزانيات حجم معلنة",
+  "analyzer.reason.noOutput": "تعذّر: لا مخرجات بناء في {path} لقياسها",
+  "analyzer.limits.manifest": "يقرأ ملف الإضافة دون تشغيلها؛ لا يثبت سلوكها",
+  "analyzer.limits.permissions": "يقارن الأذونات بالسياسة المعلنة؛ لا يثبت أن الإذن مستعمل",
+  "analyzer.limits.refs": "يتحقق من المراجع المحلية المكتوبة صراحة؛ المسارات المحسوبة وقت التشغيل لا تظهر",
+  "analyzer.limits.tokens": "يقرأ القيم المكتوبة في الأنماط؛ القيم المحسوبة يراها الفحص المعروض",
+  "analyzer.limits.fonts": "يقرأ الخطوط المعلنة وتعريفاتها؛ لا يثبت ما يُعرض فعلًا",
+  "analyzer.limits.rtl": "يقرأ الاتجاه والخصائص الفيزيائية في الأنماط؛ لا يثبت العرض",
+  "analyzer.limits.size": "يقيس الأحجام مقابل الميزانيات؛ الحجم الكبير لا يثبت شيفرة غير مستعملة",
+  "analyzer.limits.complexity": "مؤشرات صيانة للاقتراح فقط، ولا اكتشاف دون عتبة"
+}

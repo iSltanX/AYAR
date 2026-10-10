@@ -33,7 +33,14 @@ export interface ProcessSpec {
   env: Readonly<Record<string, string>>;
   token: string;
   tempDir: string | null;
-  ledger: { kind: 'check' | 'service' | 'setup'; runId: string | null; checkRunId: string | null };
+  /**
+   * The ledger row. `reuse`: the row of the previous step of the same execution (DEV-6: beh.stability's attempts,
+   * Semgrep's batches run one after the other, with one token), opened again for this step's process: one row per
+   * execution, and at any moment the process it names is the one running.
+   */
+  ledger: { kind: 'check' | 'service' | 'setup'; runId: string | null; checkRunId: string | null; reuse?: string };
+  /** Called with the ledger row's id once it exists (the next step reuses it). */
+  onLedger?(id: string): void;
   timeoutMs: number | null;
   idleTimeoutMs: number | null;
   onStdout(chunk: Uint8Array): void;
@@ -131,21 +138,26 @@ export class ProcessSupervisor {
     const { processes } = this.#ports;
     const startedAt = this.#clock.now();
     const startMono = this.#clock.monotonicMs();
-    const ledgerId = newId(this.#ports.random, 'led');
+    const ledgerId = spec.ledger.reuse ?? newId(this.#ports.random, 'led');
     const digest = `sha256:${createHash('sha256').update(JSON.stringify(spec.argv)).digest('hex')}`;
     const base = await this.baseline();
     // Before the launch: what a crash would need to clean up (C-12 point 4). pid 0 until the system names it.
-    this.#db.run(
-      "INSERT INTO process_ledger (id, check_run_id, pid, pgid, os_start_time, command_digest, check_token, temp_dir, state, created_at, kind, run_id) VALUES (?, ?, 0, 0, '', ?, ?, ?, 'running', ?, ?, ?)",
-      ledgerId,
-      spec.ledger.checkRunId,
-      digest,
-      spec.token,
-      spec.tempDir,
-      startedAt.toISOString(),
-      spec.ledger.kind,
-      spec.ledger.runId,
-    );
+    if (spec.ledger.reuse) {
+      this.#db.run("UPDATE process_ledger SET pid = 0, pgid = 0, os_start_time = '', command_digest = ?, check_token = ?, temp_dir = ?, state = 'running', ended_at = NULL WHERE id = ?", digest, spec.token, spec.tempDir, ledgerId);
+    } else {
+      this.#db.run(
+        "INSERT INTO process_ledger (id, check_run_id, pid, pgid, os_start_time, command_digest, check_token, temp_dir, state, created_at, kind, run_id) VALUES (?, ?, 0, 0, '', ?, ?, ?, 'running', ?, ?, ?)",
+        ledgerId,
+        spec.ledger.checkRunId,
+        digest,
+        spec.token,
+        spec.tempDir,
+        startedAt.toISOString(),
+        spec.ledger.kind,
+        spec.ledger.runId,
+      );
+    }
+    spec.onLedger?.(ledgerId);
     let lastOutput = startMono;
     const wrapOut = (fn: (c: Uint8Array) => void) => (c: Uint8Array) => {
       lastOutput = this.#clock.monotonicMs();

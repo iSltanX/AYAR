@@ -113,8 +113,44 @@ export class SetupService {
       allowNetwork,
       osvDbs,
       accepted,
+      projectBrowser: (component) => this.#projectBrowser(project.rootPath, component),
     });
     return { items, env: { source: env.source, fallbackReason: env.fallbackReason, probed: o.probe }, untrusted };
+  }
+
+  /**
+   * The browser of the project's Playwright (DEV-6): the revisions its playwright-core's browsers.json names
+   * (npm's flat node_modules, or pnpm's beside @playwright/test), present in PLAYWRIGHT_BROWSERS_PATH or in
+   * Playwright's cache in the user's Library. Read from files only; nothing is run or installed.
+   */
+  async #projectBrowser(root: string, component: string): Promise<boolean> {
+    const { fs } = this.#o.ports;
+    const base = await this.#o.environment.base();
+    const home = base.env.HOME ?? '';
+    const cache = base.env.PLAYWRIGHT_BROWSERS_PATH && base.env.PLAYWRIGHT_BROWSERS_PATH !== '0' ? base.env.PLAYWRIGHT_BROWSERS_PATH : posix.join(home, 'Library/Caches/ms-playwright');
+    if (!cache.startsWith('/')) return false;
+    for (const dir of [...new Set([component, '.'])]) {
+      const nm = posix.join(root, dir, 'node_modules');
+      const candidates = [posix.join(nm, 'playwright-core/browsers.json')];
+      const test = await fs.realpath(posix.join(nm, '@playwright/test')).catch(() => null);
+      if (test) candidates.push(posix.join(posix.dirname(posix.dirname(test)), 'playwright-core/browsers.json'));
+      for (const c of candidates) {
+        const st = await fs.lstat(c).catch(() => null);
+        if (!st?.isFile || st.size > 64 * 1024) continue;
+        let revisions: Record<string, string> = {};
+        try {
+          const j = JSON.parse(new TextDecoder().decode((await fs.readFilePrefix(c, 64 * 1024)).data)) as { browsers?: { name?: string; revision?: string }[] };
+          revisions = Object.fromEntries((j.browsers ?? []).filter((b) => typeof b.name === 'string' && typeof b.revision === 'string').map((b) => [b.name!, b.revision!]));
+        } catch {
+          continue;
+        }
+        const wanted = [['chromium-headless-shell', 'chromium_headless_shell'], ['chromium', 'chromium']].filter(([n]) => revisions[n!]).map(([n, d]) => posix.join(cache, `${d}-${revisions[n!]}`));
+        if (!wanted.length) continue;
+        for (const w of wanted) if (!(await fs.lstat(w).catch(() => null))?.isDirectory) return false;
+        return true;
+      }
+    }
+    return false;
   }
 
   /** readiness.evaluate: probes the tools' versions (G-DEV4-04), and lists the setup actions (9.4 point 3). */

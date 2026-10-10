@@ -41,14 +41,26 @@ export function rescrub(db: Db, redactor: Redactor): { rows: number } {
       db.run('UPDATE approvals SET note = ? WHERE id = ?', n.text, r.id);
       rows++;
     }
-    // DEV-5's JSON columns: a check's command and raw result (its last lines), plans, and setup previews.
-    const jsonColumns: [string, string][] = [['check_runs', 'command_json'], ['check_runs', 'raw_json'], ['check_runs', 'notes_json'], ['plans', 'plan_json'], ['setup_actions', 'preview_json']];
+    // DEV-5's JSON columns: a check's command and raw result (its last lines), plans, and setup previews; DEV-6's:
+    // a finding's place, and the reader of a check run.
+    const jsonColumns: [string, string][] = [['check_runs', 'command_json'], ['check_runs', 'raw_json'], ['check_runs', 'notes_json'], ['plans', 'plan_json'], ['setup_actions', 'preview_json'], ['findings', 'location_json'], ['check_runs', 'reader_json']];
     for (const [table, column] of jsonColumns) {
       if (!has(table, column)) continue;
       for (const r of db.all<{ rid: number; v: string }>(`SELECT rowid AS rid, ${column} AS v FROM ${table} WHERE ${column} IS NOT NULL`)) {
         const c = scrub<unknown>(r.v);
         if (!c.changed) continue;
         db.run(`UPDATE ${table} SET ${column} = ? WHERE rowid = ?`, JSON.stringify(c.value), r.rid);
+        rows++;
+      }
+    }
+    // DEV-6: the findings' texts (a tool's message, an expected and an actual value).
+    const textColumns: [string, string][] = [['findings', 'message_redacted'], ['findings', 'expected_text'], ['findings', 'actual_text']];
+    for (const [table, column] of textColumns) {
+      if (!has(table, column)) continue;
+      for (const r of db.all<{ rid: number; v: string }>(`SELECT rowid AS rid, ${column} AS v FROM ${table} WHERE ${column} IS NOT NULL`)) {
+        const t = redactor.redactText(r.v);
+        if (t.text === r.v) continue;
+        db.run(`UPDATE ${table} SET ${column} = ? WHERE rowid = ?`, t.text, r.rid);
         rows++;
       }
     }

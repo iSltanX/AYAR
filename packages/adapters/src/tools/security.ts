@@ -222,7 +222,7 @@ export const osv: Adapter = {
 
 function secretsParse(a: Adapter, ctx: ParseContext, history: boolean): ParsedReport {
   const r = emptyReport(a, ['gitleaks-json']);
-  for (const v of readReports(a, ctx, 'secrets.json', r)) {
+  for (const v of readReports(a, ctx, `${a.id}.json`, r)) {
     for (const leak of arr(v).map(rec)) {
       const rule = str(leak.RuleID);
       const file = str(leak.File);
@@ -269,23 +269,23 @@ function secretsFiles(key: 'betterleaks' | 'gitleaks', tested: string): Adapter 
         // E-24: on a shadow repository AYAR builds from the files (objects by alternates, refs, HEAD, an empty
         // configuration; no hooks, no attributes), with Git's own configuration out of reach.
         return managed(this, {
-          argv: ['{tool}', 'git', '{shadow}', '--redact=100', '--no-banner', '--report-format', 'json', '--report-path', '{reports}/secrets.json', '--exit-code', '42', ...(config ? ['--config', `{root}/${config}`] : [])],
+          argv: ['{tool}', 'git', '{shadow}', '--redact=100', '--no-banner', '--report-format', 'json', '--report-path', `{reports}/${key}.json`, '--exit-code', '42', ...(config ? ['--config', `{root}/${config}`] : [])],
           cwd: '{tmp}',
           env: { GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null', GIT_ATTR_NOSYSTEM: '1', GIT_TERMINAL_PROMPT: '0', HOME: '{tmp}/home' },
           prepare: ['git-shadow'],
           targets: null,
-          reports: ['secrets.json'],
+          reports: [`${key}.json`],
         });
       }
       // E-08: from the project root with `dir .`, so the report's paths match .gitleaksignore; the values redacted by
       // the tool itself (C-18 layer 3); a distinct exit code for findings; never `-v` (S-37).
       return managed(this, {
-        argv: ['{tool}', 'dir', '.', '--redact=100', '--report-format', 'json', '--report-path', '{reports}/secrets.json', '--exit-code', '42', ...(config ? ['--config', `{root}/${config}`] : [])],
+        argv: ['{tool}', 'dir', '.', '--redact=100', '--report-format', 'json', '--report-path', `{reports}/${key}.json`, '--exit-code', '42', ...(config ? ['--config', `{root}/${config}`] : [])],
         cwd: '{root}',
         env: {},
         prepare: [],
         targets: null,
-        reports: ['secrets.json'],
+        reports: [`${key}.json`],
       });
     },
     parseReports(ctx) {

@@ -237,7 +237,8 @@
       "script": null,
       "tool": "npm:system",
       "reasons": [
-        "profile.reason.defaultOptional"
+        "profile.reason.defaultOptional",
+        "adapter.reason.noAdapter"
       ]
     },
     {
@@ -302,7 +303,8 @@
       "tool": "build-script:project",
       "reasons": [
         "profile.reason.defaultRequiredBlocking",
-        "profile.reason.commandFromScript"
+        "profile.reason.commandFromScript",
+        "adapter.reason.compositeScript"
       ]
     },
     {

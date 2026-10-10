@@ -41,6 +41,8 @@ export interface StartEngineOptions {
   testLoginShell?: string | null;
   /** tools/cli's test hook (Node entry only): extra managed-tool entries for AT-35's local server. */
   testToolRegistry?: readonly unknown[];
+  /** The module the verdict's worker threads start from (the entry module itself; C-13). */
+  workerEntry?: URL | string;
 }
 
 export interface EngineHandle {
@@ -126,7 +128,7 @@ export function startEngine(o: StartEngineOptions): EngineHandle {
     if (result.state === 'degraded') degraded = result.reason ?? 'internal';
     bus = new EventBus({ stream, clock: ports.clock, send: (m) => channel.send(m) });
     if (!degraded && result.db && result.catalog && hmacKey && result.layout) {
-      services = createServices({ catalog: result.catalog, db: result.db, layout: result.layout, ports, events: bus, runGate, logger, hmacKey, testLoginShell: o.testLoginShell ?? null, testToolRegistry: o.testToolRegistry ?? [] });
+      services = createServices({ catalog: result.catalog, db: result.db, layout: result.layout, ports, events: bus, runGate, logger, hmacKey, testLoginShell: o.testLoginShell ?? null, testToolRegistry: o.testToolRegistry ?? [], ...(o.workerEntry ? { workerEntry: o.workerEntry } : {}) });
     }
     if (phase === 'stopping') return result;
     phase = 'serving';

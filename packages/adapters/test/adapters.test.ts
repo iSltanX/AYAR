@@ -80,7 +80,7 @@ describe('the final command, literally (C-15 buildInvocation)', () => {
     const os = adapterFor(spec({ checkId: 'sec.deps', section: 'security', runner: { kind: 'adapter', ids: ['osv-scanner'] }, tool: { key: 'osv-scanner', source: 'managed', runtime: null, path: null } }));
     expect(os && 'template' in os && os.template).toMatchObject({ cwd: '{tmp}', env: { OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY: '{osvdb}' }, argv: ['{tool}', 'scan', 'source', '-r', '{root}', '--offline', '--no-call-analysis=all', '--format', 'json', '--output-file', '{reports}/osv.json'] });
     const hist = adapterFor(spec({ checkId: 'sec.secrets.history', section: 'security', runner: { kind: 'adapter', ids: ['betterleaks', 'gitleaks'] }, tool: { key: 'betterleaks', source: 'managed', runtime: null, path: null } }));
-    expect(hist && 'template' in hist && hist.template).toMatchObject({ cwd: '{tmp}', prepare: ['git-shadow'], env: { GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null' }, argv: ['{tool}', 'git', '{shadow}', '--redact=100', '--no-banner', '--report-format', 'json', '--report-path', '{reports}/secrets.json', '--exit-code', '42'] });
+    expect(hist && 'template' in hist && hist.template).toMatchObject({ cwd: '{tmp}', prepare: ['git-shadow'], env: { GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null' }, argv: ['{tool}', 'git', '{shadow}', '--redact=100', '--no-banner', '--report-format', 'json', '--report-path', '{reports}/betterleaks.json', '--exit-code', '42'] });
   });
 
   it('says why when no adapter knows the tool (mocha runs as a custom check, 10.3)', () => {
@@ -245,12 +245,12 @@ describe('the managed tools (AT-14)', () => {
   });
   it('the secrets scanner: 42 leaks, 0 none, 1 the tool\'s; a leak anchored by its span, never its value', () => {
     const leak = JSON.stringify([{ RuleID: 'generic-api-key', File: 'src/a.js', StartLine: 2, StartColumn: 15, EndColumn: 71, Secret: 'REDACTED', Fingerprint: 'src/a.js:generic-api-key:2' }]);
-    const r = run(A('betterleaks'), ctx({ checkId: 'sec.secrets.files', files: { 'secrets.json': leak } }), 42);
+    const r = run(A('betterleaks'), ctx({ checkId: 'sec.secrets.files', files: { 'betterleaks.json': leak } }), 42);
     expect(r.exit).toEqual({ kind: 'ok' });
     expect(r.report.findings[0]).toMatchObject({ rule: 'secret.detected', toolRule: 'generic-api-key', location: { path: 'src/a.js', line: 2, column: 15 }, anchor: { kind: 'secret', value: 'span:2:15:71' } });
     expect(run(A('gitleaks'), ctx({ checkId: 'sec.secrets.files', stderr: 'config error' }), 1).exit).toMatchObject({ kind: 'tool_error' });
-    expect(run(A('gitleaks'), ctx({ checkId: 'sec.secrets.files', files: { 'secrets.json': leak } }), 0).exit).toMatchObject({ kind: 'conflict' });
-    const h = run(A('betterleaks'), ctx({ checkId: 'sec.secrets.history', files: { 'secrets.json': JSON.stringify([{ RuleID: 'generic-api-key', File: 'config/old-credentials.js', StartLine: 2, Commit: '29cc486a1a6f00000000', Fingerprint: '29cc486a:config/old-credentials.js:generic-api-key:2' }]) } }), 42);
+    expect(run(A('gitleaks'), ctx({ checkId: 'sec.secrets.files', files: { 'gitleaks.json': leak } }), 0).exit).toMatchObject({ kind: 'conflict' });
+    const h = run(A('betterleaks'), ctx({ checkId: 'sec.secrets.history', files: { 'betterleaks.json': JSON.stringify([{ RuleID: 'generic-api-key', File: 'config/old-credentials.js', StartLine: 2, Commit: '29cc486a1a6f00000000', Fingerprint: '29cc486a:config/old-credentials.js:generic-api-key:2' }]) } }), 42);
     expect(h.report.findings[0]).toMatchObject({ location: { path: 'config/old-credentials.js', line: 2, commit: '29cc486a1a6f00000000' }, anchor: { kind: 'secret', value: 'fp:29cc486a:config/old-credentials.js:generic-api-key:2' } });
   });
   it('lychee: 404 proven broken, 403 and a timeout for review, 3 the tool\'s (10.3)', () => {

@@ -27,6 +27,8 @@ export function streamSink(o: {
   totals: OutputTotals;
   /** Reports a written segment (its offset and length in the log file) for check.log. */
   onSegment: (stream: 'stdout' | 'stderr', offset: number, length: number) => void;
+  /** The redacted lines as they come (DEV-6: the adapter's live parser, 9.6 point 5). */
+  onLines?: (lines: readonly string[]) => void;
   limit?: number;
 }): StreamSink {
   const decoder = new TextDecoder('utf-8');
@@ -41,6 +43,7 @@ export function streamSink(o: {
       o.totals.tail.push(l.replace(/\n$/, ''));
     }
     if (o.totals.tail.length > TAIL_LINES) o.totals.tail.splice(0, o.totals.tail.length - TAIL_LINES);
+    o.onLines?.(lines);
     if (truncated) return;
     let data = encoder.encode(lines.join(''));
     if (bytes + data.length > limit) {

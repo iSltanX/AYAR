@@ -200,7 +200,8 @@
       "script": null,
       "tool": "pip-audit:system",
       "reasons": [
-        "profile.reason.defaultOptional"
+        "profile.reason.defaultOptional",
+        "adapter.reason.noAdapter"
       ]
     },
     {

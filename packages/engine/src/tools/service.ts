@@ -19,7 +19,7 @@ import type { DataLayout } from '../storage/data-dir.ts';
 import type { Db } from '../storage/db.ts';
 import { compare, parseVersion } from '../environment/semver.ts';
 import { PROBE_ENV, PROBE_TIMEOUT_MS } from '../environment/resolve.ts';
-import { isStale, machineArch, type ManagedToolDef } from './registry.ts';
+import { isStale, machineArch, SYSTEM_ONLY_TOOLS, type ManagedToolDef } from './registry.ts';
 
 export interface ToolLocation {
   key: string;
@@ -102,16 +102,25 @@ export class ToolsService {
     return posix.join(this.#o.layout.tools, def.key, def.version);
   }
 
-  /** Runs `<tool> <versionArgs>` the way C-07 probes versions: 5 s, auto-installers off, a neutral folder. */
-  async probe(def: ManagedToolDef, path: string): Promise<string | null> {
-    const r = await this.#o.ports.processes.spawn(path, def.versionArgs, { cwd: this.#o.layout.tmp, env: { PATH: '/usr/bin:/bin', HOME: this.#o.layout.tmp, ...PROBE_ENV }, timeoutMs: PROBE_TIMEOUT_MS, maxOutputBytes: 64 * 1024 });
-    if (r.error || r.timedOut || r.code !== 0) return null;
-    const text = new TextDecoder().decode(r.stdout) + new TextDecoder().decode(r.stderr);
-    return new RegExp(def.versionPattern, 'm').exec(text)?.[1] ?? null;
+  /**
+   * Runs `<tool> <versionArgs>` the way C-07 probes versions: 5 s, auto-installers off, a neutral folder of its
+   * own as its home (Semgrep writes its settings there even for `--version`), deleted after.
+   */
+  async probe(def: Pick<ManagedToolDef, 'versionArgs' | 'versionPattern'>, path: string): Promise<string | null> {
+    const home = posix.join(this.#o.layout.tmp, `probe-${Buffer.from(this.#o.ports.random.bytes(6)).toString('hex')}`);
+    await this.#o.ports.fs.mkdir(home, 0o700);
+    try {
+      const r = await this.#o.ports.processes.spawn(path, def.versionArgs, { cwd: home, env: { PATH: '/usr/bin:/bin', HOME: home, ...PROBE_ENV }, timeoutMs: PROBE_TIMEOUT_MS, maxOutputBytes: 64 * 1024 });
+      if (r.error || r.timedOut || r.code !== 0) return null;
+      const text = new TextDecoder().decode(r.stdout) + new TextDecoder().decode(r.stderr);
+      return new RegExp(def.versionPattern, 'm').exec(text)?.[1] ?? null;
+    } finally {
+      await this.#o.ports.fs.remove(home);
+    }
   }
 
   /** Is a system version inside the range this AYAR supports for the tool? */
-  #inRange(def: ManagedToolDef, version: string): boolean {
+  #inRange(def: Pick<ManagedToolDef, 'system'>, version: string): boolean {
     const v = parseVersion(version);
     const min = parseVersion(def.system?.min ?? '');
     if (!v || !min || !def.system) return false;
@@ -123,10 +132,12 @@ export class ToolsService {
    * range (its version read from the tool itself). Null: not available — the check needs setup.
    */
   async locate(key: string): Promise<ToolLocation | null> {
-    const def = this.#o.registry.get(key);
+    // A tool AYAR does not install yet, but uses from the system inside its tested range (SYSTEM_ONLY_TOOLS).
+    const def: Pick<ManagedToolDef, 'versionArgs' | 'versionPattern' | 'system'> | undefined = this.#o.registry.get(key) ?? SYSTEM_ONLY_TOOLS.find((t) => t.key === key);
     if (!def) return null;
-    const row = this.#row(key);
-    if (row && row.status === 'installed' && row.version === def.version && row.path && (await this.#o.ports.fs.lstat(row.path))?.isFile) {
+    const managed = this.#o.registry.get(key);
+    const row = managed ? this.#row(key) : undefined;
+    if (managed && row && row.status === 'installed' && row.version === managed.version && row.path && (await this.#o.ports.fs.lstat(row.path))?.isFile) {
       return { key, source: 'managed', path: row.path, version: row.version };
     }
     if (!def.system) return null;

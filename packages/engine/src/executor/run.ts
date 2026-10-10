@@ -4,13 +4,17 @@
 // and the concurrency (two light or medium checks at once, a heavy or very heavy one alone, G-34). Each check gets
 // its folders, a supervised process, its redacted logs, its side effects, its raw reports redacted into the
 // evidence store (D-46); a covered check inherits the covering execution (D-24), a shared one the very same raw
-// result (D-45), and a check whose dependency did not succeed is «تُخطّي». The verdict is not given here: the raw
-// result is handed to the classifier (DEV-6) through a hook; until then a check that ran to its end keeps no
-// outcome, and only what the process itself says — cancelled, timed out, interrupted, missing, unavailable — is
-// written. Every state change is saved before its event is sent.
+// result (D-45), and a check whose dependency did not succeed is «تُخطّي». What the process itself says —
+// cancelled, timed out, interrupted, missing, unavailable — is rule 1 of 7.3 and is written as it is; a process that
+// ran to its end is judged (DEV-6): its adapter reads the kept reports in a worker thread, the classifier (C-16)
+// gives the outcome by the ordered rules, and its findings are kept with it in the same transaction. An analyzer
+// (C-13) runs inside the engine, in a worker thread, with no process. When the run ends, C-19 computes its index
+// (9.10). Every state change is saved before its event is sent.
 import type { Catalog } from '@ayar/catalog';
-import type { CheckOutcome, CheckRunDetail, CheckRunView, CheckSpec, EvidenceRef, PlanItem, RawCheckResult, Reason, RunCounts, RunDetail, RunList, RunPlan, RunView, SideEffects } from '@ayar/protocol';
+import { adapterById } from '@ayar/adapters';
+import type { CheckOutcome, CheckRunDetail, CheckRunView, CheckSpec, EvidenceRef, PlanItem, RawCheckResult, Reason, RunCounts, RunDetail, RunList, RunPlan, RunView, SideEffects, VerdictCounts } from '@ayar/protocol';
 import { RawCheckResult as RawSchema, RunPlan as PlanSchema } from '@ayar/protocol';
+import { createHash } from 'node:crypto';
 import { posix } from 'node:path';
 import { computeChildEnv } from '../environment/child-env.ts';
 import type { EnvironmentService } from '../environment/service.ts';
@@ -21,11 +25,12 @@ import { CommandError } from '../host/errors.ts';
 import type { EventBus } from '../host/event-bus.ts';
 import { newId } from '../host/ids.ts';
 import type { RunGate } from '../host/run-gate.ts';
-import type { EnginePorts, Logger } from '../ports/index.ts';
+import type { EnginePorts, FileWriter, Logger } from '../ports/index.ts';
 import { latestSnapshot } from '../profile/service.ts';
 import { approvalsOf, latestProfile } from '../profile/store.ts';
 import type { PlannerService } from '../planner/service.ts';
 import type { ProjectsService } from '../projects/service.ts';
+import type { PurityService } from '../purity/service.ts';
 import type { RedactionService } from '../redaction/service.ts';
 import { requiresApproval, runsProjectCommand } from '../setup/readiness.ts';
 import { recordAudit } from '../storage/audit.ts';
@@ -33,13 +38,17 @@ import type { DataLayout } from '../storage/data-dir.ts';
 import type { Db } from '../storage/db.ts';
 import { readSettings } from '../storage/settings.ts';
 import type { ToolsService } from '../tools/service.ts';
-import { resolveInvocation, type RunnerHook } from './invocation.ts';
+import { reportEvidence, type JudgeRequest, type Judgement, type ReportInput, type VerdictService } from '../verdict/service.ts';
+import { resolveInvocation } from './invocation.ts';
 import { streamSink, type OutputTotals } from './output.ts';
+import { NOGIT_LOG, prepare } from './prepare.ts';
 import type { ProcessResult, ProcessSupervisor, RunningProcess } from './process.ts';
 import { CompanionServices } from './services.ts';
 
-/** The classifier's hook (C-15, C-16 in DEV-6): a verdict from the raw result, or null when it has none. */
-export type Classifier = (raw: RawCheckResult, spec: CheckSpec) => { outcome: CheckOutcome; reason: Reason } | null;
+/** At most this many provisional findings are sent per execution (9.6 point 5: the final reading decides). */
+const PROVISIONAL_MAX = 200;
+/** A raw report is read with a limit (C-15): 50 MB; beyond it, the part read is kept and the report is not judged. */
+export const REPORT_READ_LIMIT = 50 * 1024 * 1024;
 
 export interface RunServiceOptions {
   db: Db;
@@ -56,8 +65,10 @@ export interface RunServiceOptions {
   evidence: EvidenceService;
   tools: ToolsService;
   supervisor: ProcessSupervisor;
-  hooks?: readonly RunnerHook[];
-  classify?: Classifier;
+  /** C-15 and C-16 (DEV-6): reading the reports and judging them. */
+  verdict: VerdictService;
+  /** C-19 (DEV-6): the index at the end of a run. */
+  purity: PurityService;
   /** K4: a setup action of this project is running (its dependencies half installed): no run starts meanwhile. */
   setupActive?: (projectId: string) => boolean;
 }
@@ -106,6 +117,7 @@ interface CheckRunRow {
   auto_outcome: string | null;
   review_id: string | null;
   origin: string | null;
+  findings_json: string | null;
 }
 
 interface Exec {
@@ -113,10 +125,33 @@ interface Exec {
   checkRunId: string;
   item: PlanItem;
   state: 'pending' | 'running' | 'done';
-  /** Succeeded, for its dependants (7.3 rule 2): a passing verdict, or — before DEV-6 — a clean exit. */
+  /** Succeeded, for its dependants (7.3 rule 2): «اجتاز» or «تحذير». */
   ok: boolean;
   outcome: CheckOutcome | null;
   raw: RawCheckResult | null;
+  /** What its reading was made of: a shared execution (D-45) is judged again from it, by its own check's rules. */
+  judged: { req: JudgeRequest; evidenceIds: string[] } | null;
+}
+
+/** The judgement of an execution, kept with its outcome (DEV-6). */
+interface Verdict {
+  judgement: Judgement;
+  evidenceIds: string[];
+  reader: { id: string; version: string; formats: string[] } | null;
+}
+
+interface CheckContext {
+  projectId: string;
+  root: string;
+  sideEffects: boolean;
+  declared: (p: string) => boolean;
+  /** FR-36: the outputs the profile declares (code.build's adapter reads them). */
+  outputs: string[];
+  lastManifest: Manifest;
+  /** The run's inventory (its initial snapshot, .gitignore honoured), relative to the root. */
+  inventory: string[];
+  /** The specs as the project's files said at the start of the run (a shared or covered execution is judged by them). */
+  specs: Map<string, CheckSpec>;
 }
 
 interface Active {
@@ -131,6 +166,8 @@ interface Active {
   waiting: Map<string, AbortController>;
   /** Checks whose process has ended and whose result is being recorded. */
   collecting: Set<string>;
+  /** Aborted when the app quits: a report still being read is dropped, and the run ends the short way. */
+  quit: AbortController;
   wake: () => void;
 }
 
@@ -150,6 +187,38 @@ export function launchBlock(spec: CheckSpec | undefined, approvedHash: string | 
 }
 
 const TERMINAL_RUN = ['finished', 'interrupted'];
+
+/**
+ * The steps of one execution as one result: how it ended (the first step that did not end on its own, or the
+ * cancel or timeout that came between steps), the exit of the first step that did not exit with 0 (else the last),
+ * and the sums and peaks of its time, resources, sleeps and leftovers.
+ */
+export function aggregate(results: readonly ProcessResult[], unfinished: 'cancelled' | 'timed_out' | null, startedAt: Date, now: Date): ProcessResult {
+  const decisive = results.find((x) => x.ended !== 'exited' || x.exitCode !== 0) ?? results.at(-1);
+  const r: ProcessResult = {
+    ended: results.find((x) => x.ended !== 'exited')?.ended ?? unfinished ?? 'exited',
+    exitCode: decisive?.exitCode ?? null,
+    signal: decisive?.signal ?? null,
+    spawnError: results.find((x) => x.spawnError)?.spawnError ?? null,
+    pid: results.at(-1)?.pid ?? null,
+    startedAt: results[0]?.startedAt ?? startedAt,
+    finishedAt: results.at(-1)?.finishedAt ?? now,
+    durationMs: results.reduce((n, x) => n + x.durationMs, 0),
+    lastActivityAt: [...results].reverse().find((x) => x.lastActivityAt)?.lastActivityAt ?? null,
+    sleepGaps: results.flatMap((x) => x.sleepGaps),
+    resources: {
+      samples: results.reduce((n, x) => n + x.resources.samples, 0),
+      peakRssKb: Math.max(0, ...results.map((x) => x.resources.peakRssKb)),
+      maxCpuPercent: Math.max(0, ...results.map((x) => x.resources.maxCpuPercent)),
+      lastCpuPercent: results.at(-1)?.resources.lastCpuPercent ?? 0,
+    },
+    leftovers: { groupKilled: results.reduce((n, x) => n + x.leftovers.groupKilled, 0), tokenKilled: results.reduce((n, x) => n + x.leftovers.tokenKilled, 0), escapeSuspected: results.flatMap((x) => x.leftovers.escapeSuspected) },
+    escalation: results.flatMap((x) => x.escalation),
+  };
+  // A cancel or a timeout between two steps: the execution did not complete.
+  if (r.ended === 'exited' && unfinished) r.ended = unfinished;
+  return r;
+}
 
 export class RunService {
   readonly #o: RunServiceOptions;
@@ -279,7 +348,7 @@ export class RunService {
     const plan = PlanSchema.parse(JSON.parse(row.plan_json));
     const projectId = plan.projectId;
     let wake = () => {};
-    const active: Active = { runId, projectId, plan, cancel: null, procs: new Map(), cancelledChecks: new Set(), services: null, waiting: new Map(), collecting: new Set(), wake: () => wake() };
+    const active: Active = { runId, projectId, plan, cancel: null, procs: new Map(), cancelledChecks: new Set(), services: null, waiting: new Map(), collecting: new Set(), quit: new AbortController(), wake: () => wake() };
     this.#active.set(runId, active);
     // A run cancelled while it waited in the queue never starts.
     if (db.get<{ state: string }>('SELECT state FROM runs WHERE id = ?', runId)!.state !== 'queued') return;
@@ -295,7 +364,7 @@ export class RunService {
     for (const c of this.#checkRows(runId)) {
       const instance = `${c.check_id}@${c.component}`;
       const item = plan.items.find((x) => x.instance === instance)!;
-      execs.set(instance, { instance, checkRunId: c.id, item, state: c.state === 'finished' ? 'done' : 'pending', ok: false, outcome: (c.outcome as CheckOutcome | null) ?? null, raw: null });
+      execs.set(instance, { instance, checkRunId: c.id, item, state: c.state === 'finished' ? 'done' : 'pending', ok: false, outcome: (c.outcome as CheckOutcome | null) ?? null, raw: null, judged: null });
     }
     if (!fresh) {
       // Fails closed: the project's files could not be read again (a root replaced by a link, D-05; a folder gone),
@@ -327,7 +396,16 @@ export class RunService {
     active.services = new CompanionServices({ ports, supervisor: this.#o.supervisor, redaction: this.#o.redaction, projectRoot: root, env: serviceEnv, runId, tmpDir: posix.join(this.#o.layout.tmp, runId) });
     const parallel = readSettings(db, ['run.parallel'])['run.parallel'] ?? 2;
     const sideEffects = readSettings(db, ['run.sideEffects'])['run.sideEffects'] ?? true;
-    const ctx = { projectId, root, sideEffects, startManifest, declared: this.#declared(projectId, plan), lastManifest: startManifest as Manifest };
+    const ctx: CheckContext = {
+      projectId,
+      root,
+      sideEffects,
+      declared: this.#declared(projectId, plan),
+      outputs: this.#outputs(projectId),
+      lastManifest: startManifest,
+      inventory: startManifest.files.filter((f) => f[6] !== 'link').map((f) => f[0]),
+      specs: fresh,
+    };
 
     // The scheduler: order, dependencies, locks, concurrency.
     const order = plan.order.filter((x) => execs.get(x)?.state === 'pending');
@@ -364,9 +442,23 @@ export class RunService {
           if (source && source.raw === null && (source.outcome === 'missing' || source.outcome === 'unavailable')) {
             e.item = { ...e.item, status: 'run', coveredBy: null, sharedInvocationKey: null, reasons: [] };
           } else {
-            this.#inherit(e, source ?? null);
             pending.splice(n--, 1);
             progressed = true;
+            e.state = 'running';
+            // A shared execution is judged again by its own check's rules (a worker job): it waits like a check.
+            running.set(
+              inst,
+              this.#inherit(active, e, source ?? null, ctx)
+                .catch((err: unknown) => {
+                  this.#o.logger.log('error', 'inheritance failed unexpectedly', { instance: inst, error: err instanceof Error ? (err.stack ?? err.message).slice(0, 800) : String(err) });
+                  if (e.state !== 'done') this.#finishCheck(e, 'unavailable', { key: 'run.reason.internal' }, null, []);
+                })
+                .finally(() => {
+                  e.state = 'done';
+                  running.delete(inst);
+                  wake();
+                }),
+            );
             continue;
           }
         }
@@ -414,11 +506,18 @@ export class RunService {
     const change = diffManifests(startManifest, endManifest, { declared: ctx.declared, tracked: await trackedPaths(ports.fs, root) });
     const changed = [...change.created, ...change.modified, ...change.deleted].some((p) => !ctx.declared(p));
     await ports.fs.remove(posix.join(this.#o.layout.tmp, runId));
+    db.run('UPDATE runs SET snapshot_end_id = ?, state_changed = ?, cancel_reason = ? WHERE id = ?', endId, changed ? 1 : 0, active.cancel, runId);
+    // 9.10: the index of the round or the section (a cancelled check counts for nothing: «غير مكتمل» says why).
+    const purity = await this.#o.purity.afterRun(runId, ctx.declared).catch((e: unknown) => {
+      this.#o.logger.log('error', 'the purity index could not be computed', { runId, error: e instanceof Error ? e.message.slice(0, 300) : String(e) });
+      return null;
+    });
     db.transaction(() => {
-      db.run("UPDATE runs SET state = 'finished', finished_at = ?, snapshot_end_id = ?, state_changed = ?, cancel_reason = ?, counts_json = ? WHERE id = ?", this.#now(), endId, changed ? 1 : 0, active.cancel, JSON.stringify(this.#counts(runId)), runId);
+      db.run("UPDATE runs SET state = 'finished', finished_at = ?, counts_json = ? WHERE id = ?", this.#now(), JSON.stringify(this.#counts(runId)), runId);
       if (active.cancel) recordAudit(db, { id: newId(ports.random, 'aud'), at: ports.clock.now(), action: 'run.cancelled', projectId, details: { runId, reason: active.cancel } });
     });
     this.#emitRun(runId);
+    this.#o.events.emit('run.summary', { runId, purity: purity ? this.#o.purity.summaryOf(runId) : null, counts: this.#counts(runId), findings: db.get<{ n: number }>('SELECT count(*) AS n FROM findings f JOIN check_runs c ON c.id = f.check_run_id WHERE c.run_id = ?', runId)?.n ?? 0 });
     // Retention waits for the next run (or the weekly pass) when the app is quitting: the quit stays short.
     if (active.cancel !== 'app_quit') await evidence.retain(projectId).catch((e: unknown) => this.#o.logger.log('error', 'retention failed', { error: e instanceof Error ? e.message : String(e) }));
   }
@@ -452,16 +551,19 @@ export class RunService {
   /** FR-36: what the project may write — the profile's `outputs` and the output folders discovery found. */
   #declared(projectId: string, plan: RunPlan): (p: string) => boolean {
     void plan;
-    const profile = latestProfile(this.#o.db, projectId);
-    const raw = profile?.content.references.outputs;
-    const declared = Array.isArray(raw) ? raw.filter((x): x is string => typeof x === 'string') : typeof raw === 'string' ? [raw] : [];
     const outputDirs = latestSnapshot(this.#o.db, projectId)?.inventory.outputDirs.map((d) => d.path) ?? [];
-    return underAny([...declared, ...outputDirs]);
+    return underAny([...this.#outputs(projectId), ...outputDirs]);
+  }
+
+  /** FR-36: the outputs the profile declares. */
+  #outputs(projectId: string): string[] {
+    const raw = latestProfile(this.#o.db, projectId)?.content.references.outputs;
+    return Array.isArray(raw) ? raw.filter((x): x is string => typeof x === 'string') : typeof raw === 'string' ? [raw] : [];
   }
 
   // ── one check ────────────────────────────────────────────────────────────────────────────────────────────
 
-  async #runCheck(active: Active, e: Exec, ctx: { projectId: string; root: string; sideEffects: boolean; declared: (p: string) => boolean; lastManifest: Manifest }): Promise<void> {
+  async #runCheck(active: Active, e: Exec, ctx: CheckContext): Promise<void> {
     const { db, ports, evidence, layout } = this.#o;
     const runId = active.runId;
     db.run("UPDATE check_runs SET state = 'running', started_at = ? WHERE id = ?", this.#now(), e.checkRunId);
@@ -476,6 +578,8 @@ export class RunService {
       const [outcome, reason] = block ?? ['unavailable', { key: 'run.reason.specMissing' }];
       return this.#finishCheck(e, outcome, reason, null, []);
     }
+    // An analyzer (C-13) runs inside the engine, in a worker thread: no process, no folder, no service.
+    if (spec.runner.kind === 'analyzer') return this.#runAnalyzer(active, e, ctx, spec);
 
     // Its folders (C-12 point 2): the raw reports and its TMPDIR, inside AYAR's tmp/, never in the evidence store.
     const tmpRoot = posix.join(layout.tmp, e.checkRunId);
@@ -487,10 +591,17 @@ export class RunService {
     }
     const tool = e.item.tool?.source === 'managed' || e.item.tool?.source === 'system' ? await this.#o.tools.locate(e.item.tool.key).catch(() => null) : null;
     const base = await this.#o.environment.base();
-    const inv = resolveInvocation({ spec, projectRoot: ctx.root, reportsDir, tmpDir, tool, osvDbDir: layout.osvDb, path: base.env.PATH ?? '' }, this.#o.hooks ?? []);
+    const inv = resolveInvocation({ spec, projectRoot: ctx.root, reportsDir, tmpDir, tool, osvDbDir: layout.osvDb, path: base.env.PATH ?? '', inventory: ctx.inventory });
     if (!inv.ok) {
       await ports.fs.remove(tmpRoot);
       return this.#finishCheck(e, inv.outcome, inv.reason, null, []);
+    }
+    const template = inv.plan.template;
+    // What the template asks AYAR to prepare (Semgrep's rules and its stand-in git, E-24's shadow repository).
+    const prepared = await prepare({ fs: ports.fs, catalog: this.#o.catalog, template, tmpDir, root: ctx.root }).catch((err: unknown) => ({ ok: false as const, outcome: 'unavailable' as const, reason: { key: 'run.reason.prepareFailed', params: { detail: err instanceof Error ? err.message.slice(0, 200) : String(err) } } }));
+    if (!prepared.ok) {
+      await ports.fs.remove(tmpRoot);
+      return this.#finishCheck(e, prepared.outcome, prepared.reason, null, []);
     }
 
     // Companion services before it (FR-21). A cancel (of the check, the run, or the app) ends the wait at once.
@@ -513,14 +624,33 @@ export class RunService {
     // Side effects: an inventory before, compared with one after (FR-36; the E-25 shortcut is fine here).
     const before = ctx.sideEffects && spec.sideEffects.runsProjectCode ? await this.#snapshot(ctx.projectId, ctx.root, false, false, ctx.lastManifest) : null;
 
-    // The child's environment (C-07 point 5, D-47): sensitive variables only by name, a TMPDIR of its own.
-    const child = computeChildEnv({ login: base.env, rules: this.#o.redaction.names(), allowSensitive: spec.env.allowSensitive, explicit: spec.env.explicit, tmpDir, adapter: inv.invocation.env });
+    // The child's environment (C-07 point 5, D-47): sensitive variables only by name, a TMPDIR of its own; the
+    // template's variables per step (its reports folder).
+    const childFor = (env: Record<string, string>) => computeChildEnv({ login: base.env, rules: this.#o.redaction.names(), allowSensitive: spec.env.allowSensitive, explicit: spec.env.explicit, tmpDir, adapter: { ...inv.plan.env, ...env } });
+    const child = childFor(inv.plan.steps[0]!.env);
     const evDir = await evidence.store.open(ctx.projectId, runId, e.checkRunId);
     const totals: OutputTotals = { lines: 0, tail: [] };
     const redactor = this.#o.redaction.redactor();
     const onSegment = (stream: 'stdout' | 'stderr', offset: number, length: number) => this.#o.events.log(runId, e.checkRunId, { stream, offset, length });
-    const out = streamSink({ writer: await ports.fs.openWriter(posix.join(evDir, 'stdout.log'), 0o600), redactor: redactor.lineStream(), stream: 'stdout', totals, onSegment });
-    const err = streamSink({ writer: await ports.fs.openWriter(posix.join(evDir, 'stderr.log'), 0o600), redactor: redactor.lineStream(), stream: 'stderr', totals, onSegment });
+    // 9.6 point 5: the adapter's live parser turns a line into a provisional finding, confirmed or dropped by the
+    // final reading. It sees the lines after redaction.
+    const adapter = adapterById(template.adapter);
+    const live = adapter?.liveParser ? (line: string) => adapter.liveParser?.(line) ?? null : null;
+    let provisional = 0;
+    const onLines = live
+      ? (lines: readonly string[]) => {
+          for (const line of lines) {
+            if (provisional >= PROVISIONAL_MAX) return;
+            const s = live(line.replace(/\n$/, ''));
+            if (!s?.provisional) continue;
+            provisional++;
+            const p = s.provisional;
+            this.#o.events.emit('finding.provisional', { runId, checkRunId: e.checkRunId, fingerprint: createHash('sha256').update(`${spec.checkId}|${p.rule}|${p.title}`).digest('hex'), rule: p.rule, title: p.title.slice(0, 500), location: p.location });
+          }
+        }
+      : undefined;
+    const out = streamSink({ writer: await ports.fs.openWriter(posix.join(evDir, 'stdout.log'), 0o600), redactor: redactor.lineStream(), stream: 'stdout', totals, onSegment, ...(onLines ? { onLines } : {}) });
+    const err = streamSink({ writer: await ports.fs.openWriter(posix.join(evDir, 'stderr.log'), 0o600), redactor: redactor.lineStream(), stream: 'stderr', totals, onSegment, ...(onLines ? { onLines } : {}) });
     // 9.7: a cancel (of the check, its run, or the app) that came while it was being prepared launches nothing.
     // Checked in the same turn as the launch below, so no cancel slips in between.
     if (active.cancel || active.cancelledChecks.has(e.checkRunId)) {
@@ -531,37 +661,68 @@ export class RunService {
       await ports.fs.remove(tmpRoot);
       return this.#finishCheck(e, 'cancelled', { key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }, null, []);
     }
+    // The steps, one after the other, as one execution: one token, one ledger row (the next step reopens it), one
+    // timeout for them all. A step that did not end on its own (cancelled, timed out, killed) ends the execution.
     const token = Buffer.from(ports.random.bytes(24)).toString('base64url');
     const startedWall = ports.clock.now();
-    const proc = this.#o.supervisor.start({
-      argv: inv.invocation.argv,
-      cwd: inv.invocation.cwd,
-      env: child.env,
-      token,
-      tempDir: tmpRoot,
-      ledger: { kind: 'check', runId, checkRunId: e.checkRunId },
-      timeoutMs: spec.timeoutMin * 60_000,
-      idleTimeoutMs: spec.idleTimeoutSec ? spec.idleTimeoutSec * 1000 : null,
-      onStdout: (c) => out.push(c),
-      onStderr: (c) => err.push(c),
-      onSample: (s) => {
-        db.run('UPDATE check_runs SET last_activity_at = ? WHERE id = ?', new Date(ports.clock.now().getTime() - s.silentMs).toISOString(), e.checkRunId);
-        this.#o.events.emit('check.progress', {
-          runId,
-          checkRunId: e.checkRunId,
-          step: totals.lines,
-          total: null,
-          lastActivityAt: new Date(ports.clock.now().getTime() - s.silentMs).toISOString(),
-          processor: `${Math.round(s.cpuPercent)}%`,
-          silentMs: s.silentMs,
-          linesSeen: totals.lines,
-        });
-      },
-    });
-    active.procs.set(e.checkRunId, proc);
-    if (active.cancel || active.cancelledChecks.has(e.checkRunId)) proc.stop(active.cancel === 'app_quit' ? 'quit' : 'cancel');
-    const r = await proc.done;
-    active.procs.delete(e.checkRunId);
+    const deadline = ports.clock.monotonicMs() + spec.timeoutMin * 60_000;
+    let ledgerId: string | undefined;
+    const results: ProcessResult[] = [];
+    const steps: NonNullable<RawCheckResult['steps']> = [];
+    let unfinished: 'cancelled' | 'timed_out' | null = null;
+    for (const step of inv.plan.steps) {
+      if (active.cancel || active.cancelledChecks.has(e.checkRunId)) {
+        unfinished = 'cancelled';
+        break;
+      }
+      const remaining = deadline - ports.clock.monotonicMs();
+      if (remaining <= 0) {
+        unfinished = 'timed_out';
+        break;
+      }
+      await ports.fs.mkdir(step.reportsDir, 0o700);
+      // A tool that writes its findings to its output (tsc, Biome, Knip, pyright): the raw output is its report too,
+      // redacted with the others when it is kept (D-46).
+      const tee = template.stdoutReport ? await this.#tee(posix.join(step.reportsDir, 'stdout.txt')) : null;
+      const proc = this.#o.supervisor.start({
+        argv: step.argv,
+        cwd: step.cwd,
+        env: childFor(step.env).env,
+        token,
+        tempDir: tmpRoot,
+        ledger: { kind: 'check', runId, checkRunId: e.checkRunId, ...(ledgerId ? { reuse: ledgerId } : {}) },
+        onLedger: (id) => (ledgerId = id),
+        timeoutMs: remaining,
+        idleTimeoutMs: spec.idleTimeoutSec ? spec.idleTimeoutSec * 1000 : null,
+        onStdout: (c) => {
+          out.push(c);
+          tee?.push(c);
+        },
+        onStderr: (c) => err.push(c),
+        onSample: (s) => {
+          db.run('UPDATE check_runs SET last_activity_at = ? WHERE id = ?', new Date(ports.clock.now().getTime() - s.silentMs).toISOString(), e.checkRunId);
+          this.#o.events.emit('check.progress', {
+            runId,
+            checkRunId: e.checkRunId,
+            step: totals.lines,
+            total: null,
+            lastActivityAt: new Date(ports.clock.now().getTime() - s.silentMs).toISOString(),
+            processor: `${Math.round(s.cpuPercent)}%`,
+            silentMs: s.silentMs,
+            linesSeen: totals.lines,
+          });
+        },
+      });
+      active.procs.set(e.checkRunId, proc);
+      if (active.cancel || active.cancelledChecks.has(e.checkRunId)) proc.stop(active.cancel === 'app_quit' ? 'quit' : 'cancel');
+      const r = await proc.done;
+      active.procs.delete(e.checkRunId);
+      await tee?.close();
+      results.push(r);
+      steps.push({ n: step.n, ended: r.ended, exitCode: r.exitCode, signal: r.signal, durationMs: r.durationMs });
+      if (r.ended !== 'exited' || (r.exitCode === null && r.signal)) break;
+    }
+    const r = aggregate(results, unfinished, startedWall, ports.clock.now());
     // Its process has ended: what follows records its result, and a cancel now comes too late (accepted: false).
     active.collecting.add(e.checkRunId);
     const outEnd = await out.end();
@@ -574,7 +735,9 @@ export class RunService {
     // reports redacted on their way in (D-46), and the metadata of 9.9. Then the temporary folder goes.
     const refs: EvidenceRef[] = [];
     const add = async (name: string, kind: string, data: Uint8Array | undefined, extra: { counts?: Record<string, number>; truncated?: boolean } = {}) => {
-      refs.push(await evidence.store.add({ projectId: ctx.projectId, runId, checkRunId: e.checkRunId, name, kind, ...(data ? { data } : {}), redacted: true, ...extra }));
+      const ref = await evidence.store.add({ projectId: ctx.projectId, runId, checkRunId: e.checkRunId, name, kind, ...(data ? { data } : {}), redacted: true, ...extra });
+      refs.push(ref);
+      return ref;
     };
     await add('stdout.log', 'log', undefined, { counts: outEnd.counts, truncated: outEnd.truncated });
     await add('stderr.log', 'log', undefined, { counts: errEnd.counts, truncated: errEnd.truncated });
@@ -586,11 +749,20 @@ export class RunService {
       sideEffects = diffManifests(before, after, { declared: ctx.declared, tracked: await trackedPaths(ports.fs, ctx.root) });
       await add('side-effects.json', 'side_effects', new TextEncoder().encode(JSON.stringify(sideEffects, null, 2)));
     }
-    await this.#collectReports(reportsDir, async (name, data, truncated) => {
-      const text = new TextDecoder().decode(data);
-      const red = redactor.redactText(text);
-      await add(`reports/${name}`, 'report', new TextEncoder().encode(red.text), { counts: red.counts, truncated });
+    // The reports, step by step (`<reports>/<n>/`): a single step's keep their own names.
+    const reports: ReportInput[] = [];
+    const single = inv.plan.steps.length === 1;
+    await this.#collectReports(reportsDir, async (name, data, size, truncated) => {
+      const slash = name.indexOf('/');
+      const step = slash > 0 && /^\d+$/.test(name.slice(0, slash)) ? Number(name.slice(0, slash)) : 1;
+      const own = slash > 0 && /^\d+$/.test(name.slice(0, slash)) ? name.slice(slash + 1) : name;
+      const red = redactor.redactText(new TextDecoder().decode(data));
+      const ref = await add(`reports/${single ? own : name}`, 'report', new TextEncoder().encode(red.text), { counts: red.counts, truncated });
+      reports.push({ name: own, step, path: evidence.store.absolute(ref.relPath), size, truncated });
     });
+    // E-10's stand-in git: how it was called, as evidence (AT-01: no git on the project from a static tool).
+    const nogit = await ports.fs.readFilePrefix(posix.join(tmpDir, NOGIT_LOG), 1024 * 1024).catch(() => null);
+    if (nogit) await add(NOGIT_LOG, 'trace', new TextEncoder().encode(redactor.redactText(new TextDecoder().decode(nogit.data)).text));
     await ports.fs.remove(tmpRoot);
 
     // The outcome the process itself gives (7.3 rule 1; 7.5), and the notes of 9.7 and 17.
@@ -599,6 +771,8 @@ export class RunService {
     if (r.leftovers.tokenKilled > 0) notes.push('run.note.leftoversEnded');
     if (r.sleepGaps.length) notes.push('run.note.sleepGap');
     if (outEnd.truncated || errEnd.truncated) notes.push('run.note.outputTruncated');
+    if (template.suggestion) notes.push('adapter.note.directCallSuggested');
+    const logs = { stdout: refs.find((x) => x.relPath.endsWith('/stdout.log')) ?? null, stderr: refs.find((x) => x.relPath.endsWith('/stderr.log')) ?? null };
     const raw: RawCheckResult = {
       checkRunId: e.checkRunId,
       runId,
@@ -613,10 +787,10 @@ export class RunService {
       startedAt: startedWall.toISOString(),
       finishedAt: r.finishedAt.toISOString(),
       durationMs: r.durationMs,
-      command: { argv: spec.command?.argv ?? inv.invocation.argv, cwd: spec.command?.cwd ?? spec.component },
+      command: { argv: spec.command?.argv ?? template.argv, cwd: spec.command?.cwd ?? spec.component },
       envKeys: child.passed,
-      toolVersions: inv.invocation.toolVersions,
-      logs: { stdout: refs.find((x) => x.relPath.endsWith('/stdout.log')) ?? null, stderr: refs.find((x) => x.relPath.endsWith('/stderr.log')) ?? null },
+      toolVersions: inv.plan.toolVersions,
+      logs,
       reports: refs.filter((x) => x.kind === 'report'),
       tail: totals.tail.slice(-200),
       lastActivityAt: r.lastActivityAt?.toISOString() ?? null,
@@ -626,14 +800,122 @@ export class RunService {
       leftovers: r.leftovers,
       notes,
       sharedFrom: null,
+      steps,
     };
-    // The metadata of 9.9: the literal command, its folder, the variable names (no values), the tools, the
-    // environment's source; and how the process was ended (the escalation), what was left and cleaned.
-    await add('meta.json', 'meta', new TextEncoder().encode(JSON.stringify({ command: raw.command, invocation: { argv: inv.invocation.argv.map((a) => a.replace(this.#o.layout.root, '<data>')), cwd: inv.invocation.cwd === ctx.root ? '.' : posix.relative(ctx.root, inv.invocation.cwd) }, env: { source: base.source, fallbackReason: base.fallbackReason, passed: child.passed, withheld: child.withheld, allowedSensitive: child.allowedSensitive, added: child.added, removedInternal: child.removedInternal }, toolVersions: raw.toolVersions, escalation: r.escalation, leftovers: r.leftovers, sleepGaps: r.sleepGaps }, null, 2)));
-    raw.logs = { stdout: refs.find((x) => x.relPath.endsWith('/stdout.log')) ?? null, stderr: refs.find((x) => x.relPath.endsWith('/stderr.log')) ?? null };
+    // The metadata of 9.9: the literal command (the adapter's template, and its steps as run), its folder, the
+    // variable names (no values), the tools, the environment's source; and how the process was ended (the
+    // escalation), what was left and cleaned.
+    const shown = (a: string) => a.replaceAll(layout.root, '<data>');
+    await add(
+      'meta.json',
+      'meta',
+      new TextEncoder().encode(
+        JSON.stringify(
+          {
+            command: raw.command,
+            template: { adapter: template.adapter, adapterVersion: template.adapterVersion, argv: template.argv, cwd: template.cwd, suggestion: template.suggestion },
+            invocation: { argv: inv.plan.steps[0]!.argv.slice(0, 64).map(shown), cwd: inv.plan.steps[0]!.cwd === ctx.root ? '.' : shown(inv.plan.steps[0]!.cwd.startsWith(`${ctx.root}/`) ? posix.relative(ctx.root, inv.plan.steps[0]!.cwd) : inv.plan.steps[0]!.cwd), steps: inv.plan.steps.length },
+            env: { source: base.source, fallbackReason: base.fallbackReason, passed: child.passed, withheld: child.withheld, allowedSensitive: child.allowedSensitive, added: child.added, removedInternal: child.removedInternal },
+            toolVersions: raw.toolVersions,
+            steps,
+            escalation: r.escalation,
+            leftovers: r.leftovers,
+            sleepGaps: r.sleepGaps,
+          },
+          null,
+          2,
+        ),
+      ),
+    );
     const [outcome, reason] = this.#processOutcome(r, active, e, spec);
-    const classified = outcome === null ? (this.#o.classify?.(raw, spec) ?? null) : null;
-    this.#finishCheck(e, classified?.outcome ?? outcome, classified?.reason ?? reason, raw, notes, r);
+    if (outcome !== null) return this.#finishCheck(e, outcome, reason, raw, notes, r);
+
+    // 9.8: the adapter reads the kept reports (in a worker thread), the classifier judges (C-16).
+    const req: JudgeRequest = {
+      kind: 'parse',
+      adapter: template.adapter,
+      cwd: inv.plan.steps[0]!.cwd,
+      reports,
+      stdoutPath: logs.stdout ? evidence.store.absolute(logs.stdout.relPath) : null,
+      stderrPath: logs.stderr ? evidence.store.absolute(logs.stderr.relPath) : null,
+      exit: { exitCode: r.exitCode, signal: r.signal, steps: steps.map((s) => ({ n: s.n, exitCode: s.exitCode, ended: s.ended })) },
+      inventory: ctx.inventory,
+      outputs: ctx.outputs,
+    };
+    const judgement = await this.#o.verdict.judge(spec, { projectId: ctx.projectId, root: ctx.root, req, signal: active.quit.signal });
+    if (judgement.outcome === 'cancelled') return this.#finishCheck(e, 'cancelled', { key: 'run.reason.appQuit' }, raw, notes, r);
+    const evidenceIds = refs.filter((x) => x.kind === 'report').map((x) => x.id);
+    if (judgement.report) evidenceIds.push((await add('parsed.json', 'parsed', reportEvidence(redactor.redactJson(judgement.report)))).id);
+    e.judged = { req, evidenceIds };
+    this.#finishCheck(e, judgement.outcome, judgement.reason, raw, notes, r, undefined, { judgement, evidenceIds, reader: judgement.report ? { id: judgement.report.reader, version: judgement.report.readerVersion, formats: judgement.report.formats } : null });
+  }
+
+  /** A file the raw output is copied into, up to the read limit of a report (a bigger one is not judged anyway). */
+  async #tee(path: string): Promise<{ push(c: Uint8Array): void; close(): Promise<void> }> {
+    const w: FileWriter = await this.#o.ports.fs.openWriter(path, 0o600);
+    let bytes = 0;
+    return {
+      push(c) {
+        if (bytes > REPORT_READ_LIMIT) return;
+        bytes += c.length;
+        void w.write(c);
+      },
+      close: () => w.close(),
+    };
+  }
+
+  /** C-13: an analyzer runs inside the engine, in a worker thread that a cancel stops. */
+  async #runAnalyzer(active: Active, e: Exec, ctx: CheckContext, spec: CheckSpec): Promise<void> {
+    const { db, ports, evidence } = this.#o;
+    const runId = active.runId;
+    const analyzer = spec.runner.ids[0] ?? '';
+    const comp = spec.component === '.' ? '' : `${spec.component}/`;
+    const files = ctx.inventory.filter((f) => !comp || f.startsWith(comp));
+    const facts = (latestSnapshot(db, ctx.projectId)?.facts ?? []).filter((f) => f.component === spec.component || f.component === '.');
+    const ctrl = new AbortController();
+    active.waiting.set(e.checkRunId, ctrl);
+    if (active.cancel || active.cancelledChecks.has(e.checkRunId)) ctrl.abort();
+    const started = ports.clock.now();
+    const t0 = ports.clock.monotonicMs();
+    const judgement = await this.#o.verdict.judge(spec, { projectId: ctx.projectId, root: ctx.root, req: { kind: 'analyze', analyzer, files, facts }, signal: AbortSignal.any([ctrl.signal, active.quit.signal]) }).finally(() => active.waiting.delete(e.checkRunId));
+    active.collecting.add(e.checkRunId);
+    if (judgement.outcome === 'cancelled') return this.#finishCheck(e, 'cancelled', { key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }, null, []);
+    const raw: RawCheckResult = {
+      checkRunId: e.checkRunId,
+      runId,
+      instance: e.instance,
+      checkId: spec.checkId,
+      component: spec.component,
+      attempt: this.#checkRow(e.checkRunId).attempt,
+      ended: 'exited',
+      exitCode: null,
+      signal: null,
+      spawnError: null,
+      startedAt: started.toISOString(),
+      finishedAt: ports.clock.now().toISOString(),
+      durationMs: Math.max(0, Math.round(ports.clock.monotonicMs() - t0)),
+      command: null,
+      envKeys: [],
+      toolVersions: { [`analyzer:${analyzer}`]: judgement.report?.readerVersion ?? '' },
+      logs: { stdout: null, stderr: null },
+      reports: [],
+      tail: [],
+      lastActivityAt: null,
+      sideEffects: null,
+      resources: { samples: 0, peakRssKb: 0, maxCpuPercent: 0, lastCpuPercent: 0 },
+      sleepGaps: [],
+      leftovers: { groupKilled: 0, tokenKilled: 0, escapeSuspected: [] },
+      notes: [],
+      sharedFrom: null,
+      internal: { runner: analyzer, version: judgement.report?.readerVersion ?? '' },
+    };
+    const evidenceIds: string[] = [];
+    if (judgement.report) {
+      await evidence.store.open(ctx.projectId, runId, e.checkRunId);
+      const ref = await evidence.store.add({ projectId: ctx.projectId, runId, checkRunId: e.checkRunId, name: 'parsed.json', kind: 'parsed', data: reportEvidence(this.#o.redaction.redactor().redactJson(judgement.report)), redacted: true });
+      evidenceIds.push(ref.id);
+    }
+    this.#finishCheck(e, judgement.outcome, judgement.reason, raw, [], undefined, undefined, { judgement, evidenceIds, reader: judgement.report ? { id: judgement.report.reader, version: judgement.report.readerVersion, formats: judgement.report.formats } : null });
   }
 
   /** 7.3 rule 1 and C-12 «الأخطاء»: what the process itself says, before any classifier. */
@@ -657,57 +939,83 @@ export class RunService {
     }
   }
 
-  /** D-24 / D-45: a covered check takes the covering execution's result; a shared one, its very raw result. */
-  #inherit(e: Exec, source: Exec | null): void {
+  /**
+   * D-24 / D-45: a covered check takes the covering execution's result («يشمل»: beh.unit from beh.stability's
+   * attempts); a shared one, its very raw result, judged again by its own check's rules (its own findings).
+   */
+  async #inherit(active: Active, e: Exec, source: Exec | null, ctx: CheckContext): Promise<void> {
     if (!source) return this.#finishCheck(e, 'unavailable', { key: 'run.reason.internal' }, null, []);
     const raw = source.raw ? RawSchema.parse({ ...source.raw, checkRunId: e.checkRunId, instance: e.instance, checkId: e.item.checkId, component: e.item.component, sharedFrom: source.checkRunId }) : null;
-    if (e.item.status === 'covered') this.#o.db.run('UPDATE check_runs SET covered_by_check_run_id = ? WHERE id = ?', source.checkRunId, e.checkRunId);
-    const reason: Reason = e.item.status === 'covered' ? { key: 'plan.reason.coveredBy', params: { by: source.instance } } : { key: 'plan.reason.sharesExecution', params: { with: source.instance } };
-    this.#finishCheck(e, source.outcome, source.outcome === null ? null : reason, raw, raw?.notes ?? [], undefined, source.ok);
+    if (e.item.status === 'covered') {
+      this.#o.db.run('UPDATE check_runs SET covered_by_check_run_id = ? WHERE id = ?', source.checkRunId, e.checkRunId);
+      const reason: Reason = { key: 'plan.reason.coveredBy', params: { by: source.instance } };
+      const row = this.#checkRow(source.checkRunId);
+      return this.#finishCheck(e, source.outcome, source.outcome === null ? null : reason, raw, raw?.notes ?? [], undefined, source.ok, undefined, row.origin);
+    }
+    const reason: Reason = { key: 'plan.reason.sharesExecution', params: { with: source.instance } };
+    const spec = ctx.specs.get(e.instance);
+    if (!source.judged || !spec) return this.#finishCheck(e, source.outcome, source.outcome === null ? null : reason, raw, raw?.notes ?? [], undefined, source.ok);
+    const judgement = await this.#o.verdict.judge(spec, { projectId: ctx.projectId, root: ctx.root, req: source.judged.req, signal: active.quit.signal });
+    if (judgement.outcome === 'cancelled') return this.#finishCheck(e, 'cancelled', { key: 'run.reason.appQuit' }, raw, raw?.notes ?? []);
+    this.#finishCheck(e, judgement.outcome, judgement.reason, raw, raw?.notes ?? [], undefined, undefined, { judgement, evidenceIds: source.judged.evidenceIds, reader: judgement.report ? { id: judgement.report.reader, version: judgement.report.readerVersion, formats: judgement.report.formats } : null });
   }
 
-  #finishCheck(e: Exec, outcome: CheckOutcome | null, reason: Reason | null, raw: RawCheckResult | null, notes: readonly string[], r?: ProcessResult, ok?: boolean): void {
+  #finishCheck(e: Exec, outcome: CheckOutcome | null, reason: Reason | null, raw: RawCheckResult | null, notes: readonly string[], r?: ProcessResult, ok?: boolean, verdict?: Verdict, inheritedOrigin?: string | null): void {
     const { db } = this.#o;
+    const row = this.#checkRow(e.checkRunId);
     e.state = 'done';
     e.outcome = outcome;
     e.raw = raw;
-    // 7.3 rule 2: a dependant runs only after its dependency succeeded (before DEV-6, a clean exit).
-    e.ok = ok ?? (outcome === null ? (raw?.ended === 'exited' && raw.exitCode === 0) : outcome === 'passed' || outcome === 'warning');
-    db.run(
-      'UPDATE check_runs SET state = ?, outcome = ?, auto_outcome = ?, outcome_reason = ?, finished_at = ?, duration_ms = ?, exit_code = ?, signal = ?, env_keys_json = ?, tool_versions_json = ?, resource_json = ?, sleep_gaps_json = ?, last_activity_at = coalesce(?, last_activity_at), raw_json = ?, notes_json = ? WHERE id = ?',
-      'finished',
-      outcome,
-      outcome,
-      reason ? JSON.stringify(reason) : null,
-      this.#now(),
-      r?.durationMs ?? raw?.durationMs ?? null,
-      raw?.exitCode ?? null,
-      raw?.signal ?? null,
-      raw ? JSON.stringify(raw.envKeys) : null,
-      raw ? JSON.stringify(raw.toolVersions) : null,
-      raw ? JSON.stringify(raw.resources) : null,
-      raw ? JSON.stringify(raw.sleepGaps) : null,
-      raw?.lastActivityAt ?? null,
-      raw ? JSON.stringify(raw) : null,
-      notes.length ? JSON.stringify(notes) : null,
-      e.checkRunId,
-    );
+    // 7.3 rule 2: a dependant runs only after its dependency succeeded.
+    e.ok = ok ?? (outcome === 'passed' || outcome === 'warning');
+    const origin = verdict?.judgement.origin ?? inheritedOrigin ?? null;
+    db.transaction(() => {
+      if (verdict) this.#o.verdict.persist({ projectId: this.#projectOf(row.run_id), runId: row.run_id, checkRunId: e.checkRunId, spec: { checkId: e.item.checkId, component: e.item.component, section: e.item.section }, judgement: verdict.judgement, evidenceIds: verdict.evidenceIds });
+      db.run(
+        'UPDATE check_runs SET state = ?, outcome = ?, auto_outcome = ?, outcome_reason = ?, origin = ?, findings_json = ?, reader_json = ?, finished_at = ?, duration_ms = ?, exit_code = ?, signal = ?, env_keys_json = ?, tool_versions_json = ?, resource_json = ?, sleep_gaps_json = ?, last_activity_at = coalesce(?, last_activity_at), raw_json = ?, notes_json = ? WHERE id = ?',
+        'finished',
+        outcome,
+        outcome,
+        reason ? JSON.stringify(reason) : null,
+        origin,
+        verdict ? JSON.stringify(verdict.judgement.counts) : null,
+        verdict?.reader ? JSON.stringify({ ...verdict.reader, dropped: verdict.judgement.report?.findingsDropped ?? 0 }) : null,
+        this.#now(),
+        r?.durationMs ?? raw?.durationMs ?? null,
+        raw?.exitCode ?? null,
+        raw?.signal ?? null,
+        raw ? JSON.stringify(raw.envKeys) : null,
+        raw ? JSON.stringify(raw.toolVersions) : null,
+        raw ? JSON.stringify(raw.resources) : null,
+        raw ? JSON.stringify(raw.sleepGaps) : null,
+        raw?.lastActivityAt ?? null,
+        raw ? JSON.stringify(raw) : null,
+        notes.length ? JSON.stringify(notes) : null,
+        e.checkRunId,
+      );
+    });
     this.#o.events.emit('check.state', this.#checkView(this.#checkRow(e.checkRunId)));
-    this.#emitRun(this.#checkRow(e.checkRunId).run_id);
+    if (verdict) this.#o.verdict.emitFinal(row.run_id, e.checkRunId);
+    this.#emitRun(row.run_id);
   }
 
-  async #collectReports(dir: string, each: (name: string, data: Uint8Array, truncated: boolean) => Promise<void>): Promise<number> {
+  #projectOf(runId: string): string {
+    return this.#o.db.get<{ project_id: string }>('SELECT project_id FROM runs WHERE id = ?', runId)!.project_id;
+  }
+
+  async #collectReports(dir: string, each: (name: string, data: Uint8Array, size: number, truncated: boolean) => Promise<void>): Promise<number> {
     const { fs } = this.#o.ports;
     let n = 0;
     const walk = async (rel: string) => {
       const entries = await fs.readdirEntries(rel ? posix.join(dir, rel) : dir).catch(() => []);
-      for (const x of entries) {
+      for (const x of entries.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))) {
         const r = rel ? `${rel}/${x.name}` : x.name;
         if (x.kind === 'directory') await walk(r);
         else if (x.kind === 'file') {
-          // A raw report is read with a limit (10.3 «حماية القراءة»): beyond it, the part read is kept.
-          const { data, size } = await fs.readFilePrefix(posix.join(dir, r), 50 * 1024 * 1024);
-          await each(r.replace(/[^A-Za-z0-9._/-]/g, '_'), data, size > data.length);
+          // A raw report is read with a limit (10.3 «حماية القراءة»): beyond it, the part read is kept, marked, and
+          // the adapter does not read it at all (C-15: «تعذّر: التقرير أكبر من الحد»).
+          const { data, size } = await fs.readFilePrefix(posix.join(dir, r), REPORT_READ_LIMIT);
+          await each(r.replace(/[^A-Za-z0-9._/-]/g, '_'), data, size, size > data.length);
           n++;
         }
       }
@@ -767,6 +1075,8 @@ export class RunService {
   #requestCancel(a: Active, reason: 'user' | 'app_quit'): void {
     if (a.cancel === 'app_quit') return;
     a.cancel = reason;
+    // The app quits: a report still being read is dropped (the run ends the short way).
+    if (reason === 'app_quit') a.quit.abort();
     this.#o.db.run("UPDATE runs SET state = 'cancelling' WHERE id = ?", a.runId);
     for (const [checkRunId, proc] of a.procs) {
       this.#o.db.run("UPDATE check_runs SET state = 'cancelling' WHERE id = ?", checkRunId);
@@ -834,7 +1144,7 @@ export class RunService {
       autoOutcome: (c.auto_outcome as CheckOutcome | null) ?? null,
       reviewId: c.review_id,
       origin: (c.origin as CheckRunView['origin']) ?? null,
-      findings: { violations: 0, warnings: 0, review: 0, notes: 0, excludedByReview: 0 },
+      findings: c.findings_json ? (JSON.parse(c.findings_json) as VerdictCounts) : { violations: 0, warnings: 0, review: 0, notes: 0, excludedByReview: 0 },
     };
   }
 
@@ -868,9 +1178,9 @@ export class RunService {
       finishedAt: r.finished_at,
       counts: this.#counts(runId),
       stateChanged: r.state_changed === 1,
-      // 9.6 point 4: no verdict while running; the verdict itself is C-19's (DEV-6).
+      // 9.6 point 4: no verdict while running; then C-19's, never the number alone (11.5).
       verdict: TERMINAL_RUN.includes(r.state) ? ((r.verdict as RunView['verdict']) ?? null) : null,
-      purity: null,
+      purity: TERMINAL_RUN.includes(r.state) ? this.#o.purity.summaryOf(runId) : null,
       keepForever: r.keep_forever === 1,
       cancelReason: r.cancel_reason === 'user' || r.cancel_reason === 'app_quit' ? r.cancel_reason : null,
       preventSleep: r.prevent_sleep === 1,
@@ -900,7 +1210,7 @@ export class RunService {
         stateChange = diffManifests(a, b, { declared: this.#declared(row.project_id, plan.success ? plan.data : (null as unknown as RunPlan)), tracked: root ? await trackedPaths(this.#o.ports.fs, root) : null });
       }
     }
-    return { run, plan: plan.success ? plan.data : null, checks, stateChange, purity: null };
+    return { run, plan: plan.success ? plan.data : null, checks, stateChange, purity: TERMINAL_RUN.includes(row.state) ? this.#o.purity.resultOf(runId) : null };
   }
 
   keep(runId: string, keep: boolean): RunView {
