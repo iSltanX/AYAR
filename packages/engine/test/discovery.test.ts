@@ -342,3 +342,11 @@ describe('scripts and parsers', () => {
   });
 });
 
+
+describe('node:test', () => {
+  it('is declared by a script that runs node --test', async () => {
+    write('package.json', JSON.stringify({ name: 'n', scripts: { test: 'node --test --test-reporter=spec' } }, null, 2));
+    const r = await run();
+    expect(fact(r, 'testing.framework')[0]).toMatchObject({ value: { name: 'node-test', from: 'script' }, source: { pointer: '/scripts/test' } });
+  });
+});

@@ -84,5 +84,7 @@
   "profile.withheldEnv.allowWarning": "“{name}” will be passed to this check, and its value redacted from the logs. Allow it only if the check needs it.",
   "profile.import.needsApproval": "The standards profile was imported, and every command in it needs approval again.",
   "profile.export.preview": "Preview the differences before writing into the repository",
-  "profile.repoProfile.available": "The repository has a standards profile. Using it requires approving its commands."
+  "profile.repoProfile.available": "The repository has a standards profile. Using it requires approving its commands.",
+  "profile.invalid.secret_in_profile": "The standards profile holds a secret ({rules}), so it was not saved. Pass the secret as an environment variable allowed by name instead of writing it in the profile.",
+  "profile.invalid.outside_project": "The repository’s standards profile points outside the project, so it was not read."
 }

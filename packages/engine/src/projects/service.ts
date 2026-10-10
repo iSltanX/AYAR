@@ -339,6 +339,7 @@ export class ProjectsService {
       const redactor = redaction.redactor();
       const counts: Record<string, number> = {};
       const facts = redactor.redactJson(result.facts, counts);
+      const components = redactor.redactJson(result.components, counts);
       const inventory = redactor.redactJson(result.inventory, counts);
       const warnings = redactor.redactJson(result.warnings, counts);
       const snapshot: DiscoverySnapshot = {
@@ -349,7 +350,7 @@ export class ProjectsService {
         durationMs: Math.round(this.#o.ports.clock.monotonicMs() - started),
         partial: result.partial,
         partialReasons: result.partialReasons,
-        components: result.components,
+        components,
         facts,
         inventory,
         warnings,

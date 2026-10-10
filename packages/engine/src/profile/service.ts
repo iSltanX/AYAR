@@ -147,6 +147,10 @@ export class ProfileService {
     for (const [name, c] of Object.entries(settings.custom)) {
       if (judgeCommand(policy, [argvText(c.argv)]).refused.length) throw invalid('sudo', { instance: `custom.${name}@.` });
     }
+    // Nothing is saved before C-18: a profile that holds a secret (in a command, a variable, a reference) is
+    // refused rather than stored; a secret reaches a check only as an allowed variable, by name (D-47).
+    const second = this.#o.redaction.redactor().secondPass(JSON.stringify({ context: settings.context, references: settings.references, overrides: settings.overrides, custom: settings.custom }));
+    if (!second.ok) throw invalid('secret_in_profile', { rules: second.rules.join(',') });
   }
 
   update(projectId: string, patch: ProfilePatch): ProfileView {

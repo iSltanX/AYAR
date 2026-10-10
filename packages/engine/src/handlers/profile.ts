@@ -20,12 +20,15 @@ export const profileApprove: CommandHandler = (payload, ctx) => {
   return ctx.services.profiles.approve(projectId, changeSetId, instances, note);
 };
 
-/** The repository's own .ayar/profile.json, read without following a link out of the root. */
+/** The repository's own .ayar/profile.json, read only when it really is inside the root (no link out of it). */
 async function repoProfile(ctx: Parameters<CommandHandler>[1], projectId: string): Promise<string | null> {
   const root = (await ctx.services.projects.view(projectId)).rootPath;
   const path = posix.join(root, '.ayar', 'profile.json');
   const st = await ctx.ports.fs.lstat(path);
   if (!st?.isFile) return null;
+  const real = await ctx.ports.fs.realpath(path);
+  const realRoot = await ctx.ports.fs.realpath(root);
+  if (!real || !realRoot || !real.startsWith(`${realRoot}/`)) throw new CommandError('profile_invalid', { rule: 'outside_project' });
   if (st.size > MAX_PROFILE_BYTES) throw new CommandError('profile_invalid', { rule: 'too_large' });
   return new TextDecoder().decode((await ctx.ports.fs.readFilePrefix(path, MAX_PROFILE_BYTES)).data);
 }

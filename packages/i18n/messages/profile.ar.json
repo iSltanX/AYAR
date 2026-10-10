@@ -84,5 +84,7 @@
   "profile.withheldEnv.allowWarning": "سيُمرَّر «{name}» إلى هذا الفحص، وتُخفى قيمته من السجلات. اسمح به فقط إن كان الفحص يحتاجه.",
   "profile.import.needsApproval": "استُورد ملف المعايير، وكل أمر فيه يحتاج اعتمادًا من جديد.",
   "profile.export.preview": "معاينة الفرق قبل الكتابة في المستودع",
-  "profile.repoProfile.available": "في المستودع ملف معايير. استخدامه يتطلب اعتماد أوامره."
+  "profile.repoProfile.available": "في المستودع ملف معايير. استخدامه يتطلب اعتماد أوامره.",
+  "profile.invalid.secret_in_profile": "ملف المعايير يحوي سرًا ({rules})، فلم يُحفظ. مرّر السر متغيرَ بيئة مسموحًا باسمه بدل كتابته في الملف.",
+  "profile.invalid.outside_project": "ملف المعايير في المستودع يشير إلى خارج المشروع، فلم يُقرأ."
 }

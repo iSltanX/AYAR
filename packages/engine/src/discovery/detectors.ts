@@ -112,6 +112,8 @@ export const nodePackage: Detector = {
         if (typeof body !== 'string') continue;
         const info: ScriptInfo = classifyScript(name, body);
         add('node.script', info, src(file, pointer(['scripts', name]), lineOfJsonPath(text, ['scripts', name])), 'declared');
+        // node:test has no dependency to find: a script that runs `node --test` declares it.
+        if (/(^|\s)node\s+(?:[^|;&]*\s)?--test\b/.test(body)) add('testing.framework', { name: 'node-test', from: 'script', version: null }, src(file, pointer(['scripts', name]), lineOfJsonPath(text, ['scripts', name])), 'declared');
       }
     }
     const all = deps(p);

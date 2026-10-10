@@ -5,7 +5,7 @@
 // every approval again; sudo is refused; a mass deletion is flagged and approved on its own; the «مشروع غير
 // موثوق» flag is recorded. (Running checks, and the untrusted mode at run time, are DEV-5.)
 import type { CheckSpec, ExportPreview, ProfileView } from '@ayar/protocol';
-import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { pathGrant } from '../src/grants.ts';
@@ -140,6 +140,31 @@ describe('AT-05: approval, its persistence, effective changes, and dangerous com
       const src = pathGrant('source', bad);
       expect(await engine.invoke('profile.import', { projectId, sourceToken: src.token }, src.grants)).toMatchObject({ ok: false, error: { code: 'profile_invalid', details: { rule: 'schema' } } });
       expect(ok<ProfileView>(await engine.invoke('profile.get', { projectId })).version).toBe(p.version);
+    } finally {
+      await engine.close();
+    }
+  }, 60_000);
+});
+
+describe('nothing is saved before C-18 (D-21)', () => {
+  it('refuses a profile edit that would store a secret, and a repository profile that links out of the project', async () => {
+    const engine = await connectEngine({ dataDir: join(root, 'AYAR') });
+    try {
+      await engine.waitForEvent('engine.health');
+      const project = materialize('FX-EXT', 'good', join(root, 'FX-EXT'));
+      const { projectId } = await addProject(engine, project);
+      const token = ['gh', 'p_', 'S'.repeat(36)].join('');
+      const r = await engine.invoke('profile.update', { projectId, patch: { custom: { deploy: { argv: ['curl', '-H', `Authorization: Bearer ${token}`, 'https://example.com'], cwd: '.', timeoutMin: 1, success: { exitCode: 0 } } } } });
+      expect(r).toMatchObject({ ok: false, error: { code: 'profile_invalid', details: { rule: 'secret_in_profile', rules: 'github-token' } } });
+      const outside = tempDir('ayar-DEV-4-outside-');
+      try {
+        writeFileSync(join(outside.dir, 'profile.json'), '{"schema":"ayar-profile/1"}');
+        symlinkSync(outside.dir, join(project, '.ayar'));
+        expect(await engine.invoke('profile.importFromRepo', { projectId })).toMatchObject({ ok: false, error: { code: 'profile_invalid', details: { rule: 'outside_project' } } });
+        expect(await engine.invoke('profile.exportPreview', { projectId })).toMatchObject({ ok: false, error: { code: 'profile_invalid', details: { rule: 'outside_project' } } });
+      } finally {
+        outside.cleanup();
+      }
     } finally {
       await engine.close();
     }
