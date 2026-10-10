@@ -481,14 +481,16 @@ export class RunService {
     // Companion services before it (FR-21). A cancel (of the check, the run, or the app) ends the wait at once.
     const waiting = new AbortController();
     active.waiting.set(e.checkRunId, waiting);
-    const failedService = await active.services!.acquire(spec.services, waiting.signal).finally(() => active.waiting.delete(e.checkRunId));
+    // A cancel that came before the controller existed (while the spec was checked) counts too.
+    if (active.cancel || active.cancelledChecks.has(e.checkRunId)) waiting.abort();
+    const { failed: failedService, held } = await active.services!.acquire(spec.services, waiting.signal).finally(() => active.waiting.delete(e.checkRunId));
     if (waiting.signal.aborted || active.cancel || active.cancelledChecks.has(e.checkRunId)) {
-      await active.services!.release(spec.services);
+      await active.services!.release(held);
       await ports.fs.remove(tmpRoot);
       return this.#finishCheck(e, 'cancelled', { key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }, null, []);
     }
     if (failedService) {
-      await active.services!.release(spec.services);
+      await active.services!.release(held);
       await ports.fs.remove(tmpRoot);
       return this.#finishCheck(e, 'unavailable', { key: 'run.reason.serviceNotReady', params: { service: failedService } }, null, []);
     }
@@ -539,7 +541,7 @@ export class RunService {
     const errEnd = await err.end();
     // The services' logs so far are this check's evidence (FR-21), taken before a service stops with its last user.
     const serviceLogs = spec.services.map((s) => [s.id, active.services!.logOf(s.id)] as const);
-    await active.services!.release(spec.services);
+    await active.services!.release(held);
 
     // Evidence: the logs (already redacted as they were written), the services' logs, the side effects, the raw
     // reports redacted on their way in (D-46), and the metadata of 9.9. Then the temporary folder goes.

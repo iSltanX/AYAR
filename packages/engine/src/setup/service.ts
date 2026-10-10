@@ -283,14 +283,16 @@ export class SetupService {
     if (this.#o.runActive(action.projectId!)) throw new CommandError('busy', { reason: 'run_active' });
     // Taken in the same turn as the check: a second confirmation (a double click) finds it busy (one at a time).
     this.#busy = actionId;
-    let project: Awaited<ReturnType<ProjectsService['view']>>;
     try {
-      project = await this.#o.projects.view(action.projectId!);
-      if (action.kind === 'install_dependencies' && project.untrusted) throw new CommandError('untrusted_project');
-    } catch (e) {
+      return await this.#execute(action, actionId);
+    } finally {
       this.#busy = null;
-      throw e;
     }
+  }
+
+  async #execute(action: SetupAction, actionId: string): Promise<SetupExecuteResult> {
+    const project = await this.#o.projects.view(action.projectId!);
+    if (action.kind === 'install_dependencies' && project.untrusted) throw new CommandError('untrusted_project');
     const { db, ports } = this.#o;
     const now = () => ports.clock.now().toISOString();
     db.transaction(() => {
@@ -338,11 +340,15 @@ export class SetupService {
       this.#o.logger.log('error', 'setup action failed unexpectedly', { actionId, error: e instanceof Error ? e.message.slice(0, 300) : String(e) });
       state = 'failed';
       reasons.push({ key: e instanceof CommandError && e.error.code === 'busy' ? 'setup.failed.busy' : 'setup.failed.internal' });
-    } finally {
-      this.#busy = null;
     }
-    // 9.4 point 4: readiness from the tool itself, whatever the installer said.
-    const after = (await this.instances(action.projectId!, { probe: true })).items.filter((i) => action.instances.includes(i.instance));
+    // 9.4 point 4: readiness from the tool itself, whatever the installer said. If it cannot be read now, the
+    // action is still recorded as it ended; readiness is read again when next asked.
+    const after = await this.instances(action.projectId!, { probe: true })
+      .then((r) => r.items.filter((i) => action.instances.includes(i.instance)))
+      .catch((e: unknown) => {
+        this.#o.logger.log('error', 'readiness after setup could not be read', { actionId, error: e instanceof Error ? e.message.slice(0, 300) : String(e) });
+        return [];
+      });
     db.transaction(() => {
       db.run('UPDATE setup_actions SET finished_at = ?, state = ?, result = ?, reasons_json = ?, log_path = ?, log_sha256 = ? WHERE id = ?', now(), state, state, JSON.stringify(reasons), log?.path ?? null, log?.sha256 ?? null, actionId);
       recordAudit(db, { id: newId(ports.random, 'aud'), at: ports.clock.now(), action: state === 'done' ? 'setup.executed' : 'setup.failed', projectId: action.projectId, details: { actionId, kind: action.kind, state, readiness: after.map((a) => `${a.instance}=${a.readiness}`).join(',') } });

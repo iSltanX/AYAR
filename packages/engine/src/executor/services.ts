@@ -40,26 +40,29 @@ export class CompanionServices {
   }
 
   /**
-   * Starts (or joins) the services a check needs; resolves with the first that failed to become ready, or null.
-   * The signal (the check cancelled) ends the wait at once; after abort() nothing new starts.
+   * Starts (or joins) the services a check needs; resolves with the first that failed to become ready (or null),
+   * and the ones it holds — exactly what the caller releases. The signal (the check cancelled) ends the wait at
+   * once; after abort() nothing new starts.
    */
-  async acquire(services: readonly CompanionService[], signal?: AbortSignal): Promise<string | null> {
+  async acquire(services: readonly CompanionService[], signal?: AbortSignal): Promise<{ failed: string | null; held: CompanionService[] }> {
     let failed: string | null = null;
+    const held: CompanionService[] = [];
     const aborted = new Promise<false>((resolve) => {
       if (signal?.aborted) resolve(false);
       signal?.addEventListener('abort', () => resolve(false), { once: true });
     });
     for (const s of services) {
-      if (this.#aborted || signal?.aborted) return failed ?? s.id;
+      if (this.#aborted || signal?.aborted) return { failed: failed ?? s.id, held };
       let r = this.#running.get(s.id);
       if (!r) {
         r = this.#start(s);
         this.#running.set(s.id, r);
       }
       r.users++;
+      held.push(s);
       if (!(await Promise.race([r.ready, aborted])) && !failed) failed = s.id;
     }
-    return failed;
+    return { failed, held };
   }
 
   /** The run is cancelled or the app quits: every service stops now and no wait goes on (9.7). */
