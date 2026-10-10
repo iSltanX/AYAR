@@ -69,6 +69,6 @@ export function createServices(o: ServicesInput): EngineServices {
       return { shell: s['environment.shell'] ?? null, timeoutSeconds: s['environment.timeoutSeconds'] ?? 10 };
     },
   });
-  const tasks = new TasksService({ db: o.db, catalog: o.catalog, ports: o.ports });
+  const tasks = new TasksService({ db: o.db, catalog: o.catalog, ports: o.ports, logger: o.logger });
   return { redaction, profiles, projects, environment, tasks, rescrubStored };
 }

@@ -52,6 +52,7 @@ interface Scored {
   priority: 1 | 2 | 3;
   contributions: { rule: string; weight: number }[];
   includes: string[];
+  includedContributions: { rule: string; weight: number }[];
   priorityNote: Explanation | null;
 }
 
@@ -88,16 +89,18 @@ function core(given: AdvisorContext, kb: Kb, facts: AdvisorFacts): Core {
   const bonus = algo.levelBonus[risk.level];
   const th = algo.priorityThresholds;
   const prio = (total: number): 1 | 2 | 3 => (total >= th.top ? 1 : total >= th.medium ? 2 : 3);
-  let items: Scored[] = [...sums].map(([id, s]) => ({ id, total: s.total + bonus, levelBonus: bonus, priority: prio(s.total + bonus), contributions: s.contributions, includes: [], priorityNote: null }));
+  let items: Scored[] = [...sums].map(([id, s]) => ({ id, total: s.total + bonus, levelBonus: bonus, priority: prio(s.total + bonus), contributions: s.contributions, includes: [], includedContributions: [], priorityNote: null }));
 
-  // C-20 rule 6: one regression item. The full suite includes the targeted one: it stays, as urgent as the more
-  // urgent of the two, with both sets of reasons (D-DEV8-06).
+  // C-20 rule 6: one regression item. The full suite includes the targeted one: it stays, with its own weights and
+  // total, as urgent as the more urgent of the two; the targeted item's reasons are kept apart (D-DEV8-06).
   const full = items.find((i) => i.id === REGRESSION_FULL);
   const near = items.find((i) => i.id === REGRESSION_NEIGHBORS);
   if (full && near) {
-    full.priority = Math.min(full.priority, near.priority) as 1 | 2 | 3;
-    full.total = Math.max(full.total, near.total);
-    full.contributions = [...full.contributions, ...near.contributions];
+    if (near.priority < full.priority) {
+      full.priority = near.priority;
+      full.priorityNote = { code: 'advisor.priority.includes', values: { priority: near.priority } };
+    }
+    full.includedContributions = near.contributions;
     full.includes = [REGRESSION_NEIGHBORS];
     items = items.filter((i) => i !== near);
   }
@@ -135,10 +138,13 @@ const withValue = (given: AdvisorContext, k: SensitiveKey, v: string | number): 
 function ecosystemsOf(given: AdvisorContext, kb: Kb, facts: AdvisorFacts): AdvisorResult['ecosystems'] {
   const known = new Set(kb.data.ecosystems.ecosystems.map((e) => e.id));
   const fromFacts = (facts.ecosystems ?? []).filter((id) => known.has(id));
-  if (fromFacts.length) return { ids: [...new Set(fromFacts)].sort(), from: 'discovery' };
   const stack = given.stack ?? '';
-  const ids = stack ? kb.data.ecosystems.ecosystems.filter((e) => new RegExp(e.pattern, e.flags).test(stack)).map((e) => e.id) : [];
-  return ids.length ? { ids, from: 'stack' } : { ids: [], from: 'none' };
+  const fromStack = stack ? kb.data.ecosystems.ecosystems.filter((e) => new RegExp(e.pattern, e.flags).test(stack)).map((e) => e.id) : [];
+  // 28.9: C-06 «الأولى عند التعارض», not the only source: ecosystems it cannot detect (Flutter, WordPress…) still
+  // come from the text; both are listed (review m5).
+  const ids = [...new Set([...fromFacts, ...fromStack])].sort();
+  const from = fromFacts.length && fromStack.some((id) => !fromFacts.includes(id)) ? 'both' : fromFacts.length ? 'discovery' : fromStack.length ? 'stack' : 'none';
+  return { ids, from };
 }
 
 /**
@@ -169,6 +175,7 @@ export function suggest(raw: unknown, kb: Kb, facts: AdvisorFacts = {}): Advisor
       checks: [...map.checks],
       card: map.card,
       includes: s.includes,
+      includedContributions: s.includedContributions,
       priorityNote: s.priorityNote,
       tools: kb.toolsFor(s.id, ecosystems.ids).map((t) => ({ name: t.name, ecosystem: t.ecosystem, category: t.category, exampleCommand: t.exampleCommand, version: t.version, url: t.url })),
     };
@@ -180,7 +187,7 @@ export function suggest(raw: unknown, kb: Kb, facts: AdvisorFacts = {}): Advisor
     if (present.has(o.item) || !o.when(e)) continue;
     const entry = kb.data.rules.omit.find((x) => x.item === o.item);
     if (!entry) throw new Error(`kb has no omit entry for ${o.item}`);
-    const f = o.facts(e);
+    const f = o.facts(e, present);
     omitted.push({ id: o.item, facts: f.facts, hint: entry.hints[f.hint] ?? entry.hints[0]! });
   }
 
@@ -275,7 +282,8 @@ export function suggest(raw: unknown, kb: Kb, facts: AdvisorFacts = {}): Advisor
     commonBase,
     suggestedChecks,
     // 28.2-ز: a suggestion when the level is low, the evidence good and run automatically; never a skip.
-    noNewTests: c.risk.level === 'low' && e.evidence === 'good' && !e.assumedKeys.has('evidence') && e.automation === 'auto',
+    // D-DEV8-21: and no top-priority item, so the suggestion never sits beside «لا تُدمج قبلها».
+    noNewTests: c.risk.level === 'low' && e.evidence === 'good' && !e.assumedKeys.has('evidence') && e.automation === 'auto' && !items.some((i) => i.priority === 1),
     evidenceReuse: pr && pr.sameState && pr.sameTools && pr.sameScope && pr.passed ? { runId: pr.runId } : null,
     ecosystems,
   };

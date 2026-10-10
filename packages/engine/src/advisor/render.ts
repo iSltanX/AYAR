@@ -30,9 +30,15 @@ export function explanationText(x: Explanation, lang: Lang): string {
 
 /**
  * Markdown rendering of a code span holding user text: the fence is longer than any backtick run inside, so the
- * text stays literal (28.14 `malicious-text`): `<img onerror=…>` is shown, never inserted as an element.
+ * text stays literal (28.14 `malicious-text`): `<img onerror=…>` is shown, never inserted as an element. A line
+ * break would close the span, so it is shown as «␣» instead.
  */
-export function literal(text: string): string {
+/** Line breaks, control characters and bidi controls: they could end the span or reorder what is shown. */
+const UNSAFE_IN_SPAN = /[\u0000-\u001f\u007f-\u009f\u2028\u2029\u202a-\u202e\u2066-\u2069]/g;
+
+export function literal(raw: string): string {
+  // A file name from the project may hold a newline (review M1): each unsafe character becomes a visible «␣».
+  const text = raw.replace(UNSAFE_IN_SPAN, '\u2423');
   const longest = Math.max(0, ...[...text.matchAll(/`+/g)].map((m) => m[0].length));
   const fence = '`'.repeat(longest + 1);
   const pad = text.startsWith('`') || text.endsWith('`') || text.startsWith(' ') ? ' ' : '';

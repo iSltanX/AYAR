@@ -2,10 +2,10 @@
 // with the next display id TASK-NNNN of the project (D-36); tasks.list returns them. The lifecycle (copied,
 // awaiting verification, verified, closed with a reason) and its verification belong to DEV-9.
 import type { Catalog } from '@ayar/catalog';
-import { TaskCard, type TaskRecord, type TaskSource } from '@ayar/protocol';
+import { TaskCard, TaskStatus, type TaskRecord, type TaskSource } from '@ayar/protocol';
 import type { AdvisorFacts } from '../advisor/context.ts';
 import { newId } from '../host/ids.ts';
-import type { EnginePorts } from '../ports/index.ts';
+import type { EnginePorts, Logger } from '../ports/index.ts';
 import type { Db } from '../storage/db.ts';
 import { generateCard, renderCard, type CardProjectContext } from './cards.ts';
 
@@ -23,6 +23,7 @@ export interface TasksServiceOptions {
   db: Db;
   catalog: Catalog;
   ports: EnginePorts;
+  logger?: Logger;
 }
 
 const DISPLAY = /^TASK-(\d+)$/;
@@ -64,14 +65,23 @@ export class TasksService {
 
   list(projectId: string): TaskRecord[] {
     const rows = this.#o.db.all<Row>('SELECT id, display_id, project_id, body_json, status, created_at, updated_at FROM tasks WHERE project_id = ? ORDER BY created_at, length(display_id), display_id', projectId);
-    return rows.map((r) => ({
-      id: r.id,
-      displayId: r.display_id,
-      projectId: r.project_id,
-      status: r.status as TaskRecord['status'],
-      card: TaskCard.parse(JSON.parse(r.body_json)),
-      createdAt: r.created_at,
-      updatedAt: r.updated_at,
-    }));
+    const out: TaskRecord[] = [];
+    for (const r of rows) {
+      // One unreadable row (damaged, or written by another card version) never hides the others (review m7).
+      let body: unknown = null;
+      try {
+        body = JSON.parse(r.body_json);
+      } catch {
+        body = null;
+      }
+      const card = TaskCard.safeParse(body);
+      const status = TaskStatus.safeParse(r.status);
+      if (!card.success || !status.success) {
+        this.#o.logger?.log('warn', 'task row skipped: unreadable card', { displayId: r.display_id });
+        continue;
+      }
+      out.push({ id: r.id, displayId: r.display_id, projectId: r.project_id, status: status.data, card: card.data, createdAt: r.created_at, updatedAt: r.updated_at });
+    }
+    return out;
   }
 }

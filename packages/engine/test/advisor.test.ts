@@ -423,7 +423,17 @@ describe('the corrected rules (28 intro, C-20 rules 1–9)', () => {
     expect(ids(r)).toContain('regression_full');
     expect(ids(r)).not.toContain('regression_neighbors');
     expect(item(r, 'regression_full')!.includes).toEqual(['regression_neighbors']);
-    expect(item(r, 'regression_full')!.contributions.map((c) => c.rule)).toEqual(expect.arrayContaining(['R11', 'R13']));
+    const full = item(r, 'regression_full')!;
+    expect(full.contributions.map((c) => c.rule)).toContain('R11');
+    expect(full.contributions.map((c) => c.rule)).not.toContain('R13'); // R13 adds the targeted item only
+    expect(full.includedContributions.map((c) => c.rule)).toEqual(expect.arrayContaining(['R11', 'R13']));
+    // `total` is the full item's own weights plus the level bonus; its priority is the stricter of the two (review).
+    expect(full.total).toBe(full.contributions.reduce((a, c) => a + c.weight, 0) + full.levelBonus);
+    expect(full.priority).toBe(1);
+    // Omitted without the targeted regression, the hint does not say «الانحدار الموجّه يكفي».
+    const none = run({ situation: 'new_feature', areas: ['logic'], scope: 'local', evidence: 'none', impact: 2, audience: 'small', reversibility: 'easy', expected: 'clear' });
+    expect(ids(none)).not.toContain('regression_neighbors');
+    expect(none.omitted.find((o) => o.id === 'regression_full')!.hint).not.toMatch(/الانحدار الموجّه يكفي/);
   });
 
   it('rule 3: the unknown is a range with the questions that narrow it, and a shared base of checks', () => {
@@ -462,6 +472,11 @@ describe('the corrected rules (28 intro, C-20 rules 1–9)', () => {
     expect(ids(r)).toEqual(expect.arrayContaining(['visual_check', 'arabic_rtl']));
     expect(r.noNewTests).toBe(true);
     expect(r.items.every((i) => i.priority === 3)).toBe(true);
+    // D-DEV8-21: never beside a top-priority item (a low-risk bug fix still needs its reproducing test first).
+    const fix = run({ situation: 'bugfix', areas: ['logic'], impact: 1, audience: 'small', scope: 'local', evidence: 'good', automation: 'auto', reversibility: 'easy' });
+    expect(fix.risk.level).toBe('low');
+    expect(item(fix, 'confirm_bug')?.priority).toBe(1);
+    expect(fix.noNewTests).toBe(false);
   });
 
   it('rule 8: a declared risk always produces its items (every situation, every consequence)', () => {
@@ -493,13 +508,65 @@ describe('the corrected rules (28 intro, C-20 rules 1–9)', () => {
     }
   });
 
+  it('the rules in code agree with the archive expressions of kb/1, condition and weights, on random contexts (G-37.5)', () => {
+    const helpers = { has: (l: readonly unknown[], v: unknown) => l.includes(v), any: (l: readonly unknown[], vs: readonly unknown[]) => vs.some((v) => l.includes(v)), APPLIES_EXPECTED: ['new_feature', 'change_behavior', 'new_project'] };
+    type Fn = (e: unknown, x: unknown) => unknown;
+    const compile = (src: string): Fn => {
+      // The archive expressions are the plan's own text (rules.json), evaluated here only to compare.
+      // eslint-disable-next-line @typescript-eslint/no-implied-eval
+      const make = new Function('has', 'any', 'APPLIES_EXPECTED', `return (${src});`) as (h: typeof helpers.has, a: typeof helpers.any, x: string[]) => Fn;
+      return make(helpers.has, helpers.any, helpers.APPLIES_EXPECTED);
+    };
+    const archived = kb.data.rules.rules.filter((r) => r.replacedBy === null).map((r) => ({ id: r.id, when: compile(r.archiveCondition), adds: r.adds.weights ? () => r.adds.weights : compile(r.adds.expression!) }));
+    expect(archived).toHaveLength(54);
+    const effective = fc.record({
+      situation: fc.constantFrom(...ADVISOR_SITUATIONS),
+      areas: fc.uniqueArray(fc.constantFrom(...ADVISOR_AREAS)),
+      expected: fc.constantFrom(null, ...ADVISOR_EXPECTED),
+      impact: fc.constantFrom(...ADVISOR_IMPACTS),
+      audience: fc.constantFrom(...ADVISOR_AUDIENCES),
+      reversibility: fc.constantFrom(...ADVISOR_REVERSIBILITY),
+      scope: fc.constantFrom(...ADVISOR_SCOPES),
+      factors: fc.uniqueArray(fc.constantFrom(...ADVISOR_FACTORS)),
+      evidence: fc.constantFrom(...ADVISOR_EVIDENCE),
+      automation: fc.constantFrom(null, 'auto', 'manual', 'none'),
+      flaky: fc.boolean(),
+      platform: fc.uniqueArray(fc.constantFrom(...ADVISOR_PLATFORMS)),
+      stack: fc.constant(''),
+      stage: fc.constantFrom(null, ...ADVISOR_STAGES),
+      frequency: fc.constantFrom(null, 'rare', 'frequent'),
+      time: fc.constantFrom(null, ...ADVISOR_TIME),
+      migrations: fc.boolean(),
+    });
+    const x = fc.record({ depth: fc.constantFrom('none', 'focused', 'focused_reg', 'expanded', 'comprehensive'), levelIdx: fc.integer({ min: 0, max: 3 }) });
+    fc.assert(
+      fc.property(effective, x, (e, xx) => {
+        const code = { ...e, assumedKeys: new Set<string>() } as unknown as Parameters<(typeof RULES)[number]['apply']>[0];
+        for (const a of archived) {
+          const rule = RULES.find((r) => r.id === a.id)!;
+          const archiveX = { depth: xx.depth, risk: { levelIdx: xx.levelIdx } };
+          const expected = a.when(e, archiveX) ? a.adds(e, archiveX) : null;
+          expect(rule.apply(code, xx), a.id).toEqual(expected);
+        }
+      }),
+      { numRuns: 3000 },
+    );
+  });
+
+  it('ecosystems: discovery first, and the text adds what discovery cannot detect (28.9)', () => {
+    const ctx: AdvisorContext = { situation: 'new_feature', areas: ['ui'] };
+    expect(run({ ...ctx, stack: 'Flutter' }, { ecosystems: ['js'] }).ecosystems).toEqual({ ids: ['flutter', 'js'], from: 'both' });
+    expect(run({ ...ctx, stack: 'React' }, { ecosystems: ['js'] }).ecosystems).toEqual({ ids: ['js'], from: 'discovery' });
+    expect(run(ctx, { ecosystems: ['python'] }).ecosystems).toEqual({ ids: ['python'], from: 'discovery' });
+  });
+
   it('the rules in code are exactly the 55 of kb/1, each adding only the items its record lists (G-37.5)', () => {
     expect(RULES.map((r) => r.kbRule).sort()).toEqual(kb.data.rules.rules.map((r) => r.id).sort());
     const allowed = new Map(kb.data.rules.rules.map((r) => [r.id, new Set(r.adds.items)]));
     const contexts = kb.data.presets.presets.map((p) => p.inputs).concat(kb.data.verification.archive.map((c) => c.inputs));
     for (const ctx of contexts) {
+      const r = run(ctx);
       for (const depth of ['none', 'focused', 'focused_reg', 'expanded', 'comprehensive']) {
-        const r = run(ctx);
         for (const rule of RULES) {
           const e = { ...r.input.effective, assumedKeys: new Set<string>() } as unknown as Parameters<typeof rule.apply>[0];
           const w = rule.apply(e, { depth, levelIdx: 3 });

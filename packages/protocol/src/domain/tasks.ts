@@ -37,7 +37,7 @@ export const CardText = z
   .string()
   .min(1)
   .max(500)
-  .refine((s) => !/[\u0000-\u0008\u000a-\u001f\u007f]/.test(s), 'control character');
+  .refine((s) => !/[\u0000-\u001f\u007f-\u009f\u2028\u2029\u202a-\u202e\u2066-\u2069]/.test(s), 'control or bidi character');
 
 /**
  * What a card is generated from (C-20 «مصادر البطاقات»). DEV-8 builds two: an advisor item for a change context
@@ -80,7 +80,7 @@ export const TaskCard = z.strictObject({
   expected: z.string().nullable(),
   location: z.string().nullable(),
   /** C-06: the project's test framework and a few existing tests to imitate. */
-  context: z.strictObject({ framework: z.string().nullable(), examples: z.array(z.string()) }),
+  context: z.strictObject({ framework: z.string().nullable(), examples: z.array(z.string()).max(5) }),
   /** Which parts are the user's own words: they stay literal in the text (28.14 `malicious-text`). */
   userSupplied: z.strictObject({ subject: z.boolean(), location: z.boolean() }),
   steps: z.array(z.string()),

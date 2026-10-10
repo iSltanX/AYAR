@@ -1,5 +1,5 @@
 // kb/1 (C-08 point 4, plan 28): the knowledge base as data with a schema and a version. Its text is transcribed
-// from plan 28 by scripts/kb-extract.ts and compared with the plan by test/kb-plan.test.ts. The advisor's
+// from plan 28 by scripts/kb-extract.ts and compared with the plan by test/kb.test.ts. The advisor's
 // logic (conditions and weights) lives in versioned, tested code in packages/engine/src/advisor (G-37.5,
 // D-DEV8-02); the data here holds what the logic refers to, and the loader checks that every reference resolves.
 //

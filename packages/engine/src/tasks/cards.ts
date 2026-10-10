@@ -11,7 +11,7 @@ import { suggest, type AdvisorFacts } from '../advisor/advisor.ts';
 import { literal } from '../advisor/render.ts';
 
 export class CardSourceError extends Error {
-  readonly reason: 'unknown_item' | 'covered_by_checks' | 'unknown_check';
+  readonly reason: 'unknown_item' | 'covered_by_checks' | 'not_recommended' | 'unknown_check' | 'outcome_mismatch';
   constructor(reason: CardSourceError['reason'], detail: string) {
     super(`cannot build a card: ${reason} (${detail})`);
     this.name = 'CardSourceError';
@@ -92,15 +92,17 @@ export function cardFromAdvisorItem(source: Extract<TaskSource, { kind: 'advisor
   if (map.card === null) throw new CardSourceError('covered_by_checks', item.id);
   const advice = suggest(source.context, kb, facts);
   const recommended = advice.items.find((i) => i.id === item.id || i.includes.includes(item.id));
+  // A card from the advisor carries the rule that recommended it (review): an item the advice left out is not carded.
+  if (!recommended) throw new CardSourceError('not_recommended', item.id);
   const type = map.card as CardType;
   const def = typeDef(kb, type);
-  const rules = recommended?.contributions.map((c) => c.rule) ?? [];
+  const rules = [...recommended.contributions, ...recommended.includedContributions].map((c) => c.rule);
   const tpl = kb.cards.template;
   const behavior = source.behavior ?? item.title;
   const card: CardFields = {
     template: 'card/1',
     type,
-    priority: recommended?.priority ?? 3,
+    priority: recommended.priority,
     nextStep: def.nextStep,
     source: { kind: 'advisorItem', ref: `${tpl.sources.advisorItem}${rules.length ? ` ${[...new Set(rules)].join('، ')}` : ''} (${kbRef('item', item.id)})` },
     name: `${def.name}: ${behavior} — ${source.location ?? tpl.ownerDecides}`,
@@ -127,7 +129,10 @@ export function cardFromCheck(source: Extract<TaskSource, { kind: 'check' }>, ca
   const t = arabic();
   const key = check.id.replace('*', 'any');
   const title = t(`catalog.check.${key}.title` as MessageKey);
-  const type: CardType = source.outcome === 'missing_tests' ? (TEST_CARD_FOR_CHECK[check.id] ?? 'unit_test') : 'check_setup';
+  // «ناقص» for want of tests exists only for the checks that run tests (12.7): any other pairing is refused.
+  const testCard = TEST_CARD_FOR_CHECK[check.id];
+  if (source.outcome === 'missing_tests' && !testCard) throw new CardSourceError('outcome_mismatch', check.id);
+  const type: CardType = source.outcome === 'missing_tests' ? testCard! : 'check_setup';
   const def = typeDef(kb, type);
   const needs = check.requirements.map((r) => (r.kind === 'reference' ? r.ref : r.kind === 'tool' ? r.tools.join('/') : r.kind === 'dataAsset' ? r.asset : r.kind));
   const policy = check.default;

@@ -40,7 +40,7 @@ const multi = <T extends z.ZodType>(item: T, max: number) =>
 export const AdvisorStack = z
   .string()
   .max(300)
-  .refine((s) => !/[\u0000-\u0008\u000a-\u001f\u007f]/.test(s), 'control character');
+  .refine((s) => !/[\u0000-\u001f\u007f-\u009f\u2028\u2029\u202a-\u202e\u2066-\u2069]/.test(s), 'control or bidi character');
 
 /**
  * The change context (28.1). Only `situation` is required (28.1: «إلزامي»). Every other key may be absent, which
@@ -110,6 +110,8 @@ export const AdvisorItem = z.strictObject({
   card: z.string().nullable(),
   /** C-20 rule 6: the other regression item, folded into this one («يشمل»). */
   includes: z.array(ItemId),
+  /** The reasons of the included item, kept apart so `total` stays the sum of `contributions` plus the bonus. */
+  includedContributions: z.array(z.strictObject({ rule: RuleId, weight: z.int().positive() })),
   /** Why the priority is what it is when a rule forced it (depth `none`, C-20 rule 7). */
   priorityNote: Explanation.nullable(),
   /** 28.9 tools for the ecosystems in play. Commands are for explanation only, never run (4.1). */
@@ -175,6 +177,6 @@ export const AdvisorResult = z.strictObject({
   noNewTests: z.boolean(),
   /** C-20 rule 7: reuse is suggested only from an AYAR run with the same state, tools and scope, which passed. */
   evidenceReuse: z.strictObject({ runId: Id }).nullable(),
-  ecosystems: z.strictObject({ ids: z.array(z.string()), from: z.enum(['discovery', 'stack', 'none']) }),
+  ecosystems: z.strictObject({ ids: z.array(z.string()), from: z.enum(['discovery', 'stack', 'both', 'none']) }),
 });
 export type AdvisorResult = z.infer<typeof AdvisorResult>;

@@ -31,7 +31,8 @@ export const taskCreate: CommandHandler = (payload, ctx) => {
   try {
     return { task: ctx.services.tasks.create(projectId, source, advisorFactsFromSnapshot(snapshot), cardContextFromSnapshot(snapshot)) };
   } catch (e) {
-    if (e instanceof CardSourceError) throw new CommandError('not_found', { reason: e.reason });
+    // The project exists; the source is what is wrong (review m6).
+    if (e instanceof CardSourceError) throw new CommandError('invalid_payload', { path: 'source', reason: e.reason });
     throw e;
   }
 };

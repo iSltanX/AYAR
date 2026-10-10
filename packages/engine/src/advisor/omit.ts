@@ -10,7 +10,7 @@ interface OmitRule {
   /** The archive's condition for showing the item as «غير موصى به» (28.2-و), transcribed. */
   when(e: Effective): boolean;
   /** The input facts that explain the absence, and which of the kb hints applies. */
-  facts(e: Effective): { facts: Explanation[]; hint: number };
+  facts(e: Effective, present: ReadonlySet<string>): { facts: Explanation[]; hint: number };
 }
 
 const fact = (e: Effective, key: 'impact' | 'audience' | 'reversibility' | 'scope' | 'evidence' | 'situation' | 'expected'): Explanation => {
@@ -26,7 +26,8 @@ export const OMIT_RULES: readonly OmitRule[] = [
     when: (e) => e.situation !== 'cosmetic',
     facts: (e) => (has(e.areas, 'ui') ? { facts: [fact(e, 'impact'), fact(e, 'situation')], hint: 0 } : { facts: [areaFact(e, 'ui'), fact(e, 'situation')], hint: 1 }),
   },
-  { item: 'regression_full', when: (e) => e.situation !== 'cosmetic', facts: (e) => ({ facts: [fact(e, 'situation'), fact(e, 'scope')], hint: 0 }) },
+  // Hint 0 says the targeted regression is enough: only when it is recommended (review); otherwise hint 1.
+  { item: 'regression_full', when: (e) => e.situation !== 'cosmetic', facts: (e, present) => ({ facts: [fact(e, 'situation'), fact(e, 'scope')], hint: present.has('regression_neighbors') ? 0 : 1 }) },
   { item: 'perf_budget', when: (e) => any(e.areas, ['logic', 'data', 'ui']) && e.situation !== 'cosmetic', facts: (e) => ({ facts: [areaFact(e, 'perf')], hint: 0 }) },
   { item: 'load_test', when: (e) => has(e.platform, 'api'), facts: (e) => ({ facts: [fact(e, 'audience'), areaFact(e, 'perf')], hint: 0 }) },
   { item: 'security_authz', when: (e) => e.audience !== 'me' && any(e.areas, ['data', 'external']), facts: (e) => ({ facts: [areaFact(e, 'auth')], hint: 0 }) },

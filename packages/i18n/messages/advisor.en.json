@@ -145,5 +145,6 @@
   "advisor.md.assumptions": "Assumptions",
   "advisor.md.questions": "Questions that narrow the unknown",
   "advisor.md.checks": "Suggested AYAR checks",
-  "advisor.md.noNewTests": "Suggestion: the level is low and the evidence good and automatic, so new tests may not be needed. The items stay visible."
+  "advisor.md.noNewTests": "Suggestion: the level is low and the evidence good and automatic, so new tests may not be needed. The items stay visible.",
+  "advisor.priority.includes": "The item includes the targeted regression, so it takes that priority: «{priorityLabel}»."
 }
