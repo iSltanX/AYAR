@@ -1,0 +1,35 @@
+{
+  "id": "FX-REPORTS",
+  "title": "FX-REPORTS — تقارير تالفة ومتعارضة",
+  "description": "تقارير حقيقية لأربع أدوات (vitest وpytest وeslint وsemgrep) بصيغها JSON وJUnit وSARIF، ونسخ تالفة ومتعارضة: JUnit تالف، وSARIF ناقص، وJSON عميق جدًا، وتقرير أكبر من الحد (يُولَّد وقت الاختبار)، وخروج 0 مع إخفاقات. لاختبار حماية القراءة وتعارض الأدلة (الخطة 7.3 و10.3 وAT-14).",
+  "kind": "overlay",
+  "variants": {
+    "good": {
+      "description": "التقارير الأربعة سليمة ومتسقة مع رموز خروجها."
+    },
+    "junit-corrupt": {
+      "description": "تقرير JUnit مبتور في منتصف وسم: XML غير سليم (AT-14: تعذّر)."
+    },
+    "sarif-incomplete": {
+      "description": "SARIF بلا tool.driver (اسم الأداة): ناقص عن المجموعة الجزئية المقروءة من SARIF 2.1.0."
+    },
+    "json-too-deep": {
+      "description": "تقرير ESLint JSON متداخل بعمق 5000 مستوى: يتجاوز حد عمق القراءة."
+    },
+    "oversize": {
+      "description": "تقرير Vitest JSON أكبر من الحد 50 ميغابايت: يُولَّد وقت الاختبار بـ tools/gen-oversize.mjs ولا يُلتزم في المستودع (مكانه reports/vitest.json يُستبدل)."
+    },
+    "exit0-with-failures": {
+      "description": "تقرير Vitest فيه إخفاق بينما سُجل رمز خروج الأداة 0: تعارض أدلة (AT-14: تعذّر، ولا يُرجَّح النجاح)."
+    }
+  },
+  "limits": {
+    "max_report_bytes": 52428800,
+    "max_json_depth": 64,
+    "note": "الحدان من الخطة 10.3 (50 ميغابايت) ومن رقم عمق مقترح 64 يحسمه DEV-6؛ والنسخة العميقة بعمق 5000 فترفضها أي قيمة معقولة"
+  },
+  "toolchain": {
+    "node": "24.16.0",
+    "xmllint": "من النظام (libxml2)"
+  }
+}

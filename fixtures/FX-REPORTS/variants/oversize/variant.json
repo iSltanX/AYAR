@@ -1,0 +1,10 @@
+{
+  "name": "oversize",
+  "description": "تقرير Vitest JSON أكبر من الحد 50 ميغابايت: يُولَّد وقت الاختبار بـ tools/gen-oversize.mjs ولا يُلتزم في المستودع (مكانه reports/vitest.json يُستبدل).",
+  "defects": [
+    "beh.unit: تقرير أكبر من الحد"
+  ],
+  "generate": [
+    "FX-REPORTS/tools/gen-oversize.mjs"
+  ]
+}

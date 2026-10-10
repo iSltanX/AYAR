@@ -1,0 +1,22 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-REPORTS",
+  "variant": "json-too-deep",
+  "expectations": [
+    {
+      "check": "code.lint",
+      "component": "eslint-json",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "reports/eslint.json",
+        "line": 1,
+        "anchor": "[[[["
+      },
+      "confidence": null,
+      "origin": "الأداة",
+      "reason": "JSON بحد عمق: تقرير أعمق من الحد (الخطة 10.3)"
+    }
+  ]
+}

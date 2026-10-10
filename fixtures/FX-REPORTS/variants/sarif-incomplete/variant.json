@@ -1,0 +1,7 @@
+{
+  "name": "sarif-incomplete",
+  "description": "SARIF بلا tool.driver (اسم الأداة): ناقص عن المجموعة الجزئية المقروءة من SARIF 2.1.0.",
+  "defects": [
+    "sec.sast: SARIF ناقص"
+  ]
+}

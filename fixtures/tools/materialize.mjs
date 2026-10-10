@@ -70,6 +70,15 @@ export function installPath(id, variant, seen = new Set()) {
   return vmeta.install_path ?? installPath(id, vmeta.derived_from ?? 'good', seen);
 }
 
+/** مولّدات ما بعد التركيب للنسخة وسلسلة اشتقاقها (من الجذر إلى الورقة). */
+export function generators(id, variant, seen = new Set()) {
+  const { dir, meta } = loadProject(id);
+  if (meta.kind !== 'overlay' || variant === 'good' || seen.has(variant)) return [];
+  seen.add(variant);
+  const vmeta = readJson(path.join(dir, 'variants', variant, 'variant.json'));
+  return [...generators(id, vmeta.derived_from ?? 'good', seen), ...(vmeta.generate ?? [])];
+}
+
 /** يركّب النسخة تحت dest ويعيد جذر المشروع الفعلي (dest، أو dest/<install_path>). */
 export function materialize(id, variant, dest) {
   const { dir, meta } = loadProject(id);
@@ -89,6 +98,13 @@ export function materialize(id, variant, dest) {
     fs.mkdirSync(path.dirname(to), { recursive: true });
     fs.copyFileSync(src, to);
     fs.chmodSync(to, fs.statSync(src).mode & 0o777);
+  }
+  // مولّدات ما بعد التركيب (مثل تقرير أكبر من الحد يُولَّد وقت الاختبار ولا يُلتزم): variant.json.generate = [مسار سكربت نسبة إلى fixtures/]
+  if (variant !== 'good') {
+    for (const g of generators(id, variant)) {
+      const r = spawnSync(process.execPath, [path.join(FIXTURES_ROOT, g), '--out', root], { stdio: 'inherit' });
+      if (r.status !== 0) throw new Error(`فشل مولّد ما بعد التركيب ${g}`);
+    }
   }
   void dir;
   return root;

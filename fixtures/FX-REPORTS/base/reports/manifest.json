@@ -1,0 +1,41 @@
+{
+  "$comment": "فهرس تقارير FX-REPORTS: لكل تقرير أداته وصيغته ورمز خروجها كما سُجل عند توليده بالأداة الحقيقية (أسماء المضيف والمسارات والتواريخ مطبَّعة).",
+  "limits": {
+    "max_report_bytes": 52428800,
+    "max_json_depth": 64
+  },
+  "cases": [
+    {
+      "id": "vitest-json",
+      "tool": "vitest 5.0.3",
+      "format": "vitest-json",
+      "file": "reports/vitest.json",
+      "exit_code": 0,
+      "check": "beh.unit"
+    },
+    {
+      "id": "pytest-junit",
+      "tool": "pytest 9.1.1",
+      "format": "junit-xml",
+      "file": "reports/pytest.junit.xml",
+      "exit_code": 0,
+      "check": "beh.unit"
+    },
+    {
+      "id": "eslint-json",
+      "tool": "eslint 10.12.0",
+      "format": "eslint-json",
+      "file": "reports/eslint.json",
+      "exit_code": 0,
+      "check": "code.lint"
+    },
+    {
+      "id": "semgrep-sarif",
+      "tool": "semgrep 1.180.0",
+      "format": "sarif-2.1.0",
+      "file": "reports/semgrep.sarif",
+      "exit_code": 0,
+      "check": "sec.sast"
+    }
+  ]
+}

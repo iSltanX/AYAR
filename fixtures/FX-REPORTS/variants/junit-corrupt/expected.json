@@ -1,0 +1,22 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-REPORTS",
+  "variant": "junit-corrupt",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "component": "pytest-junit",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "reports/pytest.junit.xml",
+        "line": 1,
+        "anchor": "<testcase"
+      },
+      "confidence": null,
+      "origin": "الأداة",
+      "reason": "XML غير سليم؛ لا يُقرأ منه شيء ولا يُرجَّح النجاح"
+    }
+  ]
+}

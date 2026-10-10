@@ -1,0 +1,7 @@
+{
+  "name": "json-too-deep",
+  "description": "تقرير ESLint JSON متداخل بعمق 5000 مستوى: يتجاوز حد عمق القراءة.",
+  "defects": [
+    "code.lint: JSON عميق جدًا"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-REPORTS",
+  "variant": "oversize",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "component": "vitest-json",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "reports/vitest.json",
+        "line": 6,
+        "anchor": "numTotalTests"
+      },
+      "confidence": null,
+      "origin": "الأداة",
+      "reason": "تقرير أكبر من الحد: تعذّر بسبب «تقرير أكبر من الحد» دون قراءة محتواه (الخطة 10.3)"
+    }
+  ]
+}
