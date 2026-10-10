@@ -1,14 +1,15 @@
 // G-38 and C-16 (DEV-6): AYAR's rules — every check has its display code and its rules, the codes are unique, the
 // tables of C-16 hold (test, build and type failures high; a high-confidence secret critical; a permission
 // outside the policy high; Knip low; complexity info), D-34's levels (only a proven rule breaks the criterion or
-// warns), and the Semgrep package (D-13): versioned, its rules in the book, and each rule with its test project.
+// warns), and the Semgrep package (D-13): versioned, its rules in the book, and each rule with its test project
+// (fixtures/semgrep-rules/<rule id>.<ext>, run with the real Semgrep in packages/adapters/test/semgrep-rules.test.ts).
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { builtinCatalogData, CatalogError, loadCatalog, type CatalogData } from '../src/index.ts';
 
 const NOW = new Date('2026-10-11T12:00:00Z');
 const { catalog } = loadCatalog(undefined, { now: NOW });
-const TESTS = new URL('./semgrep/', import.meta.url).pathname;
+const TESTS = new URL('../../../fixtures/semgrep-rules/', import.meta.url).pathname;
 
 describe('AYAR rules (G-38)', () => {
   it('gives every check its code and rules, the codes unique, every section a code', () => {
@@ -66,7 +67,7 @@ describe('AYAR rules (G-38)', () => {
 describe('the Semgrep rules package (D-13)', () => {
   it('is versioned, and every rule has its test project with positive and negative cases', () => {
     expect(catalog.semgrep.version).toBe('1.0.0');
-    expect(JSON.parse(catalog.semgrep.configText()).rules).toHaveLength(catalog.semgrep.ids.length);
+    expect((JSON.parse(catalog.semgrep.configText()) as { rules: unknown[] }).rules).toHaveLength(catalog.semgrep.ids.length);
     const files = readdirSync(TESTS);
     for (const id of catalog.semgrep.ids) {
       const file = files.find((f) => f.slice(0, f.lastIndexOf('.')) === id);

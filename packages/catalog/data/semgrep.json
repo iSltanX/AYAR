@@ -1,5 +1,5 @@
 {
-  "$comment": "D-13 and 10.3 sec.sast: AYAR's own Semgrep rules (the registry's rules may not be distributed, S-35), versioned. The adapter writes them into the instance's temporary folder as a rules file (JSON is YAML) and runs `semgrep scan --config <that file>`; no `--config auto`, no autofix. metadata.ayar.category: «forbidden» — a match is a proven violation (أخفق); «suspect» — a match needs a review (يحتاج مراجعة). Each rule has its test project: packages/catalog/test/semgrep/<rule id>.<ext>, with `ruleid:` and `ok:` annotations, run by `semgrep --test`.",
+  "$comment": "D-13 and 10.3 sec.sast: AYAR's own Semgrep rules (the registry's rules may not be distributed, S-35), versioned. The adapter writes them into the instance's temporary folder as a rules file (JSON is YAML) and runs `semgrep scan --config <that file>`; no `--config auto`, no autofix. metadata.ayar.category: «forbidden» — a match is a proven violation (أخفق); «suspect» — a match needs a review (يحتاج مراجعة). Each rule has its test project: fixtures/semgrep-rules/<rule id>.<ext>, with `ruleid:` and `ok:` annotations on the line before each case, checked against the real Semgrep (packages/adapters/test/semgrep-rules.test.ts).",
   "version": "1.0.0",
   "verifiedAt": "2026-10-11",
   "engine": "semgrep 1.180.0",

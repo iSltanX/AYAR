@@ -275,7 +275,7 @@ export const RulesData = z.strictObject({
 });
 export type RulesData = z.infer<typeof RulesData>;
 
-/** D-13 and 10.3 sec.sast: AYAR's own Semgrep rules, versioned; each has its test project (packages/catalog/test/semgrep). */
+/** D-13 and 10.3 sec.sast: AYAR's own Semgrep rules, versioned; each has its test project (fixtures/semgrep-rules). */
 export const SemgrepRule = z.looseObject({
   id: z.string().regex(/^ayar\.(js|py)\.[a-z][a-z0-9-]*$/),
   languages: z.array(z.string()).min(1),
