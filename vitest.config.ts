@@ -14,6 +14,7 @@ export default defineConfig({
       project('catalog', 'packages/catalog'),
       // DEV-6: the adapters (C-15) and the analyzers (C-13).
       project('adapters', 'packages/adapters', 30_000),
+      project('analyzers', 'packages/analyzers', 30_000),
       project('engine', 'packages/engine', 30_000),
       project('cli', 'tools/cli', 30_000),
       project('desktop', 'apps/desktop', 30_000),

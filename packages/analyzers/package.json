@@ -1,0 +1,20 @@
+{
+  "name": "@ayar/analyzers",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AYAR's internal analyzers (C-13): checks AYAR writes itself, pure functions that read the project's files and run none of its code — the extension manifest and permissions, local references, design tokens, fonts and direction in the static sources, output size, and the maintenance indicators — plus the inventory of tests and their gaps for the task cards.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "node ../../node_modules/@typescript/native/bin/tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ayar/adapters": "0.1.0",
+    "@ayar/protocol": "0.1.0",
+    "@babel/parser": "8.0.7",
+    "postcss": "8.5.29"
+  }
+}
