@@ -5,7 +5,7 @@
 import { loadCatalog } from '@ayar/catalog';
 import type { Fact } from '@ayar/protocol';
 import { execFileSync } from 'node:child_process';
-import { chmodSync, mkdirSync, symlinkSync, writeFileSync } from 'node:fs';
+import { chmodSync, mkdirSync, readFileSync, realpathSync, symlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { computeChildEnv } from '../src/environment/child-env.ts';
@@ -87,7 +87,7 @@ describe('the login shell (C-07 point 1, E-06)', () => {
     expect(r).toMatchObject({ ok: false, reason: 'timeout' });
     await new Promise((res) => setTimeout(res, 700));
     expect(execFileSync('/bin/ps', ['-axo', 'args=']).toString().split('\n').filter((l) => l.startsWith('/bin/sleep 31.4159'))).toEqual([]);
-    const svc = new EnvironmentService({ ports: nodePorts, redaction: new RedactionService(catalog), logger: { log: () => {}, flush: () => {} }, catalog, settings: () => ({ shell, timeoutSeconds: 1 }), processEnv: { HOME: root, USER: 'u' } });
+    const svc = new EnvironmentService({ ports: nodePorts, redaction: new RedactionService(catalog), logger: { log: () => {}, flush: () => {} }, catalog, shellOverride: shell, settings: () => ({ shell: null, timeoutSeconds: 1 }), processEnv: { HOME: root, USER: 'u' } });
     const env = await svc.resolve({ projectRoot: root, facts: [] });
     expect(env).toMatchObject({ source: 'fallback', fallbackReason: 'timeout' });
     expect(env.path.slice(-4)).toEqual(['/usr/bin', '/bin', '/usr/sbin', '/sbin']);
@@ -105,7 +105,7 @@ describe('the environment service and the child environment (D-47, AT-48, G-35)'
   it('lists the sensitive variables as withheld, passes the exceptions, removes internals, and registers values with C-18', async () => {
     const shell = fakeShell({ MY_API_TOKEN: 'mytoken-value-123456', NPM_TOKEN: 'npmtoken-value-123456', SSH_AUTH_SOCK: '/tmp/agent.sock', TERM_SESSION_ID: 'w0t0p0', ELECTRON_RUN_AS_NODE: '1' });
     const redaction = new RedactionService(catalog);
-    const svc = new EnvironmentService({ ports: nodePorts, redaction, logger: { log: () => {}, flush: () => {} }, catalog, settings: () => ({ shell, timeoutSeconds: 5 }), processEnv: { HOME: root, USER: 'u' } });
+    const svc = new EnvironmentService({ ports: nodePorts, redaction, logger: { log: () => {}, flush: () => {} }, catalog, shellOverride: shell, settings: () => ({ shell: null, timeoutSeconds: 5 }), processEnv: { HOME: root, USER: 'u' } });
     const env = await svc.resolve({ projectRoot: root, facts: [] });
     expect(env.source).toBe('login_shell');
     expect(env.withheld).toEqual(['MY_API_TOKEN', 'NPM_TOKEN']);
@@ -201,7 +201,9 @@ describe('toolchains (C-07 point 3, E-07, G-49, G-DEV2-01)', () => {
     const hang = script('p/hang', 'exec /bin/sleep 27.1828');
     const base = { tool: 'x', realPath: null, viaCorepack: false, shellFunction: false, version: null, versionSource: null, required: null, satisfies: null, installed: [], proposedPath: null, terminalVersion: null, status: 'unknown' as const, probe: null };
     const started = Date.now();
-    const out = await probeVersions(nodeProcessControl, [{ ...base, tool: 'node', path: ok, required: { spec: '24', from: 'nvmrc' } }, { ...base, tool: 'hang', path: hang }], { cwd: root, env: { PATH: '/usr/bin:/bin' } });
+    const outside = tempRoot('ayar-DEV-4-probe-project-');
+    const out = await probeVersions(nodeProcessControl, [{ ...base, tool: 'node', path: ok, required: { spec: '24', from: 'nvmrc' } }, { ...base, tool: 'hang', path: hang }], { projectRoot: outside.dir, neutralCwd: root, untrusted: false, env: { PATH: '/usr/bin:/bin' }, realpath: (p) => nodeFileSystem.realpath(p) });
+    outside.cleanup();
     expect(Date.now() - started).toBeLessThan(9000);
     expect(out[0]).toMatchObject({ version: '24.16.0', versionSource: 'probe', satisfies: true, status: 'ok', probe: { ok: true } });
     expect(out[1]).toMatchObject({ status: 'unknown', probe: { ok: false, error: 'timeout' } });
@@ -215,3 +217,34 @@ describe('toolchains (C-07 point 3, E-07, G-49, G-DEV2-01)', () => {
     expect(versionFromPath('/usr/bin/node')).toBeNull();
   });
 });
+
+describe('nothing of the project runs at readiness, and the shell is a system one (review C2, M10)', () => {
+  it('never runs a program inside the project, nor a shim in the folder of an untrusted project', async () => {
+    const mark = join(root, 'PWNED');
+    const venvPython = script('project/.venv/bin/python3', `touch '${mark}'; echo "Python 3.12.13"`);
+    writeFileSync(join(root, 'project/.venv/pyvenv.cfg'), 'version = 3.12.13\n');
+    const shim = script('home/.local/share/mise/shims/node', `pwd > '${join(root, 'shim-cwd')}'; echo v24.16.0`);
+    const base = { realPath: null, viaCorepack: false, shellFunction: false, versionSource: null, required: null, satisfies: null, installed: [], proposedPath: null, terminalVersion: null, status: 'unknown' as const, probe: null };
+    const project = join(root, 'project');
+    const opts = { projectRoot: project, neutralCwd: join(root, 'home'), env: { PATH: '/usr/bin:/bin' }, realpath: (p: string) => nodeFileSystem.realpath(p) };
+    const trusted = await probeVersions(nodeProcessControl, [{ ...base, tool: 'python3', path: venvPython, version: '3.12.13' }, { ...base, tool: 'node', path: shim, version: null }], { ...opts, untrusted: false });
+    expect(trusted[0]).toMatchObject({ version: '3.12.13', probe: { ok: false, error: 'project_controlled' } });
+    expect(() => readFileSync(mark)).toThrow();
+    expect(trusted[1]).toMatchObject({ version: '24.16.0', probe: { ok: true } });
+    expect(readFileSync(join(root, 'shim-cwd'), 'utf8').trim()).toBe(realpathSync(project));
+    const untrusted = await probeVersions(nodeProcessControl, [{ ...base, tool: 'node', path: shim, version: null }], { ...opts, untrusted: true });
+    expect(untrusted[0]!.probe).toMatchObject({ ok: false, error: 'untrusted' });
+  });
+
+  it('reads the login shell the setting names only when the system lists it in /etc/shells', async () => {
+    const account = fakeShell({ WHICH_SHELL: 'account' });
+    const other = script('bin/other-shell', `export WHICH_SHELL=setting\nexec /bin/sh -c "$2"`);
+    const lines: string[] = [];
+    const svc = new EnvironmentService({ ports: nodePorts, redaction: new RedactionService(catalog), logger: { log: (_l, m) => lines.push(m), flush: () => {} }, catalog, settings: () => ({ shell: other, timeoutSeconds: 5 }), processEnv: { HOME: root, USER: 'u', SHELL: account } });
+    const b = await svc.base();
+    expect(b.shell).toBe(account);
+    expect(b.env.WHICH_SHELL).toBe('account');
+    expect(lines).toContain('environment.shell is not a system login shell: using the account shell');
+  });
+});
+

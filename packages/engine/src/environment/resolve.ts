@@ -169,16 +169,48 @@ export async function resolveTools(i: ResolveToolsInput): Promise<ToolResolution
   return out;
 }
 
-/** Readiness only (C-07 point 4): runs `<tool> --version` in the project folder, 5 s, no network for corepack. */
-export async function probeVersions(processes: ProcessControl, tools: ToolResolution[], o: { cwd: string; env: Record<string, string> }): Promise<ToolResolution[]> {
+/** Version-manager shims choose the version by the working folder: they are probed in the project folder. */
+const DIRECTORY_SHIMS = /\/(\.local\/share\/mise\/shims|\.asdf\/shims|\.pyenv\/shims|\.volta\/bin|\.rbenv\/shims)\//;
+
+export interface ProbeOptions {
+  /** The real path of the project root: no program inside it is ever run (review C2). */
+  projectRoot: string;
+  /** A neutral working folder (the home folder): the default, so no project configuration is read. */
+  neutralCwd: string;
+  /** In «مشروع غير موثوق» mode nothing is probed in the project folder (FR-55). */
+  untrusted: boolean;
+  env: Record<string, string>;
+  realpath: (p: string) => Promise<string | null>;
+}
+
+/**
+ * Readiness only (C-07 point 4): `<tool> --version`, 5 s, COREPACK_ENABLE_NETWORK=0 and auto-install off. These
+ * are tool programs, never project code: a program whose real path is inside the project (a .venv's python, a
+ * node_modules binary) is not run — its version comes from its files. The probe runs in a neutral folder, except
+ * for a version-manager shim or corepack's pnpm, which resolve by folder: those run in the project folder, and
+ * only for a trusted project. Yarn is never run there (yarnPath points at a file the project ships).
+ */
+export async function probeVersions(processes: ProcessControl, tools: ToolResolution[], o: ProbeOptions): Promise<ToolResolution[]> {
   const out: ToolResolution[] = [];
+  const insideProject = (p: string) => p === o.projectRoot || p.startsWith(`${o.projectRoot}/`);
   for (const t of tools) {
     const program = t.proposedPath ?? t.path;
     if (!program) {
       out.push(t);
       continue;
     }
-    const r = await processes.spawn(program, ['--version'], { cwd: o.cwd, env: { ...o.env, ...PROBE_ENV }, timeoutMs: PROBE_TIMEOUT_MS, maxOutputBytes: 64 * 1024 });
+    const real = (await o.realpath(program)) ?? program;
+    if (insideProject(program) || insideProject(real)) {
+      out.push({ ...t, probe: { ok: false, version: null, durationMs: 0, error: 'project_controlled' } });
+      continue;
+    }
+    const byFolder = DIRECTORY_SHIMS.test(program) || (t.viaCorepack && t.tool === 'pnpm');
+    if (byFolder && o.untrusted) {
+      out.push({ ...t, probe: { ok: false, version: null, durationMs: 0, error: 'untrusted' } });
+      continue;
+    }
+    const cwd = byFolder && t.tool !== 'yarn' ? o.projectRoot : o.neutralCwd;
+    const r = await processes.spawn(program, ['--version'], { cwd, env: { ...o.env, ...PROBE_ENV }, timeoutMs: PROBE_TIMEOUT_MS, maxOutputBytes: 64 * 1024 });
     const text = new TextDecoder().decode(r.stdout) + new TextDecoder().decode(r.stderr);
     const m = /(\d+\.\d+\.\d+)/.exec(text);
     const ok = !r.error && !r.timedOut && r.code === 0 && !!m;

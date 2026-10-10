@@ -141,7 +141,8 @@ export async function discover(o: DiscoverOptions): Promise<DiscoveryResult> {
     return t.ok ? t.text : null;
   }, o.fingerprint);
   if (identity) project('project.identity', { ...identity }, { file: identity.file, pointer: '', line: null }, 'declared', 'identity@1');
-  const git = await readGitInfo(o.fs, o.root);
+  const git = await readGitInfo(o.fs, o.root, 0, o.signal);
+  if (o.signal.aborted) throw new DiscoveryCancelled();
   if (git) project('git.repository', { ...git }, { file: '.git/HEAD', pointer: '', line: 1 }, git.confidence === 'confirmed' ? 'declared' : 'inferred', 'git@1');
   if (w.sensitive.length) project('sensitive.files', { files: w.sensitive.map((s) => ({ path: s.path, kind: s.kind })) }, null, 'declared', 'sensitive@1');
   if (reader.has('.ayar/profile.json')) project('ayar.repoProfile', { path: '.ayar/profile.json', size: reader.size('.ayar/profile.json') }, { file: '.ayar/profile.json', pointer: '', line: null }, 'declared', 'ayar@1');

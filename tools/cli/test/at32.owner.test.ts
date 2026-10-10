@@ -94,7 +94,8 @@ describe.skipIf(!RUN)('AT-32 (development level, owner’s Mac): toolchain and e
     expect(value(snapshot, 'python.manager')).toEqual([{ name: 'uv' }]);
     const { env } = ok<{ env: ResolvedEnv }>(await engine.invoke('environment.resolve', { projectId, probe: true }));
     const py = tool(env, 'python3')!;
-    expect(py).toMatchObject({ path: join(root, '.venv/bin/python3'), versionSource: 'probe', satisfies: true, status: 'ok' });
+    // The venv's python is the project's own file: its version comes from pyvenv.cfg, it is never run (C2).
+    expect(py).toMatchObject({ path: join(root, '.venv/bin/python3'), versionSource: 'venv', satisfies: true, status: 'ok', probe: { ok: false, error: 'project_controlled' } });
     expect(py.version).toMatch(/^3\.12\./);
     process.stdout.write(`AT-32 python: ${JSON.stringify({ path: py.path, version: py.version, status: py.status })}\n`);
   }, 120_000);

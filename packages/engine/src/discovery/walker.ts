@@ -35,6 +35,7 @@ const SENSITIVE_ENV = /^\.env(\..*)?$/i;
 const SENSITIVE_KEY = /\.(pem|key|p12|pfx|jks|keystore|keychain|ppk|asc)$|^id_(rsa|dsa|ecdsa|ed25519)$/i;
 const SENSITIVE_CREDENTIALS = /^(\.npmrc|\.pypirc|\.netrc|\.git-credentials|credentials\.json|\.dockercfg)$/i;
 const GITIGNORE_MAX_BYTES = 256 * 1024;
+const GITIGNORE_MAX_RULES = 1000;
 const OUTPUT_SIZE_BUDGET = 50_000;
 const CONCURRENCY = 16;
 
@@ -177,7 +178,10 @@ export async function walk(o: WalkOptions): Promise<WalkResult> {
     if (list.some((e) => e.name === '.gitignore' && e.kind === 'file')) {
       try {
         const { data } = await fs.readFilePrefix(full(childRel(rel, '.gitignore')), GITIGNORE_MAX_BYTES);
-        here = [...scopes, { base: rel, ig: ignore().add(new TextDecoder().decode(data)) }];
+        // At most GITIGNORE_MAX_RULES rules (review M1: every rule is tested against every path below).
+        const rules = new TextDecoder().decode(data).split('\n').filter((l) => l.trim() && !l.trimStart().startsWith('#'));
+        if (rules.length > GITIGNORE_MAX_RULES) r.warnings.push({ code: 'gitignoreTruncated', path: childRel(rel, '.gitignore'), values: { rules: rules.length } });
+        here = [...scopes, { base: rel, ig: ignore().add(rules.slice(0, GITIGNORE_MAX_RULES)) }];
       } catch (e) {
         r.warnings.push({ code: 'unreadable', path: childRel(rel, '.gitignore'), values: { error: errCode(e) } });
       }
@@ -193,8 +197,19 @@ export async function walk(o: WalkOptions): Promise<WalkResult> {
       if (MARKERS[e.name]) markers.add(MARKERS[e.name]!);
 
       if (e.kind === 'symlink') {
-        const real = await fs.realpath(full(crel));
-        const target = real ? await fs.stat(real) : null;
+        // A link is judged by its target too: a link named like a config file that points at .env, a key, a
+        // file under .git or node_modules, an ignored file, or anything that is not a regular file inside the
+        // root, is never read (FR-08, D-05). Errors on one link do not stop the walk.
+        let real: string | null = null;
+        let target: FileStat | null = null;
+        try {
+          real = await fs.realpath(full(crel));
+          target = real ? await fs.stat(real) : null;
+        } catch (err) {
+          r.symlinks.push({ path: crel, kind: 'broken', inside: false });
+          r.warnings.push({ code: 'unreadable', path: crel, values: { error: errCode(err) } });
+          continue;
+        }
         if (!real || !target) {
           r.symlinks.push({ path: crel, kind: 'broken', inside: false });
           continue;
@@ -205,14 +220,23 @@ export async function walk(o: WalkOptions): Promise<WalkResult> {
           r.warnings.push({ code: isInside ? 'symlinkDirNotFollowed' : 'symlinkOutside', path: crel });
           continue;
         }
-        r.symlinks.push({ path: crel, kind: 'file', inside: isInside });
+        r.symlinks.push({ path: crel, kind: target.isFile ? 'file' : 'broken', inside: isInside });
         if (!isInside) {
           r.warnings.push({ code: 'symlinkOutside', path: crel });
           continue;
         }
-        const kind = sensitiveKind(e.name);
-        if (kind) r.sensitive.push({ path: crel, kind, ignored: ignored(here, crel, false) });
-        else if (!ignored(here, crel, false)) r.files.set(crel, { size: target.size, mtimeMs: target.mtimeMs, target: real });
+        const targetRel = real.slice(root.length + 1);
+        const segments = targetRel.split('/');
+        const kind = sensitiveKind(e.name) ?? segments.map(sensitiveKind).find((k) => k !== null) ?? null;
+        if (kind) {
+          r.sensitive.push({ path: crel, kind, ignored: ignored(here, crel, false) });
+          continue;
+        }
+        if (!target.isFile || segments.some((x) => DEFAULT_SKIP.has(x)) || ignored(here, targetRel, false)) {
+          r.warnings.push({ code: 'symlinkTargetSkipped', path: crel });
+          continue;
+        }
+        if (!ignored(here, crel, false)) r.files.set(crel, { size: target.size, mtimeMs: target.mtimeMs, target: real });
         continue;
       }
 
@@ -247,8 +271,13 @@ export async function walk(o: WalkOptions): Promise<WalkResult> {
         continue;
       }
       if (ignored(here, crel, false)) continue;
-      const st = await fs.lstat(full(crel));
-      if (st) r.files.set(crel, { size: st.size, mtimeMs: st.mtimeMs });
+      let st: FileStat | null = null;
+      try {
+        st = await fs.lstat(full(crel));
+      } catch (err) {
+        r.warnings.push({ code: 'unreadable', path: crel, values: { error: errCode(err) } });
+      }
+      if (st?.isFile) r.files.set(crel, { size: st.size, mtimeMs: st.mtimeMs });
     }
     return next;
   }

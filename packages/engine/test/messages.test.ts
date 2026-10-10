@@ -14,6 +14,7 @@ function sources(dir = SRC): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? sources(join(dir, e.name)) : e.name.endsWith('.ts') ? [readFileSync(join(dir, e.name), 'utf8')] : []));
 }
 const all = sources().join('\n');
+const discovery = sources(join(SRC, 'discovery')).join('\n');
 const ar = MESSAGES.ar as Record<string, string>;
 const en = MESSAGES.en as Record<string, string>;
 const both = (key: string) => {
@@ -41,7 +42,8 @@ describe('message keys of DEV-4 (NFR-11)', () => {
     const rules = [...new Set([...all.matchAll(/invalid\('([a-z_]+)'/g)].map((m) => m[1]!))];
     expect(rules.length).toBeGreaterThan(5);
     for (const r of [...rules, 'not_pending']) both(`profile.invalid.${r}`);
-    const warnings = [...new Set([...all.matchAll(/code: '([a-zA-Z]+)'/g), ...all.matchAll(/'(configTooLarge|configInvalid|symlinkDirNotFollowed)'/g)].map((m) => m[1]!))];
+    const warnings = [...new Set([...discovery.matchAll(/code: '([a-zA-Z]+)'/g), ...discovery.matchAll(/'(configTooLarge|configInvalid|symlinkDirNotFollowed)'/g)].map((m) => m[1]!))];
+    expect(warnings).toEqual(expect.arrayContaining(['unreadable', 'symlinkOutside', 'symlinkTargetSkipped', 'gitignoreTruncated', 'partialScan']));
     for (const w of warnings) both(`discovery.warning.${w}`);
     for (const s of ['ok', 'mismatch', 'missing', 'unknown']) both(`environment.tool.status.${s}`);
     for (const r of ['timeout', 'exit', 'no_markers', 'spawn_failed']) both(`environment.fallback.${r}`);

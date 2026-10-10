@@ -34,14 +34,45 @@ export class EnvironmentService {
   readonly #logger: Logger;
   readonly #settings: () => EnvironmentSettings;
   readonly #processEnv: Readonly<Record<string, string | undefined>>;
+  readonly #shellOverride: string | null;
   #base: Promise<BaseEnv> | null = null;
 
-  constructor(o: { ports: EnginePorts; redaction: RedactionService; logger: Logger; settings: () => EnvironmentSettings; catalog: Catalog; processEnv?: Readonly<Record<string, string | undefined>> }) {
+  constructor(o: {
+    ports: EnginePorts;
+    redaction: RedactionService;
+    logger: Logger;
+    settings: () => EnvironmentSettings;
+    catalog: Catalog;
+    processEnv?: Readonly<Record<string, string | undefined>>;
+    /** A shell chosen by the host itself (tools/cli's test hook), not by the renderer. */
+    shellOverride?: string | null;
+  }) {
     this.#ports = o.ports;
     this.#redaction = o.redaction;
     this.#logger = o.logger;
     this.#settings = o.settings;
     this.#processEnv = o.processEnv ?? process.env;
+    this.#shellOverride = o.shellOverride ?? null;
+  }
+
+  /**
+   * The shell to read: the host's override, else the setting — only if it is a login shell the system lists in
+   * /etc/shells, owned by root and not writable by others (review M10: a setting is not a way to run any
+   * program) — else the account's shell.
+   */
+  async #shell(setting: string | null): Promise<string> {
+    if (this.#shellOverride) return this.#shellOverride;
+    const account = this.#processEnv.SHELL ?? userInfo().shell ?? '/bin/zsh';
+    if (!setting) return account;
+    try {
+      const listed = new TextDecoder().decode((await this.#ports.fs.readFilePrefix('/etc/shells', 64 * 1024)).data).split('\n').map((l) => l.trim());
+      const st = await this.#ports.fs.stat(setting);
+      if (listed.includes(setting) && st?.isFile && st.uid === 0 && (st.mode & 0o022) === 0) return setting;
+    } catch {
+      /* fall through: the setting is refused */
+    }
+    this.#logger.log('warn', 'environment.shell is not a system login shell: using the account shell', {});
+    return account;
   }
 
   home(): string {
@@ -56,7 +87,7 @@ export class EnvironmentService {
 
   async #read(): Promise<BaseEnv> {
     const s = this.#settings();
-    const shell = s.shell ?? this.#processEnv.SHELL ?? userInfo().shell ?? '/bin/zsh';
+    const shell = await this.#shell(s.shell);
     const user = this.#processEnv.USER ?? userInfo().username;
     const base = { HOME: this.home(), USER: user, LOGNAME: this.#processEnv.LOGNAME ?? user, TMPDIR: this.#processEnv.TMPDIR ?? tmpdir(), LANG: this.#processEnv.LANG ?? null };
     const nonce = Buffer.from(this.#ports.random.bytes(12)).toString('hex');
@@ -85,7 +116,7 @@ export class EnvironmentService {
   }
 
   /** ResolvedEnv for a project (names only, never values). */
-  async resolve(o: { projectRoot: string; facts: readonly Fact[]; refresh?: boolean; probe?: boolean }): Promise<ResolvedEnv> {
+  async resolve(o: { projectRoot: string; facts: readonly Fact[]; refresh?: boolean; probe?: boolean; untrusted?: boolean }): Promise<ResolvedEnv> {
     const b = await this.base(o.refresh ?? false);
     const rules = this.#redaction.names();
     const names = Object.keys(b.env).sort();
@@ -94,7 +125,7 @@ export class EnvironmentService {
     let tools = await resolveTools({ fs: this.#ports.fs, path, projectRoot: o.projectRoot, facts: o.facts, installed, shellFunctions: b.functions, nvmDefault: await nvmDefault(this.#ports.fs, this.home(), installed) });
     if (o.probe) {
       const child = computeChildEnv({ login: b.env, rules, allowSensitive: [], explicit: {} });
-      tools = await probeVersions(this.#ports.processes, tools, { cwd: o.projectRoot, env: child.env });
+      tools = await probeVersions(this.#ports.processes, tools, { projectRoot: o.projectRoot, neutralCwd: this.home(), untrusted: o.untrusted ?? false, env: child.env, realpath: (p) => this.#ports.fs.realpath(p).catch(() => null) });
     }
     return {
       source: b.source,

@@ -31,6 +31,8 @@ export interface ServicesInput {
   hmacKey: HmacKey;
   /** Tests point the home folder elsewhere. */
   home?: string;
+  /** tools/cli's test hook: a login shell chosen by the host (never by the renderer). */
+  testLoginShell?: string | null;
 }
 
 export function createServices(o: ServicesInput): EngineServices {
@@ -43,6 +45,7 @@ export function createServices(o: ServicesInput): EngineServices {
     redaction,
     logger: o.logger,
     catalog: o.catalog,
+    shellOverride: o.testLoginShell ?? null,
     settings: () => {
       const s = readSettings(o.db, ['environment.shell', 'environment.timeoutSeconds']);
       return { shell: s['environment.shell'] ?? null, timeoutSeconds: s['environment.timeoutSeconds'] ?? 10 };

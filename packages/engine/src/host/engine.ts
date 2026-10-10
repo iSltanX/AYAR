@@ -34,6 +34,8 @@ export interface StartEngineOptions {
   catalog?: CatalogLoader;
   /** How often the weekly integrity check and backup are considered (default: daily). */
   maintenanceIntervalMs?: number;
+  /** tools/cli's test hook (Node entry only): the login shell C-07 reads. */
+  testLoginShell?: string | null;
 }
 
 export interface EngineHandle {
@@ -118,7 +120,7 @@ export function startEngine(o: StartEngineOptions): EngineHandle {
     }
     if (result.state === 'degraded') degraded = result.reason ?? 'internal';
     bus = new EventBus({ stream, clock: ports.clock, send: (m) => channel.send(m) });
-    if (!degraded && result.db && result.catalog && hmacKey) services = createServices({ catalog: result.catalog, db: result.db, ports, events: bus, logger, hmacKey });
+    if (!degraded && result.db && result.catalog && hmacKey) services = createServices({ catalog: result.catalog, db: result.db, ports, events: bus, logger, hmacKey, testLoginShell: o.testLoginShell ?? null });
     if (phase === 'stopping') return result;
     phase = 'serving';
     logger.log('info', 'engine serving', { state: degraded ? 'degraded' : 'ready', reason: degraded, keySource: hmacKey?.source ?? null });

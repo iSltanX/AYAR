@@ -4,7 +4,7 @@
 // whole (AT-01) and becomes a «too large» warning instead.
 import { posix } from 'node:path';
 import { parseConfig, type ConfigFormat } from './parse.ts';
-import type { DiscoveryFs, WalkResult } from './walker.ts';
+import { sensitiveKind, type DiscoveryFs, type WalkResult } from './walker.ts';
 
 export type ReadOutcome = { ok: true; text: string; size: number } | { ok: false; error: 'missing' | 'too_large' | 'unreadable'; size?: number };
 export type ConfigOutcome = { ok: true; value: unknown; text: string } | { ok: false; error: 'missing' | 'too_large' | 'unreadable' | 'invalid'; message?: string };
@@ -59,6 +59,8 @@ export class ProjectReader {
   async #read(rel: string, maxBytes: number, prefixOnly: boolean): Promise<ReadOutcome> {
     const f = this.#walk.files.get(rel);
     if (!f) return { ok: false, error: 'missing' };
+    // Defence in depth (FR-08): never open a sensitive name, neither the path nor a link's target.
+    if (sensitiveKind(posix.basename(rel)) || (f.target && sensitiveKind(posix.basename(f.target)))) return { ok: false, error: 'missing' };
     if (!prefixOnly && f.size > maxBytes) return { ok: false, error: 'too_large', size: f.size };
     const path = f.target ?? posix.join(this.#root, rel);
     try {

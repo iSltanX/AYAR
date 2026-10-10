@@ -38,7 +38,44 @@ async function readText(fs: DiscoveryFs, path: string): Promise<string | null> {
   }
 }
 
-const isHex = (s: string, n: number) => new RegExp(`^[0-9a-f]{${n}}$`).test(s);
+const isHex = (s: string, n: number) => s.length === n && /^[0-9a-f]+$/.test(s);
+const MAX_SUBMODULES = 200;
+const MAX_CONFIG_LINES = 20_000;
+
+/**
+ * Git's config syntax, line by line (review M1: no pattern that can backtrack across lines): `[section]` or
+ * `[section "sub"]`, then `key = value`. Sections and keys are lower-cased; the last value wins, as in Git.
+ */
+export function parseGitConfig(text: string): Map<string, Map<string, string>> {
+  const out = new Map<string, Map<string, string>>();
+  let section = '';
+  for (const raw of text.split('\n').slice(0, MAX_CONFIG_LINES)) {
+    const t = raw.trim();
+    if (!t || t.startsWith('#') || t.startsWith(';')) continue;
+    if (t.startsWith('[')) {
+      const end = t.indexOf(']');
+      if (end < 0) continue;
+      const inner = t.slice(1, end).trim();
+      const q = inner.indexOf('"');
+      const last = inner.lastIndexOf('"');
+      section = q < 0 ? inner.toLowerCase() : `${inner.slice(0, q).trim().toLowerCase()} "${last > q ? inner.slice(q + 1, last) : inner.slice(q + 1)}"`;
+      if (!out.has(section)) out.set(section, new Map());
+      continue;
+    }
+    const eq = t.indexOf('=');
+    const key = (eq < 0 ? t : t.slice(0, eq)).trim().toLowerCase();
+    let value = eq < 0 ? 'true' : t.slice(eq + 1).trim();
+    if (value.length >= 2 && value.startsWith('"') && value.endsWith('"')) value = value.slice(1, -1);
+    if (!out.has(section)) out.set(section, new Map());
+    out.get(section)!.set(key, value);
+  }
+  return out;
+}
+
+/** An external git directory is accepted only where Git keeps linked work trees and submodules (review M2). */
+function acceptedGitdir(gitdir: string, root: string): boolean {
+  return gitdir === `${root}/.git` || gitdir.startsWith(`${root}/`) || /\/\.git\/(worktrees|modules)\/[^/]+(\/[^/]+)*$/.test(gitdir);
+}
 
 async function locate(fs: DiscoveryFs, root: string): Promise<{ gitdir: string; commondir: string; linked: boolean } | null> {
   const dotGit = posix.join(root, '.git');
@@ -47,12 +84,15 @@ async function locate(fs: DiscoveryFs, root: string): Promise<{ gitdir: string; 
   let gitdir: string;
   if (st.isDirectory) gitdir = dotGit;
   else if (st.isFile) {
-    const m = /^gitdir:\s*(.+?)\s*$/m.exec((await readText(fs, dotGit)) ?? '');
-    if (!m) return null;
-    gitdir = posix.resolve(root, m[1]!);
+    const line = ((await readText(fs, dotGit)) ?? '').split('\n').find((l) => l.startsWith('gitdir:'));
+    if (!line) return null;
+    gitdir = posix.resolve(root, line.slice('gitdir:'.length).trim());
+    if (!acceptedGitdir(gitdir, root)) return null;
   } else return null;
-  const common = await readText(fs, posix.join(gitdir, 'commondir'));
-  const commondir = common ? posix.resolve(gitdir, common.trim()) : gitdir;
+  const common = (await readText(fs, posix.join(gitdir, 'commondir')))?.trim();
+  const candidate = common ? posix.resolve(gitdir, common) : gitdir;
+  // commondir must be where the linked work tree lives (…/.git for …/.git/worktrees/<n>), nowhere else.
+  const commondir = candidate !== gitdir && gitdir.startsWith(`${candidate}/`) ? candidate : gitdir;
   return { gitdir, commondir, linked: commondir !== gitdir };
 }
 
@@ -67,14 +107,14 @@ export function remoteHost(url: string): string | null {
   }
 }
 
-export async function readGitInfo(fs: DiscoveryFs, root: string, depth = 0): Promise<GitInfo | null> {
+export async function readGitInfo(fs: DiscoveryFs, root: string, depth = 0, signal?: AbortSignal): Promise<GitInfo | null> {
   const loc = await locate(fs, root);
   if (!loc) return null;
   const { gitdir, commondir, linked } = loc;
-  const config = (await readText(fs, posix.join(commondir, 'config'))) ?? '';
-  const objectFormat = /^\s*objectformat\s*=\s*sha256\s*$/im.test(config) ? 'sha256' : 'sha1';
+  const config = parseGitConfig((await readText(fs, posix.join(commondir, 'config'))) ?? '');
+  const objectFormat = config.get('extensions')?.get('objectformat')?.toLowerCase() === 'sha256' ? 'sha256' : 'sha1';
   const hashLen = objectFormat === 'sha256' ? 64 : 40;
-  const bare = /^\s*bare\s*=\s*true\s*$/im.test(config);
+  const bare = config.get('core')?.get('bare') === 'true';
   const packedText = (await readText(fs, posix.join(commondir, 'packed-refs'))) ?? '';
   const packed = new Map<string, string>();
   for (const line of packedText.split('\n')) {
@@ -125,14 +165,24 @@ export async function readGitInfo(fs: DiscoveryFs, root: string, depth = 0): Pro
   const submodules: GitInfo['submodules'] = [];
   const gm = depth < 2 ? await readText(fs, posix.join(root, '.gitmodules')) : null;
   if (gm) {
-    for (const m of gm.matchAll(/\[submodule "([^"]+)"\]([^[]*)/g)) {
-      const path = /^\s*path\s*=\s*(.+)$/m.exec(m[2]!)?.[1]?.trim();
-      if (!path || path.startsWith('/') || path.split('/').includes('..')) continue;
-      const inner = await readGitInfo(fs, posix.join(root, path), depth + 1);
+    const seen = new Set<string>();
+    for (const [section, values] of parseGitConfig(gm)) {
+      if (!section.startsWith('submodule ')) continue;
+      const path = values.get('path');
+      if (!path || path.startsWith('/') || path.split('/').includes('..') || seen.has(path)) continue;
+      if (seen.size >= MAX_SUBMODULES) break;
+      if (signal?.aborted) break;
+      seen.add(path);
+      // A submodule path that goes through a link is not followed (D-05): its Git data stays unread.
+      let throughLink = false;
+      for (let i = 1, segs = path.split('/'); i <= segs.length; i++) {
+        if ((await fs.lstat(posix.join(root, ...segs.slice(0, i))))?.isSymbolicLink) throughLink = true;
+      }
+      const inner = throughLink ? null : await readGitInfo(fs, posix.join(root, path), depth + 1, signal);
       submodules.push({ path, initialized: inner !== null, commit: inner?.commit ?? null });
     }
   }
-  const remoteUrl = /\[remote "origin"\][^[]*?^\s*url\s*=\s*(.+)$/m.exec(config)?.[1]?.trim() ?? null;
+  const remoteUrl = config.get('remote "origin"')?.get('url') ?? null;
   return {
     isRepo: true,
     branch,

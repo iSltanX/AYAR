@@ -66,6 +66,9 @@ const QUALITY_DEPS: Record<string, string> = {
 };
 const FRAMEWORK_DEPS = ['vite', 'svelte', '@sveltejs/kit', 'react', 'vue', 'next', 'astro', 'nuxt', 'wxt', '@crxjs/vite-plugin', 'plasmo', 'esbuild', 'rollup', 'webpack', 'electron', '@tauri-apps/api', '@tauri-apps/cli', 'obsidian', '@types/chrome', 'webextension-polyfill'];
 const EXTENSION_FRAMEWORKS: Record<string, string> = { '@crxjs/vite-plugin': 'crxjs', wxt: 'wxt', plasmo: 'plasmo' };
+const MAX_SCRIPTS = 500;
+const SCRIPT_NAME = /^[^\0\s]{1,200}$/;
+
 const LOCKFILES: Record<string, string> = {
   'pnpm-lock.yaml': 'pnpm',
   'package-lock.json': 'npm',
@@ -108,8 +111,9 @@ export const nodePackage: Detector = {
     if (typeof engines.vscode === 'string') add('type.vscodeExtension', { engine: engines.vscode }, src(file, '/engines/vscode', lineOfJsonPath(text, ['engines', 'vscode'])), 'declared');
     if (p.bin !== undefined) add('type.cli', { from: 'bin' }, src(file, '/bin', lineOfJsonPath(text, ['bin'])), 'declared');
     if (isRecord(p.scripts)) {
-      for (const [name, body] of Object.entries(p.scripts)) {
-        if (typeof body !== 'string') continue;
+      // At most MAX_SCRIPTS scripts, with sane names (a hostile file must not inflate the snapshot or its contracts).
+      for (const [name, body] of Object.entries(p.scripts).slice(0, MAX_SCRIPTS)) {
+        if (typeof body !== 'string' || !SCRIPT_NAME.test(name) || body.length > 8192) continue;
         const info: ScriptInfo = classifyScript(name, body);
         add('node.script', info, src(file, pointer(['scripts', name]), lineOfJsonPath(text, ['scripts', name])), 'declared');
         // node:test has no dependency to find: a script that runs `node --test` declares it.
@@ -118,16 +122,16 @@ export const nodePackage: Detector = {
     }
     const all = deps(p);
     const runtime = all.filter((d) => d.field !== 'devDependencies').length;
-    const notable = Object.fromEntries(all.filter((d) => FRAMEWORK_DEPS.includes(d.name) || TEST_DEPS[d.name] || QUALITY_DEPS[d.name] || d.name.startsWith('@storybook/')).map((d) => [d.name, d.version]));
+    const notable = Object.fromEntries(all.filter((d) => FRAMEWORK_DEPS.includes(d.name) || TEST_DEPS[d.name] || QUALITY_DEPS[d.name] || d.name.startsWith('@storybook/')).slice(0, 100).map((d) => [d.name.slice(0, 214), d.version.slice(0, 200)]));
     add('node.dependencies', { count: all.length, runtime, dev: all.length - runtime, notable }, src(file, all.length ? `/${all[0]!.field}` : '', all.length ? lineOfJsonPath(text, [all[0]!.field]) : null), 'declared');
     for (const d of all) {
-      const ptr = pointer([d.field, d.name]);
-      const line = lineOfJsonPath(text, [d.field, d.name]);
       const t = TEST_DEPS[d.name] ?? (d.name.startsWith('@storybook/') ? 'storybook' : null);
-      if (t) add('testing.framework', { name: t, from: 'dependency', version: d.version }, src(file, ptr, line), 'declared');
       const q = QUALITY_DEPS[d.name];
-      if (q) add('quality.tool', { name: q, from: 'dependency', config: null }, src(file, ptr, line), 'declared');
-      if (d.name === 'electron') add('type.desktopApp', { kind: 'electron' }, src(file, ptr, line), 'declared');
+      if (!t && !q && d.name !== 'electron') continue; // only notable dependencies become facts (and get a line)
+      const source = src(file, pointer([d.field, d.name]), lineOfJsonPath(text, [d.field, d.name]));
+      if (t) add('testing.framework', { name: t, from: 'dependency', version: d.version.slice(0, 200) }, source, 'declared');
+      if (q) add('quality.tool', { name: q, from: 'dependency', config: null }, source, 'declared');
+      if (d.name === 'electron') add('type.desktopApp', { kind: 'electron' }, source, 'declared');
     }
     if (p['size-limit'] !== undefined) add('references.sizeBudgets', { from: 'package.json' }, src(file, '/size-limit', lineOfJsonPath(text, ['size-limit'])), 'declared');
     // Lock files of this component, and the manager they imply when packageManager is absent.
@@ -351,11 +355,15 @@ export const web: Detector = {
       const h = await ctx.reader.head(f, 64 * 1024);
       if (!h.ok) continue;
       const dir = /\bdir\s*=\s*["']rtl["']/i.exec(h.text);
-      const lang = /<html[^>]*\blang\s*=\s*["']([A-Za-z-]+)["']/i.exec(h.text);
-      if (lang && RTL_LANGS.test(lang[1]!)) languages.add(lang[1]!.toLowerCase());
-      if (dir || (lang && RTL_LANGS.test(lang[1]!))) {
+      const htmlAt = h.text.search(/<html\b/i);
+      const htmlTag = htmlAt < 0 ? '' : h.text.slice(htmlAt, Math.min(h.text.length, htmlAt + 2048)).split('>')[0]!;
+      const lang = /\blang\s*=\s*["']([A-Za-z-]+)["']/i.exec(htmlTag);
+      const rtlLang = lang && RTL_LANGS.test(lang[1]!) ? lang : null;
+      if (rtlLang) languages.add(rtlLang[1]!.toLowerCase());
+      const hit = dir ?? rtlLang;
+      if (hit) {
         rtlFiles.push(f);
-        first ??= src(f, '', lineOf(h.text, (dir ?? lang)![0]));
+        first ??= src(f, '', lineOf(h.text, hit[0]));
       }
     }
     if (rtlFiles.length) add('ui.rtl', { files: rtlFiles, languages: [...languages].sort() }, first, 'declared');
@@ -439,6 +447,22 @@ export const qualityConfig: Detector = {
   },
 };
 
+/** `:root { --x: … }` within the first thousand `:root` blocks, without a backtracking pattern (review M1). */
+function rootVariables(css: string): boolean {
+  let from = 0;
+  for (let n = 0; n < 1000; n++) {
+    const i = css.indexOf(':root', from);
+    if (i < 0) return false;
+    const open = css.indexOf('{', i);
+    if (open < 0) return false;
+    const close = css.indexOf('}', open);
+    const body = css.slice(open + 1, close < 0 ? Math.min(css.length, open + 4096) : Math.min(close, open + 4096));
+    if (/--[\w-]+\s*:/.test(body)) return true;
+    from = open + 1;
+  }
+  return false;
+}
+
 export const references: Detector = {
   id: 'references',
   version: 1,
@@ -454,9 +478,9 @@ export const references: Detector = {
     for (const f of css) {
       const h = await ctx.reader.head(f, 128 * 1024);
       if (!h.ok) continue;
-      if (/:root\s*\{[^}]*--[\w-]+\s*:/.test(h.text)) vars.push(f);
-      if (/@theme\b/.test(h.text)) themes.push(f);
-      const n = (h.text.match(/@font-face\b/g) ?? []).length;
+      if (rootVariables(h.text)) vars.push(f);
+      if (h.text.includes('@theme')) themes.push(f);
+      const n = h.text.split('@font-face').length - 1;
       if (n) {
         fontFaces += n;
         fonts.push(f);

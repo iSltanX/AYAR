@@ -9,5 +9,7 @@
   "discovery.warning.partialScan": "Partial scan ({reasons}): {entries} entries were read, then discovery stopped at the limit.",
   "discovery.warning.configTooLarge": "The configuration file “{path}” is larger than the limit; it was not read.",
   "discovery.warning.configInvalid": "The configuration file “{path}” is invalid; checks that depend on it may be unavailable.",
-  "discovery.sensitive.named": "“{path}” was recorded by name only; its values were not read."
+  "discovery.sensitive.named": "“{path}” was recorded by name only; its values were not read.",
+  "discovery.warning.symlinkTargetSkipped": "The symbolic link “{path}” points to a file discovery does not read (skipped, ignored, or not a regular file); it was not read.",
+  "discovery.warning.gitignoreTruncated": "“{path}” has {rules} rules; only the first thousand were read."
 }

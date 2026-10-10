@@ -9,5 +9,7 @@
   "discovery.warning.partialScan": "مسح جزئي ({reasons}): قُرئ {entries} مدخل ثم توقف الاكتشاف عند الحد.",
   "discovery.warning.configTooLarge": "ملف الإعداد «{path}» أكبر من الحد، فلم يُقرأ.",
   "discovery.warning.configInvalid": "ملف الإعداد «{path}» غير صالح، فقد تتعذر الفحوص التي تعتمد عليه.",
-  "discovery.sensitive.named": "سُجّل «{path}» باسمه فقط، ولم تُقرأ قيمه."
+  "discovery.sensitive.named": "سُجّل «{path}» باسمه فقط، ولم تُقرأ قيمه.",
+  "discovery.warning.symlinkTargetSkipped": "الرابط الرمزي «{path}» يشير إلى ملف لا يقرؤه الاكتشاف (مستثنى أو مُتجاهَل أو ليس ملفًا عاديًا)، فلم يُقرأ.",
+  "discovery.warning.gitignoreTruncated": "في «{path}» {rules} قاعدة؛ قُرئت أول ألف منها فقط."
 }

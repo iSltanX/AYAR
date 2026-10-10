@@ -37,8 +37,11 @@ describe('AT-01 (discovery): discovery runs nothing, and keeps no secret', () =>
     writeFileSync(join(fakeBin, 'git'), `#!/bin/sh\necho "$@" >> '${gitMark}'\nexit 1\n`);
     chmodSync(join(fakeBin, 'git'), 0o755);
 
+    const slowShell = join(fakeBin, 'slow-login-shell');
+    writeFileSync(slowShell, '#!/bin/sh\n/bin/sleep 0.3\nexec /bin/sh -c "$2"\n');
+    chmodSync(slowShell, 0o755);
     const dataDir = join(root, 'AYAR');
-    const engine = await connectEngine({ dataDir, env: { PATH: `${fakeBin}:${process.env.PATH ?? '/usr/bin:/bin'}` } });
+    const engine = await connectEngine({ dataDir, env: { PATH: `${fakeBin}:${process.env.PATH ?? '/usr/bin:/bin'}`, AYAR_TEST_LOGIN_SHELL: slowShell } });
     try {
       await engine.waitForEvent('engine.health');
       const enginePid = engine.welcome.engine.pid;
@@ -76,11 +79,8 @@ describe('AT-01 (discovery): discovery runs nothing, and keeps no secret', () =>
       // Facts carry their sources.
       for (const f of snap.facts.filter((x) => x.key.startsWith('type.') || x.key.startsWith('testing.framework') || x.key.startsWith('node.'))) expect(f.source, f.key).not.toBeNull();
 
-      // Positive control: the same sampler does see a child when the engine runs one (C-07 reads the login shell).
-      const slowShell = join(fakeBin, 'slow-login-shell');
-      writeFileSync(slowShell, '#!/bin/sh\n/bin/sleep 0.3\nexec /bin/sh -c "$2"\n');
-      chmodSync(slowShell, 0o755);
-      ok(await engine.invoke('settings.set', { key: 'environment.shell', value: slowShell }));
+      // Positive control: the same sampler does see a child when the engine runs one (C-07 reads the login shell,
+      // here the slow stand-in this test chose through the host's hook).
       sampling = true;
       const control = (async () => {
         while (sampling) {

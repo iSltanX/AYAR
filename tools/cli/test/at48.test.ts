@@ -22,10 +22,10 @@ describe('AT-48 (environment): sensitive variables are withheld, and allowed one
     writeFileSync(shell, `#!/bin/sh\nexport MY_API_TOKEN='${myToken}'\nexport NPM_TOKEN='${npmToken}'\nexport PATH='/usr/bin:/bin'\nexec /bin/sh -c "$2"\n`);
     chmodSync(shell, 0o755);
     const dataDir = join(root, 'AYAR');
-    const engine = await connectEngine({ dataDir });
+    // The host chooses the login shell (tools/cli's hook); the renderer's setting accepts only system shells (M10).
+    const engine = await connectEngine({ dataDir, env: { AYAR_TEST_LOGIN_SHELL: shell } });
     try {
       await engine.waitForEvent('engine.health');
-      ok(await engine.invoke('settings.set', { key: 'environment.shell', value: shell }));
       const { projectId, profile } = await addProject(engine, materialize('FX-EXT', 'good', join(root, 'FX-EXT')));
       ok(await engine.invoke('profile.approve', { projectId, changeSetId: profile.pending.id }));
 

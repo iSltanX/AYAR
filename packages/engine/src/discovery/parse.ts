@@ -86,13 +86,37 @@ export function parseConfig(text: string, format: ConfigFormat): ParseResult {
   }
 }
 
-/** The 1-based line where `needle` first appears, or null. Used to place a fact inside its file. */
+// Line positions are looked up in a table of newline offsets, built once per text (a few texts are cached), so
+// placing many facts in one large file stays linear (review M1: a hostile file must not cost quadratic time).
+const lineTables = new Map<string, number[]>();
+function newlines(text: string): number[] {
+  let t = lineTables.get(text);
+  if (!t) {
+    t = [];
+    for (let i = text.indexOf('\n'); i >= 0; i = text.indexOf('\n', i + 1)) t.push(i);
+    if (lineTables.size >= 8) lineTables.delete(lineTables.keys().next().value!);
+    lineTables.set(text, t);
+  }
+  return t;
+}
+
+/** The 1-based line of a character offset. */
+export function lineAt(text: string, index: number): number {
+  const t = newlines(text);
+  let lo = 0;
+  let hi = t.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (t[mid]! < index) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo + 1;
+}
+
+/** The 1-based line where `needle` first appears (from `from`), or null. Used to place a fact inside its file. */
 export function lineOf(text: string, needle: string, from = 0): number | null {
   const i = text.indexOf(needle, from);
-  if (i < 0) return null;
-  let line = 1;
-  for (let k = 0; k < i; k++) if (text.charCodeAt(k) === 10) line++;
-  return line;
+  return i < 0 ? null : lineAt(text, i);
 }
 
 /** The line of a JSON key path such as ["scripts", "test"]: each key is searched after the previous one. */
@@ -103,24 +127,29 @@ export function lineOfJsonPath(text: string, path: readonly string[]): number | 
     const needle = `"${key}"`;
     const i = text.indexOf(needle, from);
     if (i < 0) return line;
-    line = lineOf(text, needle, from);
+    line = lineAt(text, i);
     from = i + needle.length;
   }
   return line;
 }
 
-/** A TOML table header or key: `[tool.pytest.ini_options]`, or `name =` within a table. */
+/** A TOML table header or key: `[tool.pytest.ini_options]`, or `name =` within a table. Line by line, linear. */
 export function lineOfToml(text: string, table: string, key?: string): number | null {
-  const header = new RegExp(`^\\s*\\[\\[?\\s*${table.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\]\\]?\\s*$`, 'm');
-  const m = header.exec(text);
-  if (!m) return null;
-  if (!key) return lineOf(text, m[0].trimStart(), m.index);
-  const after = text.slice(m.index + m[0].length);
-  const next = /^\s*\[/m.exec(after);
-  const body = next ? after.slice(0, next.index) : after;
-  const k = new RegExp(`^\\s*"?${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"?\\s*=`, 'm').exec(body);
-  if (!k) return lineOf(text, m[0].trimStart(), m.index);
-  return lineOf(text, k[0].trimStart(), m.index + m[0].length + k.index);
+  const lines = text.split('\n');
+  const header = (l: string) => {
+    const t = l.trim();
+    return t === `[${table}]` || t === `[[${table}]]`;
+  };
+  const at = lines.findIndex(header);
+  if (at < 0) return null;
+  if (!key) return at + 1;
+  for (let i = at + 1; i < lines.length; i++) {
+    const t = lines[i]!.trim();
+    if (t.startsWith('[')) break;
+    const eq = t.indexOf('=');
+    if (eq > 0 && t.slice(0, eq).trim().replace(/^"|"$/g, '') === key) return i + 1;
+  }
+  return at + 1;
 }
 
 /** A JSON pointer (RFC 6901) for a key path. */

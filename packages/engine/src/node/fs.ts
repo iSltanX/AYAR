@@ -53,9 +53,13 @@ export const nodeFileSystem: FileSystem = {
     }));
   },
   async readFilePrefix(path, maxBytes) {
-    const handle = await fsp.open(path, constants.O_RDONLY);
+    // No link is followed, and a FIFO or device cannot block the engine: open non-blocking, then insist on a
+    // regular file by the handle itself (the path may have changed since it was listed).
+    const handle = await fsp.open(path, constants.O_RDONLY | constants.O_NONBLOCK | constants.O_NOFOLLOW);
     try {
-      const { size } = await handle.stat();
+      const st = await handle.stat();
+      if (!st.isFile()) throw Object.assign(new Error(`not a regular file: ${path}`), { code: 'ENOTFILE' });
+      const { size } = st;
       const length = Math.max(0, Math.min(size, maxBytes));
       const buffer = new Uint8Array(length);
       let read = 0;

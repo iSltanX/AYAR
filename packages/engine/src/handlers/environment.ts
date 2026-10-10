@@ -9,7 +9,7 @@ export const environmentResolve: CommandHandler = async (payload, ctx) => {
   const { projectId, refresh, probe, instance } = payload as CommandPayload<'environment.resolve'>;
   const project = await ctx.services.projects.view(projectId);
   const snapshot = ctx.services.projects.snapshot(projectId);
-  const env = await ctx.services.environment.resolve({ projectRoot: project.rootPath, facts: snapshot?.facts ?? [], refresh: refresh ?? false, probe: probe ?? false });
+  const env = await ctx.services.environment.resolve({ projectRoot: project.rootPath, facts: snapshot?.facts ?? [], refresh: refresh ?? false, probe: probe ?? false, untrusted: project.untrusted });
   let child = null;
   if (instance) {
     const spec = latestProfile(ctx.db, projectId)?.content.checks.find((c) => c.instance === instance);

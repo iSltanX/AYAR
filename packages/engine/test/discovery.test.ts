@@ -1,6 +1,7 @@
 // C-06 (D-05, FR-04 to FR-09): discovery reads files only, within its limits, never follows a folder link,
 // records .env* by name without opening it, never reads a huge file, respects nested .gitignore files, finds
 // components, reads Git from files, and can be cancelled. A spy file system records every file opened.
+import { execFileSync } from 'node:child_process';
 import { closeSync, mkdirSync, openSync, symlinkSync, writeFileSync, ftruncateSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -348,5 +349,80 @@ describe('node:test', () => {
     write('package.json', JSON.stringify({ name: 'n', scripts: { test: 'node --test --test-reporter=spec' } }, null, 2));
     const r = await run();
     expect(fact(r, 'testing.framework')[0]).toMatchObject({ value: { name: 'node-test', from: 'script' }, source: { pointer: '/scripts/test' } });
+  });
+});
+
+describe('links are judged by their target (FR-08, review C1)', () => {
+  it('never reads .env, a key, .git, a FIFO or an ignored file through an in-root link', async () => {
+    const secret = ['DB_PASS', 'WORD=hunter2', 'hunter2'].join('');
+    write('.env', `${secret}\n`);
+    write('sub/id_rsa', secret);
+    write('.git/config', `[core]\n# ${secret}\n`);
+    write('ignored.json', `{"x":"${secret}"}`);
+    write('.gitignore', 'ignored.json\n');
+    symlinkSync(join(root, '.env'), join(root, '.nvmrc'));
+    symlinkSync(join(root, '.env'), join(root, 'package.json'));
+    symlinkSync(join(root, 'sub/id_rsa'), join(root, 'tsconfig.json'));
+    symlinkSync(join(root, '.git/config'), join(root, 'pyproject.toml'));
+    symlinkSync(join(root, 'ignored.json'), join(root, 'manifest.json'));
+    execFileSync('/usr/bin/mkfifo', [join(root, 'pipe')]);
+    symlinkSync(join(root, 'pipe'), join(root, '.python-version'));
+    const fs = spyFs();
+    const r = await run(fs);
+    for (const name of ['.nvmrc', 'package.json', 'tsconfig.json', 'pyproject.toml', 'manifest.json', '.python-version', '.env', 'sub/id_rsa']) expect(fs.reads.map((x) => x.path), name).not.toContain(name);
+    expect(r.inventory.sensitiveFiles.map((s) => s.path)).toEqual(expect.arrayContaining(['.env', '.nvmrc', 'package.json', 'tsconfig.json', 'sub/id_rsa']));
+    expect(r.warnings).toEqual(expect.arrayContaining([{ code: 'symlinkTargetSkipped', path: 'pyproject.toml' }, { code: 'symlinkTargetSkipped', path: 'manifest.json' }, { code: 'symlinkTargetSkipped', path: '.python-version' }]));
+    expect(JSON.stringify(r)).not.toContain('hunter2');
+  });
+});
+
+describe('hostile inputs stay cheap and confined (review M1, M2)', () => {
+  const timed = async <T>(fn: () => Promise<T>): Promise<{ r: T; ms: number }> => {
+    const t0 = performance.now();
+    const r = await fn();
+    return { r, ms: performance.now() - t0 };
+  };
+
+  it('reads a Git config with a huge section, many submodules and a gitdir outside, quickly and confined', async () => {
+    write('.git/HEAD', `ref: refs/heads/main\n`);
+    write('.git/refs/heads/main', `${'e'.repeat(40)}\n`);
+    write('.git/config', `[remote "origin"]${'\n'.repeat(19_000)}\turl = https://github.com/x/y\n`);
+    write('.gitmodules', Array.from({ length: 20_000 }, (_, i) => `[submodule "s${i}"]\n\tpath = libs/same\n`).join(''));
+    const { r, ms } = await timed(() => run());
+    expect(ms).toBeLessThan(5000);
+    const git = fact(r, 'git.repository')[0]?.value as { submodules: unknown[]; remoteHost: string };
+    expect(git.submodules).toHaveLength(1);
+    expect(git.remoteHost).toBe('github.com');
+    // A .git file pointing anywhere else than a work tree or module folder is not read (M2).
+    cleanup();
+    ({ dir: root, cleanup } = tempRoot('ayar-DEV-4-discovery-'));
+    const elsewhere = tempRoot('ayar-DEV-4-elsewhere-');
+    try {
+      mkdirSync(join(elsewhere.dir, 'repo'), { recursive: true });
+      writeFileSync(join(elsewhere.dir, 'repo/HEAD'), `${'f'.repeat(40)}\n`);
+      write('.git', `gitdir: ${join(elsewhere.dir, 'repo')}\n`);
+      expect(fact(await run(), 'git.repository')).toEqual([]);
+    } finally {
+      elsewhere.cleanup();
+    }
+  }, 30_000);
+
+  it('places facts in a package.json with thousands of dependencies and scripts in linear time', async () => {
+    const deps = Object.fromEntries(Array.from({ length: 20_000 }, (_, i) => [`dep-${i}`, '1.0.0']));
+    const scripts = Object.fromEntries(Array.from({ length: 5_000 }, (_, i) => [`s${i}`, 'echo x']));
+    write('package.json', JSON.stringify({ name: 'big', dependencies: { ...deps, vitest: '5.0.3' }, scripts }, null, 2));
+    write('pyproject.toml', `${'\n'.repeat(40_000)}[project]\nname = "p"\n`);
+    write('a.css', ':root{ '.repeat(20_000));
+    const { r, ms } = await timed(() => run());
+    expect(ms).toBeLessThan(5000);
+    expect(fact(r, 'node.script')).toHaveLength(500);
+    expect(fact(r, 'testing.framework')[0]).toMatchObject({ value: { name: 'vitest' }, source: { pointer: '/dependencies/vitest', line: 20004 } });
+    expect(fact(r, 'python.project')[0]?.source).toMatchObject({ line: 40_001 });
+  }, 30_000);
+
+  it('caps a .gitignore with too many rules, and says so', async () => {
+    write('.gitignore', Array.from({ length: 3000 }, (_, i) => `ignored-${i}/`).join('\n'));
+    const r = await run();
+    expect(r.warnings).toContainEqual({ code: 'gitignoreTruncated', path: '.gitignore', values: { rules: 3000 } });
   });
 });
