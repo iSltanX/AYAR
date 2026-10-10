@@ -18,6 +18,16 @@ import profileAr from './profile.ar.json' with { type: 'json' };
 import profileEn from './profile.en.json' with { type: 'json' };
 import projectsAr from './projects.ar.json' with { type: 'json' };
 import projectsEn from './projects.en.json' with { type: 'json' };
+import controlsAr from './controls.ar.json' with { type: 'json' };
+import controlsEn from './controls.en.json' with { type: 'json' };
+import resultsAr from './results.ar.json' with { type: 'json' };
+import resultsEn from './results.en.json' with { type: 'json' };
+import sheetsAr from './sheets.ar.json' with { type: 'json' };
+import sheetsEn from './sheets.en.json' with { type: 'json' };
+import shellAr from './shell.ar.json' with { type: 'json' };
+import shellEn from './shell.en.json' with { type: 'json' };
+import statusAr from './status.ar.json' with { type: 'json' };
+import statusEn from './status.en.json' with { type: 'json' };
 import uiAr from './ui.ar.json' with { type: 'json' };
 import uiEn from './ui.en.json' with { type: 'json' };
 
@@ -32,11 +42,16 @@ export const MESSAGE_FILES = {
   profile: { ar: profileAr, en: profileEn },
   projects: { ar: projectsAr, en: projectsEn },
   ui: { ar: uiAr, en: uiEn },
+  controls: { ar: controlsAr, en: controlsEn },
+  results: { ar: resultsAr, en: resultsEn },
+  sheets: { ar: sheetsAr, en: sheetsEn },
+  shell: { ar: shellAr, en: shellEn },
+  status: { ar: statusAr, en: statusEn },
 } as const;
 
 export type Scope = keyof typeof MESSAGE_FILES;
 
 export const MESSAGES = {
-  ar: { ...catalogAr, ...commonAr, ...discoveryAr, ...environmentAr, ...errorsAr, ...glossaryAr, ...menuAr, ...profileAr, ...projectsAr, ...uiAr },
-  en: { ...catalogEn, ...commonEn, ...discoveryEn, ...environmentEn, ...errorsEn, ...glossaryEn, ...menuEn, ...profileEn, ...projectsEn, ...uiEn },
+  ar: { ...catalogAr, ...commonAr, ...discoveryAr, ...environmentAr, ...errorsAr, ...glossaryAr, ...menuAr, ...profileAr, ...projectsAr, ...uiAr, ...controlsAr, ...resultsAr, ...sheetsAr, ...shellAr, ...statusAr },
+  en: { ...catalogEn, ...commonEn, ...discoveryEn, ...environmentEn, ...errorsEn, ...glossaryEn, ...menuEn, ...profileEn, ...projectsEn, ...uiEn, ...controlsEn, ...resultsEn, ...sheetsEn, ...shellEn, ...statusEn },
 } as const;

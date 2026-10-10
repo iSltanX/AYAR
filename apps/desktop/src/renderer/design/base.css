@@ -1,0 +1,66 @@
+/* Document-wide rules of the design system (plan 16.4-16.6, NFR-04). Component styles live in their .svelte
+   files (emitted as CSS files, never inline: 15.2). */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font: var(--type-body);
+  letter-spacing: 0; /* never letter-spacing: it breaks Arabic joining (16.4) */
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  letter-spacing: 0;
+}
+
+/* The focus ring (D-DES3-02): ink, 2 px, offset 2 px, following the element's corners. Never removed. */
+:focus-visible {
+  outline: var(--focus-width) solid var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+/* Code, paths, commands and logs: the system monospace font, isolated left to right (C-24, D-DES3-04). */
+code,
+kbd,
+samp {
+  font: var(--type-mono);
+}
+
+/* Reduced motion: every transition and animation becomes an instant change (16.6, D-DES1-08). Spinners swap
+   to their static symbols in StatusSymbol. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

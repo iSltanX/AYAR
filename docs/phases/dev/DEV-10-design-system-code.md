@@ -4,8 +4,8 @@ track: dev
 number: 10
 stage: interface
 title: نظام التصميم في الشيفرة — الرموز والخطوط والحالات والمكونات
-status: not-started
-status_date: 2026-10-09
+status: in-progress
+status_date: 2026-10-10
 depends_on: [DEV-3]
 design_gates: [DES-1, DES-2, DES-3]
 owner_gates: []
@@ -115,8 +115,9 @@ closing_commit:
 
 ## 11. حالة التقدم ونقطة الاستئناف
 
-- **الحالة:** لم تبدأ.
-- **آخر تحديث:** 2026-10-09.
-- **المنجز:** —
-- **آخر commit:** —
-- **نقطة الاستئناف:** المهمة 1 (الرموز).
+- **الحالة:** جارية.
+- **آخر تحديث:** 2026-10-10.
+- **المنجز:** المهمة 1 (المتغيرات من Figma إلى `design/figma/variables.txt` ومولّد `tokens.css` بالوضعين، واختبار التباين لثنائيات DES-1 وDES-2 وDES-3)، والمهمة 2 (Cairo وAlmarai مضمنان بترخيصهما)، والمهمة 3 (رموز الحالات من Figma وLucide 1.48.0 مولّدة)، وأساس المعرض واختباراته، وأول المكوّنات (Button وIcon button وStatusSymbol وResultBadge وReadinessBadge).
+- **آخر commit:** انظر `git log` على `phase/DEV-10`.
+- **نقطة الاستئناف:** المكوّنات الباقية بمجموعاتها (المهمة 4) ثم المعرض الكامل والمطابقة.
+- **المواضع المؤقتة:** `$TMPDIR/ayar-DEV-10-fonts.*` (تنزيل الخطين، يُحذف عند التنظيف)، و`$TMPDIR/ayar-DEV-10-shot-*` و`$TMPDIR/ayar-gallery-*` و`$TMPDIR/ayar-e2e-*` (مجلدات بيانات مؤقتة للتشغيل، تحذفها السكربتات).
