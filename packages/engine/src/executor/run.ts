@@ -124,6 +124,8 @@ interface Active {
   services: CompanionServices | null;
   /** Checks waiting for their companion services: a cancel wakes them (FR-21, 9.7). */
   waiting: Map<string, AbortController>;
+  /** Checks whose process has ended and whose result is being recorded. */
+  collecting: Set<string>;
   wake: () => void;
 }
 
@@ -270,7 +272,7 @@ export class RunService {
     const plan = PlanSchema.parse(JSON.parse(row.plan_json));
     const projectId = plan.projectId;
     let wake = () => {};
-    const active: Active = { runId, projectId, plan, cancel: null, procs: new Map(), cancelledChecks: new Set(), services: null, waiting: new Map(), wake: () => wake() };
+    const active: Active = { runId, projectId, plan, cancel: null, procs: new Map(), cancelledChecks: new Set(), services: null, waiting: new Map(), collecting: new Set(), wake: () => wake() };
     this.#active.set(runId, active);
     // A run cancelled while it waited in the queue never starts.
     if (db.get<{ state: string }>('SELECT state FROM runs WHERE id = ?', runId)!.state !== 'queued') return;
@@ -512,6 +514,16 @@ export class RunService {
     const onSegment = (stream: 'stdout' | 'stderr', offset: number, length: number) => this.#o.events.log(runId, e.checkRunId, { stream, offset, length });
     const out = streamSink({ writer: await ports.fs.openWriter(posix.join(evDir, 'stdout.log'), 0o600), redactor: redactor.lineStream(), stream: 'stdout', totals, onSegment });
     const err = streamSink({ writer: await ports.fs.openWriter(posix.join(evDir, 'stderr.log'), 0o600), redactor: redactor.lineStream(), stream: 'stderr', totals, onSegment });
+    // 9.7: a cancel (of the check, its run, or the app) that came while it was being prepared launches nothing.
+    // Checked in the same turn as the launch below, so no cancel slips in between.
+    if (active.cancel || active.cancelledChecks.has(e.checkRunId)) {
+      await out.end();
+      await err.end();
+      for (const name of ['stdout.log', 'stderr.log']) await ports.fs.remove(posix.join(evDir, name));
+      await active.services!.release(held);
+      await ports.fs.remove(tmpRoot);
+      return this.#finishCheck(e, 'cancelled', { key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }, null, []);
+    }
     const token = Buffer.from(ports.random.bytes(24)).toString('base64url');
     const startedWall = ports.clock.now();
     const proc = this.#o.supervisor.start({
@@ -543,6 +555,8 @@ export class RunService {
     if (active.cancel || active.cancelledChecks.has(e.checkRunId)) proc.stop(active.cancel === 'app_quit' ? 'quit' : 'cancel');
     const r = await proc.done;
     active.procs.delete(e.checkRunId);
+    // Its process has ended: what follows records its result, and a cancel now comes too late (accepted: false).
+    active.collecting.add(e.checkRunId);
     const outEnd = await out.end();
     const errEnd = await err.end();
     // The services' logs so far are this check's evidence (FR-21), taken before a service stops with its last user.
@@ -721,16 +735,21 @@ export class RunService {
     if (!c) throw new CommandError('not_found', { reason: 'check_run' });
     const a = this.#active.get(c.run_id);
     if (!a || c.state === 'finished') return { accepted: false, state: c.state };
+    // Its process already ended: its real result is being recorded, so the cancel is too late.
+    if (a.collecting.has(target.checkRunId)) return { accepted: false, state: c.state };
     a.cancelledChecks.add(target.checkRunId);
     a.waiting.get(target.checkRunId)?.abort();
     const proc = a.procs.get(target.checkRunId);
-    if (proc) {
+    // Running or being prepared (its spec checked, its services awaited): «يُلغى» until it ends; not started yet:
+    // the scheduler ends it «أُلغي» at once.
+    const started = proc !== undefined || c.state === 'running';
+    if (started) {
       db.run("UPDATE check_runs SET state = 'cancelling' WHERE id = ?", target.checkRunId);
       this.#o.events.emit('check.state', this.#checkView(this.#checkRow(target.checkRunId)));
-      proc.stop('cancel');
+      proc?.stop('cancel');
     }
     a.wake();
-    return { accepted: true, state: proc ? 'cancelling' : 'finished' };
+    return { accepted: true, state: started ? 'cancelling' : 'finished' };
   }
 
   #requestCancel(a: Active, reason: 'user' | 'app_quit'): void {

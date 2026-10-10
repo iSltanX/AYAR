@@ -151,6 +151,26 @@ export class ProcessSupervisor {
       lastOutput = this.#clock.monotonicMs();
       fn(c);
     };
+    // 9.7: stopped before it was even launched (a cancel or a quit during the preparation): nothing is launched.
+    if (stopMode()) {
+      this.#endLedger(ledgerId);
+      const at = this.#clock.now();
+      return {
+        ended: 'cancelled',
+        exitCode: null,
+        signal: null,
+        spawnError: null,
+        pid: null,
+        startedAt,
+        finishedAt: at,
+        durationMs: 0,
+        lastActivityAt: null,
+        sleepGaps: [],
+        resources: { samples: 0, peakRssKb: 0, maxCpuPercent: 0, lastCpuPercent: 0 },
+        leftovers: { groupKilled: 0, tokenKilled: 0, escapeSuspected: [] },
+        escalation: [],
+      };
+    }
     let started: StartedProcess;
     try {
       started = await processes.start(spec.argv[0]!, spec.argv.slice(1), { cwd: spec.cwd, env: { ...spec.env, AYAR_CHECK_TOKEN: spec.token }, onStdout: wrapOut((c) => spec.onStdout(c)), onStderr: wrapOut((c) => spec.onStderr(c)) });
@@ -227,10 +247,13 @@ export class ProcessSupervisor {
     const cpuBefore = new Map<number, number>();
     let ending: EndReason | null = null;
     while (!exited) {
-      await new Promise<void>((r) => {
-        wakeLoop = r;
-        setTimeout(r, SAMPLE_INTERVAL_MS).unref?.();
-      });
+      // A stop asked before this loop could be woken (during the launch) is acted on at once, not a sample later.
+      if (!stopMode()) {
+        await new Promise<void>((r) => {
+          wakeLoop = r;
+          setTimeout(r, SAMPLE_INTERVAL_MS).unref?.();
+        });
+      }
       if (exited) break;
       const nowMono = this.#clock.monotonicMs();
       const nowWall = this.#clock.now().getTime();

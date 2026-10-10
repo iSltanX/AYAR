@@ -84,9 +84,11 @@ describe('FR-21: companion services', () => {
       const p = await plan(engine, projectId, { kind: 'check', instance: 'custom.needs@.' });
       const { runId } = await startRun(engine, p.id);
       // The service has started (its ledger row) and the check waits for it.
-      await engine.waitForEvent('check.state', (e) => e.payload.runId === runId && e.payload.state === 'running', 20_000);
+      const running = await engine.waitForEvent('check.state', (e) => e.payload.runId === runId && e.payload.state === 'running', 20_000);
       await new Promise((r) => setTimeout(r, 1500));
       const t0 = Date.now();
+      // The check itself, while it waits (no process yet): «يُلغى», not a «finished» that is not true yet.
+      expect(ok(await engine.invoke('run.cancel', { target: { kind: 'checkRun', checkRunId: running.payload.checkRunId } }))).toEqual({ accepted: true, state: 'cancelling' });
       ok(await engine.invoke('run.cancel', { target: { kind: 'run', runId } }));
       const d = await waitRun(engine, runId, 20_000);
       expect(Date.now() - t0).toBeLessThan(15_000);
