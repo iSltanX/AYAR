@@ -1,0 +1,14 @@
+{
+  "label": "test-package-identity",
+  "appPath": "AYAR Spike.app",
+  "startedAt": "2026-10-10T05:34:57.811Z",
+  "launched": true,
+  "title": "AYAR Spike — E-01",
+  "monoText": "/Users/me/Projects/ayar/packages/engine/src/index.ts:42 — npm run test -- --reporter=json",
+  "mainEval": {
+    "name": "AYAR Spike",
+    "packaged": true
+  },
+  "ok": true,
+  "ms": 2239
+}

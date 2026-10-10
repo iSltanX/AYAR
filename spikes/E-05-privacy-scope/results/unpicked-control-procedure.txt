@@ -1,0 +1,13 @@
+# E-05 scope control, 2026-10-10 07:44 (the commands as run; app = AYAR Spike E05, com.bysltan.ayar.spike.e05)
+# State before: e05 had picked ~/Downloads/ayar-e05-probe (and the other probes) through the open panel,
+# and had been relaunched once with --replay. ~/Downloads/ayar-e05-unpicked was never shown in any panel.
+cp -R ~/Downloads/ayar-e05-probe ~/Downloads/ayar-e05-unpicked && rm -f ~/Downloads/ayar-e05-unpicked/.ayar-probe-test-output
+# point the stored "downloads" project at the unpicked folder:
+node -e '...s.downloads = os.homedir() + "/Downloads/ayar-e05-unpicked"...' "~/Library/Application Support/AYAR Spike/e05-projects.json"
+open -n ".../AYAR Spike E05.app" --args --replay --only downloads
+# result file (the mode did not yet record the accessed path): results/e05-replay-downloads.json
+#   discover ok, 4 files, 0 ms; test ok (PROBE_TEST_OK), 8 ms
+# privacy log for the same window (until the E05B run started): results/tcc-replay-unpicked-downloads.json
+# afterwards: rm -rf ~/Downloads/ayar-e05-unpicked; e05-projects.json restored from a saved copy.
+# The same control in Documents (results/e05-replay-documents.json) is NOT valid: an earlier mis-click had
+# picked the whole ~/Documents folder through the open panel.

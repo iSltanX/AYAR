@@ -1,0 +1,8 @@
+# path 1: fuses-only ad-hoc (no osxSign), 2026-10-10
+$ codesign --verify --deep --strict --verbose=2 <app>
+out/AYAR Spike-darwin-arm64/AYAR Spike.app: invalid Info.plist (plist or signature have been modified)
+In architecture: arm64
+$ codesign -dvv <app> | grep -E "Identifier|flags|Signature"
+Identifier=com.github.Electron
+CodeDirectory v=20400 size=300 flags=0x2(adhoc) hashes=3+3 location=embedded
+Signature=adhoc

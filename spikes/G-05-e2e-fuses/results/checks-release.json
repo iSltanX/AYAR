@@ -1,7 +1,7 @@
 {
   "label": "release",
   "app": "AYAR Spike.app",
-  "at": "2026-10-09T20:27:31.997Z",
+  "at": "2026-10-10T05:31:29.092Z",
   "checks": {
     "inspect": {
       "code": null,
@@ -27,11 +27,29 @@
         "AYAR Spike: refusing remote debugging switches without the inspector fuse"
       ]
     },
+    "remoteDebuggingAddress": {
+      "code": 78,
+      "signal": null,
+      "killedAfterMs": null,
+      "output": [
+        "AYAR Spike: refusing remote debugging switches without the inspector fuse"
+      ]
+    },
+    "sigusr1": {
+      "code": null,
+      "signal": "SIGUSR1",
+      "inspectorOpened": false
+    },
     "runAsNode": {
       "code": null,
       "signal": "SIGKILL",
       "killedAfterMs": 6000,
-      "output": [],
+      "output": [
+        "[9743:1010/083111.330214:ERROR:gpu/command_buffer/service/shared_image/shared_image_manager.cc:370] SharedImageManager::ProduceOverlay: Trying to Produce a Overlay representation from a non-existent mailbox.",
+        "[9743:1010/083111.330403:ERROR:components/viz/service/display_embedder/skia_output_device_buffer_queue.cc:258] Invalid mailbox.",
+        "[9743:1010/083111.330406:ERROR:gpu/command_buffer/service/shared_image/shared_image_manager.cc:370] SharedImageManager::ProduceOverlay: Trying to Produce a Overlay representation from a non-existent mailbox.",
+        "[9743:1010/083111.330408:ERROR:components/viz/service/display_embedder/skia_output_device_buffer_queue.cc:258] Invalid mailbox."
+      ],
       "actedAsNode": false
     },
     "nodeOptions": {
@@ -40,6 +58,16 @@
       "killedAfterMs": 6000,
       "output": [],
       "requireRan": false
+    },
+    "nodeOptionsHttp": {
+      "code": null,
+      "signal": "SIGKILL",
+      "killedAfterMs": 6000,
+      "output": [
+        "AYAR_HTTP_MAX_HEADER=16384"
+      ],
+      "maxHeaderSize": 16384,
+      "honored": false
     }
   }
 }

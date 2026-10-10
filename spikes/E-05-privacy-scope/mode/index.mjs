@@ -49,6 +49,7 @@ export async function run({ app, createWindow, Engine, info, readBundleId }) {
       entry.discover = await engine.call('e05.discover', { root }, 600000);
       entry.test = await engine.call('e05.test', { root }, 600000);
     }
+    entry.root = root ? root.replace(home, '~') : null; // which path was actually accessed
     entry.t1 = new Date().toISOString();
     report.locations.push(entry);
     show();

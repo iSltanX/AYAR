@@ -1,6 +1,6 @@
 {
   "label": "image-exfat",
-  "dir": "/private/tmp/claude-501/-Volumes-iSltanXx-Projects-AYAR/5325b37f-5df0-4226-8a37-d85230946040/scratchpad/mnt-exfat",
+  "dir": "<tmp>/mnt-exfat",
   "fs": {
     "personality": "ExFAT",
     "location": "External",

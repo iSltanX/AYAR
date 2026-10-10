@@ -17,6 +17,14 @@ if (DEBUG_SWITCHES.some((s) => app.commandLine.hasSwitch(s)) && !inspector.url()
   app.exit(78);
 }
 
+// G-05 positive control for the EnableNodeOptionsEnvironmentVariable fuse: Electron accepts
+// --max-http-header-size from NODE_OPTIONS in packaged apps (unlike --require), so its effect shows
+// whether NODE_OPTIONS was honored at all.
+if (process.env.AYAR_SPIKE_REPORT_NODE_OPTIONS === '1') {
+  const http = await import('node:http');
+  process.stderr.write(`AYAR_HTTP_MAX_HEADER=${http.maxHeaderSize}\n`);
+}
+
 const here = path.dirname(fileURLToPath(import.meta.url));
 const appRoot = path.resolve(here, '..');
 const rendererRoot = path.join(here, 'renderer');

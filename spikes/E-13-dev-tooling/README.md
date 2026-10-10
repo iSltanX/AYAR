@@ -35,6 +35,8 @@ cat results/{ts6,ts7,hybrid}/summary.tsv
 
 الخرج الخام لكل فحص في `results/<الإعداد>/`، وخرج التثبيت في `results/install-*.txt`.
 
+ملاحظة: `run-matrix.sh` يقبل أي رمز غير الصفر في الفحص السلبي. فخانتا «معيب» لـ svelte-check وtypescript-eslint في عمود TS 7 وحده ناجحتان شكلًا، لكن الأداة انهارت ولم تكشف شيئًا (`results/ts7/*.txt`). والجدول أعلاه يسجلهما ✗.
+
 **ما ظهر أثناء التجربة:**
 
 1. **npm لا يمنع TS 7 مع أدوات تشترط 6.** يثبته بتحذير `ERESOLVE overriding peer dependency`، فتنكسر الأدوات وقت التشغيل لا وقت التثبيت.
@@ -49,3 +51,5 @@ cat results/{ts6,ts7,hybrid}/summary.tsv
 - **TypeScript 6.0.3 حزمةً باسم `typescript`،** لأن svelte-check وtypescript-eslint تعطّلا مع 7. وهو ما تقرأه الأدوات وتفحص به الواجهة.
 - **TypeScript 7.0.2 بالاسم المستعار `@typescript/native`،** يُستدعى بمساره الصريح لفحص أنواع حزم المحرك، كما يجيز المعيار. وهو أسرع بنحو 3.5 مرات هنا.
 - **Vitest مشغّلًا لاختبارات عِيَار.** عمل مع الحزم كلها، المحرك والواجهة بـ Svelte، فتثبت التوصية. وnode:test لا حاجة له.
+- **ترتيب الاسمين عكس نص الخطة:** الخطة 3.2 تذكر أن الأدوات تبقى على 6 «عبر `@typescript/typescript6`». والمجرَّب هنا ما يطلبه svelte-check نفسه: `typescript` = 6 و`@typescript/native` = 7. التفصيل في D-55.
+- **في DEV-3:** المجلدات المعيبة عمدًا (`negative-lint/` و`negative-svelte/` و`packages/engine/negative/`) أمثلة تجربة، ولا تدخل أنماط تدقيق المستودع أو اختباراته.

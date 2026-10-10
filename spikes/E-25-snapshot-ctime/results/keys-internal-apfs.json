@@ -1,6 +1,6 @@
 {
   "label": "internal-apfs",
-  "dir": "/private/tmp/claude-501/-Volumes-iSltanXx-Projects-AYAR/5325b37f-5df0-4226-8a37-d85230946040/scratchpad/e25-internal",
+  "dir": "<tmp>/e25-internal",
   "fs": {
     "personality": "APFS",
     "location": "Internal",

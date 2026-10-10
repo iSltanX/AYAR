@@ -1,23 +1,25 @@
 // G-05: derive an ephemeral E2E test package from the release package by flipping exactly one fuse
 // (EnableNodeCliInspectArguments -> on), re-sign it with the same identity, and prove that this
 // fuse byte is the only difference once code signatures are stripped.
-// Usage: node make-test-package.mjs "<release .app>" <codesign identity> <out dir>
+// Usage: node make-test-package.mjs "<release .app>" <codesign identity> <out dir> [fuses to enable, comma-separated]
+// The 4th argument exists only for positive controls (e.g. RunAsNode,EnableNodeOptionsEnvironmentVariable).
 import { flipFuses, getCurrentFuseWire, FuseV1Options, FuseState } from '../E-01-electron-forge/node_modules/@electron/fuses/dist/index.js';
 import { execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const [releaseApp, identity, outDir] = process.argv.slice(2);
+const [releaseApp, identity, outDir, fuseList = 'EnableNodeCliInspectArguments'] = process.argv.slice(2);
 const name = path.basename(releaseApp);
 const testApp = path.join(outDir, name);
 const fw = (app) => path.join(app, 'Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework');
 const sh = (cmd, args) => execFileSync(cmd, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 
+if (path.resolve(outDir) === path.resolve(path.dirname(releaseApp))) throw new Error('out dir must not be the release package folder');
 fs.rmSync(testApp, { recursive: true, force: true });
 fs.mkdirSync(outDir, { recursive: true });
 sh('ditto', [releaseApp, testApp]);
-await flipFuses(testApp, { version: '1', [FuseV1Options.EnableNodeCliInspectArguments]: true });
+await flipFuses(testApp, { version: '1', ...Object.fromEntries(fuseList.split(',').map((n) => [FuseV1Options[n], true])) });
 
 // Re-sign inner to outer, keeping identifier, entitlements, requirements, flags and runtime.
 const keep = '--preserve-metadata=identifier,entitlements,requirements,flags,runtime';

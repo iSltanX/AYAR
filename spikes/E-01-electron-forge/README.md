@@ -46,10 +46,11 @@ cat ~/Library/Application\ Support/AYAR\ Spike/selftest.json
 | الخطوة | النتيجة | الدليل |
 |---|---|---|
 | التثبيت | Forge 8.0.1 (ESM، ويحتاج Node 22.13 فأحدث) مع npm 11.16.0 وNode 24.18.1. والملف الثنائي لـ Electron نُزّل يدويًا وبصمته مطابقة | — |
-| التغليف | نجح، في 4.6 ثانية | `results/package-*.txt` |
+| التغليف | نجح، في ثوانٍ | `results/package-*.txt` |
 | الصمامات | الستة في 15.2 كما يجب: `RunAsNode` و`EnableNodeOptionsEnvironmentVariable` و`EnableNodeCliInspectArguments` و`GrantFileProtocolExtraPrivileges` معطلة، و`EnableEmbeddedAsarIntegrityValidation` و`OnlyLoadAppFromAsar` مفعّلان | `results/fuses-final.txt` |
-| التوقيع، المسار 1 | **غير صالح للحزمة**: إضافة الصمامات تعيد توقيع الملف التنفيذي وحده، فيبقى ختم الحزمة القديم (`invalid Info.plist`). والتطبيق يعمل، لكن `tccd` يعجز عن نسبته إلى هوية (`IDENTITY_ATTRIBUTION: Failed to copy signing info`) | `results/tcc-attribution-fuses-only-adhoc.txt` |
+| التوقيع، المسار 1 | **غير صالح للحزمة**: إضافة الصمامات تعيد توقيع الملف التنفيذي وحده، فيبقى ختم الحزمة القديم (`invalid Info.plist`). والتطبيق يعمل، لكن `tccd` يعجز عن نسبته إلى هوية (`IDENTITY_ATTRIBUTION: Failed to copy signing info`) | `results/codesign-fuses-only-adhoc.txt` و`results/tcc-attribution-fuses-only-adhoc.txt` |
 | التوقيع، المسار 2 | **صالح**: `valid on disk` و`satisfies its Designated Requirement`، والمعرّف `com.bysltan.ayar.spike` | `results/codesign-final.txt` |
+| التشغيل المحصّن يمنع حقن المكتبات | `DYLD_INSERT_LIBRARIES` بمكتبة تكتب علامة: **حُقنت** في المسار 1 (بلا تشغيل محصّن، ضابط إيجابي)، و**لم تُحقن** في المسار 2 مع `disable-library-validation`. و`SIGUSR1` لا يفتح مفتش Node في المسار 2 | `results/dyld-and-sigusr1.txt` |
 | التشغيل المحصّن دون Team ID | يرفض النظام تحميل `Electron Framework` (`Library Validation failed ... different Team IDs`). والحل استثناء `com.apple.security.cs.disable-library-validation` في التطبيق ومساعديه | `results/hardened-runtime-no-dlv.txt` |
 | الفتح عبر LaunchServices وFinder | نجح، وأب العملية `launchd` (ppid = 1). وفي 2026-10-10 فُتحت حزم التطبيق نفسه بالنقر المزدوج في Finder (E-04 بناءان، وE-05) بالتحكم بالشاشة وعملت. ملاحظة: `open` ينقل بيئة مستدعيه إلى التطبيق، وFinder لا ينقلها (E-06) | `results/selftest-final.json` |
 | `utilityProcess` | أُنشئ وفتح القاعدة، وعاش بعد قتل الواجهة بالـ pid نفسه، وقرأ القاعدة بعده | `steps.renderer.kill` |

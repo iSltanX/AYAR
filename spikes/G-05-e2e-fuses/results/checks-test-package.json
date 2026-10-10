@@ -1,14 +1,14 @@
 {
   "label": "test-package",
   "app": "AYAR Spike.app",
-  "at": "2026-10-09T20:27:50.379Z",
+  "at": "2026-10-10T05:31:58.607Z",
   "checks": {
     "inspect": {
       "code": null,
       "signal": "SIGKILL",
       "killedAfterMs": 6000,
       "output": [
-        "Debugger listening on ws://127.0.0.1:52202/eb19995f-a408-4e3e-9744-7f3825b6315b",
+        "Debugger listening on ws://127.0.0.1:54781/993e1f85-ece5-4082-96d4-207be81dba5e",
         "For help, see: https://nodejs.org/learn/getting-started/debugging"
       ],
       "nodeInspectorOpened": true
@@ -30,11 +30,29 @@
         "AYAR Spike: refusing remote debugging switches without the inspector fuse"
       ]
     },
+    "remoteDebuggingAddress": {
+      "code": 78,
+      "signal": null,
+      "killedAfterMs": null,
+      "output": [
+        "AYAR Spike: refusing remote debugging switches without the inspector fuse"
+      ]
+    },
+    "sigusr1": {
+      "code": null,
+      "signal": "SIGKILL",
+      "inspectorOpened": true
+    },
     "runAsNode": {
       "code": null,
       "signal": "SIGKILL",
       "killedAfterMs": 6000,
-      "output": [],
+      "output": [
+        "[9797:1010/083140.881386:ERROR:gpu/command_buffer/service/shared_image/shared_image_manager.cc:370] SharedImageManager::ProduceOverlay: Trying to Produce a Overlay representation from a non-existent mailbox.",
+        "[9797:1010/083140.881597:ERROR:components/viz/service/display_embedder/skia_output_device_buffer_queue.cc:258] Invalid mailbox.",
+        "[9797:1010/083140.881601:ERROR:gpu/command_buffer/service/shared_image/shared_image_manager.cc:370] SharedImageManager::ProduceOverlay: Trying to Produce a Overlay representation from a non-existent mailbox.",
+        "[9797:1010/083140.881607:ERROR:components/viz/service/display_embedder/skia_output_device_buffer_queue.cc:258] Invalid mailbox."
+      ],
       "actedAsNode": false
     },
     "nodeOptions": {
@@ -43,6 +61,16 @@
       "killedAfterMs": 6000,
       "output": [],
       "requireRan": false
+    },
+    "nodeOptionsHttp": {
+      "code": null,
+      "signal": "SIGKILL",
+      "killedAfterMs": 6000,
+      "output": [
+        "AYAR_HTTP_MAX_HEADER=16384"
+      ],
+      "maxHeaderSize": 16384,
+      "honored": false
     }
   }
 }

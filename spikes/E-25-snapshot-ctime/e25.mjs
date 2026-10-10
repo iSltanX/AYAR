@@ -134,7 +134,7 @@ async function bench() {
     shortcutFirst: Math.round(fast1.ms), shortcutSecond: Math.round(fast2.ms),
   };
   result.shortcutHashed = [fast1.hashed, fast2.hashed];
-  // Mutate 210 files: 30 per method, then compare what the shortcut and a full re-hash see as changed.
+  // Mutate 30 files per method (8 methods: 240 files), then compare what the shortcut and a full re-hash see as changed.
   const files = [...full2.m.keys()];
   const picks = new Set();
   while (picks.size < 30 * Object.keys(METHODS).length) picks.add(files[Math.floor(Math.random() * files.length)]);

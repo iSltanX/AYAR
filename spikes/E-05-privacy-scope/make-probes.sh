@@ -10,6 +10,8 @@ locations=(
   "$HOME/Documents/ayar-e04-probe"
 )
 for d in $locations; do
+  # The external case needs the volume mounted; never create a stray folder on the boot disk.
+  if [[ $d == /Volumes/* && ! -d ${d%/*} ]]; then print -r -- "skipped $d (volume not mounted)"; continue; fi
   if [[ ${1:-} == --remove ]]; then rm -rf "$d"; print -r -- "removed $d"; continue; fi
   mkdir -p "$d/src" "$d/test"
   print -r -- '{ "name": "ayar-privacy-probe", "private": true, "scripts": { "test": "sh test/run.sh" } }' > "$d/package.json"

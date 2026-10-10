@@ -1,6 +1,6 @@
 {
   "label": "image-fat32",
-  "dir": "/private/tmp/claude-501/-Volumes-iSltanXx-Projects-AYAR/5325b37f-5df0-4226-8a37-d85230946040/scratchpad/mnt-fat32",
+  "dir": "<tmp>/mnt-fat32",
   "fs": {
     "personality": "MS-DOS FAT32",
     "location": "External",

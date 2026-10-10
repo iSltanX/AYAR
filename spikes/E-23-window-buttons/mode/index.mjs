@@ -1,6 +1,8 @@
 // E-23 mode: where does macOS put the window buttons, by the language it resolves for the app,
 // and does an in-app language switch move them? Reads the Window Controls Overlay rect.
 // Launch args: --label <name> [--auto-quit] [--hold-ms N]
+import { systemPreferences } from 'electron';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -55,6 +57,9 @@ export async function run({ app, createWindow, ipcMain, info }) {
     style: argValue('--style', 'hidden'),
     overlay: argValue('--overlay', 'true'),
     locale: { app: app.getLocale(), system: app.getSystemLocale(), preferred: app.getPreferredSystemLanguages() },
+    // Candidate signals for the system language under a per-app override (review of D-54):
+    appDefaultsAppleLanguages: systemPreferences.getUserDefault('AppleLanguages', 'array'),
+    globalAppleLanguages: (() => { try { return execFileSync('/usr/bin/defaults', ['read', '-g', 'AppleLanguages'], { encoding: 'utf8' }).replace(/[\s()"]/g, '').split(',').filter(Boolean); } catch (e) { return String(e.message); } })(),
     window: { contentSize: [w, h], buttonPosition: win.getWindowButtonPosition?.() ?? null },
     measurements: measurements.map((m) => ({
       ...m,
