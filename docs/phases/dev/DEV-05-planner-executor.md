@@ -4,7 +4,7 @@ track: dev
 number: 5
 stage: engine
 title: المخطِّط ومدير الأدوات والمنفّذ والأدلة
-status: delivered
+status: closed
 status_date: 2026-10-10
 depends_on: [DEV-4]
 design_gates: []
@@ -22,7 +22,7 @@ outputs:
   - C-10 المخطِّط، وC-11 مدير الأدوات وإجراءات التجهيز، وC-12 المنفذ والدفتر والخدمات المرافقة
   - C-17 مخزن الأدلة ولقطات الحالة والاحتفاظ
   - عقود RunPlan وRawCheckResult
-closing_commit:
+closing_commit: fd6c90e
 ---
 
 # DEV-5 — المخطِّط ومدير الأدوات والمنفّذ والأدلة
