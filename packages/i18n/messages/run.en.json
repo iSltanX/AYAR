@@ -16,6 +16,7 @@
   "run.reason.permissionDenied": "Unavailable: no permission to run the command",
   "run.reason.specChangedSinceApproval": "Missing: the command changed since it was approved and needs approval again",
   "run.reason.specMissing": "Unavailable: the check is no longer in the standards profile",
+  "run.reason.specNotVerified": "Unavailable: the check’s command could not be verified against the project’s files now, so it did not run",
   "run.reason.notReady": "Missing: the check is not ready",
   "run.reason.internal": "Unavailable: an internal AYAR error",
   "run.note.escapeSuspected": "A process left the check’s group and may still be running",

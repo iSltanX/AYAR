@@ -24,10 +24,10 @@ import type { RunGate } from '../host/run-gate.ts';
 import type { EnginePorts, Logger } from '../ports/index.ts';
 import { latestSnapshot } from '../profile/service.ts';
 import { approvalsOf, latestProfile } from '../profile/store.ts';
-import { needsApproval } from '../profile/propose.ts';
 import type { PlannerService } from '../planner/service.ts';
 import type { ProjectsService } from '../projects/service.ts';
 import type { RedactionService } from '../redaction/service.ts';
+import { requiresApproval, runsProjectCommand } from '../setup/readiness.ts';
 import { recordAudit } from '../storage/audit.ts';
 import type { DataLayout } from '../storage/data-dir.ts';
 import type { Db } from '../storage/db.ts';
@@ -122,8 +122,24 @@ interface Active {
   procs: Map<string, RunningProcess>;
   cancelledChecks: Set<string>;
   services: CompanionServices | null;
+  /** Checks waiting for their companion services: a cancel wakes them (FR-21, 9.7). */
+  waiting: Map<string, AbortController>;
   wake: () => void;
-  done: Promise<void>;
+}
+
+/**
+ * C-12 point 3 and FR-55 at «ابدأ» and again right before each launch: why an instance may not start now, from
+ * its spec as the project's files say now, its approval, and the project's trust; or null. It fails closed: a spec
+ * that is gone, refused (sudo), changed since its approval, or a project command in «مشروع غير موثوق» never runs.
+ */
+export function launchBlock(spec: CheckSpec | undefined, approvedHash: string | undefined, untrusted: boolean): [CheckOutcome, Reason] | null {
+  if (!spec) return ['unavailable', { key: 'run.reason.specMissing' }];
+  if (!spec.applicable) return ['not_applicable', { key: 'plan.reason.notApplicable' }];
+  if (!spec.enabled) return ['skipped', { key: 'plan.reason.disabled' }];
+  if (untrusted && runsProjectCommand(spec)) return ['missing', { key: 'setup.reason.untrusted' }];
+  if (spec.refused.length) return ['missing', { key: 'setup.reason.refused', params: { categories: spec.refused.join(', ') } }];
+  if (requiresApproval(spec) && approvedHash !== spec.specHash) return ['missing', { key: 'run.reason.specChangedSinceApproval' }];
+  return null;
 }
 
 const TERMINAL_RUN = ['finished', 'interrupted'];
@@ -254,7 +270,7 @@ export class RunService {
     const plan = PlanSchema.parse(JSON.parse(row.plan_json));
     const projectId = plan.projectId;
     let wake = () => {};
-    const active: Active = { runId, projectId, plan, cancel: null, procs: new Map(), cancelledChecks: new Set(), services: null, wake: () => wake(), done: Promise.resolve() };
+    const active: Active = { runId, projectId, plan, cancel: null, procs: new Map(), cancelledChecks: new Set(), services: null, waiting: new Map(), wake: () => wake() };
     this.#active.set(runId, active);
     // A run cancelled while it waited in the queue never starts.
     if (db.get<{ state: string }>('SELECT state FROM runs WHERE id = ?', runId)!.state !== 'queued') return;
@@ -272,10 +288,20 @@ export class RunService {
       const item = plan.items.find((x) => x.instance === instance)!;
       execs.set(instance, { instance, checkRunId: c.id, item, state: c.state === 'finished' ? 'done' : 'pending', ok: false, outcome: (c.outcome as CheckOutcome | null) ?? null, raw: null });
     }
+    if (!fresh) {
+      // Fails closed: the project's files could not be read again (a root replaced by a link, D-05; a folder gone),
+      // so nothing is launched, and no snapshot follows the path either.
+      for (const e of execs.values()) if (e.state === 'pending') this.#finishCheck(e, 'unavailable', { key: 'run.reason.specNotVerified' }, null, []);
+      db.run("UPDATE runs SET state = 'finished', finished_at = ?, counts_json = ? WHERE id = ?", this.#now(), JSON.stringify(this.#counts(runId)), runId);
+      this.#emitRun(runId);
+      return;
+    }
+    // A run that waited in the queue meets the trust and approvals of now, not of its plan (FR-55, D-33).
+    const untrusted = this.#untrusted(projectId);
     for (const e of execs.values()) {
       if (e.state !== 'pending' || e.item.status !== 'run') continue;
-      const spec = fresh.get(e.instance);
-      if (spec && needsApproval(spec) && approvals.get(e.instance)?.specHash !== spec.specHash) this.#finishCheck(e, 'missing', { key: 'run.reason.specChangedSinceApproval' }, null, []);
+      const block = launchBlock(fresh.get(e.instance), approvals.get(e.instance)?.specHash, untrusted);
+      if (block) this.#finishCheck(e, block[0], block[1], null, []);
     }
 
     // 9.5 point 5: the initial state; a full scan hashes everything (E-25, C-17).
@@ -292,7 +318,7 @@ export class RunService {
     active.services = new CompanionServices({ ports, supervisor: this.#o.supervisor, redaction: this.#o.redaction, projectRoot: root, env: serviceEnv, runId, tmpDir: posix.join(this.#o.layout.tmp, runId) });
     const parallel = readSettings(db, ['run.parallel'])['run.parallel'] ?? 2;
     const sideEffects = readSettings(db, ['run.sideEffects'])['run.sideEffects'] ?? true;
-    const ctx = { projectId, root, specs: fresh, sideEffects, startManifest, declared: this.#declared(projectId, plan), lastManifest: startManifest as Manifest };
+    const ctx = { projectId, root, sideEffects, startManifest, declared: this.#declared(projectId, plan), lastManifest: startManifest as Manifest };
 
     // The scheduler: order, dependencies, locks, concurrency.
     const order = plan.order.filter((x) => execs.get(x)?.state === 'pending');
@@ -374,13 +400,19 @@ export class RunService {
     await evidence.retain(projectId).catch((e: unknown) => this.#o.logger.log('error', 'retention failed', { error: e instanceof Error ? e.message : String(e) }));
   }
 
-  async #freshSpecs(projectId: string): Promise<Map<string, CheckSpec>> {
+  /** The specs as the project's files say now, or null when they cannot be read (the caller fails closed). */
+  async #freshSpecs(projectId: string): Promise<Map<string, CheckSpec> | null> {
     try {
       return new Map((await this.#o.projects.freshSpecs(projectId)).map((s) => [s.instance, s]));
     } catch (e) {
-      this.#o.logger.log('warn', 'specs could not be checked again: the saved ones are used', { error: e instanceof Error ? e.message : String(e) });
-      return new Map((latestProfile(this.#o.db, projectId)?.content.checks ?? []).map((s) => [s.instance, s]));
+      this.#o.logger.log('warn', 'specs could not be checked again: nothing is launched', { error: e instanceof Error ? e.message : String(e) });
+      return null;
     }
+  }
+
+  /** «مشروع غير موثوق» as the profile says now (D-DEV4-04). */
+  #untrusted(projectId: string): boolean {
+    return latestProfile(this.#o.db, projectId)?.content.untrusted === true;
   }
 
   async #snapshot(projectId: string, root: string, full: boolean, store: boolean, previous: Manifest | null): Promise<Manifest & { pinned?: string[] }> {
@@ -406,19 +438,20 @@ export class RunService {
 
   // ── one check ────────────────────────────────────────────────────────────────────────────────────────────
 
-  async #runCheck(active: Active, e: Exec, ctx: { projectId: string; root: string; specs: Map<string, CheckSpec>; sideEffects: boolean; declared: (p: string) => boolean; lastManifest: Manifest }): Promise<void> {
+  async #runCheck(active: Active, e: Exec, ctx: { projectId: string; root: string; sideEffects: boolean; declared: (p: string) => boolean; lastManifest: Manifest }): Promise<void> {
     const { db, ports, evidence, layout } = this.#o;
     const runId = active.runId;
-    const spec = ctx.specs.get(e.instance) ?? latestProfile(db, ctx.projectId)?.content.checks.find((s) => s.instance === e.instance);
-    if (!spec) return this.#finishCheck(e, 'unavailable', { key: 'run.reason.specMissing' }, null, []);
     db.run("UPDATE check_runs SET state = 'running', started_at = ? WHERE id = ?", this.#now(), e.checkRunId);
     this.#o.events.emit('check.state', this.#checkView(this.#checkRow(e.checkRunId)));
 
-    // C-12 point 3, again right before the launch: the spec as the files say now.
-    if (needsApproval(spec)) {
-      const now = (await this.#freshSpecs(ctx.projectId)).get(e.instance);
-      const approved = approvalsOf(db, ctx.projectId).get(e.instance)?.specHash;
-      if (!now || now.specHash !== approved) return this.#finishCheck(e, 'missing', { key: 'run.reason.specChangedSinceApproval' }, null, []);
+    // C-12 point 3, again right before the launch: the spec as the files say now is the one that runs, if it may.
+    const fresh = await this.#freshSpecs(ctx.projectId);
+    if (!fresh) return this.#finishCheck(e, 'unavailable', { key: 'run.reason.specNotVerified' }, null, []);
+    const spec = fresh.get(e.instance);
+    const block = launchBlock(spec, approvalsOf(db, ctx.projectId).get(e.instance)?.specHash, this.#untrusted(ctx.projectId));
+    if (block || !spec) {
+      const [outcome, reason] = block ?? ['unavailable', { key: 'run.reason.specMissing' }];
+      return this.#finishCheck(e, outcome, reason, null, []);
     }
 
     // Its folders (C-12 point 2): the raw reports and its TMPDIR, inside AYAR's tmp/, never in the evidence store.
@@ -437,8 +470,15 @@ export class RunService {
       return this.#finishCheck(e, inv.outcome, inv.reason, null, []);
     }
 
-    // Companion services before it (FR-21).
-    const failedService = await active.services!.acquire(spec.services);
+    // Companion services before it (FR-21). A cancel (of the check, the run, or the app) ends the wait at once.
+    const waiting = new AbortController();
+    active.waiting.set(e.checkRunId, waiting);
+    const failedService = await active.services!.acquire(spec.services, waiting.signal).finally(() => active.waiting.delete(e.checkRunId));
+    if (waiting.signal.aborted || active.cancel || active.cancelledChecks.has(e.checkRunId)) {
+      await active.services!.release(spec.services);
+      await ports.fs.remove(tmpRoot);
+      return this.#finishCheck(e, 'cancelled', { key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }, null, []);
+    }
     if (failedService) {
       await active.services!.release(spec.services);
       await ports.fs.remove(tmpRoot);
@@ -666,6 +706,7 @@ export class RunService {
     const a = this.#active.get(c.run_id);
     if (!a || c.state === 'finished') return { accepted: false, state: c.state };
     a.cancelledChecks.add(target.checkRunId);
+    a.waiting.get(target.checkRunId)?.abort();
     const proc = a.procs.get(target.checkRunId);
     if (proc) {
       db.run("UPDATE check_runs SET state = 'cancelling' WHERE id = ?", target.checkRunId);
@@ -685,6 +726,9 @@ export class RunService {
       this.#o.events.emit('check.state', this.#checkView(this.#checkRow(checkRunId)));
       proc.stop(reason === 'app_quit' ? 'quit' : 'cancel');
     }
+    // Checks still waiting for a companion service stop waiting, and the services stop now (9.7: the short way).
+    for (const w of a.waiting.values()) w.abort();
+    a.services?.abort(reason === 'app_quit' ? 'quit' : 'cancel');
     this.#emitRun(a.runId);
     a.wake();
   }

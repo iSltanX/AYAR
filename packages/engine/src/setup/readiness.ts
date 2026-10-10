@@ -50,6 +50,15 @@ export interface ReadinessInput {
 
 const rec = (v: unknown): Record<string, unknown> => (v !== null && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {});
 
+/**
+ * C-09 and FR-11: a project command never runs unapproved. Besides what the profile includes (needsApproval), a
+ * check chosen explicitly or added as a dependency that runs something of the project needs its approval too: it is
+ * approved by including it in the profile first [D-DEV5-12].
+ */
+export function requiresApproval(spec: CheckSpec): boolean {
+  return needsApproval(spec) || (spec.applicable && spec.enabled && spec.refused.length === 0 && runsProjectCommand(spec));
+}
+
 /** Does this instance run something of the project (its command, its scripts, its companion services)? FR-55. */
 export function runsProjectCommand(spec: CheckSpec): boolean {
   if (spec.services.length) return true;
@@ -124,7 +133,7 @@ export async function evaluateInstances(i: ReadinessInput): Promise<InstanceRead
     if (inner === 'ready' && spec.refused.length) {
       inner = 'needs_approval';
       reasons.push({ key: 'setup.reason.refused', params: { categories: spec.refused.join(', ') } });
-    } else if (inner === 'ready' && needsApproval(spec) && i.approvals.get(spec.instance)?.specHash !== spec.specHash) {
+    } else if (inner === 'ready' && requiresApproval(spec) && i.approvals.get(spec.instance)?.specHash !== spec.specHash) {
       inner = 'needs_approval';
       reasons.push({ key: i.approvals.has(spec.instance) ? 'setup.reason.specChanged' : 'setup.reason.notApproved' });
     }

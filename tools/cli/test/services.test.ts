@@ -60,4 +60,35 @@ describe('FR-21: companion services', () => {
     // Both services were stopped with their checks: nothing carries their tokens any more.
     expect(processesWithTokens(ledgerTokens(dataDir))).toEqual([]);
   }, 90_000);
+
+  it('a cancel does not wait for a service that is not ready yet: the wait ends and the service stops (9.7)', async () => {
+    const dataDir = join(root, 'AYAR');
+    const engine = await connectEngine({ dataDir, env: { AYAR_TEST_LOGIN_SHELL: loginShell(root, { path: '/opt/homebrew/bin:/usr/bin:/bin' }) } });
+    try {
+      await engine.waitForEvent('engine.health');
+      const { projectId } = await addProject(engine, materialize('FX-PROC', 'good', join(root, 'fx')));
+      ok(await engine.invoke('profile.update', {
+        projectId,
+        patch: {
+          services: { slow: { argv: ['node', '-e', 'setInterval(() => {}, 1000)'], cwd: '.', readyUrl: null, readyPattern: 'never printed', readyTimeoutSec: 120, ports: [] } },
+          custom: { needs: { argv: ['node', '-e', '1'], cwd: '.', timeoutMin: 1, success: { exitCode: 0 } } },
+          checks: { 'custom.needs@.': { services: ['slow'] } },
+        },
+      }));
+      await approveAll(engine, projectId);
+      const p = await plan(engine, projectId, { kind: 'check', instance: 'custom.needs@.' });
+      const { runId } = await startRun(engine, p.id);
+      // The service has started (its ledger row) and the check waits for it.
+      await engine.waitForEvent('check.state', (e) => e.payload.runId === runId && e.payload.state === 'running', 20_000);
+      await new Promise((r) => setTimeout(r, 1500));
+      const t0 = Date.now();
+      ok(await engine.invoke('run.cancel', { target: { kind: 'run', runId } }));
+      const d = await waitRun(engine, runId, 20_000);
+      expect(Date.now() - t0).toBeLessThan(15_000);
+      expect(check(d, 'custom.needs@.')).toMatchObject({ outcome: 'cancelled', outcomeReason: { key: 'run.reason.cancelledByUser' }, raw: null });
+    } finally {
+      await engine.close();
+    }
+    expect(processesWithTokens(ledgerTokens(dataDir))).toEqual([]);
+  }, 60_000);
 });

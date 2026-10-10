@@ -31,24 +31,39 @@ export interface CompanionServicesOptions {
 export class CompanionServices {
   readonly #running = new Map<string, Running>();
   readonly #o: CompanionServicesOptions;
+  #aborted = false;
 
   constructor(o: CompanionServicesOptions) {
     this.#o = o;
   }
 
-  /** Starts (or joins) the services a check needs; resolves with the first that failed to become ready, or null. */
-  async acquire(services: readonly CompanionService[]): Promise<string | null> {
+  /**
+   * Starts (or joins) the services a check needs; resolves with the first that failed to become ready, or null.
+   * The signal (the check cancelled) ends the wait at once; after abort() nothing new starts.
+   */
+  async acquire(services: readonly CompanionService[], signal?: AbortSignal): Promise<string | null> {
     let failed: string | null = null;
+    const aborted = new Promise<false>((resolve) => {
+      if (signal?.aborted) resolve(false);
+      signal?.addEventListener('abort', () => resolve(false), { once: true });
+    });
     for (const s of services) {
+      if (this.#aborted || signal?.aborted) return failed ?? s.id;
       let r = this.#running.get(s.id);
       if (!r) {
         r = this.#start(s);
         this.#running.set(s.id, r);
       }
       r.users++;
-      if (!(await r.ready) && !failed) failed = s.id;
+      if (!(await Promise.race([r.ready, aborted])) && !failed) failed = s.id;
     }
     return failed;
+  }
+
+  /** The run is cancelled or the app quits: every service stops now and no wait goes on (9.7). */
+  abort(mode: 'cancel' | 'quit'): void {
+    this.#aborted = true;
+    for (const r of this.#running.values()) r.proc.stop(mode);
   }
 
   /** A check that used them is done: a service nobody needs any more is stopped (escalation, C-12 point 8). */
@@ -106,7 +121,7 @@ export class CompanionServices {
     void proc.done.then(() => (exited = true));
     const ready = (async () => {
       const until = ports.clock.monotonicMs() + s.readyTimeoutSec * 1000;
-      while (ports.clock.monotonicMs() < until && !exited) {
+      while (ports.clock.monotonicMs() < until && !exited && !this.#aborted) {
         if (matched) return true;
         if (s.readyUrl && (await ports.network.ping(s.readyUrl, 1000)) !== null) return true;
         await new Promise((r) => setTimeout(r, POLL_MS));

@@ -16,6 +16,7 @@
   "run.reason.permissionDenied": "تعذّر: لا إذن بتشغيل الأمر",
   "run.reason.specChangedSinceApproval": "ناقص: تغيّر الأمر منذ اعتماده، فيحتاج اعتمادًا جديدًا",
   "run.reason.specMissing": "تعذّر: لم يعد الفحص في ملف المعايير",
+  "run.reason.specNotVerified": "تعذّر: لم يمكن التحقق من أمر الفحص في ملفات المشروع الآن، فلم يُشغَّل",
   "run.reason.notReady": "ناقص: الفحص غير جاهز",
   "run.reason.internal": "تعذّر: خطأ داخلي في عِيَار",
   "run.note.escapeSuspected": "بقيت عملية خرجت من مجموعة الفحص وقد لا تكون أُنهيت",
