@@ -5,19 +5,10 @@
 import { constants, promises as fsp } from 'node:fs';
 import { request as httpRequest, type IncomingMessage } from 'node:http';
 import { request as httpsRequest } from 'node:https';
-import type { Network } from '../ports/index.ts';
+import { DownloadError, type Network } from '../ports/index.ts';
 
 const MAX_REDIRECTS = 5;
 const LOOPBACK = new Set(['127.0.0.1', 'localhost', '[::1]', '::1']);
-
-export class DownloadError extends Error {
-  readonly code: 'network' | 'too_large' | 'http_status' | 'insecure_url' | 'too_many_redirects' | 'aborted';
-  constructor(code: DownloadError['code'], message: string) {
-    super(message);
-    this.name = 'DownloadError';
-    this.code = code;
-  }
-}
 
 export interface NetworkOptions {
   /** Test hook from the host (never the renderer): plain HTTP to this machine. */
@@ -42,6 +33,24 @@ function get(url: URL, o: NetworkOptions, signal: AbortSignal | undefined): Prom
 
 export function nodeNetwork(o: NetworkOptions = {}): Network {
   return {
+    ping(raw, timeoutMs) {
+      return new Promise((resolve) => {
+        let url: URL;
+        try {
+          url = new URL(raw);
+        } catch {
+          return resolve(null);
+        }
+        if (!LOOPBACK.has(url.hostname) || !['http:', 'https:'].includes(url.protocol)) return resolve(null);
+        const req = (url.protocol === 'https:' ? httpsRequest : httpRequest)(url, { method: 'GET', rejectUnauthorized: false }, (res) => {
+          res.resume();
+          resolve(res.statusCode ?? null);
+        });
+        req.setTimeout(timeoutMs, () => req.destroy());
+        req.once('error', () => resolve(null));
+        req.end();
+      });
+    },
     async download(raw, dest, opts) {
       let url = new URL(raw);
       let res: IncomingMessage | null = null;

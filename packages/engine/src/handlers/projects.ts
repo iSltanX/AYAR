@@ -28,7 +28,12 @@ export const projectCancelDiscovery: CommandHandler = (payload, ctx) => ({ cance
 export const projectRelocate: CommandHandler = (payload, ctx) => ctx.services.projects.relocate((payload as CommandPayload<'project.relocate'>).projectId, grantedPath(ctx, 'selectionToken'));
 
 export const projectRemove: CommandHandler = async (payload, ctx) => {
-  await ctx.services.projects.remove((payload as CommandPayload<'project.remove'>).projectId);
+  const { projectId } = payload as CommandPayload<'project.remove'>;
+  // A project whose run is active or waiting is not removed under it.
+  if (ctx.services.runs.busy(projectId)) throw new CommandError('busy', { reason: 'run_active' });
+  await ctx.services.projects.remove(projectId);
+  // FR-02: its evidence folder and the contents only its snapshots used; the repository is never touched.
+  await ctx.services.evidence.afterProjectRemoved(projectId);
   return { removed: true };
 };
 

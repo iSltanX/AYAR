@@ -19,5 +19,7 @@ export const settingsSet: CommandHandler = async (payload, ctx) => {
     // A new user pattern applies to what is already stored, too (re-review R3).
     if (entry.key === 'redaction.userPatterns') ctx.services.rescrubStored();
   }
+  // A smaller retention applies now (C-17 «الاحتفاظ»), not at the next run.
+  if (entry.key === 'evidence.retainRuns') await ctx.services.evidence.retainAll();
   return entry;
 };

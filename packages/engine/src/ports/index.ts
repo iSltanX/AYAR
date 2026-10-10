@@ -139,8 +139,10 @@ export interface ProcessInfo {
   ppid: number;
   pgid: number;
   uid: number;
-  /** Processor use in percent (ps %cpu: decaying average). */
+  /** Processor use in percent (ps %cpu: a decaying average, for display). */
   cpu: number;
+  /** Processor time used so far (ps time): its change between two samples is the real activity (C-12 point 7). */
+  cpuTimeMs: number;
   rssKb: number;
   /** As startTime() reports it (ps lstart, C locale, UTC). */
   startTime: string;
@@ -167,6 +169,16 @@ export interface StartedProcess {
   exited: Promise<{ code: number | null; signal: string | null }>;
 }
 
+/** Why a download stopped (the Network port's one error). */
+export class DownloadError extends Error {
+  readonly code: 'network' | 'too_large' | 'http_status' | 'insecure_url' | 'too_many_redirects' | 'aborted';
+  constructor(code: DownloadError['code'], message: string) {
+    super(message);
+    this.name = 'DownloadError';
+    this.code = code;
+  }
+}
+
 /** HTTPS downloads for C-11 (managed tools and data assets). Never used for anything a check runs. */
 export interface Network {
   /**
@@ -174,6 +186,11 @@ export interface Network {
    * for tests. Redirects are followed (https only), at most `maxBytes` are accepted. Resolves with the size.
    */
   download(url: string, dest: string, o: { maxBytes: number; signal?: AbortSignal; onProgress?: (bytes: number, total: number | null) => void }): Promise<{ bytes: number }>;
+  /**
+   * A companion service's readiness (C-12 point 10): one GET to a URL on this machine (the profile accepts no
+   * other), the HTTP status or null when nothing answered within the time.
+   */
+  ping(url: string, timeoutMs: number): Promise<number | null>;
 }
 
 /** The message channel to the host (main process or tools/cli). */

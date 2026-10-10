@@ -15,12 +15,21 @@ const PS_MAX_BUFFER = 64 * 1024 * 1024;
  */
 const START_DRAIN_MS = 300;
 
-const LINE = /^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([\d.]+)\s+(\d+)\s+([A-Z][a-z]{2} [A-Z][a-z]{2} [ \d]\d \d\d:\d\d:\d\d \d{4})\s+(.*)$/;
+const LINE = /^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([\d:.-]+)\s+([\d.]+)\s+(\d+)\s+([A-Z][a-z]{2} [A-Z][a-z]{2} [ \d]\d \d\d:\d\d:\d\d \d{4})\s+(.*)$/;
+
+/** ps(1) time: `M:SS.cc`, `H:MM:SS`, or `D-HH:MM:SS`, as milliseconds. */
+export function parseCpuTime(text: string): number {
+  const [days, rest] = text.includes('-') ? [Number(text.split('-')[0]), text.split('-')[1]!] : [0, text];
+  const parts = rest.split(':').map(Number);
+  let seconds = 0;
+  for (const p of parts) seconds = seconds * 60 + (Number.isFinite(p) ? p : 0);
+  return Math.round((days * 86_400 + seconds) * 1000);
+}
 
 export function parsePsLine(line: string): ProcessInfo | null {
   const m = LINE.exec(line);
   if (!m) return null;
-  return { pid: Number(m[1]), ppid: Number(m[2]), pgid: Number(m[3]), uid: Number(m[4]), cpu: Number(m[5]), rssKb: Number(m[6]), startTime: m[7]!, command: m[8]! };
+  return { pid: Number(m[1]), ppid: Number(m[2]), pgid: Number(m[3]), uid: Number(m[4]), cpuTimeMs: parseCpuTime(m[5]!), cpu: Number(m[6]), rssKb: Number(m[7]), startTime: m[8]!, command: m[9]! };
 }
 
 /**
@@ -82,7 +91,7 @@ export const nodeProcessControl: ProcessControl = {
     }
   },
   async listProcesses() {
-    const { stdout } = await run('/bin/ps', ['-A', '-o', 'pid=,ppid=,pgid=,uid=,%cpu=,rss=,lstart=,comm='], { env: PS_ENV, maxBuffer: PS_MAX_BUFFER });
+    const { stdout } = await run('/bin/ps', ['-A', '-o', 'pid=,ppid=,pgid=,uid=,time=,%cpu=,rss=,lstart=,comm='], { env: PS_ENV, maxBuffer: PS_MAX_BUFFER });
     const out: ProcessInfo[] = [];
     for (const line of stdout.split('\n')) {
       const p = parsePsLine(line);

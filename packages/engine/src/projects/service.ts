@@ -8,6 +8,7 @@
 import type { Catalog } from '@ayar/catalog';
 import {
   protocolError,
+  type CheckSpec,
   type DiscoverySnapshot,
   type DiscoverySummary,
   type PendingConfirmation,
@@ -325,49 +326,64 @@ export class ProjectsService {
     await this.#running.get(projectId)?.done;
   }
 
-  async #run(projectId: string, discoveryId: string, signal: AbortSignal): Promise<void> {
-    const { db, events, redaction, profiles } = this.#o;
+  /**
+   * C-12 point 3: the specs as the project's files say now, from a discovery that is neither saved nor announced
+   * (the plan's approved hashes are checked against them at «ابدأ» and before each launch).
+   */
+  async freshSpecs(projectId: string, signal: AbortSignal = new AbortController().signal): Promise<CheckSpec[]> {
+    const snapshot = await this.#snapshotNow(projectId, signal, null);
+    return this.#o.profiles.specs(snapshot, this.#o.profiles.settingsOf(projectId));
+  }
+
+  /** A discovery of the project now, redacted (C-18 before anything is kept), not saved. */
+  async #snapshotNow(projectId: string, signal: AbortSignal, onProgress: ((p: { filesSeen: number; dirsSeen: number; currentDir: string; markers: ReadonlySet<string> }) => void) | null): Promise<DiscoverySnapshot> {
+    const { db, redaction } = this.#o;
     const started = this.#o.ports.clock.monotonicMs();
+    const row = this.#row(projectId);
+    // The root is checked again: a folder replaced by a link since it was added is not followed (D-05).
+    const rootStat = await this.#o.ports.fs.lstat(row.root_realpath);
+    if (!rootStat || rootStat.isSymbolicLink || !rootStat.isDirectory) throw new CommandError('path_missing');
+    const s = readSettings(db, ['discovery.maxDepth', 'discovery.maxEntries', 'discovery.maxConfigBytes']);
+    const result = await discover({
+      root: row.root_realpath,
+      fs: this.#o.ports.fs,
+      limits: { maxDepth: s['discovery.maxDepth']!, maxEntries: s['discovery.maxEntries']!, maxConfigBytes: s['discovery.maxConfigBytes']! },
+      signal,
+      fingerprint: (data) => hmacHex(this.#o.hmacKey, data),
+      ...(onProgress ? { onProgress } : {}),
+    });
+    if (signal.aborted) throw new DiscoveryCancelled();
+    const redactor = redaction.redactor();
+    const counts: Record<string, number> = {};
+    const facts = redactor.redactJson(result.facts, counts);
+    const components = redactor.redactJson(result.components, counts);
+    const inventory = redactor.redactJson(result.inventory, counts);
+    const warnings = redactor.redactJson(result.warnings, counts);
+    return {
+      id: newId(this.#o.ports.random, 'snp'),
+      projectId,
+      createdAt: this.#now().toISOString(),
+      scannerVersion: SCANNER_VERSION,
+      durationMs: Math.round(this.#o.ports.clock.monotonicMs() - started),
+      partial: result.partial,
+      partialReasons: result.partialReasons,
+      components,
+      facts,
+      inventory,
+      warnings,
+      specFingerprints: {},
+      redactions: counts,
+    };
+  }
+
+  async #run(projectId: string, discoveryId: string, signal: AbortSignal): Promise<void> {
+    const { db, events, profiles } = this.#o;
     try {
       if (signal.aborted) throw new DiscoveryCancelled();
-      const row = this.#row(projectId);
-      // The root is checked again: a folder replaced by a link since it was added is not followed (D-05).
-      const rootStat = await this.#o.ports.fs.lstat(row.root_realpath);
-      if (!rootStat || rootStat.isSymbolicLink || !rootStat.isDirectory) throw new CommandError('path_missing');
-      const s = readSettings(db, ['discovery.maxDepth', 'discovery.maxEntries', 'discovery.maxConfigBytes']);
-      const result = await discover({
-        root: row.root_realpath,
-        fs: this.#o.ports.fs,
-        limits: { maxDepth: s['discovery.maxDepth']!, maxEntries: s['discovery.maxEntries']!, maxConfigBytes: s['discovery.maxConfigBytes']! },
-        signal,
-        fingerprint: (data) => hmacHex(this.#o.hmacKey, data),
-        onProgress: (p) => {
-          if (!signal.aborted) events.emit('discovery.progress', { projectId, discoveryId, filesSeen: p.filesSeen, dirsSeen: p.dirsSeen, currentDir: p.currentDir, kinds: [...p.markers].sort() });
-        },
-      });
-      if (signal.aborted) throw new DiscoveryCancelled();
       // C-18 before any save: every string of the facts, the inventory and the warnings.
-      const redactor = redaction.redactor();
-      const counts: Record<string, number> = {};
-      const facts = redactor.redactJson(result.facts, counts);
-      const components = redactor.redactJson(result.components, counts);
-      const inventory = redactor.redactJson(result.inventory, counts);
-      const warnings = redactor.redactJson(result.warnings, counts);
-      const snapshot: DiscoverySnapshot = {
-        id: newId(this.#o.ports.random, 'snp'),
-        projectId,
-        createdAt: this.#now().toISOString(),
-        scannerVersion: SCANNER_VERSION,
-        durationMs: Math.round(this.#o.ports.clock.monotonicMs() - started),
-        partial: result.partial,
-        partialReasons: result.partialReasons,
-        components,
-        facts,
-        inventory,
-        warnings,
-        specFingerprints: {},
-        redactions: counts,
-      };
+      const snapshot = await this.#snapshotNow(projectId, signal, (p) => {
+        if (!signal.aborted) events.emit('discovery.progress', { projectId, discoveryId, filesSeen: p.filesSeen, dirsSeen: p.dirsSeen, currentDir: p.currentDir, kinds: [...p.markers].sort() });
+      });
       const settings = profiles.settingsOf(projectId);
       const specs = profiles.specs(snapshot, settings);
       snapshot.specFingerprints = Object.fromEntries(specs.filter((x) => x.applicable).map((x) => [x.instance, x.specHash]));
