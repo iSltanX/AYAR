@@ -19,6 +19,9 @@
 | @formatjs/icu-skeleton-parser | 2.1.12 | MIT | تبعية intl-messageformat (غير مباشرة) | — |
 | @formatjs/fast-memoize | 3.1.7 | MIT | تبعية intl-messageformat (غير مباشرة) | — |
 | svelte | 5.57.2 | MIT | الواجهة؛ يُشحن منها وقت التشغيل المجمّع وحده | `apps/desktop` (الواجهة) |
+| yaml | 2.9.1 | ISC | تحليل YAML في الاكتشاف (`pnpm-workspace.yaml` وworkflows) بالمخطط الأساسي دون وسوم مخصصة، وبحد للأسماء المستعارة. أضافته DEV-4 | `packages/engine` |
+| smol-toml | 1.9.0 | BSD-3-Clause | تحليل TOML في الاكتشاف (`pyproject.toml` و`uv.toml`). أضافته DEV-4 | `packages/engine` |
+| ignore | 7.0.12 | MIT | قواعد `.gitignore` المتداخلة في الاكتشاف (وفي الشجرة نسخة 5.3.2 أخرى تبعية لـ ESLint). أضافته DEV-4 | `packages/engine` |
 
 و`node:sqlite` (طبقة التخزين، E-03) مضمّن في Node داخل Electron، فلا حزمة له.
 
@@ -54,10 +57,7 @@
 | الحزمة | الإصدار في 6.6 | الترخيص | المرحلة المتوقعة |
 |---|---|---|---|
 | fast-xml-parser | 5.11.2 | MIT | DEV-6 (JUnit) |
-| yaml | 2.9.1 | ISC | DEV-4 (pnpm-workspace وworkflows) |
-| smol-toml | 1.9.0 | BSD-3-Clause | DEV-4 (pyproject وmise) |
-| ignore | 7.0.12 | MIT | DEV-4 (`.gitignore` في الاكتشاف) |
-| picomatch | 4.0.7 | MIT | DEV-4 |
+| picomatch | 4.0.7 | MIT | لم تحتجه DEV-4 (الاكتشاف بـ `ignore`)؛ يُضاف حين تحتاجه مرحلة |
 | pixelmatch | 8.0.0 | ISC | DEV-7 |
 | axe-core و@axe-core/playwright | 4.14.0 و4.13.0 | MPL-2.0 | DEV-7، يُضمَّن دون تعديل |
 | lucide | 1.54.0 | ISC | DEV-10 |
