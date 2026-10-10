@@ -156,3 +156,58 @@ describe('component paths with @ and spaces (review M7)', () => {
     }
   }, 60_000);
 });
+
+describe('discovery runs and their races (review M11)', () => {
+  it('a rescan after a cancel is not lost, and a relocation does not keep the old path’s discovery running', async () => {
+    const engine = await connectEngine({ dataDir: join(root, 'AYAR') });
+    try {
+      await engine.waitForEvent('engine.health');
+      const dir = project(join(root, 'big'), 'big');
+      for (let i = 0; i < 200; i++) {
+        mkdirSync(join(dir, `d${i}`), { recursive: true });
+        for (let j = 0; j < 100; j++) writeFileSync(join(dir, `d${i}`, `f${j}.ts`), 'x');
+      }
+      const added = ok<{ project: Project; discoveryId: string }>(await add(engine, dir));
+      const id = added.project.id;
+      ok(await engine.invoke('project.cancelDiscovery', { projectId: id }));
+      const again = ok<{ discoveryId: string }>(await engine.invoke('project.rescan', { projectId: id }));
+      expect(again.discoveryId).not.toBe(added.discoveryId);
+      await engine.waitForEvent('discovery.done', (e) => e.payload.discoveryId === again.discoveryId, 30_000);
+      // Relocate to a copy while a discovery of the old path still runs: the old one is cancelled and saves
+      // nothing, and the copy gets its own discovery.
+      const copy = project(join(root, 'big-copy'), 'big');
+      const old = ok<{ discoveryId: string }>(await engine.invoke('project.rescan', { projectId: id }));
+      const g = pathGrant('selection', copy);
+      const moved = ok<{ status: string; discoveryId: string }>(await engine.invoke('project.relocate', { projectId: id, selectionToken: g.token }, g.grants));
+      // Events emitted before the relocation was handled arrive before its reply; none of the old run may follow.
+      const mark = engine.events.length;
+      const settled = (topic: string) => engine.events.slice(0, mark).some((e) => e.topic === topic && (e.payload as { discoveryId: string }).discoveryId === old.discoveryId);
+      expect(settled('discovery.done') || settled('discovery.failed')).toBe(false); // the race is really exercised
+      expect(moved.status).toBe('relocated');
+      expect(moved.discoveryId).not.toBe(old.discoveryId);
+      await engine.waitForEvent('discovery.done', (e) => e.payload.discoveryId === moved.discoveryId, 30_000);
+      const oldDone = engine.events.slice(mark).filter((e) => e.topic === 'discovery.done' && (e.payload as { discoveryId: string }).discoveryId === old.discoveryId);
+      expect(oldDone).toEqual([]);
+    } finally {
+      await engine.close();
+    }
+  }, 60_000);
+
+  it('does not follow a project folder replaced by a link since it was added (review m9, D-05)', async () => {
+    const engine = await connectEngine({ dataDir: join(root, 'AYAR') });
+    try {
+      await engine.waitForEvent('engine.health');
+      const dir = project(join(root, 'swap'), 'swap');
+      const elsewhere = project(join(root, 'elsewhere'), 'elsewhere');
+      const added = ok<{ project: Project; discoveryId: string }>(await add(engine, dir));
+      await engine.waitForEvent('discovery.done', (e) => e.payload.discoveryId === added.discoveryId);
+      renameSync(dir, join(root, 'swap-old'));
+      symlinkSync(elsewhere, dir);
+      const again = ok<{ discoveryId: string }>(await engine.invoke('project.rescan', { projectId: added.project.id }));
+      const failed = await engine.waitForEvent('discovery.failed', (e) => e.payload.discoveryId === again.discoveryId);
+      expect(failed.payload.error.code).toBe('path_missing');
+    } finally {
+      await engine.close();
+    }
+  }, 60_000);
+});

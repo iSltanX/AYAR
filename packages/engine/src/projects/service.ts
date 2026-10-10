@@ -186,6 +186,8 @@ export class ProjectsService {
   }
 
   async #relink(projectId: string, path: string, real: string): Promise<{ status: 'relocated'; project: Project; discoveryId: string }> {
+    // A discovery of the old path must not save its snapshot after the move (review M11).
+    this.cancelDiscovery(projectId);
     this.#o.db.transaction(() => {
       this.#o.db.run('UPDATE projects SET root_path = ?, root_realpath = ?, last_opened_at = ? WHERE id = ?', path, real, this.#now().toISOString(), projectId);
       recordAudit(this.#o.db, { id: newId(this.#o.ports.random, 'aud'), at: this.#now(), action: 'project.relocated', projectId, details: {} });
@@ -285,17 +287,23 @@ export class ProjectsService {
     return this.startDiscovery(projectId);
   }
 
-  /** Starts a discovery in the background (one per project; a second request joins the running one). */
+  /**
+   * Starts a discovery in the background: one per project. A request while one runs joins it; a request after
+   * it was cancelled starts a new one once the cancelled one has stopped (review M11), so it is never lost.
+   */
   startDiscovery(projectId: string): string {
     const running = this.#running.get(projectId);
-    if (running) return running.discoveryId;
+    if (running && !running.controller.signal.aborted) return running.discoveryId;
     const discoveryId = newId(this.#o.ports.random, 'dsc');
     const controller = new AbortController();
     const entry: Running = { discoveryId, controller, done: Promise.resolve() };
     this.#running.set(projectId, entry);
-    entry.done = this.#run(projectId, discoveryId, controller.signal).finally(() => {
-      if (this.#running.get(projectId) === entry) this.#running.delete(projectId);
-    });
+    const previous = running?.done ?? Promise.resolve();
+    entry.done = previous
+      .then(() => this.#run(projectId, discoveryId, controller.signal))
+      .finally(() => {
+        if (this.#running.get(projectId) === entry) this.#running.delete(projectId);
+      });
     return discoveryId;
   }
 
@@ -321,7 +329,11 @@ export class ProjectsService {
     const { db, events, redaction, profiles } = this.#o;
     const started = this.#o.ports.clock.monotonicMs();
     try {
+      if (signal.aborted) throw new DiscoveryCancelled();
       const row = this.#row(projectId);
+      // The root is checked again: a folder replaced by a link since it was added is not followed (D-05).
+      const rootStat = await this.#o.ports.fs.lstat(row.root_realpath);
+      if (!rootStat || rootStat.isSymbolicLink || !rootStat.isDirectory) throw new CommandError('path_missing');
       const s = readSettings(db, ['discovery.maxDepth', 'discovery.maxEntries', 'discovery.maxConfigBytes']);
       const result = await discover({
         root: row.root_realpath,
