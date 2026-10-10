@@ -4,7 +4,7 @@ track: design
 number: 2
 stage: design
 title: نظام الحالات ورموزه ودائرة العيار
-status: delivered
+status: closed
 status_date: 2026-10-10
 depends_on: [DES-1]
 design_gates: []
@@ -22,7 +22,7 @@ outputs:
   - صفحة Status System مكتملة
   - صفحة Icons برموز الحالات الخمسة عشر بالأحجام 12 و16 و20 وقواعد Lucide والانعكاس
   - اعتماد المالك مسجل
-closing_commit:
+closing_commit: eb0f91b
 ---
 
 # DES-2 — نظام الحالات ورموزه ودائرة العيار
