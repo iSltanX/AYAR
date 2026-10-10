@@ -6,6 +6,9 @@ import { CheckInstanceKey, Id, IsoTimestamp } from '../common.ts';
 import { z } from '../zod.ts';
 import { Argv, CompanionService, Reason } from './profile.ts';
 import { RelPath } from './discovery.ts';
+import { VerdictCounts } from './findings.ts';
+import { PurityResult, PurityVerdict, PuritySummary } from './purity.ts';
+import { CheckOutcome, Origin } from './terms.ts';
 
 /** 7.2-أ: readiness is shown apart from the outcome. `untrusted` is FR-55 (G-20): a project command in «مشروع غير موثوق». */
 export const READINESS_VALUES = ['ready', 'needs_setup', 'needs_approval', 'not_applicable', 'not_included', 'untrusted'] as const;
@@ -16,14 +19,6 @@ export type Readiness = z.infer<typeof Readiness>;
 export const CHECK_STATES = ['planned', 'queued', 'running', 'cancelling', 'finished'] as const;
 export const CheckState = z.enum(CHECK_STATES);
 export type CheckState = z.infer<typeof CheckState>;
-
-/**
- * 7.5 and 7.2-ج: the outcomes. DEV-5 produces missing, unavailable, timed_out, cancelled, interrupted, skipped,
- * not_applicable, and the raw exit; passed/failed/warning/needs_review/flaky come from the classifier (DEV-6).
- */
-export const CHECK_OUTCOMES = ['passed', 'failed', 'warning', 'needs_review', 'flaky', 'missing', 'unavailable', 'timed_out', 'cancelled', 'interrupted', 'skipped', 'not_applicable'] as const;
-export const CheckOutcome = z.enum(CHECK_OUTCOMES);
-export type CheckOutcome = z.infer<typeof CheckOutcome>;
 
 /** The states of a run. `queued` is the visible queue of D-33 (one active run); `interrupted` is set at boot (FR-25). */
 export const RUN_STATES = ['queued', 'running', 'cancelling', 'finished', 'interrupted'] as const;
@@ -216,6 +211,14 @@ export const RawCheckResult = z.strictObject({
   notes: z.array(z.string()),
   /** Raw results the shared execution was copied from (D-45), when this instance did not run its own process. */
   sharedFrom: Id.nullable(),
+  /**
+   * Protocol 1.3 (DEV-6): one execution may run its invocation more than once, in turn — the attempts of
+   * beh.stability's repetition mode, or Semgrep's batches of targets (D-DEV2-01). Each step's end, in order; the
+   * fields above give the first step that did not end with 0, or the last one. Absent in results before 1.3.
+   */
+  steps: z.array(z.strictObject({ n: z.int().positive(), ended: z.enum(['exited', 'timed_out', 'idle_timed_out', 'cancelled', 'spawn_failed', 'service_failed']), exitCode: z.int().nullable(), signal: z.string().nullable(), durationMs: z.int().nonnegative() })).optional(),
+  /** Protocol 1.3: the in-engine runner (an analyzer, C-13) that ran instead of a process, with its version. */
+  internal: z.strictObject({ runner: z.string(), version: z.string() }).nullable().optional(),
 });
 export type RawCheckResult = z.infer<typeof RawCheckResult>;
 
@@ -243,7 +246,10 @@ export const RunView = z.strictObject({
   counts: RunCounts,
   /** 9.9: the project source changed during the run, outside the declared outputs. */
   stateChanged: z.boolean(),
-  verdict: z.string().nullable(),
+  /** C-19 (protocol 1.3): the round's verdict, once the run finished; null for a section, a check, or while running. */
+  verdict: PurityVerdict.nullable(),
+  /** C-19 (protocol 1.3): never the number alone (11.5); null for a run that computes no index. */
+  purity: PuritySummary.nullable(),
   keepForever: z.boolean(),
   /** A cancelled run: the reason (user, app quit). */
   cancelReason: z.enum(['user', 'app_quit']).nullable(),
@@ -277,6 +283,13 @@ export const CheckRunView = z.strictObject({
   previousCheckRunId: Id.nullable(),
   lastActivityAt: IsoTimestamp.nullable(),
   notes: z.array(z.string()),
+  /** G-17 (protocol 1.3): the automatic outcome, kept as it was when a review later decides «يحتاج مراجعة». */
+  autoOutcome: CheckOutcome.nullable(),
+  reviewId: Id.nullable(),
+  /** 7.2-د for a «أخفق» or «تعذّر»: the project, or the tool and its configuration, or the environment. */
+  origin: Origin.nullable(),
+  /** The findings behind the outcome, by effect, with what a review excluded (D-35: never a silent exclusion). */
+  findings: VerdictCounts,
 });
 export type CheckRunView = z.infer<typeof CheckRunView>;
 
@@ -305,6 +318,8 @@ export const RunDetail = z.strictObject({
   checks: z.array(CheckRunDetail),
   /** FR-36, 9.9: the files the run changed in the project, outside and inside the declared outputs. */
   stateChange: SideEffects.nullable(),
+  /** C-19 (protocol 1.3): the round's or the section's index, with its breakdown, once the run finished. */
+  purity: PurityResult.nullable(),
 });
 export type RunDetail = z.infer<typeof RunDetail>;
 

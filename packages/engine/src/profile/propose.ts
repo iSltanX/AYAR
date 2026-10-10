@@ -269,6 +269,7 @@ function specFor(
     runner: { kind: def.runner.kind, ids: [...def.runner.ids] },
     command,
     tool,
+    invocation: null,
     env: { explicit: { ...(override?.explicitEnv ?? {}) }, allowSensitive: [...(override?.allowSensitive ?? [])].sort() },
     references: usedRefs,
     referenceValues: Object.fromEntries(usedRefs.map((k) => [k, (referenceValue(k, input.settings.references, facts) ?? null) as JsonValue])),

@@ -167,6 +167,39 @@ export const ToolSpec = z.strictObject({
   path: AbsolutePath.nullable(),
 });
 
+/**
+ * C-15 (protocol 1.3, DEV-6): the final command an adapter runs, as the approval shows it literally — the project's
+ * approved command with the adapter's report flags appended (after `--` for npm), or a managed tool's own
+ * invocation — with AYAR's placeholders for what exists only at run time: `{reports}` and `{tmp}` (the instance's
+ * folders), `{root}` (the project), `{tool}` (the managed tool's path), `{rules}` (AYAR's Semgrep rules, written
+ * into {tmp}), `{osvdb}` (the offline database), `{nogit}` (a folder whose `git` fails at once, D-DEV2-01),
+ * `{path}` (the computed PATH), `{shadow}` (the Git shadow repository, E-24) and `{targets}` (the target files
+ * from AYAR's own inventory, split in batches of 512 KB, each batch one step). Part of the spec hash: an adapter
+ * that changes its flags asks for the approval again.
+ */
+export const InvocationTemplate = z.strictObject({
+  adapter: z.string().regex(/^[a-z][a-z0-9-]*$/),
+  adapterVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
+  argv: z.array(z.string().max(4096).refine((a) => !a.includes('\0'), 'NUL in an argument')).min(1).max(512),
+  /** `{root}` or `{root}/<component>`, or `{tmp}` (a neutral folder: Semgrep, OSV, the history scan). */
+  cwd: z.string().max(4096),
+  env: z.record(EnvName, z.string().max(8192)),
+  /** Runs in turn as one execution: beh.stability's repetitions (its threshold `repeats`, 5 by default). */
+  repeat: z.int().min(1).max(50),
+  /** Prepared by AYAR in the instance's folder before the launch. */
+  prepare: z.array(z.enum(['semgrep-rules', 'git-shadow', 'nogit'])),
+  /** The reports it asks the tool for, by name inside {reports}; empty when none can be asked for. */
+  reports: z.array(z.string().regex(/^[A-Za-z0-9._-]+$/)),
+  /** Where the adapter reads its findings from when a tool writes them to its output (Biome, Knip, pyright, tsc). */
+  stdoutReport: z.boolean(),
+  /**
+   * A composite project script (C-15): it runs as approved, with the report flags appended when they reach the
+   * tool (its last command); the direct call to the tool, with the script's options kept, is suggested here.
+   */
+  suggestion: z.strictObject({ argv: z.array(z.string().max(4096)).min(1).max(512), reason: z.string() }).nullable(),
+});
+export type InvocationTemplate = z.infer<typeof InvocationTemplate>;
+
 export const CheckSpec = z.strictObject({
   instance: InstanceKey,
   checkId: z.string(),
@@ -184,6 +217,8 @@ export const CheckSpec = z.strictObject({
   runner: z.strictObject({ kind: z.string(), ids: z.array(z.string()) }),
   command: CommandSpec.nullable(),
   tool: ToolSpec.nullable(),
+  /** Protocol 1.3 (DEV-6): what the adapter will run (C-15); null for an analyzer, the probe, an internal check. */
+  invocation: InvocationTemplate.nullable(),
   env: z.strictObject({ explicit: z.record(z.string(), z.string()), allowSensitive: z.array(z.string()) }),
   references: z.array(ReferenceKindSchema),
   /** The value each used reference has for this spec: declared in the profile, or found by discovery. */

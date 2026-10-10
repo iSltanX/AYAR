@@ -103,6 +103,9 @@ interface CheckRunRow {
   last_activity_at: string | null;
   notes_json: string | null;
   raw_json: string | null;
+  auto_outcome: string | null;
+  review_id: string | null;
+  origin: string | null;
 }
 
 interface Exec {
@@ -828,6 +831,10 @@ export class RunService {
       previousCheckRunId: c.previous_check_run_id,
       lastActivityAt: c.last_activity_at,
       notes: c.notes_json ? (JSON.parse(c.notes_json) as string[]) : [],
+      autoOutcome: (c.auto_outcome as CheckOutcome | null) ?? null,
+      reviewId: c.review_id,
+      origin: (c.origin as CheckRunView['origin']) ?? null,
+      findings: { violations: 0, warnings: 0, review: 0, notes: 0, excludedByReview: 0 },
     };
   }
 
@@ -862,7 +869,8 @@ export class RunService {
       counts: this.#counts(runId),
       stateChanged: r.state_changed === 1,
       // 9.6 point 4: no verdict while running; the verdict itself is C-19's (DEV-6).
-      verdict: TERMINAL_RUN.includes(r.state) ? r.verdict : null,
+      verdict: TERMINAL_RUN.includes(r.state) ? ((r.verdict as RunView['verdict']) ?? null) : null,
+      purity: null,
       keepForever: r.keep_forever === 1,
       cancelReason: r.cancel_reason === 'user' || r.cancel_reason === 'app_quit' ? r.cancel_reason : null,
       preventSleep: r.prevent_sleep === 1,
@@ -892,7 +900,7 @@ export class RunService {
         stateChange = diffManifests(a, b, { declared: this.#declared(row.project_id, plan.success ? plan.data : (null as unknown as RunPlan)), tracked: root ? await trackedPaths(this.#o.ports.fs, root) : null });
       }
     }
-    return { run, plan: plan.success ? plan.data : null, checks, stateChange };
+    return { run, plan: plan.success ? plan.data : null, checks, stateChange, purity: null };
   }
 
   keep(runId: string, keep: boolean): RunView {
