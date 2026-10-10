@@ -4,7 +4,7 @@ track: dev
 number: 8
 stage: engine
 title: قاعدة المعرفة kb/1 والمستشار وقوالب البطاقات
-status: delivered
+status: closed
 status_date: 2026-10-10
 depends_on: [DEV-4]
 design_gates: []
@@ -21,7 +21,7 @@ outputs:
   - ملفات kb/1 في packages/catalog (المدخلات، والقواعد، والبنود، والمناهج، والمراحل، والأعماق، والمواقف، والمنظومات، والأدوات، والمصادر، والمصطلحات)
   - C-20 المستشار (advisor.suggest) ومولّد البطاقات (tasks.generate)
   - اختبارات 28.12 و28.13 و28.14 بعد تكييفها
-closing_commit:
+closing_commit: 7d2c635
 ---
 
 # DEV-8 — قاعدة المعرفة kb/1 والمستشار وقوالب البطاقات
