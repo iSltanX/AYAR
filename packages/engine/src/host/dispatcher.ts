@@ -3,7 +3,8 @@
 // the command's contract. Expected failures become coded responses. Any other exception is an unknown state:
 // the dispatcher answers `internal` and tells the engine to crash on purpose, so the supervisor restarts it.
 import { checkGrants, COMMANDS, protocolError, type CommandName, type Grants, type ParsedCommand, type ProtocolError, type ResponseMessage } from '@ayar/protocol';
-import type { Clock, Logger } from '../ports/index.ts';
+import type { Catalog } from '@ayar/catalog';
+import type { Clock, EnginePorts, Logger } from '../ports/index.ts';
 import type { Db } from '../storage/db.ts';
 import { StorageError } from '../storage/errors.ts';
 import type { HmacKey } from '../storage/hmac-key.ts';
@@ -18,6 +19,10 @@ export interface HandlerContext {
   events: EventBus;
   runGate: RunGate;
   hmacKey: HmacKey;
+  /** The validated catalog (C-08) loaded at boot. */
+  catalog: Catalog;
+  /** The engine's ports (file system, processes, clock, randomness). */
+  ports: EnginePorts;
   grants: Grants;
 }
 

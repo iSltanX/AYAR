@@ -8,6 +8,8 @@ import { RunGate } from '../src/host/run-gate.ts';
 import { StorageError } from '../src/storage/errors.ts';
 import type { Db } from '../src/storage/db.ts';
 import { fakeClock } from './support/tmp.ts';
+import type { Catalog } from '@ayar/catalog';
+import { nodePorts } from '../src/node/ports.ts';
 
 const logger = { log: () => {}, flush: () => {} };
 const ready: ServiceState = {
@@ -19,6 +21,8 @@ const ready: ServiceState = {
     events: new EventBus({ stream: 'engine-abcdef', clock: fakeClock(), send: () => {} }),
     runGate: new RunGate(),
     hmacKey: { source: 'test', key: new Uint8Array(32), fingerprint: 'x', created: false },
+    catalog: {} as Catalog,
+    ports: nodePorts,
   },
 };
 const cmd = (command: string, payload: unknown, grants = {}) => ({ kind: 'command' as const, id: 7, command: command as never, payload, grants });

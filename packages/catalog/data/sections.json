@@ -1,0 +1,10 @@
+[
+  { "id": "design", "name": "catalog.section.design", "inIndex": true, "fullScan": true },
+  { "id": "security", "name": "catalog.section.security", "inIndex": true, "fullScan": true },
+  { "id": "code", "name": "catalog.section.code", "inIndex": true, "fullScan": true },
+  { "id": "behavior", "name": "catalog.section.behavior", "inIndex": true, "fullScan": true },
+  { "id": "performance", "name": "catalog.section.performance", "inIndex": true, "fullScan": true },
+  { "id": "custom", "name": "catalog.section.custom", "inIndex": true, "fullScan": true },
+  { "id": "integrity", "name": "catalog.section.integrity", "inIndex": false, "fullScan": true },
+  { "id": "model", "name": "catalog.section.model", "inIndex": false, "fullScan": false }
+]

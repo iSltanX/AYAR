@@ -1,5 +1,7 @@
 // Message index (C-24): one file per scope and language, `messages/<scope>.<lang>.json`, merged here so that
 // parallel phases only meet on one import line. Keys are prefixed by their scope.
+import catalogAr from './catalog.ar.json' with { type: 'json' };
+import catalogEn from './catalog.en.json' with { type: 'json' };
 import commonAr from './common.ar.json' with { type: 'json' };
 import commonEn from './common.en.json' with { type: 'json' };
 import errorsAr from './errors.ar.json' with { type: 'json' };
@@ -12,6 +14,7 @@ import uiAr from './ui.ar.json' with { type: 'json' };
 import uiEn from './ui.en.json' with { type: 'json' };
 
 export const MESSAGE_FILES = {
+  catalog: { ar: catalogAr, en: catalogEn },
   common: { ar: commonAr, en: commonEn },
   errors: { ar: errorsAr, en: errorsEn },
   glossary: { ar: glossaryAr, en: glossaryEn },
@@ -22,6 +25,6 @@ export const MESSAGE_FILES = {
 export type Scope = keyof typeof MESSAGE_FILES;
 
 export const MESSAGES = {
-  ar: { ...commonAr, ...errorsAr, ...glossaryAr, ...menuAr, ...uiAr },
-  en: { ...commonEn, ...errorsEn, ...glossaryEn, ...menuEn, ...uiEn },
+  ar: { ...catalogAr, ...commonAr, ...errorsAr, ...glossaryAr, ...menuAr, ...uiAr },
+  en: { ...catalogEn, ...commonEn, ...errorsEn, ...glossaryEn, ...menuEn, ...uiEn },
 } as const;

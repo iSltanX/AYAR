@@ -1,0 +1,436 @@
+{
+  "section": "behavior",
+  "checks": [
+    {
+      "id": "beh.unit",
+      "version": "1.0.0",
+      "section": "behavior",
+      "criterion": "behavior",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.beh.unit.title",
+        "why": "catalog.check.beh.unit.why",
+        "limits": "catalog.check.beh.unit.limits"
+      },
+      "applies": {
+        "all": [
+          {
+            "signal": "code.any"
+          },
+          {
+            "not": {
+              "signal": "site.staticNoScripts"
+            }
+          }
+        ]
+      },
+      "default": {
+        "kind": "required",
+        "blocking": true
+      },
+      "requirements": [
+        {
+          "kind": "tests"
+        },
+        {
+          "kind": "tool",
+          "tools": [
+            "vitest",
+            "jest",
+            "mocha",
+            "node-test",
+            "pytest"
+          ],
+          "from": "project"
+        },
+        {
+          "kind": "dependencies"
+        }
+      ],
+      "runner": {
+        "kind": "adapter",
+        "ids": [
+          "vitest",
+          "jest",
+          "node-test",
+          "pytest"
+        ]
+      },
+      "resourceClass": "medium",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "maybe"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-24",
+        "S-25",
+        "S-26"
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "beh.integration",
+      "version": "1.0.0",
+      "section": "behavior",
+      "criterion": "behavior",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.beh.integration.title",
+        "why": "catalog.check.beh.integration.why",
+        "limits": "catalog.check.beh.integration.limits"
+      },
+      "applies": {
+        "signal": "tests.integration"
+      },
+      "default": {
+        "kind": "conditional",
+        "when": {
+          "signal": "tests.integration"
+        }
+      },
+      "requirements": [
+        {
+          "kind": "service"
+        },
+        {
+          "kind": "dependencies"
+        }
+      ],
+      "runner": {
+        "kind": "adapter",
+        "ids": [
+          "vitest",
+          "jest",
+          "node-test",
+          "pytest"
+        ]
+      },
+      "resourceClass": "heavy",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "maybe"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "beh.e2e",
+      "version": "1.0.0",
+      "section": "behavior",
+      "criterion": "journeys",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.beh.e2e.title",
+        "why": "catalog.check.beh.e2e.why",
+        "limits": "catalog.check.beh.e2e.limits"
+      },
+      "applies": {
+        "signal": "tests.playwright"
+      },
+      "default": {
+        "kind": "conditional",
+        "when": {
+          "signal": "tests.playwright"
+        }
+      },
+      "requirements": [
+        {
+          "kind": "tool",
+          "tools": [
+            "playwright"
+          ],
+          "from": "project"
+        },
+        {
+          "kind": "dataAsset",
+          "asset": "browser"
+        },
+        {
+          "kind": "dependencies"
+        }
+      ],
+      "runner": {
+        "kind": "adapter",
+        "ids": [
+          "playwright"
+        ]
+      },
+      "resourceClass": "heavy",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "maybe"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [
+          "perf.compat"
+        ],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-17",
+        "S-19"
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "beh.contract",
+      "version": "1.0.0",
+      "section": "behavior",
+      "criterion": "contracts",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.beh.contract.title",
+        "why": "catalog.check.beh.contract.why",
+        "limits": "catalog.check.beh.contract.limits"
+      },
+      "applies": {
+        "signal": "tests.contract"
+      },
+      "default": {
+        "kind": "conditional",
+        "when": {
+          "signal": "tests.contract"
+        }
+      },
+      "requirements": [
+        {
+          "kind": "dependencies"
+        }
+      ],
+      "runner": {
+        "kind": "adapter",
+        "ids": [
+          "contract-tool"
+        ]
+      },
+      "resourceClass": "medium",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "beh.ext.host",
+      "version": "1.0.0",
+      "section": "behavior",
+      "criterion": "host",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.beh.ext.host.title",
+        "why": "catalog.check.beh.ext.host.why",
+        "limits": "catalog.check.beh.ext.host.limits"
+      },
+      "applies": {
+        "signal": "type.chromiumExtension"
+      },
+      "default": {
+        "kind": "required",
+        "blocking": false
+      },
+      "requirements": [
+        {
+          "kind": "dataAsset",
+          "asset": "browser"
+        }
+      ],
+      "runner": {
+        "kind": "probe",
+        "ids": [
+          "ext-host"
+        ]
+      },
+      "resourceClass": "heavy",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [
+          {
+            "check": "code.build",
+            "when": {
+              "signal": "build.step"
+            }
+          }
+        ],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-18"
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "beh.stability",
+      "version": "1.0.0",
+      "section": "behavior",
+      "criterion": "test-reliability",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.beh.stability.title",
+        "why": "catalog.check.beh.stability.why",
+        "limits": "catalog.check.beh.stability.limits"
+      },
+      "applies": {
+        "all": [
+          {
+            "signal": "code.any"
+          },
+          {
+            "not": {
+              "signal": "site.staticNoScripts"
+            }
+          }
+        ]
+      },
+      "default": {
+        "kind": "optional"
+      },
+      "requirements": [
+        {
+          "kind": "tests"
+        },
+        {
+          "kind": "dependencies"
+        }
+      ],
+      "runner": {
+        "kind": "adapter",
+        "ids": [
+          "vitest",
+          "jest",
+          "node-test",
+          "pytest"
+        ]
+      },
+      "resourceClass": "very_heavy",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "maybe"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [
+          "beh.unit"
+        ],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "beh.mutation",
+      "version": "1.0.0",
+      "section": "behavior",
+      "criterion": "test-reliability",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.beh.mutation.title",
+        "why": "catalog.check.beh.mutation.why",
+        "limits": "catalog.check.beh.mutation.limits"
+      },
+      "applies": {
+        "any": [
+          {
+            "signal": "lang.js"
+          },
+          {
+            "signal": "lang.ts"
+          }
+        ]
+      },
+      "default": {
+        "kind": "optional"
+      },
+      "requirements": [
+        {
+          "kind": "tool",
+          "tools": [
+            "stryker"
+          ],
+          "from": "project"
+        },
+        {
+          "kind": "tests"
+        },
+        {
+          "kind": "dependencies"
+        }
+      ],
+      "runner": {
+        "kind": "adapter",
+        "ids": [
+          "stryker"
+        ]
+      },
+      "resourceClass": "very_heavy",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "maybe"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-30"
+      ],
+      "verifiedAt": "2026-10-09"
+    }
+  ]
+}

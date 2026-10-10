@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ProtocolClient, ProtocolFailure, PROTOCOL_VERSION } from '../src/index.ts';
+import { formatVersion, ProtocolClient, ProtocolFailure, PROTOCOL_VERSION } from '../src/index.ts';
 import { fakeTransport, welcome } from './helpers.ts';
 
 const config = { dataDir: '/tmp/ayar-test', hmacKeySource: 'test', appVersion: '0.1.0' } as const;
@@ -37,7 +37,7 @@ describe('ProtocolClient', () => {
     const client = new ProtocolClient(end.transport);
     const hs = client.handshake('cli', config);
     end.deliver(welcome(2));
-    await expect(hs).rejects.toMatchObject({ error: { code: 'protocol_mismatch', details: { expected: '1.0', received: '2.0' } } });
+    await expect(hs).rejects.toMatchObject({ error: { code: 'protocol_mismatch', details: { expected: formatVersion(PROTOCOL_VERSION), received: '2.0' } } });
     expect(client.closed).toBe(true);
   });
 

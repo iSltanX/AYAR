@@ -23,6 +23,14 @@ export const ERROR_CODES = [
   'not_found',
   'cancelled',
   'internal',
+  // DEV-4 (protocol 1.1): the catalog, the project registry and the profile.
+  'catalog_invalid',
+  'permission_denied',
+  'path_missing',
+  'not_a_directory',
+  'profile_invalid',
+  'stale_change_set',
+  'preview_required',
 ] as const;
 
 export const ErrorCode = z.enum(ERROR_CODES);

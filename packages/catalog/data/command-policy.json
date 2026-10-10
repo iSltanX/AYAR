@@ -1,0 +1,43 @@
+{
+  "version": "1.0.0",
+  "verifiedAt": "2026-10-10",
+  "refused": [
+    { "id": "sudo", "regex": { "pattern": "(?:^|[\\s;&|()`]|\\$\\()(?:sudo|doas)(?:\\s|$)", "flags": "" }, "label": "catalog.command.refused.sudo" }
+  ],
+  "dangerous": [
+    {
+      "id": "mass-delete",
+      "label": "catalog.command.dangerous.mass-delete",
+      "regexes": [
+        { "pattern": "\\brm\\s+(?:-[A-Za-z]*[rR][A-Za-z]*|--recursive)\\b", "flags": "" },
+        { "pattern": "\\bfind\\b[^|;&]*\\s-delete\\b", "flags": "" },
+        { "pattern": "\\bgit\\s+clean\\s+-[A-Za-z]*[fdxX]", "flags": "" },
+        { "pattern": "\\brimraf\\b", "flags": "" },
+        { "pattern": "\\bshred\\b|\\bmkfs\\b|\\bdd\\s+[^|;&]*of=", "flags": "" }
+      ]
+    },
+    {
+      "id": "publish",
+      "label": "catalog.command.dangerous.publish",
+      "regexes": [
+        { "pattern": "\\b(?:npm|pnpm|yarn|bun)\\s+(?:run\\s+)?publish\\b", "flags": "" },
+        { "pattern": "\\b(?:twine|flit)\\s+(?:upload|publish)\\b|\\b(?:poetry|uv|cargo|vsce|ovsx)\\s+publish\\b", "flags": "" },
+        { "pattern": "\\bgh\\s+release\\s+(?:create|upload)\\b|\\bdocker\\s+push\\b", "flags": "" }
+      ]
+    },
+    {
+      "id": "push",
+      "label": "catalog.command.dangerous.push",
+      "regexes": [{ "pattern": "\\bgit\\s+(?:[^|;&]*\\s)?push\\b", "flags": "" }]
+    },
+    {
+      "id": "download-execute",
+      "label": "catalog.command.dangerous.download-execute",
+      "regexes": [
+        { "pattern": "\\b(?:curl|wget)\\b[^|;&]*\\|\\s*(?:sudo\\s+)?(?:ba|z|da|k|fi)?sh\\b", "flags": "" },
+        { "pattern": "\\b(?:ba|z)?sh\\s+<\\(\\s*(?:curl|wget)\\b", "flags": "" },
+        { "pattern": "\\b(?:curl|wget)\\b[^|;&]*\\|\\s*(?:python3?|node|perl|ruby)\\b", "flags": "" }
+      ]
+    }
+  ]
+}

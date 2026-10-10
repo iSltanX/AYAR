@@ -1,0 +1,25 @@
+{
+  "schema": "ayar-catalog/1",
+  "version": "1.0.0",
+  "purityFormula": "purity/1",
+  "staleAfterDays": 180,
+  "timeouts": { "light": 2, "medium": 10, "heavy": 30, "very_heavy": 60 },
+  "nextSteps": {
+    "passed": "none",
+    "passed_reviewed": "none",
+    "failed": "model",
+    "failed_reviewed": "model",
+    "warning": "model",
+    "needs_review": "review",
+    "flaky": "model",
+    "missing": "direct",
+    "missing_configuration": "direct",
+    "missing_tests": "model",
+    "error": "direct",
+    "timeout": "direct",
+    "cancelled": "direct",
+    "interrupted": "direct",
+    "skipped": "direct",
+    "not_applicable": "none"
+  }
+}

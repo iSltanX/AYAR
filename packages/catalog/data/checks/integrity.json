@@ -1,0 +1,173 @@
+{
+  "section": "integrity",
+  "checks": [
+    {
+      "id": "integ.guard",
+      "version": "1.0.0",
+      "section": "integrity",
+      "criterion": null,
+      "inIndex": false,
+      "scope": "project",
+      "text": {
+        "title": "catalog.check.integ.guard.title",
+        "why": "catalog.check.integ.guard.why",
+        "limits": "catalog.check.integ.guard.limits"
+      },
+      "applies": {
+        "always": true
+      },
+      "default": {
+        "kind": "alwaysOn"
+      },
+      "requirements": [],
+      "runner": {
+        "kind": "internal",
+        "ids": [
+          "integrity-guard"
+        ]
+      },
+      "resourceClass": "light",
+      "sideEffects": {
+        "runsProjectCode": false,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "integ.state",
+      "version": "1.0.0",
+      "section": "integrity",
+      "criterion": null,
+      "inIndex": false,
+      "scope": "project",
+      "text": {
+        "title": "catalog.check.integ.state.title",
+        "why": "catalog.check.integ.state.why",
+        "limits": "catalog.check.integ.state.limits"
+      },
+      "applies": {
+        "always": true
+      },
+      "default": {
+        "kind": "alwaysOn"
+      },
+      "requirements": [],
+      "runner": {
+        "kind": "internal",
+        "ids": [
+          "state-snapshot"
+        ]
+      },
+      "resourceClass": "light",
+      "sideEffects": {
+        "runsProjectCode": false,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "integ.model-claims",
+      "version": "1.0.0",
+      "section": "integrity",
+      "criterion": null,
+      "inIndex": false,
+      "scope": "project",
+      "text": {
+        "title": "catalog.check.integ.model-claims.title",
+        "why": "catalog.check.integ.model-claims.why",
+        "limits": "catalog.check.integ.model-claims.limits"
+      },
+      "applies": {
+        "signal": "ayar.aiResults"
+      },
+      "default": {
+        "kind": "alwaysOn"
+      },
+      "requirements": [],
+      "runner": {
+        "kind": "internal",
+        "ids": [
+          "model-claims"
+        ]
+      },
+      "resourceClass": "light",
+      "sideEffects": {
+        "runsProjectCode": false,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "integ.reviews",
+      "version": "1.0.0",
+      "section": "integrity",
+      "criterion": null,
+      "inIndex": false,
+      "scope": "project",
+      "text": {
+        "title": "catalog.check.integ.reviews.title",
+        "why": "catalog.check.integ.reviews.why",
+        "limits": "catalog.check.integ.reviews.limits"
+      },
+      "applies": {
+        "signal": "state.reviews"
+      },
+      "default": {
+        "kind": "alwaysOn"
+      },
+      "requirements": [],
+      "runner": {
+        "kind": "internal",
+        "ids": [
+          "reviews"
+        ]
+      },
+      "resourceClass": "light",
+      "sideEffects": {
+        "runsProjectCode": false,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [],
+      "verifiedAt": "2026-10-09"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 // The engine host in-process, over a fake channel: handshake (D-29), boot, numbered events, dispatch,
 // and the stop paths. The same engine over a real child process is tested in tools/cli.
-import { PROTOCOL_VERSION } from '@ayar/protocol';
+import { formatVersion, PROTOCOL_VERSION } from '@ayar/protocol';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -71,7 +71,7 @@ describe('engine host (C-04)', () => {
     const h = harness();
     h.hello(PROTOCOL_VERSION.major + 1);
     expect(h.sent).toEqual([
-      { kind: 'refuse', protocol: PROTOCOL_VERSION, error: { code: 'protocol_mismatch', messageKey: 'errors.protocol_mismatch', details: { expected: '1.0', received: `${PROTOCOL_VERSION.major + 1}.0` } } },
+      { kind: 'refuse', protocol: PROTOCOL_VERSION, error: { code: 'protocol_mismatch', messageKey: 'errors.protocol_mismatch', details: { expected: formatVersion(PROTOCOL_VERSION), received: `${PROTOCOL_VERSION.major + 1}.0` } } },
     ]);
     await new Promise((r) => setTimeout(r, 80));
     expect(h.exits).toEqual([76]);

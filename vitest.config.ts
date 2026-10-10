@@ -11,6 +11,7 @@ export default defineConfig({
     projects: [
       project('protocol', 'packages/protocol'),
       project('i18n', 'packages/i18n'),
+      project('catalog', 'packages/catalog'),
       project('engine', 'packages/engine', 30_000),
       project('cli', 'tools/cli', 30_000),
       project('desktop', 'apps/desktop', 30_000),

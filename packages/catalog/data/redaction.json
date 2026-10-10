@@ -1,0 +1,53 @@
+{
+  "version": "1.0.0",
+  "verifiedAt": "2026-10-10",
+  "sensitiveNames": {
+    "words": [
+      "SECRET", "SECRETS", "TOKEN", "TOKENS", "PASSWORD", "PASSWORDS", "PASSWD", "PASS", "PASSPHRASE",
+      "KEY", "KEYS", "APIKEY", "PRIVATE", "CREDENTIAL", "CREDENTIALS", "CREDS", "AUTH", "COOKIE", "COOKIES",
+      "SESSION", "SESSIONS"
+    ],
+    "prefixes": ["AWS_", "AZURE_", "GOOGLE_"],
+    "names": [
+      "GITHUB_TOKEN", "GH_TOKEN", "NPM_TOKEN", "NODE_AUTH_TOKEN", "OPENAI_API_KEY", "ANTHROPIC_API_KEY",
+      "HF_TOKEN", "GITLAB_TOKEN", "CODECOV_TOKEN", "PGPASSWORD", "MYSQL_PWD", "DATABASE_URL", "SENTRY_DSN",
+      "SLACK_WEBHOOK_URL"
+    ],
+    "exceptions": [
+      { "name": "SSH_AUTH_SOCK", "reason": "catalog.redaction.exception.SSH_AUTH_SOCK" },
+      { "name": "TERM_SESSION_ID", "reason": "catalog.redaction.exception.TERM_SESSION_ID" }
+    ]
+  },
+  "internalNames": {
+    "prefixes": ["ELECTRON_", "AYAR_"],
+    "names": ["NODE_CHANNEL_FD", "NODE_CHANNEL_SERIALIZATION_MODE", "NODE_UNIQUE_ID"]
+  },
+  "minValueLength": 8,
+  "highConfidence": [
+    { "id": "aws-access-key-id", "version": "1.0.0", "regex": { "pattern": "\\b(?:AKIA|ASIA|ABIA|ACCA)[A-Z0-9]{16}\\b", "flags": "" } },
+    { "id": "github-token", "version": "1.0.0", "regex": { "pattern": "\\b(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36,255}\\b", "flags": "" } },
+    { "id": "github-fine-grained-pat", "version": "1.0.0", "regex": { "pattern": "\\bgithub_pat_[A-Za-z0-9_]{22,255}\\b", "flags": "" } },
+    { "id": "npm-token", "version": "1.0.0", "regex": { "pattern": "\\bnpm_[A-Za-z0-9]{36}\\b", "flags": "" } },
+    { "id": "slack-token", "version": "1.0.0", "regex": { "pattern": "\\bxox[abposre]-(?:[0-9]+-)?[A-Za-z0-9-]{10,250}", "flags": "" } },
+    { "id": "slack-webhook", "version": "1.0.0", "regex": { "pattern": "https://hooks\\.slack\\.com/(?:services|workflows)/[A-Za-z0-9+/_-]{20,200}", "flags": "" } },
+    { "id": "stripe-live-key", "version": "1.0.0", "regex": { "pattern": "\\b(?:sk|rk)_live_[A-Za-z0-9]{16,247}\\b", "flags": "" } },
+    { "id": "google-api-key", "version": "1.0.0", "regex": { "pattern": "\\bAIza[0-9A-Za-z_-]{35}", "flags": "" } },
+    { "id": "openai-api-key", "version": "1.0.0", "regex": { "pattern": "\\bsk-(?:proj|svcacct|admin)-[A-Za-z0-9_-]{40,}", "flags": "" } },
+    { "id": "anthropic-api-key", "version": "1.0.0", "regex": { "pattern": "\\bsk-ant-[a-z0-9]+-[A-Za-z0-9_-]{40,}", "flags": "" } },
+    { "id": "jwt", "version": "1.0.0", "regex": { "pattern": "\\beyJ[A-Za-z0-9_-]{5,}\\.eyJ[A-Za-z0-9_-]{5,}\\.[A-Za-z0-9_-]{8,}", "flags": "" } },
+    { "id": "private-key-inline", "version": "1.0.0", "regex": { "pattern": "-----BEGIN[A-Z0-9 ]*PRIVATE KEY(?: BLOCK)?-----[\\s\\S]*?-----END[A-Z0-9 ]*PRIVATE KEY(?: BLOCK)?-----", "flags": "" } },
+    { "id": "password-assignment", "version": "1.0.0", "regex": { "pattern": "(?:password|passwd|secret|api[_-]?key|access[_-]?key|auth[_-]?token|token)[\"']?\\s*[:=]\\s*[\"']?([^\\s\"'`,;]{12,256})", "flags": "i" }, "group": 1, "minEntropy": 3.5 }
+  ],
+  "multiline": [
+    {
+      "id": "private-key",
+      "version": "1.0.0",
+      "begin": { "pattern": "-----BEGIN[A-Z0-9 ]*PRIVATE KEY(?: BLOCK)?-----", "flags": "" },
+      "end": { "pattern": "-----END[A-Z0-9 ]*PRIVATE KEY(?: BLOCK)?-----", "flags": "" }
+    }
+  ],
+  "toolRedaction": [
+    { "tool": "betterleaks", "flag": "--redact=100" },
+    { "tool": "gitleaks", "flag": "--redact=100" }
+  ]
+}

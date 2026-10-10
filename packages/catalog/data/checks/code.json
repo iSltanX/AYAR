@@ -1,0 +1,453 @@
+{
+  "section": "code",
+  "checks": [
+    {
+      "id": "code.build",
+      "version": "1.0.0",
+      "section": "code",
+      "criterion": "build",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.code.build.title",
+        "why": "catalog.check.code.build.why",
+        "limits": "catalog.check.code.build.limits"
+      },
+      "applies": {
+        "signal": "build.step"
+      },
+      "default": {
+        "kind": "required",
+        "blocking": true
+      },
+      "requirements": [
+        {
+          "kind": "tool",
+          "tools": [
+            "build-command"
+          ],
+          "from": "project"
+        },
+        {
+          "kind": "dependencies"
+        }
+      ],
+      "runner": {
+        "kind": "adapter",
+        "ids": [
+          "build-command"
+        ]
+      },
+      "resourceClass": "medium",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "maybe"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "code.types",
+      "version": "1.0.0",
+      "section": "code",
+      "criterion": "types",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.code.types.title",
+        "why": "catalog.check.code.types.why",
+        "limits": "catalog.check.code.types.limits"
+      },
+      "applies": {
+        "signal": "types.config"
+      },
+      "default": {
+        "kind": "required",
+        "blocking": true
+      },
+      "requirements": [
+        {
+          "kind": "tool",
+          "tools": [
+            "tsc",
+            "svelte-check",
+            "vue-tsc",
+            "mypy",
+            "pyright"
+          ],
+          "from": "project_or_system"
+        },
+        {
+          "kind": "dependencies"
+        }
+      ],
+      "runner": {
+        "kind": "adapter",
+        "ids": [
+          "tsc",
+          "svelte-check",
+          "mypy",
+          "pyright"
+        ]
+      },
+      "resourceClass": "medium",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-28"
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "code.lint",
+      "version": "1.0.0",
+      "section": "code",
+      "criterion": "lint",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.code.lint.title",
+        "why": "catalog.check.code.lint.why",
+        "limits": "catalog.check.code.lint.limits"
+      },
+      "applies": {
+        "signal": "lint.config"
+      },
+      "default": {
+        "kind": "required",
+        "blocking": false
+      },
+      "requirements": [
+        {
+          "kind": "tool",
+          "tools": [
+            "eslint",
+            "biome",
+            "ruff"
+          ],
+          "from": "project_or_system"
+        },
+        {
+          "kind": "dependencies"
+        }
+      ],
+      "runner": {
+        "kind": "adapter",
+        "ids": [
+          "eslint",
+          "biome",
+          "ruff"
+        ]
+      },
+      "resourceClass": "medium",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-27"
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "code.unused",
+      "version": "1.0.0",
+      "section": "code",
+      "criterion": "unused",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.code.unused.title",
+        "why": "catalog.check.code.unused.why",
+        "limits": "catalog.check.code.unused.limits"
+      },
+      "applies": {
+        "any": [
+          {
+            "signal": "lang.js"
+          },
+          {
+            "signal": "lang.ts"
+          }
+        ]
+      },
+      "default": {
+        "kind": "optional",
+        "suggestWhen": {
+          "signal": "type.library"
+        }
+      },
+      "requirements": [
+        {
+          "kind": "tool",
+          "tools": [
+            "knip"
+          ],
+          "from": "project_or_managed"
+        },
+        {
+          "kind": "dependencies"
+        }
+      ],
+      "runner": {
+        "kind": "adapter",
+        "ids": [
+          "knip"
+        ]
+      },
+      "resourceClass": "medium",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-29"
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "code.refs.local",
+      "version": "1.0.0",
+      "section": "code",
+      "criterion": "references",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.code.refs.local.title",
+        "why": "catalog.check.code.refs.local.why",
+        "limits": "catalog.check.code.refs.local.limits"
+      },
+      "applies": {
+        "signal": "markup.any"
+      },
+      "default": {
+        "kind": "required",
+        "blocking": false
+      },
+      "requirements": [],
+      "runner": {
+        "kind": "analyzer",
+        "ids": [
+          "refs-local"
+        ]
+      },
+      "resourceClass": "light",
+      "sideEffects": {
+        "runsProjectCode": false,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "code.refs.external",
+      "version": "1.0.0",
+      "section": "code",
+      "criterion": "references",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.code.refs.external.title",
+        "why": "catalog.check.code.refs.external.why",
+        "limits": "catalog.check.code.refs.external.limits"
+      },
+      "applies": {
+        "signal": "markup.any"
+      },
+      "default": {
+        "kind": "optional"
+      },
+      "requirements": [
+        {
+          "kind": "network"
+        },
+        {
+          "kind": "tool",
+          "tools": [
+            "lychee"
+          ],
+          "from": "managed"
+        }
+      ],
+      "runner": {
+        "kind": "adapter",
+        "ids": [
+          "lychee"
+        ]
+      },
+      "resourceClass": "heavy",
+      "sideEffects": {
+        "runsProjectCode": false,
+        "writesRepo": "no"
+      },
+      "network": "required",
+      "cost": "network",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-32"
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "code.size",
+      "version": "1.0.0",
+      "section": "code",
+      "criterion": "size",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.code.size.title",
+        "why": "catalog.check.code.size.why",
+        "limits": "catalog.check.code.size.limits"
+      },
+      "applies": {
+        "signal": "build.step"
+      },
+      "default": {
+        "kind": "conditional",
+        "when": {
+          "ref": "budgets"
+        }
+      },
+      "requirements": [
+        {
+          "kind": "reference",
+          "ref": "budgets"
+        }
+      ],
+      "runner": {
+        "kind": "analyzer",
+        "ids": [
+          "size"
+        ]
+      },
+      "resourceClass": "light",
+      "sideEffects": {
+        "runsProjectCode": false,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [
+          {
+            "check": "code.build"
+          }
+        ],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "code.complexity",
+      "version": "1.0.0",
+      "section": "code",
+      "criterion": null,
+      "inIndex": false,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.code.complexity.title",
+        "why": "catalog.check.code.complexity.why",
+        "limits": "catalog.check.code.complexity.limits"
+      },
+      "applies": {
+        "any": [
+          {
+            "signal": "lang.js"
+          },
+          {
+            "signal": "lang.ts"
+          }
+        ]
+      },
+      "default": {
+        "kind": "optional"
+      },
+      "requirements": [],
+      "runner": {
+        "kind": "analyzer",
+        "ids": [
+          "complexity"
+        ]
+      },
+      "resourceClass": "light",
+      "sideEffects": {
+        "runsProjectCode": false,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {
+        "passed": "none",
+        "warning": "model"
+      },
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-27"
+      ],
+      "verifiedAt": "2026-10-09"
+    }
+  ]
+}

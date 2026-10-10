@@ -81,8 +81,8 @@ export function startEngine(o: StartEngineOptions): EngineHandle {
   const state = (): ServiceState => {
     if (phase === 'awaiting_hello' || phase === 'booting') return { kind: 'unavailable', error: protocolError('engine_starting') };
     if (phase === 'stopping') return { kind: 'unavailable', error: protocolError('engine_unavailable') };
-    if (degraded || !result?.db || !hmacKey || !bus) return { kind: 'unavailable', error: protocolError(degraded ?? 'internal') };
-    return { kind: 'ready', context: { db: result.db, clock: ports.clock, logger, events: bus, runGate, hmacKey } };
+    if (degraded || !result?.db || !result.catalog || !hmacKey || !bus) return { kind: 'unavailable', error: protocolError(degraded ?? 'internal') };
+    return { kind: 'ready', context: { db: result.db, clock: ports.clock, logger, events: bus, runGate, hmacKey, catalog: result.catalog, ports } };
   };
   const dispatcher = new Dispatcher(o.handlers ?? HANDLERS, state, () => logger);
 

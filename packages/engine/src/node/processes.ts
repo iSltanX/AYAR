@@ -1,10 +1,20 @@
 // Node implementation of the ProcessControl port. The start time comes from ps(1), so that a reused pid is
 // never mistaken for the process the ledger recorded (C-12: "مطابقة وقت بدئه").
-import { execFile } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
 import { promisify } from 'node:util';
-import type { ProcessControl } from '../ports/index.ts';
+import type { ProcessControl, SpawnResult } from '../ports/index.ts';
 
 const run = promisify(execFile);
+
+/** Kills the whole group: the program and anything it started in its group (C-07 login shell, probes). */
+function killTree(pid: number | undefined, signal: NodeJS.Signals): void {
+  if (pid === undefined) return;
+  try {
+    process.kill(-pid, signal);
+  } catch {
+    /* already gone */
+  }
+}
 
 export const nodeProcessControl: ProcessControl = {
   currentUid: () => process.getuid?.() ?? -1,
@@ -27,5 +37,42 @@ export const nodeProcessControl: ProcessControl = {
       if ((e as NodeJS.ErrnoException).code === 'ESRCH') return Promise.resolve(false);
       return Promise.reject(e instanceof Error ? e : new Error(String(e)));
     }
+  },
+  spawn(command, args, o) {
+    const started = performance.now();
+    return new Promise<SpawnResult>((resolve) => {
+      const out: Buffer[] = [];
+      const err: Buffer[] = [];
+      let outBytes = 0;
+      let errBytes = 0;
+      let truncated = false;
+      let timedOut = false;
+      const keep = (chunks: Buffer[], size: number, d: Buffer): number => {
+        const room = o.maxOutputBytes - size;
+        if (room <= 0) {
+          truncated = true;
+          return size;
+        }
+        if (d.length > room) truncated = true;
+        chunks.push(d.subarray(0, room));
+        return size + Math.min(d.length, room);
+      };
+      const child = spawn(command, [...args], { cwd: o.cwd, env: { ...o.env }, stdio: ['ignore', 'pipe', 'pipe'], detached: true, shell: false });
+      const timer = setTimeout(() => {
+        timedOut = true;
+        killTree(child.pid, 'SIGTERM');
+        setTimeout(() => killTree(child.pid, 'SIGKILL'), 500).unref();
+      }, o.timeoutMs);
+      child.stdout.on('data', (d: Buffer) => (outBytes = keep(out, outBytes, d)));
+      child.stderr.on('data', (d: Buffer) => (errBytes = keep(err, errBytes, d)));
+      const finish = (code: number | null, signal: string | null, error: string | null) => {
+        clearTimeout(timer);
+        // Anything the program left in its group (a login shell's background jobs) goes with it.
+        killTree(child.pid, 'SIGKILL');
+        resolve({ code, signal, stdout: new Uint8Array(Buffer.concat(out)), stderr: new Uint8Array(Buffer.concat(err)), timedOut, truncated, error, durationMs: Math.round(performance.now() - started) });
+      };
+      child.once('error', (e: NodeJS.ErrnoException) => finish(null, null, e.code ?? 'spawn_failed'));
+      child.once('close', (code, signal) => finish(code, signal, null));
+    });
   },
 };
