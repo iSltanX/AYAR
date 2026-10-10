@@ -1,0 +1,204 @@
+{
+  "project": "Wasl",
+  "root": "/Volumes/iSltanXx/Projects/Plugins/Wasl",
+  "scannedAt": "2026-10-10T09:38:31.306Z",
+  "entries": 201,
+  "partial": false,
+  "warnings": [],
+  "outputDirs": [],
+  "symlinks": [],
+  "configFilesPresent": [
+    "package.json",
+    "package-lock.json",
+    "tsconfig.json",
+    "manifest.json",
+    "esbuild.config.mjs",
+    "README.md",
+    "LICENSE"
+  ],
+  "secretFilesByName": [],
+  "ayarDir": false,
+  "package": {
+    "name": "obsidian-wasl",
+    "private": true,
+    "type": "module",
+    "packageManager": null,
+    "enginesNode": null,
+    "workspaces": null,
+    "hasBin": false,
+    "hasExportsOrMain": false,
+    "depCount": 0,
+    "devDepCount": 4,
+    "scripts": [
+      {
+        "name": "dev",
+        "kind": "بناء",
+        "tool": "node",
+        "composite": false,
+        "length": 23
+      },
+      {
+        "name": "build",
+        "kind": "فحص أنواع",
+        "tool": "tsc",
+        "composite": true,
+        "length": 50
+      },
+      {
+        "name": "typecheck",
+        "kind": "فحص أنواع",
+        "tool": "tsc",
+        "composite": false,
+        "length": 12
+      },
+      {
+        "name": "test",
+        "kind": "اختبار",
+        "tool": "vitest",
+        "composite": false,
+        "length": 10
+      },
+      {
+        "name": "check",
+        "kind": "اختبار",
+        "tool": "tsc",
+        "composite": true,
+        "length": 64
+      },
+      {
+        "name": "t0",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 26
+      },
+      {
+        "name": "metrics",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": false,
+        "length": 29
+      },
+      {
+        "name": "version",
+        "kind": "أخرى",
+        "tool": "node",
+        "composite": true,
+        "length": 60
+      },
+      {
+        "name": "prepare",
+        "kind": "أخرى",
+        "tool": "git",
+        "composite": true,
+        "length": 43
+      }
+    ],
+    "notableDeps": [
+      "esbuild",
+      "obsidian",
+      "typescript",
+      "vitest"
+    ]
+  },
+  "lockfiles": [
+    "package-lock.json"
+  ],
+  "runtimeFiles": {},
+  "manifests": [
+    {
+      "rel": "manifest.json",
+      "manifest_version": null,
+      "hasDefaultLocale": false,
+      "hasLocalesDir": false,
+      "permissions": null,
+      "hostPermissions": null,
+      "isObsidian": true,
+      "hasCsp": false
+    },
+    {
+      "rel": "test-vault/.obsidian/plugins/wasl/manifest.json",
+      "manifest_version": null,
+      "hasDefaultLocale": false,
+      "hasLocalesDir": false,
+      "permissions": null,
+      "hostPermissions": null,
+      "isObsidian": true,
+      "hasCsp": false
+    }
+  ],
+  "typeSignals": {
+    "browserExtension": false,
+    "obsidianPlugin": true,
+    "tauri": false,
+    "cargoToml": [],
+    "electron": false,
+    "svelte": false,
+    "vite": false,
+    "wxt": false,
+    "esbuild": true
+  },
+  "tests": {
+    "unit": 19,
+    "e2eDir": 0,
+    "pytest": 0,
+    "stories": 0,
+    "rust": 0
+  },
+  "quality": {
+    "eslint": [],
+    "biome": [],
+    "prettier": [],
+    "tsconfig": [
+      "tsconfig.json"
+    ],
+    "knip": [],
+    "secretsConfig": []
+  },
+  "workflows": [
+    {
+      "file": "ci.yml",
+      "runSteps": 4,
+      "usesSecrets": false,
+      "usesExpressions": 0,
+      "nodeVersions": [
+        "24"
+      ]
+    },
+    {
+      "file": "release.yml",
+      "runSteps": 4,
+      "usesSecrets": true,
+      "usesExpressions": 1,
+      "nodeVersions": [
+        "24"
+      ]
+    }
+  ],
+  "references": {
+    "tokensFiles": [],
+    "cssRootVars": [],
+    "tailwindTheme": false,
+    "openapi": [],
+    "locales": 0,
+    "i18nFiles": 0,
+    "rtlOrArabic": false,
+    "permissionsPolicy": []
+  },
+  "gitAttributes": null,
+  "hooksDirs": [
+    ".githooks"
+  ],
+  "durationMs": 3,
+  "divergences": [
+    "إضافة Obsidian: manifest.json لها minAppVersion لا manifest_version، فلا يُصنف إضافة متصفح",
+    "سكربت الاختبار مركب (&& أو ;) فإضافة الوسائط غير مضمونة (C-15)",
+    "workflow يستخدم secrets: خطواته «غير قابلة للتشغيل محليًّا كما هي»",
+    "لا مدقق معلن (ESLint/Biome): code.lint غير منطبق مع بطاقة اقتراح"
+  ],
+  "readOnlyProof": {
+    "filesInventoried": 2515,
+    "changedAfterDiscovery": [],
+    "ayarDirCreated": false
+  }
+}

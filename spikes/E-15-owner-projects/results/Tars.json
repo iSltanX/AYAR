@@ -1,0 +1,150 @@
+{
+  "project": "Tars",
+  "root": "/Volumes/iSltanXx/Projects/Tars",
+  "scannedAt": "2026-10-10T09:38:30.729Z",
+  "entries": 11740,
+  "partial": false,
+  "warnings": [],
+  "outputDirs": [
+    {
+      "rel": "dist",
+      "sizeBytes": 449228
+    },
+    {
+      "rel": "eval/out",
+      "sizeBytes": 3107459
+    }
+  ],
+  "symlinks": [],
+  "configFilesPresent": [
+    "package.json",
+    "package-lock.json",
+    "tsconfig.json",
+    "vite.config.ts",
+    "svelte.config.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "secretFilesByName": [
+    ".env.example"
+  ],
+  "ayarDir": false,
+  "package": {
+    "name": "tars",
+    "private": true,
+    "type": "module",
+    "packageManager": null,
+    "enginesNode": null,
+    "workspaces": null,
+    "hasBin": false,
+    "hasExportsOrMain": false,
+    "depCount": 3,
+    "devDepCount": 6,
+    "scripts": [
+      {
+        "name": "dev",
+        "kind": "تشغيل",
+        "tool": "vite",
+        "composite": false,
+        "length": 4
+      },
+      {
+        "name": "build",
+        "kind": "بناء",
+        "tool": "vite",
+        "composite": false,
+        "length": 10
+      },
+      {
+        "name": "preview",
+        "kind": "تشغيل",
+        "tool": "vite",
+        "composite": false,
+        "length": 12
+      },
+      {
+        "name": "check",
+        "kind": "فحص أنواع",
+        "tool": "svelte-check",
+        "composite": false,
+        "length": 58
+      },
+      {
+        "name": "tauri",
+        "kind": "أخرى",
+        "tool": "tauri",
+        "composite": false,
+        "length": 5
+      }
+    ],
+    "notableDeps": [
+      "@tauri-apps/api",
+      "@tauri-apps/cli",
+      "svelte",
+      "typescript",
+      "vite"
+    ]
+  },
+  "lockfiles": [
+    "package-lock.json"
+  ],
+  "runtimeFiles": {},
+  "manifests": [],
+  "typeSignals": {
+    "browserExtension": false,
+    "obsidianPlugin": false,
+    "tauri": true,
+    "cargoToml": [
+      "src-tauri/Cargo.toml"
+    ],
+    "electron": false,
+    "svelte": true,
+    "vite": true,
+    "wxt": false,
+    "esbuild": false
+  },
+  "tests": {
+    "unit": 0,
+    "e2eDir": 0,
+    "pytest": 0,
+    "stories": 0,
+    "rust": 50
+  },
+  "quality": {
+    "eslint": [],
+    "biome": [],
+    "prettier": [],
+    "tsconfig": [
+      "tsconfig.json"
+    ],
+    "knip": [],
+    "secretsConfig": []
+  },
+  "workflows": [],
+  "references": {
+    "tokensFiles": [],
+    "cssRootVars": [
+      "src/lib/theme.css"
+    ],
+    "tailwindTheme": false,
+    "openapi": [],
+    "locales": 0,
+    "i18nFiles": 1,
+    "rtlOrArabic": true,
+    "permissionsPolicy": []
+  },
+  "gitAttributes": null,
+  "hooksDirs": [],
+  "durationMs": 90,
+  "divergences": [
+    "تطبيق Tauri: الجزء الأصلي Rust (Cargo) اكتشاف وفحوص مخصصة فقط (17)",
+    "50 ملف Rust: اختباراته (cargo test) غير مدعومة محولًا؛ فحص مخصص",
+    "لا مدقق معلن (ESLint/Biome): code.lint غير منطبق مع بطاقة اقتراح",
+    "لا ملفات اختبار بأنماط الأطر: beh.unit «ناقص»"
+  ],
+  "readOnlyProof": {
+    "filesInventoried": 71626,
+    "changedAfterDiscovery": [],
+    "ayarDirCreated": false
+  }
+}
