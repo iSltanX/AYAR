@@ -195,6 +195,7 @@ function live(p) {
     exists: true,
     worktree: wt?.path ?? null,
     ahead: Number(git(['rev-list', '--count', `${REF}..${branch}`]) ?? 0),
+    behind: Number(git(['rev-list', '--count', `${branch}..${REF}`]) ?? 0),
     dirty: wt ? (git(['-C', wt.path, 'status', '--porcelain']) ?? '') !== '' : false,
     handoff: git(['cat-file', '-e', `${branch}:docs/handoffs/${p.id}.md`]) !== null,
     status: branchPhase?.status,
@@ -208,10 +209,12 @@ const view = phases.map((p) => {
   const waitingDeps = p.depends_on.filter((id) => !isClosed(id));
   const waitingDesign = p.design_gates.filter((id) => !isClosed(id));
   const waitingOwner = p.owner_gates.filter((id) => !decisions[id]?.resolved);
+  // مجلد جُهّز ولم يبدأ فيه عمل، ثم تقدم main: تحدّثه جلسة التنسيق قبل فتح جلسته
+  const stale = l.exists && l.ahead === 0 && !l.dirty && (l.status ?? 'not-started') === 'not-started' && l.behind > 0;
   let state;
   let statusDate = p.status_date;
   if (p.status === 'closed') state = 'closed';
-  else if (l.exists) {
+  else if (l.exists && !stale) {
     statusDate = l.statusDate ?? statusDate;
     if (l.status === 'delivered' || l.status === 'closed') state = 'delivered';
     else if (['in-progress', 'awaiting-owner', 'blocked'].includes(l.status)) state = l.status;
@@ -247,6 +250,7 @@ const view = phases.map((p) => {
     branch: l.branch,
     folder: l.worktree ?? `${wtBase}/${p.id}`,
     folderExists: Boolean(l.worktree),
+    stale,
     ahead: l.ahead ?? 0,
     dirty: Boolean(l.dirty),
     handoff: Boolean(l.handoff),

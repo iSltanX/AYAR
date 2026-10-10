@@ -347,6 +347,7 @@ function phaseCard(p) {
   if (opens.length) add('تفتح للتطوير', list(opens.map(phaseRef)));
 
   const notes = [];
+  if (p.stale) notes.push(h('p', { class: 'note', text: 'مجلدها موجود لكنه على main أقدم من الحالي. تحدّثه جلسة التنسيق عند أمر الموجة، ثم تفتح جلسته.' }));
   if (p.unlockedByMerge) notes.push(h('p', { class: 'note', text: 'تصير متاحة حين تدمج جلسة التنسيق ما سُلّم من تبعياتها.' }));
   if (p.state === 'delivered') notes.push(h('p', { class: 'note', text: p.handoff ? 'ملف التسليم موجود. تدمجها جلسة التنسيق عند أمر الموجة التالية.' : 'حالتها «سُلّمت» لكن ملف التسليم غير موجود بعد.' }));
   if (p.unverifiedClose) notes.push(h('p', { class: 'note warn', text: `مغلقة في ملفها دون وسم ${p.id}-closed في Git.` }));
@@ -372,7 +373,9 @@ function phaseCard(p) {
   }, 'التفاصيل');
 
   const actions = [];
-  if (!['closed', 'delivered'].includes(p.state)) actions.push(cmdBtn(p.command));
+  const ready = ['prepared', 'in-progress', 'awaiting-owner', 'blocked'].includes(p.state);
+  if (ready) actions.push(cmdBtn(p.command));
+  else if (!['closed', 'delivered'].includes(p.state)) actions.push(h('button', { class: 'btn btn-quiet', type: 'button', title: 'يُرسل بعد أن تجهّز جلسة التنسيق مجلدها', onclick: () => copy(p.command, `الأمر «${p.command}»`) }, 'انسخ أمر البدء'));
   if (!p.folderExists && p.state !== 'closed') actions.push(copyBtn('انسخ أمر التجهيز', p.setup, 'أمر التجهيز'));
   actions.push(more);
 
@@ -443,7 +446,7 @@ function render() {
         h('h3', { text: `أرسل «${a.command}» في جلسة التنسيق` }),
         h('p', { class: 'where' }, 'المكان: جلسة على المجلد الأصلي ', h('span', { class: 'ltr', text: coord.path }), pathBtn(coord.path)),
         a.merges.length ? h('p', { class: 'note' }, 'ستتحقق من تسليم ', list(a.merges.map(phaseRef), '، '), ' وتدمجها وتفحص التكامل وتدفع.') : null,
-        a.prepares.length ? h('p', { class: 'note' }, 'ستجهّز مجلدات ', list(a.prepares.map(phaseRef), '، '), '، وتسألك عن أي قرار يلزم قبل البدء.') : null,
+        a.prepares.length ? h('p', { class: 'note' }, 'ستجهّز مجلدات ', list(a.prepares.map(phaseRef), '، '), ' (أو تحدّثها إن وُجدت دون عمل)، وتسألك عن أي قرار يلزم قبل البدء.') : null,
         h('div', { class: 'actions' }, cmdBtn(a.command)),
       ));
     } else if (a.kind === 'open') {
