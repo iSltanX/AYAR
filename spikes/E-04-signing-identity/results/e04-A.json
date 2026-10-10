@@ -1,0 +1,37 @@
+{
+  "spike": "E-04",
+  "tag": "A",
+  "at": "2026-10-10T04:26:03.816Z",
+  "bundleId": "com.bysltan.ayar.spike.e04",
+  "buildInfo": {
+    "mode": "e04",
+    "bundleId": "com.bysltan.ayar.spike.e04",
+    "productName": "AYAR Spike E04",
+    "signed": "identity",
+    "buildTag": "A",
+    "builtAt": "2026-10-10T04:18:57.300Z"
+  },
+  "steps": {
+    "documentsReadInEngine": {
+      "ok": true,
+      "value": "export const answer = 42;",
+      "ms": 5153
+    },
+    "documentsReadByChild": {
+      "ok": true,
+      "value": "export const answer = 42;",
+      "ms": 35
+    },
+    "safeStorageAvailable": {
+      "ok": true,
+      "value": true,
+      "ms": 35
+    },
+    "safeStorage": {
+      "ok": true,
+      "value": true,
+      "ms": 0
+    }
+  },
+  "finishedAt": "2026-10-10T04:26:09.066Z"
+}

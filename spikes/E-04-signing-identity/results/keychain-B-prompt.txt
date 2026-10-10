@@ -1,0 +1,7 @@
+2026-10-10 07:30:14.225 Df securityd[390:59120a] [com.apple.securityd:integrity] ACL partition mismatch: client cdhash:93ef69fd45ddb50c0192beeda7b55e2b01db478b ACL (
+    "cdhash:455b114a835e7ae03e38ce99b55a07f152f7df18"
+)
+2026-10-10 07:30:14.225 Df securityd[390:59120a] [com.apple.securityd:kcacl] displaying keychain prompt for spikes/E-01-electron-forge/out/AYAR Spike E04-darwin-arm64/AYAR Spike E04.app(93255); ACL: <AclValidationContext(action:65538)SUBJECT[not-init]OBJECT[no
+2026-10-10 07:30:14.225 Df securityd[390:59120a] [com.apple.securityd:integrity] ACL partition mismatch: client cdhash:93ef69fd45ddb50c0192beeda7b55e2b01db478b ACL (
+    "cdhash:455b114a835e7ae03e38ce99b55a07f152f7df18"
+)

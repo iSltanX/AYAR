@@ -1,0 +1,52 @@
+{
+  "start": "2026-10-10 07:29:47",
+  "prefix": "com.bysltan.ayar.spike.e04",
+  "requests": 3,
+  "prompted": 0,
+  "byService": {
+    "kTCCServiceListenEvent": {
+      "requests": 1,
+      "prompted": 0,
+      "denied": 0
+    },
+    "kTCCServiceSystemPolicyAllFiles": {
+      "requests": 1,
+      "prompted": 0,
+      "denied": 1
+    },
+    "kTCCServiceSystemPolicyDocumentsFolder": {
+      "requests": 1,
+      "prompted": 0,
+      "denied": 0
+    }
+  },
+  "requestsDetail": [
+    {
+      "time": "2026-10-10 07:30:13.890",
+      "service": "kTCCServiceListenEvent",
+      "responsible": "com.bysltan.ayar.spike.e04",
+      "accessing": "com.bysltan.ayar.spike.e04.helper spikes/E-01-electron-forge/out/AYAR Spike E04-darwin-arm64/AYAR Spike E04.app/Contents/Frameworks/AYAR Spike E04 Helper.app/Contents/MacOS/AYAR Spike E04 Helper",
+      "authValue": 1,
+      "authReason": 5,
+      "prompted": false
+    },
+    {
+      "time": "2026-10-10 07:30:14.175",
+      "service": "kTCCServiceSystemPolicyAllFiles",
+      "responsible": "com.bysltan.ayar.spike.e04",
+      "accessing": "com.bysltan.ayar.spike.e04.helper spikes/E-01-electron-forge/out/AYAR Spike E04-darwin-arm64/AYAR Spike E04.app/Contents/Frameworks/AYAR Spike E04 Helper.app/Contents/MacOS/AYAR Spike E04 Helper",
+      "authValue": 0,
+      "authReason": 5,
+      "prompted": false
+    },
+    {
+      "time": "2026-10-10 07:30:14.194",
+      "service": "kTCCServiceSystemPolicyDocumentsFolder",
+      "responsible": "com.bysltan.ayar.spike.e04",
+      "accessing": "com.bysltan.ayar.spike.e04.helper spikes/E-01-electron-forge/out/AYAR Spike E04-darwin-arm64/AYAR Spike E04.app/Contents/Frameworks/AYAR Spike E04 Helper.app/Contents/MacOS/AYAR Spike E04 Helper",
+      "authValue": 2,
+      "authReason": 2,
+      "prompted": false
+    }
+  ]
+}

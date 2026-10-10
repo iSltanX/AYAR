@@ -1,0 +1,10 @@
+A:
+Identifier=com.bysltan.ayar.spike.e04
+CDHash=455b114a835e7ae03e38ce99b55a07f152f7df18
+ef9771157b903a89
+B:
+Identifier=com.bysltan.ayar.spike.e04
+CDHash=93ef69fd45ddb50c0192beeda7b55e2b01db478b
+5c27d53b9fe6b1a1
+DR:
+designated => identifier "com.bysltan.ayar.spike.e04" and certificate leaf = H"86526c3ec084f4676eecbd8d298c35eab3278364"
