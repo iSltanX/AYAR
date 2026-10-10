@@ -1,0 +1,153 @@
+{
+  "project": "FX-NOTEST",
+  "variants": {
+    "good": [
+      {
+        "id": "imports",
+        "cmd": "node --input-type=module -e \"import fs from 'node:fs'; let n = 0; for (const f of fs.readdirSync('src')) { await import('./src/' + f); n++; } console.log('IMPORTED ' + n);\"",
+        "ok": true,
+        "code": 0,
+        "ms": 31,
+        "proves": "الوحدات الأربع عشرة تُحمَّل دون خطأ",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "IMPORTED 14"
+      },
+      {
+        "id": "facts",
+        "cmd": "echo \"logic_files=$(ls src/*.js | wc -l | tr -d ' ') test_files=$(find . -name '*.test.*' -o -name '*.spec.*' | wc -l | tr -d ' ')\"",
+        "ok": true,
+        "code": 0,
+        "ms": 10,
+        "proves": "حقائق AT-44: 14 ملف منطق و0 ملف اختبار",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "logic_files=14 test_files=0"
+      },
+      {
+        "id": "refs",
+        "cmd": "lychee --offline --no-progress --include-fragments README.md docs/index.html docs/guide.md",
+        "ok": true,
+        "code": 0,
+        "ms": 36,
+        "proves": "code.refs.local: كل المراجع المحلية والمراسي سليمة",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "🔍 6 Total (in 3ms) 🔗 6 Unique ✅ 6 OK 🚫 0 Errors"
+      },
+      {
+        "id": "complexity",
+        "cmd": "eslint --no-config-lookup --rule '{\"complexity\":[\"error\",10]}' src",
+        "ok": true,
+        "code": 0,
+        "ms": 127,
+        "proves": "code.complexity: لا دالة تتجاوز 10",
+        "problems": [],
+        "evidence": false,
+        "excerpt": ""
+      }
+    ],
+    "broken-md-link": [
+      {
+        "id": "imports",
+        "cmd": "node --input-type=module -e \"import fs from 'node:fs'; let n = 0; for (const f of fs.readdirSync('src')) { await import('./src/' + f); n++; } console.log('IMPORTED ' + n);\"",
+        "ok": true,
+        "code": 0,
+        "ms": 32,
+        "proves": "الوحدات الأربع عشرة تُحمَّل دون خطأ",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "IMPORTED 14"
+      },
+      {
+        "id": "refs",
+        "cmd": "lychee --offline --no-progress --include-fragments README.md docs/index.html docs/guide.md",
+        "ok": true,
+        "code": 2,
+        "ms": 11,
+        "proves": "code.refs.local: docs/usage.md غير موجود",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Issues found in 1 input. Find details below.\n\n[README.md]:\n[ERROR] file:///private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-NOTEST-Ovzos3/p/docs/usage.md#install (at 5:3) | File not found. Check if file exists and path is correct\n\n🔍 6 Total (in 0s) 🔗 6 Unique ✅ 5 OK 🚫 1 Error"
+      }
+    ],
+    "missing-image": [
+      {
+        "id": "imports",
+        "cmd": "node --input-type=module -e \"import fs from 'node:fs'; let n = 0; for (const f of fs.readdirSync('src')) { await import('./src/' + f); n++; } console.log('IMPORTED ' + n);\"",
+        "ok": true,
+        "code": 0,
+        "ms": 30,
+        "proves": "الوحدات الأربع عشرة تُحمَّل دون خطأ",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "IMPORTED 14"
+      },
+      {
+        "id": "refs",
+        "cmd": "lychee --offline --no-progress --include-fragments README.md docs/index.html docs/guide.md",
+        "ok": true,
+        "code": 2,
+        "ms": 11,
+        "proves": "code.refs.local: img/logo-large.png غير موجود",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Issues found in 1 input. Find details below.\n\n[docs/index.html]:\n[ERROR] file:///private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-NOTEST-NYHiNg/p/docs/img/logo-large.png (at 11:28) | File not found. Check if file exists and path is correct\n\n🔍 6 Total (in 0s) 🔗 6 Unique ✅ 5 OK 🚫 1 Error"
+      }
+    ],
+    "broken-anchor": [
+      {
+        "id": "imports",
+        "cmd": "node --input-type=module -e \"import fs from 'node:fs'; let n = 0; for (const f of fs.readdirSync('src')) { await import('./src/' + f); n++; } console.log('IMPORTED ' + n);\"",
+        "ok": true,
+        "code": 0,
+        "ms": 31,
+        "proves": "الوحدات الأربع عشرة تُحمَّل دون خطأ",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "IMPORTED 14"
+      },
+      {
+        "id": "refs",
+        "cmd": "lychee --offline --no-progress --include-fragments README.md docs/index.html docs/guide.md",
+        "ok": true,
+        "code": 2,
+        "ms": 10,
+        "proves": "code.refs.local: المرسى #setup غير موجود في guide.md",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Issues found in 1 input. Find details below.\n\n[README.md]:\n[ERROR] file:///private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-NOTEST-TJJctM/p/docs/guide.md#setup (at 5:3) | Cannot find fragment\n\n🔍 6 Total (in 0s) 🔗 6 Unique ✅ 5 OK 🚫 1 Error"
+      }
+    ],
+    "complex-function": [
+      {
+        "id": "imports",
+        "cmd": "node --input-type=module -e \"import fs from 'node:fs'; let n = 0; for (const f of fs.readdirSync('src')) { await import('./src/' + f); n++; } console.log('IMPORTED ' + n);\"",
+        "ok": true,
+        "code": 0,
+        "ms": 30,
+        "proves": "الوحدات الأربع عشرة تُحمَّل دون خطأ",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "IMPORTED 14"
+      },
+      {
+        "id": "complexity",
+        "cmd": "eslint --no-config-lookup --rule '{\"complexity\":[\"error\",10]}' src",
+        "ok": true,
+        "code": 1,
+        "ms": 109,
+        "proves": "code.complexity: validatePayload تتجاوز العتبة 10",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-NOTEST-uwXyVJ/p/src/validate.js\n  18:8  error  Function 'validatePayload' has a complexity of 19. Maximum allowed is 10  complexity\n\n✖ 1 problem (1 error, 0 warnings)"
+      }
+    ]
+  },
+  "date": "2026-10-10",
+  "versions": {
+    "node": "v24.16.0",
+    "eslint": "v10.12.0",
+    "lychee": "lychee 0.24.2"
+  }
+}

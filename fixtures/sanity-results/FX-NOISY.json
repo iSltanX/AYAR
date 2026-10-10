@@ -1,0 +1,90 @@
+{
+  "project": "FX-NOISY",
+  "variants": {
+    "good": [
+      {
+        "id": "status-before",
+        "cmd": "git status --porcelain | wc -l | tr -d \" \"",
+        "ok": true,
+        "code": 0,
+        "ms": 12,
+        "proves": "قبل التشغيل: المستودع المؤقت نظيف",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "0"
+      },
+      {
+        "id": "test",
+        "cmd": "npm test",
+        "ok": true,
+        "code": 0,
+        "ms": 221,
+        "proves": "beh.unit: الاختباران ينجحان بالسكربت المركب",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "> ayar-fx-noisy@1.0.0 test\n> node scripts/prepare.mjs && node --test --test-reporter=spec\n\n✔ يسجل التشغيل ويترك آثارًا جانبية (1.388209ms)\n✔ صياغة الملخص (0.056125ms)\nℹ tests 2\nℹ suites 0\nℹ pass 2\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 44.56925"
+      },
+      {
+        "id": "side-effects",
+        "cmd": "git status --porcelain",
+        "ok": true,
+        "code": 0,
+        "ms": 12,
+        "proves": "C-17: ملفان جديدان وملف متتبع معدّل بعد التشغيل",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "M data/runs.json\n?? .cache/\n?? reports/"
+      },
+      {
+        "id": "tracked-diff",
+        "cmd": "git diff --stat",
+        "ok": true,
+        "code": 0,
+        "ms": 12,
+        "proves": "data/runs.json تعدّل (runs: 0 ← 1)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "data/runs.json | 4 ++--\n 1 file changed, 2 insertions(+), 2 deletions(-)"
+      },
+      {
+        "id": "nvmrc",
+        "cmd": "cat .nvmrc && (ls \"$HOME/.nvm/versions/node\" | grep -c \"^v22\\.11\\.0$\" || true)",
+        "ok": true,
+        "code": 0,
+        "ms": 7,
+        "proves": ".nvmrc يطلب 22.11.0 وهو غير مثبت (عدد النسخ المطابقة 0)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "22.11.0\n0"
+      }
+    ],
+    "pnpm-unpinned": [
+      {
+        "id": "declared",
+        "cmd": "node -e \"console.log('PM_DECLARED=' + require('./package.json').packageManager)\"",
+        "ok": true,
+        "code": 0,
+        "ms": 32,
+        "proves": "packageManager يطلب pnpm@9.15.4 (والمثبت 12.8.1)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "PM_DECLARED=pnpm@9.15.4"
+      },
+      {
+        "id": "pnpm-offline",
+        "cmd": "pnpm --version",
+        "ok": true,
+        "code": 1,
+        "ms": 49,
+        "proves": "pnpm (عبر Corepack) بلا شبكة لا ينزّل pnpm@9.15.4: يخرج بخطأ «Network access disabled» لا بتنزيل صامت (AT-31)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "! Corepack is about to download https://registry.npmjs.org/pnpm/-/pnpm-9.15.4.tgz\nNetwork access disabled by the environment; can't reach https://registry.npmjs.org/pnpm/-/pnpm-9.15.4.tgz"
+      }
+    ]
+  },
+  "date": "2026-10-10",
+  "versions": {
+    "node": "v24.16.0"
+  }
+}
