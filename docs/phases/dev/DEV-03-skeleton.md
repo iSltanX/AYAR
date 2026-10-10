@@ -4,7 +4,7 @@ track: dev
 number: 3
 stage: engine
 title: الهيكل والبروتوكول والغلاف الآمن والتخزين
-status: delivered
+status: closed
 status_date: 2026-10-10
 depends_on: [DEV-0]
 design_gates: []
@@ -24,7 +24,7 @@ outputs:
   - tools/cli
   - مخطط القاعدة الأول (الخطة 14.1) بترحيل ونسخ احتياطي
   - بنية الاختبارات (وحدة وخصائص وتكامل) وقاعدة منع استيراد electron في المحرك
-closing_commit:
+closing_commit: b9ee023
 ---
 
 # DEV-3 — الهيكل والبروتوكول والغلاف الآمن والتخزين
