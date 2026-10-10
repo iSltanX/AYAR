@@ -306,8 +306,9 @@ if (cur) {
   const open = items.filter((v) => v.state !== 'closed');
   const started = items.some((v) => STARTED.includes(v.state));
   let state;
-  if (open.some((v) => ['in-progress', 'delivered', 'unverified'].includes(v.state))) state = 'running';
-  else if (open.some((v) => v.state === 'awaiting-owner')) state = 'needs-owner';
+  // ما ينتظر المالك يتقدم في العرض على ما يعمل، لأن الصفحة له
+  if (open.some((v) => v.state === 'awaiting-owner')) state = 'needs-owner';
+  else if (open.some((v) => ['in-progress', 'delivered', 'unverified'].includes(v.state))) state = 'running';
   else if (open.length && open.every((v) => v.state === 'blocked')) state = 'blocked';
   else state = started ? 'running' : 'not-started';
 

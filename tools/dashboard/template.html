@@ -459,8 +459,8 @@ function needItem(x, isNow) {
   }
   const fallback = x.kind === 'blocker' ? 'عائق مثبت، وسببه وما يلزم لفكّه في سجل العوائق.' : 'سؤال أو اعتماد تعرضه عليك الجلسة الرئيسية.';
   return h('li', { class: 'now' },
-    h('div', { class: 'row' }, phaseRef(p.id), h('strong', { text: x.kind === 'blocker' ? `${p.title} معطّلة` : p.title })),
-    h('p', { class: 'sub', text: x.text || fallback }),
+    h('div', { class: 'row' }, phaseRef(p.id), h('strong', { text: p.title })),
+    h('p', { class: 'sub', text: x.kind === 'blocker' && x.text ? `عائق: ${x.text}` : x.text || fallback }),
   );
 }
 
