@@ -1,9 +1,80 @@
 {
   "date": "2026-10-10",
   "script": "docs/design/DES-4/screen-audit.js",
-  "ar": {"frames": 37, "nodes": 3978, "instances": 1187, "layoutFrames": 1655, "texts": 1136, "otherTypes": {}, "unboundFill": 0, "unboundStroke": 0, "textNoStyle": 0, "mirrorFail": [], "dirMismatch": {"Tag": 31}, "forbidden": [], "redGreenOutside": 0,
-    "copyButtons": ["7.1: content 1 · inspector 1", "7.2: content 1 · inspector 1", "7.3: content 1", "7.4: content 1", "7.5: content 1", "7.6: content 1", "7.7: content 1", "7.8: content 1", "7.9: content 1", "7.10: content 1", "7.11: content 1 · inspector 1", "8.1: content 1", "8.2: content 1"]},
-  "dark": {"frames": 3, "nodes": 351, "instances": 118, "layoutFrames": 139, "texts": 94, "otherTypes": {}, "unboundFill": 0, "unboundStroke": 0, "textNoStyle": 0, "mirrorFail": [], "dirMismatch": {}, "forbidden": [], "redGreenOutside": 0, "copyButtons": ["7.1: content 1 · inspector 1"], "darkModes": ["4.1:3", "6.1:3", "7.1:3"]},
-  "en": {"frames": 5, "nodes": 340, "instances": 117, "layoutFrames": 112, "texts": 111, "otherTypes": {}, "unboundFill": 0, "unboundStroke": 0, "textNoStyle": 0, "mirrorFail": [], "dirMismatch": {}, "forbidden": [], "redGreenOutside": 0, "copyButtons": ["7.1: content 1 · inspector 1 · other text 'Copy it with the button above' (sentence inside Next step card, not a button)", "8.1: content 1"]},
-  "claimOrInstructionResultBadges": 0
+  "ar": {
+    "frames": 37,
+    "nodes": 3981,
+    "instances": 1187,
+    "layoutFrames": 1655,
+    "texts": 1139,
+    "otherTypes": {},
+    "unboundFill": 0,
+    "unboundStroke": 0,
+    "textNoStyle": 0,
+    "mirrorFail": [],
+    "dirMismatch": {
+      "Tag": 29
+    },
+    "forbidden": [],
+    "redGreenOutside": 0,
+    "copyButtons": [
+      "7.1: content 1 · inspector 1",
+      "7.2: content 1 · inspector 1",
+      "7.3: content 1",
+      "7.4: content 1",
+      "7.5: content 1",
+      "7.6: content 1",
+      "7.7: content 1",
+      "7.8: content 1",
+      "7.9: content 1",
+      "7.10: content 1",
+      "7.11: content 1 · inspector 1",
+      "8.1: content 1",
+      "8.2: content 1"
+    ]
+  },
+  "dark": {
+    "frames": 3,
+    "nodes": 350,
+    "instances": 117,
+    "layoutFrames": 139,
+    "texts": 94,
+    "otherTypes": {},
+    "unboundFill": 0,
+    "unboundStroke": 0,
+    "textNoStyle": 0,
+    "mirrorFail": [],
+    "dirMismatch": {},
+    "forbidden": [],
+    "redGreenOutside": 0,
+    "copyButtons": [
+      "7.1: content 1 · inspector 1"
+    ],
+    "darkModes": [
+      "7.1:3",
+      "4.1:3",
+      "6.1:3"
+    ]
+  },
+  "en": {
+    "frames": 5,
+    "nodes": 338,
+    "instances": 116,
+    "layoutFrames": 111,
+    "texts": 111,
+    "otherTypes": {},
+    "unboundFill": 0,
+    "unboundStroke": 0,
+    "textNoStyle": 0,
+    "mirrorFail": [],
+    "dirMismatch": {},
+    "forbidden": [],
+    "redGreenOutside": 0,
+    "copyButtons": [
+      "7.1: content 1 · inspector 1 · other text 'Copy it with the button above' (sentence inside Next step card, not a button)",
+      "8.1: content 1"
+    ]
+  },
+  "claimOrInstructionResultBadges": 0,
+  "note": "Re-run after the ui-ux-guardian fixes (2026-10-10); copy buttons: max 1 per context in every frame."
 }

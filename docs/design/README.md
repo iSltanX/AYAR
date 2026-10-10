@@ -238,8 +238,8 @@
 | DES-3 | `Guidelines` | G-00 · مسودة اتفاقية التسمية | `118:16695` | `approved/DES-3/G-00-component-naming.png` |
 | DES-4 | `Cover` | الغلاف والفهرس (حالات مصححة وإصدار 0.4) | `58:2` | `approved/DES-4/Cover.png` |
 | DES-4 | `Components` | C-30 · إضافات DES-4 (4 مكوّنات) | `139:10340` | `approved/DES-4/C-30-des4-additions.png` |
-| DES-4 | `Screens — AR Light` | 1.1 · المشاريع — فارغة | `153:27966` | `approved/DES-4/S1-1-projects-empty.png` |
-| DES-4 | `Screens — AR Light` | 1.2 · المشاريع — قائمة بثلاثة مشاريع | `153:28378` | `approved/DES-4/S1-2-projects-list.png` |
+| DES-4 | `Screens — AR Light` | 1.1 · المشاريع — فارغة | `160:16137` | `approved/DES-4/S1-1-projects-empty.png` |
+| DES-4 | `Screens — AR Light` | 1.2 · المشاريع — قائمة بثلاثة مشاريع | `160:16549` | `approved/DES-4/S1-2-projects-list.png` |
 | DES-4 | `Screens — AR Light` | 2.1 · الاكتشاف — التقدم | `143:912` | `approved/DES-4/S2-1-discovery-progress.png` |
 | DES-4 | `Screens — AR Light` | 2.2 · الاكتشاف — ما وجده عِيَار | `143:1352` | `approved/DES-4/S2-2-discovery-result.png` |
 | DES-4 | `Screens — AR Light` | 2.3 · الاكتشاف — فشل | `143:1813` | `approved/DES-4/S2-3-discovery-failure.png` |
@@ -248,22 +248,22 @@
 | DES-4 | `Screens — AR Light` | 3.1 · اعتماد ملف المعايير (كامل الطول) | `146:1396` | `approved/DES-4/S3-1-profile-approval-full.png` |
 | DES-4 | `Screens — AR Light` | 3.2 · اعتماد ملف المعايير — تغييرات معلقة مع الفرق | `146:2316` | `approved/DES-4/S3-2-profile-pending-diff.png` |
 | DES-4 | `Screens — AR Light` | 3.3 · اعتماد ملف المعايير — أمر خطر | `146:2979` | `approved/DES-4/S3-3-profile-dangerous-command.png` |
-| DES-4 | `Screens — AR Light` | 4.1 · نظرة عامة — محجوب | `150:2589` | `approved/DES-4/S4-1-overview-blocked.png` |
-| DES-4 | `Screens — AR Light` | 4.2 · نظرة عامة — غير مكتمل | `150:3921` | `approved/DES-4/S4-2-overview-incomplete.png` |
-| DES-4 | `Screens — AR Light` | 4.3 · نظرة عامة — نقي، عيار 24 | `150:5098` | `approved/DES-4/S4-3-overview-pure-24.png` |
-| DES-4 | `Screens — AR Light` | 4.4 · نظرة عامة — عيار 24، يمنع حكم ‹نقي›: بندان | `150:6317` | `approved/DES-4/S4-4-overview-24-integrity-hold.png` |
-| DES-4 | `Screens — AR Light` | 4.5 · نظرة عامة — من جولة سابقة، تغيرت الشيفرة | `150:7538` | `approved/DES-4/S4-5-overview-stale.png` |
-| DES-4 | `Screens — AR Light` | 4.6 · نظرة عامة — لم يُشغَّل فحص كامل بعد | `150:8767` | `approved/DES-4/S4-6-overview-no-full-scan.png` |
-| DES-4 | `Screens — AR Light` | 4.7 · نظرة عامة — تفاصيل الاحتساب مفتوحة | `150:9672` | `approved/DES-4/S4-7-overview-scoring-details.png` |
-| DES-4 | `Screens — AR Light` | 5.1 · خطة الفحص الكامل (كامل الطول) | `150:30128` | `approved/DES-4/S5-1-plan-full.png` |
-| DES-4 | `Screens — AR Light` | 5.2 · خطة الفحص الكامل — لوحة التجهيز | `150:31163` | `approved/DES-4/S5-2-plan-setup-panel.png` |
-| DES-4 | `Screens — AR Light` | 5.3 · خطة الفحص الكامل — تنبيه الاعتماد | `150:32286` | `approved/DES-4/S5-3-plan-approval-alert.png` |
-| DES-4 | `Screens — AR Light` | 6.1 · متابعة التشغيل (كامل الطول) | `151:8399` | `approved/DES-4/S6-1-run-monitor-full.png` |
-| DES-4 | `Screens — AR Light` | 6.2 · متابعة التشغيل — يُلغى… | `151:9508` | `approved/DES-4/S6-2-run-monitor-cancelling.png` |
-| DES-4 | `Screens — AR Light` | 6.3 · متابعة التشغيل — توقف المحرك | `151:10555` | `approved/DES-4/S6-3-run-monitor-engine-stopped.png` |
-| DES-4 | `Screens — AR Light` | 6.4 · متابعة التشغيل — توقف الجهاز | `151:11601` | `approved/DES-4/S6-4-run-monitor-sleep-gap.png` |
+| DES-4 | `Screens — AR Light` | 4.1 · نظرة عامة — محجوب | `160:17209` | `approved/DES-4/S4-1-overview-blocked.png` |
+| DES-4 | `Screens — AR Light` | 4.2 · نظرة عامة — غير مكتمل | `160:18414` | `approved/DES-4/S4-2-overview-incomplete.png` |
+| DES-4 | `Screens — AR Light` | 4.3 · نظرة عامة — نقي، عيار 24 | `160:19562` | `approved/DES-4/S4-3-overview-pure-24.png` |
+| DES-4 | `Screens — AR Light` | 4.4 · نظرة عامة — عيار 24، يمنع حكم ‹نقي›: بندان | `160:20756` | `approved/DES-4/S4-4-overview-24-integrity-hold.png` |
+| DES-4 | `Screens — AR Light` | 4.5 · نظرة عامة — من جولة سابقة، تغيرت الشيفرة | `160:21952` | `approved/DES-4/S4-5-overview-stale.png` |
+| DES-4 | `Screens — AR Light` | 4.6 · نظرة عامة — لم يُشغَّل فحص كامل بعد | `160:23151` | `approved/DES-4/S4-6-overview-no-full-scan.png` |
+| DES-4 | `Screens — AR Light` | 4.7 · نظرة عامة — تفاصيل الاحتساب مفتوحة | `160:24050` | `approved/DES-4/S4-7-overview-scoring-details.png` |
+| DES-4 | `Screens — AR Light` | 5.1 · خطة الفحص الكامل (كامل الطول) | `160:44428` | `approved/DES-4/S5-1-plan-full.png` |
+| DES-4 | `Screens — AR Light` | 5.2 · خطة الفحص الكامل — لوحة التجهيز | `160:45464` | `approved/DES-4/S5-2-plan-setup-panel.png` |
+| DES-4 | `Screens — AR Light` | 5.3 · خطة الفحص الكامل — تنبيه الاعتماد | `160:46587` | `approved/DES-4/S5-3-plan-approval-alert.png` |
+| DES-4 | `Screens — AR Light` | 6.1 · متابعة التشغيل (كامل الطول) | `160:47633` | `approved/DES-4/S6-1-run-monitor-full.png` |
+| DES-4 | `Screens — AR Light` | 6.2 · متابعة التشغيل — يُلغى… | `160:48666` | `approved/DES-4/S6-2-run-monitor-cancelling.png` |
+| DES-4 | `Screens — AR Light` | 6.3 · متابعة التشغيل — توقف المحرك | `160:49709` | `approved/DES-4/S6-3-run-monitor-engine-stopped.png` |
+| DES-4 | `Screens — AR Light` | 6.4 · متابعة التشغيل — توقف الجهاز | `160:50751` | `approved/DES-4/S6-4-run-monitor-sleep-gap.png` |
 | DES-4 | `Screens — AR Light` | 7.1 · نتائج التشغيل — «لك»، محجوب، المفتش (كامل الطول) | `153:29037` | `approved/DES-4/S7-1-results-for-you-blocked.png` |
-| DES-4 | `Screens — AR Light` | 7.2 · نتائج التشغيل — «للنموذج» والمفتش | `154:15258` | `approved/DES-4/S7-2-results-for-the-model.png` |
+| DES-4 | `Screens — AR Light` | 7.2 · نتائج التشغيل — «للنموذج» والمفتش | `160:51791` | `approved/DES-4/S7-2-results-for-the-model.png` |
 | DES-4 | `Screens — AR Light` | 7.3 · نتائج التشغيل — «الاكتشافات» مع التحديد | `153:29866` | `approved/DES-4/S7-3-results-findings.png` |
 | DES-4 | `Screens — AR Light` | 7.4 · نتائج التشغيل — «الفحوص»: صفوف بمراجعة | `153:30726` | `approved/DES-4/S7-4-results-checks-reviewed.png` |
 | DES-4 | `Screens — AR Light` | 7.5 · نتائج التشغيل — «الأدلة» | `153:31347` | `approved/DES-4/S7-5-results-evidence.png` |
@@ -273,13 +273,13 @@
 | DES-4 | `Screens — AR Light` | 7.9 · نتائج التشغيل — إعادة فحص بعد تغير الشيفرة | `153:33857` | `approved/DES-4/S7-9-results-recheck-after-change.png` |
 | DES-4 | `Screens — AR Light` | 7.10 · نتائج التشغيل — أُلغي التشغيل | `153:34456` | `approved/DES-4/S7-10-results-cancelled.png` |
 | DES-4 | `Screens — AR Light` | 7.11 · نتائج التشغيل — نافذة الإعادة | `153:34991` | `approved/DES-4/S7-11-results-rerun-sheet.png` |
-| DES-4 | `Screens — AR Light` | 8.1 · تقرير «للنموذج» — النص كاملًا (كامل الطول) | `154:15945` | `approved/DES-4/S8-1-model-report-full.png` |
-| DES-4 | `Screens — AR Light` | 8.2 · تقرير «للنموذج» — تجاوز الحد | `154:16494` | `approved/DES-4/S8-2-model-report-over-limit.png` |
-| DES-4 | `Screens — AR Dark` | 4.1 · نظرة عامة — محجوب (داكن) | `154:32388` | `approved/DES-4/D4-1-overview-blocked-dark.png` |
-| DES-4 | `Screens — AR Dark` | 6.1 · متابعة التشغيل (داكن) | `154:32566` | `approved/DES-4/D6-1-run-monitor-dark.png` |
+| DES-4 | `Screens — AR Light` | 8.1 · تقرير «للنموذج» — النص كاملًا (كامل الطول) | `160:52480` | `approved/DES-4/S8-1-model-report-full.png` |
+| DES-4 | `Screens — AR Light` | 8.2 · تقرير «للنموذج» — تجاوز الحد | `160:53028` | `approved/DES-4/S8-2-model-report-over-limit.png` |
+| DES-4 | `Screens — AR Dark` | 4.1 · نظرة عامة — محجوب (داكن) | `160:56044` | `approved/DES-4/D4-1-overview-blocked-dark.png` |
+| DES-4 | `Screens — AR Dark` | 6.1 · متابعة التشغيل (داكن) | `160:56222` | `approved/DES-4/D6-1-run-monitor-dark.png` |
 | DES-4 | `Screens — AR Dark` | 7.1 · نتائج التشغيل — «لك» (داكن) | `154:32635` | `approved/DES-4/D7-1-results-for-you-dark.png` |
-| DES-4 | `Screens — EN Light` | 1.1 · Projects — empty | `154:34764` | `approved/DES-4/E1-1-projects-empty-en.png` |
-| DES-4 | `Screens — EN Light` | 1.2 · Projects — list of three | `154:35176` | `approved/DES-4/E1-2-projects-list-en.png` |
-| DES-4 | `Screens — EN Light` | 6.1 · Run monitor | `154:35836` | `approved/DES-4/E6-1-run-monitor-en.png` |
+| DES-4 | `Screens — EN Light` | 1.1 · Projects — empty | `160:53587` | `approved/DES-4/E1-1-projects-empty-en.png` |
+| DES-4 | `Screens — EN Light` | 1.2 · Projects — list of three | `160:53999` | `approved/DES-4/E1-2-projects-list-en.png` |
+| DES-4 | `Screens — EN Light` | 6.1 · Run monitor | `160:54659` | `approved/DES-4/E6-1-run-monitor-en.png` |
 | DES-4 | `Screens — EN Light` | 7.1 · Run results — For you | `154:36871` | `approved/DES-4/E7-1-results-for-you-en.png` |
-| DES-4 | `Screens — EN Light` | 8.1 · Report for the model (12.4) | `154:37706` | `approved/DES-4/E8-1-model-report-en.png` |
+| DES-4 | `Screens — EN Light` | 8.1 · Report for the model (12.4) | `160:55694` | `approved/DES-4/E8-1-model-report-en.png` |
