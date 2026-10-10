@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "exports": {
     ".": "./src/index.ts",
-    "./data-dir": "./src/storage/data-dir.ts",
+    "./host-support": "./src/host-support.ts",
     "./bin/node": "./src/bin/node.ts",
     "./bin/utility": "./src/bin/utility.ts"
   },
@@ -15,7 +15,6 @@
     "typecheck": "node ../../node_modules/@typescript/native/bin/tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@ayar/protocol": "0.1.0",
-    "zod": "4.6.5"
+    "@ayar/protocol": "0.1.0"
   }
 }
