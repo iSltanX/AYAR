@@ -136,10 +136,10 @@ const outOfScope = changed.filter((p) => !inside(p, [...scope, ...always]) && !i
 if (touchedShared.length) warn(`عُدّلت ملفات مشتركة يملكها المنسّق: ${touchedShared.join('، ')}`);
 if (scope.length && outOfScope.length) warn(`ملفات خارج نطاق المرحلة: ${outOfScope.slice(0, 15).join('، ')}${outOfScope.length > 15 ? '…' : ''}`);
 if (!scope.length) warn('لا حقل scope في ملف المرحلة، فلم يُفحص النطاق');
-pass(`${changed.length} ملفًا تغيّر منذ التفرع من main`);
+pass(`الملفات المتغيرة منذ التفرع من main: ${changed.length}`);
 
 const behind = git(['rev-list', '--count', `${branch}..main`]);
-if (behind && behind !== '0') warn(`main تقدم ${behind} commits منذ تفرّع الفرع؛ توقع تعارضًا عند الدمج إن التقيا في ملف`);
+if (behind && behind !== '0') warn(`تقدم main منذ تفرّع الفرع (commits: ${behind})؛ توقع تعارضًا عند الدمج إن التقيا في ملف`);
 
 report();
 
