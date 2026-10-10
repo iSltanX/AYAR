@@ -1,5 +1,7 @@
 // Message index (C-24): one file per scope and language, `messages/<scope>.<lang>.json`, merged here so that
 // parallel phases only meet on one import line. Keys are prefixed by their scope.
+import advisorAr from './advisor.ar.json' with { type: 'json' };
+import advisorEn from './advisor.en.json' with { type: 'json' };
 import catalogAr from './catalog.ar.json' with { type: 'json' };
 import catalogEn from './catalog.en.json' with { type: 'json' };
 import commonAr from './common.ar.json' with { type: 'json' };
@@ -22,6 +24,7 @@ import uiAr from './ui.ar.json' with { type: 'json' };
 import uiEn from './ui.en.json' with { type: 'json' };
 
 export const MESSAGE_FILES = {
+  advisor: { ar: advisorAr, en: advisorEn },
   catalog: { ar: catalogAr, en: catalogEn },
   common: { ar: commonAr, en: commonEn },
   discovery: { ar: discoveryAr, en: discoveryEn },
@@ -37,6 +40,6 @@ export const MESSAGE_FILES = {
 export type Scope = keyof typeof MESSAGE_FILES;
 
 export const MESSAGES = {
-  ar: { ...catalogAr, ...commonAr, ...discoveryAr, ...environmentAr, ...errorsAr, ...glossaryAr, ...menuAr, ...profileAr, ...projectsAr, ...uiAr },
-  en: { ...catalogEn, ...commonEn, ...discoveryEn, ...environmentEn, ...errorsEn, ...glossaryEn, ...menuEn, ...profileEn, ...projectsEn, ...uiEn },
+  ar: { ...advisorAr, ...catalogAr, ...commonAr, ...discoveryAr, ...environmentAr, ...errorsAr, ...glossaryAr, ...menuAr, ...profileAr, ...projectsAr, ...uiAr },
+  en: { ...advisorEn, ...catalogEn, ...commonEn, ...discoveryEn, ...environmentEn, ...errorsEn, ...glossaryEn, ...menuEn, ...profileEn, ...projectsEn, ...uiEn },
 } as const;

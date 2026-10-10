@@ -13,7 +13,7 @@ import { isRecord, str } from './parse.ts';
 import { ProjectReader } from './reader.ts';
 import { DiscoveryCancelled, walk, type DiscoveryFs, type DiscoveryLimits, type WalkResult } from './walker.ts';
 
-export const SCANNER_VERSION = 'discovery/1.0.0';
+export const SCANNER_VERSION = 'discovery/1.1.0';
 /** Configuration files C-06 knows by name (C-06 point 5). */
 const KNOWN_CONFIG = /^(package\.json|pnpm-workspace\.yaml|tsconfig(\.[\w-]+)?\.json|jsconfig\.json|pyproject\.toml|manifest\.json|biome\.jsonc?|\.eslintrc(\.\w+)?|eslint\.config\.\w+|(vite|vitest|playwright|jest|svelte|next|astro|nuxt|wxt)\.config\.\w+|mise\.toml|\.tool-versions|\.nvmrc|\.node-version|\.python-version|pytest\.ini|ruff\.toml|mypy\.ini|knip\.json)$/;
 const TEST_PATH_CAP = 500;

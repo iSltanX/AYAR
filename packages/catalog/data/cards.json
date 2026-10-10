@@ -1,0 +1,180 @@
+{
+  "version": "1.0.0",
+  "verifiedAt": "2026-10-09",
+  "nameFormat": "{type}: {behavior} — {location}",
+  "types": [
+    {
+      "id": "unit_test",
+      "name": "اختبار وحدة",
+      "nextStep": "model",
+      "isTest": true
+    },
+    {
+      "id": "integration_test",
+      "name": "اختبار تكامل",
+      "nextStep": "model",
+      "isTest": true
+    },
+    {
+      "id": "journey_test",
+      "name": "اختبار رحلة",
+      "nextStep": "model",
+      "isTest": true
+    },
+    {
+      "id": "property_test",
+      "name": "اختبار خصائص",
+      "nextStep": "model",
+      "isTest": true
+    },
+    {
+      "id": "characterization_test",
+      "name": "اختبار توصيفي",
+      "nextStep": "model",
+      "isTest": true
+    },
+    {
+      "id": "bug_repro_test",
+      "name": "اختبار يعيد إنتاج خلل",
+      "nextStep": "model",
+      "isTest": true
+    },
+    {
+      "id": "ui_state_review",
+      "name": "مراجعة حالة واجهة",
+      "nextStep": "review",
+      "isTest": false
+    },
+    {
+      "id": "ui_states_definition",
+      "name": "تعريف حالات واجهة",
+      "nextStep": "direct",
+      "isTest": false
+    },
+    {
+      "id": "check_setup",
+      "name": "تجهيز فحص",
+      "nextStep": "direct",
+      "isTest": false
+    },
+    {
+      "id": "permission_review",
+      "name": "مراجعة صلاحية",
+      "nextStep": "review",
+      "isTest": false
+    },
+    {
+      "id": "human_a11y_review",
+      "name": "مراجعة إتاحة بشرية",
+      "nextStep": "review",
+      "isTest": false
+    },
+    {
+      "id": "exploratory_session",
+      "name": "جلسة استكشاف",
+      "nextStep": "review",
+      "isTest": false
+    },
+    {
+      "id": "refactor_review",
+      "name": "مراجعة إعادة هيكلة",
+      "nextStep": "review",
+      "isTest": false
+    },
+    {
+      "id": "strengthen_assertions",
+      "name": "تقوية تأكيدات",
+      "nextStep": "model",
+      "isTest": true
+    },
+    {
+      "id": "model_check",
+      "name": "فحص نموذج",
+      "nextStep": "model",
+      "isTest": false
+    },
+    {
+      "id": "fix_verification",
+      "name": "تحقق إصلاح",
+      "nextStep": "direct",
+      "isTest": false
+    }
+  ],
+  "generic": {
+    "id": "generic",
+    "name": "مهمة",
+    "nextStep": "review",
+    "isTest": false
+  },
+  "template": {
+    "heading": "# بطاقة مهمة من عِيَار — {id}",
+    "meta": "النوع: {type} · الأولوية: {priority} · المصدر: {source} · الخطوة التالية: {nextStep}",
+    "sections": {
+      "name": "## الاسم",
+      "why": "## لماذا",
+      "behavior": "## السلوك المطلوب إثباته",
+      "context": "## السياق",
+      "steps": "## الخطوات",
+      "acceptance": "## معيار القبول",
+      "constraints": "## القيود",
+      "verify": "## التحقق"
+    },
+    "behaviorLine": "- بمعطى: {given} · عند: {when} · يجب: {must}",
+    "expectedLine": "- المتوقع: {expected}",
+    "contextLine": "- الملفات والرموز: {files} · إطار الاختبار في المشروع: {framework} · أمثلة اختبارات قائمة للمحاكاة: {examples}",
+    "acceptanceTest": [
+      "- يفشل الاختبار عند كسر السلوك عمدًا مرة واحدة، وينجح بعد إعادته.",
+      "- يجتاز {checks} في عِيَار، ويزداد عدد الاختبارات المنفذة، ويذكر الاختبار الجديد الرمز أو الملف المستهدف، ولا يرصد حارس النزاهة إسكاتًا أو تخطيًا."
+    ],
+    "acceptanceSetup": [
+      "- يزول النقص: يصير {checks} قابلًا للتشغيل في عِيَار بإعادة الفحص."
+    ],
+    "acceptanceReview": [
+      "- تُسجَّل المراجعة في عِيَار بقرارها وسببها."
+    ],
+    "constraints": [
+      "- ضع الاختبار في مستودع المشروع وبإطاره القائم. لا تغيّر الشيفرة المختبرة إلا إن طُلب.",
+      "- القواعد الإلزامية 1–8 من تقرير النموذج تنطبق هنا."
+    ],
+    "verifyLine": "أعد الفحص في عِيَار: {checks}",
+    "noCheckLine": "لا فحص آلي مقابل: تُغلق البطاقة بقرار مسجل.",
+    "priorities": {
+      "1": "عليا",
+      "2": "متوسطة",
+      "3": "اختيارية"
+    },
+    "nextSteps": {
+      "model": "تحتاج نموذجًا",
+      "direct": "تعالجها مباشرة",
+      "review": "تحتاج مراجعتك"
+    },
+    "sources": {
+      "advisorItem": "قاعدة مستشار",
+      "check": "فحص"
+    },
+    "ownerDecidesExpected": "يحدده المالك قبل كتابة الاختبار",
+    "ownerDecides": "يحدده المالك",
+    "noneKnown": "لا شيء معروف",
+    "draftId": "TASK-????",
+    "setupSteps": {
+      "missing_configuration": [
+        "اكتب ما ينقص الفحص {check} في ملف المعايير: {needs}.",
+        "اعتمد ملف المعايير، ثم أعد الفحص."
+      ],
+      "missing": [
+        "جهّز ما ينقص الفحص {check}: {needs}.",
+        "أعد الفحص."
+      ],
+      "missing_tests": [
+        "اكتب اختبارات في إطار المشروع تغطي السلوك المهم في الموضع المسمّى.",
+        "أضف سكربتًا يشغّلها إن لم يوجد، ثم أعد الفحص."
+      ]
+    },
+    "checkBehavior": {
+      "missing_configuration": "أكمل ما ينقص «{title}»",
+      "missing": "جهّز ما ينقص «{title}»",
+      "missing_tests": "اكتب اختبارات يشغّلها «{title}»"
+    },
+    "profileLocation": "ملف المعايير"
+  }
+}

@@ -13,6 +13,8 @@ export * from './domain/discovery.ts';
 export * from './domain/profile.ts';
 export * from './domain/projects.ts';
 export * from './domain/environment.ts';
+export * from './domain/advisor.ts';
+export * from './domain/tasks.ts';
 export * from './bridge.ts';
 export * from './client.ts';
 export * from './ownership.ts';

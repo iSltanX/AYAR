@@ -1,0 +1,411 @@
+{
+  "verifiedAt": "2026-10-09",
+  "inputs": [
+    {
+      "id": "situation",
+      "group": "situation",
+      "type": "single",
+      "required": true,
+      "basic": true,
+      "question": "ما الموقف الذي تقيّمه؟",
+      "values": [
+        {
+          "id": "new_feature",
+          "label": "إضافة وظيفة"
+        },
+        {
+          "id": "change_behavior",
+          "label": "تعديل سلوك قائم"
+        },
+        {
+          "id": "bugfix",
+          "label": "إصلاح خلل"
+        },
+        {
+          "id": "refactor",
+          "label": "إعادة هيكلة"
+        },
+        {
+          "id": "shared_change",
+          "label": "تعديل مكوّن مشترك"
+        },
+        {
+          "id": "deps_upgrade",
+          "label": "ترقية تبعيات أو منصة"
+        },
+        {
+          "id": "cosmetic",
+          "label": "تعديل نصي أو شكلي طفيف"
+        },
+        {
+          "id": "release",
+          "label": "التحضير لإصدار"
+        },
+        {
+          "id": "new_project",
+          "label": "بداية مشروع"
+        },
+        {
+          "id": "legacy_assess",
+          "label": "تقييم مشروع قائم"
+        }
+      ]
+    },
+    {
+      "id": "areas",
+      "group": "situation",
+      "type": "multi",
+      "required": false,
+      "basic": true,
+      "question": "ما الذي يمسّه التغيير؟",
+      "values": [
+        {
+          "id": "logic",
+          "label": "منطق أو حسابات أو قواعد"
+        },
+        {
+          "id": "ui",
+          "label": "الواجهة والتفاعل"
+        },
+        {
+          "id": "data",
+          "label": "بيانات محفوظة أو بنيتها"
+        },
+        {
+          "id": "external",
+          "label": "خدمة أو واجهة برمجية خارجية"
+        },
+        {
+          "id": "auth",
+          "label": "الدخول والصلاحيات"
+        },
+        {
+          "id": "input",
+          "label": "مدخلات غير موثوقة"
+        },
+        {
+          "id": "arabic",
+          "label": "النص العربي والاتجاه"
+        },
+        {
+          "id": "perf",
+          "label": "مسار حساس للأداء أو بيانات كبيرة"
+        },
+        {
+          "id": "config",
+          "label": "الإعداد والبناء والنشر"
+        },
+        {
+          "id": "compat",
+          "label": "التوافق مع متصفحات أو أجهزة أو إصدارات منصة"
+        }
+      ]
+    },
+    {
+      "id": "expected",
+      "group": "situation",
+      "type": "single",
+      "required": false,
+      "basic": true,
+      "question": "هل السلوك المتوقع محدد؟",
+      "values": [
+        {
+          "id": "clear",
+          "label": "محدد بأمثلة واضحة"
+        },
+        {
+          "id": "vague",
+          "label": "فكرة عامة فقط"
+        }
+      ]
+    },
+    {
+      "id": "impact",
+      "group": "consequence",
+      "type": "single",
+      "required": false,
+      "basic": true,
+      "question": "ما أسوأ عاقبة معقولة إن فشل التغيير؟",
+      "values": [
+        {
+          "id": 1,
+          "label": "إزعاج شكلي"
+        },
+        {
+          "id": 2,
+          "label": "تعطّل ميزة مع بديل"
+        },
+        {
+          "id": 3,
+          "label": "تعطّل جوهري"
+        },
+        {
+          "id": 4,
+          "label": "فقدان بيانات أو ثغرة أو خسارة مالية"
+        }
+      ]
+    },
+    {
+      "id": "audience",
+      "group": "consequence",
+      "type": "single",
+      "required": false,
+      "basic": false,
+      "question": "من يستخدم ما سيتأثر؟",
+      "values": [
+        {
+          "id": "me",
+          "label": "أنا وحدي"
+        },
+        {
+          "id": "small",
+          "label": "مجموعة صغيرة أعرفها"
+        },
+        {
+          "id": "public",
+          "label": "جمهور عام"
+        }
+      ]
+    },
+    {
+      "id": "reversibility",
+      "group": "consequence",
+      "type": "single",
+      "required": false,
+      "basic": false,
+      "question": "لو وصل الخلل إلى المستخدمين، هل يُكتشف ويُعكس بسهولة؟",
+      "values": [
+        {
+          "id": "easy",
+          "label": "سهل"
+        },
+        {
+          "id": "hard",
+          "label": "صعب"
+        }
+      ]
+    },
+    {
+      "id": "scope",
+      "group": "likelihood",
+      "type": "single",
+      "required": false,
+      "basic": false,
+      "question": "ما نطاق أثر التغيير؟",
+      "values": [
+        {
+          "id": "local",
+          "label": "موضعي"
+        },
+        {
+          "id": "module",
+          "label": "وحدة أو ميزة"
+        },
+        {
+          "id": "wide",
+          "label": "واسع"
+        }
+      ]
+    },
+    {
+      "id": "factors",
+      "group": "likelihood",
+      "type": "multi",
+      "required": false,
+      "basic": false,
+      "question": "عوامل ترفع احتمال الخلل",
+      "values": [
+        {
+          "id": "complex",
+          "label": "منطق معقد أو حالات حدية كثيرة"
+        },
+        {
+          "id": "unfamiliar",
+          "label": "شيفرة جديدة عليّ أو لم أكتبها"
+        },
+        {
+          "id": "defect_history",
+          "label": "منطقة ظهرت فيها أخطاء سابقًا"
+        },
+        {
+          "id": "ai_generated",
+          "label": "شيفرة مولّدة بمساعد لم أراجعها سطرًا سطرًا"
+        },
+        {
+          "id": "async",
+          "label": "توقيت أو تزامن أو عمليات غير متزامنة"
+        }
+      ]
+    },
+    {
+      "id": "evidence",
+      "group": "evidence",
+      "type": "single",
+      "required": false,
+      "basic": true,
+      "question": "ما الاختبارات الموجودة حول المنطقة المتأثرة؟",
+      "values": [
+        {
+          "id": "none",
+          "label": "لا شيء"
+        },
+        {
+          "id": "weak",
+          "label": "قليلة أو قديمة"
+        },
+        {
+          "id": "good",
+          "label": "جيدة وتغطي السلوك المهم"
+        }
+      ]
+    },
+    {
+      "id": "automation",
+      "group": "evidence",
+      "type": "single",
+      "required": false,
+      "basic": false,
+      "question": "كيف تُشغَّل الاختبارات؟",
+      "values": [
+        {
+          "id": "auto",
+          "label": "تلقائيًا مع كل تغيير"
+        },
+        {
+          "id": "manual",
+          "label": "يدويًا حين أتذكر"
+        },
+        {
+          "id": "none",
+          "label": "لا تُشغَّل"
+        }
+      ]
+    },
+    {
+      "id": "flaky",
+      "group": "evidence",
+      "type": "bool",
+      "required": false,
+      "basic": false,
+      "question": "توجد اختبارات متقلبة في هذه المنطقة",
+      "values": []
+    },
+    {
+      "id": "platform",
+      "group": "project",
+      "type": "multi",
+      "required": false,
+      "basic": false,
+      "question": "نوع المنتج",
+      "values": [
+        {
+          "id": "web",
+          "label": "واجهة ويب"
+        },
+        {
+          "id": "api",
+          "label": "خادم أو واجهة برمجية"
+        },
+        {
+          "id": "mobile",
+          "label": "تطبيق جوال"
+        },
+        {
+          "id": "desktop",
+          "label": "تطبيق سطح مكتب"
+        },
+        {
+          "id": "plugin",
+          "label": "إضافة أو ملحق"
+        },
+        {
+          "id": "theme",
+          "label": "ثيم أو قالب"
+        },
+        {
+          "id": "library",
+          "label": "مكتبة أو أداة سطر أوامر"
+        },
+        {
+          "id": "text",
+          "label": "معالجة نصوص أو بيانات"
+        }
+      ]
+    },
+    {
+      "id": "stack",
+      "group": "project",
+      "type": "text",
+      "required": false,
+      "basic": false,
+      "question": "التقنية المستخدمة",
+      "values": []
+    },
+    {
+      "id": "stage",
+      "group": "project",
+      "type": "single",
+      "required": false,
+      "basic": false,
+      "question": "مرحلة المشروع",
+      "values": [
+        {
+          "id": "proto",
+          "label": "نموذج أولي"
+        },
+        {
+          "id": "active",
+          "label": "تطوير نشط قبل الإطلاق"
+        },
+        {
+          "id": "released",
+          "label": "منتج مطلق"
+        },
+        {
+          "id": "maintenance",
+          "label": "صيانة واستقرار"
+        }
+      ]
+    },
+    {
+      "id": "frequency",
+      "group": "project",
+      "type": "single",
+      "required": false,
+      "basic": false,
+      "question": "كم يتغيّر هذا الجزء؟",
+      "values": [
+        {
+          "id": "rare",
+          "label": "نادرًا أو مرة واحدة"
+        },
+        {
+          "id": "frequent",
+          "label": "كثيرًا"
+        }
+      ]
+    },
+    {
+      "id": "time",
+      "group": "project",
+      "type": "single",
+      "required": false,
+      "basic": false,
+      "question": "الوقت المتاح للاختبار الآن",
+      "values": [
+        {
+          "id": "minutes",
+          "label": "أقل من ساعة"
+        },
+        {
+          "id": "hours",
+          "label": "ساعات"
+        },
+        {
+          "id": "days",
+          "label": "يوم أو أكثر"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,184 @@
+{
+  "verifiedAt": "2026-10-09",
+  "ecosystems": [
+    {
+      "id": "js",
+      "name": "JavaScript / TypeScript",
+      "pattern": "next|react|vue|svelte|nuxt|astro|vite|typescript|javascript|node|angular|remix|\\bts\\b|\\bjs\\b|رياكت|نكست|جافاسكربت|تايب\\s?سكربت",
+      "flags": "i"
+    },
+    {
+      "id": "python",
+      "name": "Python",
+      "pattern": "python|django|flask|fastapi|\\bpy\\b|بايثون",
+      "flags": "i"
+    },
+    {
+      "id": "swift",
+      "name": "Swift / iOS",
+      "pattern": "swift|ios|ipad|xcode|uikit|macos|سويفت|آيفون",
+      "flags": "i"
+    },
+    {
+      "id": "android",
+      "name": "Android / Kotlin",
+      "pattern": "android|kotlin|jetpack|أندرويد|كوتلن",
+      "flags": "i"
+    },
+    {
+      "id": "flutter",
+      "name": "Flutter",
+      "pattern": "flutter|dart|فلاتر",
+      "flags": "i"
+    },
+    {
+      "id": "wordpress",
+      "name": "WordPress / PHP",
+      "pattern": "wordpress|woocommerce|gutenberg|\\bphp\\b|\\bwp\\b|ووردبريس|وردبريس",
+      "flags": "i"
+    },
+    {
+      "id": "qt",
+      "name": "KDE Plasma / Qt / QML",
+      "pattern": "kde|plasma|\\bqml\\b|\\bqt\\b|kirigami|كيدي|بلازما",
+      "flags": "i"
+    },
+    {
+      "id": "obsidian",
+      "name": "Obsidian",
+      "pattern": "obsidian|أوبسيديان|اوبسيديان",
+      "flags": "i"
+    },
+    {
+      "id": "extension",
+      "name": "إضافات المتصفح",
+      "pattern": "extension|manifest\\s?v3|\\bmv3\\b|chrome ext|firefox|إضافة متصفح|امتداد",
+      "flags": "i"
+    },
+    {
+      "id": "electron",
+      "name": "Electron / Tauri",
+      "pattern": "electron|tauri|إلكترون|تاوري",
+      "flags": "i"
+    },
+    {
+      "id": "go",
+      "name": "Go",
+      "pattern": "\\bgo\\b|golang",
+      "flags": "i"
+    },
+    {
+      "id": "rust",
+      "name": "Rust",
+      "pattern": "rust|cargo|راست",
+      "flags": "i"
+    }
+  ],
+  "categories": [
+    {
+      "id": "static",
+      "label": "فحص ساكن",
+      "origin": "plan"
+    },
+    {
+      "id": "secrets",
+      "label": "الأسرار",
+      "origin": "plan"
+    },
+    {
+      "id": "sast",
+      "label": "فحص أمني ساكن",
+      "origin": "plan"
+    },
+    {
+      "id": "unit",
+      "label": "وحدة وتكامل",
+      "origin": "plan"
+    },
+    {
+      "id": "mutation",
+      "label": "طفرات",
+      "origin": "plan"
+    },
+    {
+      "id": "property",
+      "label": "خصائص",
+      "origin": "plan"
+    },
+    {
+      "id": "fuzz",
+      "label": "Fuzzing",
+      "origin": "plan"
+    },
+    {
+      "id": "integration",
+      "label": "تكامل",
+      "origin": "plan"
+    },
+    {
+      "id": "mocknet",
+      "label": "اعتراض الشبكة",
+      "origin": "plan"
+    },
+    {
+      "id": "contract",
+      "label": "عقود",
+      "origin": "plan"
+    },
+    {
+      "id": "e2e",
+      "label": "رحلات كاملة",
+      "origin": "plan"
+    },
+    {
+      "id": "component",
+      "label": "مكوّنات",
+      "origin": "plan"
+    },
+    {
+      "id": "visual",
+      "label": "مقارنة بصرية",
+      "origin": "plan"
+    },
+    {
+      "id": "a11y",
+      "label": "إتاحة",
+      "origin": "plan"
+    },
+    {
+      "id": "perf",
+      "label": "أداء",
+      "origin": "plan"
+    },
+    {
+      "id": "load",
+      "label": "حمل",
+      "origin": "plan"
+    },
+    {
+      "id": "deps",
+      "label": "تبعيات",
+      "origin": "plan"
+    },
+    {
+      "id": "dast",
+      "label": "فحص أمني ديناميكي",
+      "origin": "plan"
+    },
+    {
+      "id": "rtl",
+      "label": "الاتجاه",
+      "origin": "plan"
+    },
+    {
+      "id": "hooks",
+      "label": "تشغيل تلقائي",
+      "origin": "plan"
+    },
+    {
+      "id": "compat",
+      "label": "التوافق",
+      "origin": "G-37.8"
+    }
+  ]
+}

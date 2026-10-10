@@ -10,7 +10,7 @@
 - **الرموز والمنح:** الواجهة لا ترسل مسارًا أبدًا. ترسل رمزًا (`sel_` و`dst_` و`src_` و`cfm_`) تصدره العملية الرئيسية بعد نافذة نظام، أو بعد معاينة (`setup.preview` و`tools.preview`)، أو بعد تأكيد الواجهة لإجراء مدمّر (`confirm.issue`). وعند تمرير الأمر إلى المحرك تستبدل العملية الرئيسية بالرمز «منحة» (`grants`) تحمل المسار أو ربط التأكيد بالأمر وهدفه. والمحرك يرفض الأمر دون منحه (`checkGrants`).
 - **الأحداث:** مرقمة في «مجرى» (`stream`) لكل جلسة محرك، وللمشرف مجراه. الفجوة في الترقيم أو تبدّل المجرى تطلق إعادة المزامنة في الجسر (`bridge.resync`).
 - **`report.copied`** سجل تدقيق في `audit_log`، لا حدث (G-21). والأحداث الناقصة (تقدم التجهيز، وحالات فحوص النموذج والبطاقات) تضيفها مراحلها بإصدار ثانوي.
-- **عقود المجال** في `src/domain/` ملفًا لكل مجال: `DiscoverySnapshot` و`ResolvedEnv` وملف المعايير (`ProfileView` و`ExportedProfile` بصيغة `ayar-profile/1`) وعقود المشاريع من DEV-4 (الإصدار 1.1)، و`RunPlan` وغيره تضيفها مراحلها. ونتيجة `z.unknown()` تعني أن عقد النتيجة لم يُعرَّف بعد.
+- **عقود المجال** في `src/domain/` ملفًا لكل مجال: `DiscoverySnapshot` و`ResolvedEnv` وملف المعايير (`ProfileView` و`ExportedProfile` بصيغة `ayar-profile/1`) وعقود المشاريع من DEV-4 (الإصدار 1.1)، وسياق التغيير ونتيجة المستشار (`AdvisorContext` و`AdvisorResult`) والبطاقة (`TaskCard` و`TaskRecord` و`TaskSource`) من DEV-8 (الإصدار 1.2)، و`RunPlan` وغيره تضيفها مراحلها. ونتيجة `z.unknown()` تعني أن عقد النتيجة لم يُعرَّف بعد.
 
 ## ملكية الأوامر (G-19)
 
@@ -59,7 +59,7 @@
 | `clipboard.copy` | C-01 | main | renderer | — | DEV-9 |
 | `tasks.list` | C-20 | engine | renderer | — | DEV-8 |
 | `task.create` | C-20 | engine | renderer | — | DEV-8 |
-| `task.update` | C-20 | engine | renderer | — | DEV-8 |
+| `task.update` | C-20 | engine | renderer | — | DEV-9 |
 | `advisor.suggest` | C-20 | engine | renderer | — | DEV-8 |
 | `report.export` | C-23 | engine | renderer | destination | DEV-9 |
 | `aiChecks.needs` | C-25 | engine | renderer | — | DEV-9 |
