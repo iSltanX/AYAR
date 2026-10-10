@@ -1,0 +1,314 @@
+{
+  "at": "2026-10-10T09:27:05.162Z",
+  "synthetic": [
+    {
+      "name": "مراجع فضفاضة",
+      "reader": {
+        "branch": "main",
+        "commit": "9ea4b5f9dd47672b2d6fcef64711907c8c6ad122",
+        "detached": false,
+        "headSource": "loose",
+        "objectFormat": "sha1",
+        "packedRefs": 0,
+        "linkedWorktree": false,
+        "worktrees": 0,
+        "submodules": [],
+        "shallow": false,
+        "reflogAgrees": true,
+        "confidence": "مؤكد"
+      },
+      "git": {
+        "commit": "9ea4b5f9dd47672b2d6fcef64711907c8c6ad122",
+        "branch": "main"
+      },
+      "match": true
+    },
+    {
+      "name": "packed-refs (بعد git pack-refs --all)",
+      "reader": {
+        "branch": "main",
+        "commit": "9ea4b5f9dd47672b2d6fcef64711907c8c6ad122",
+        "detached": false,
+        "headSource": "packed-refs",
+        "objectFormat": "sha1",
+        "packedRefs": 1,
+        "linkedWorktree": false,
+        "worktrees": 0,
+        "submodules": [],
+        "shallow": false,
+        "reflogAgrees": true,
+        "confidence": "مؤكد"
+      },
+      "git": {
+        "commit": "9ea4b5f9dd47672b2d6fcef64711907c8c6ad122",
+        "branch": "main"
+      },
+      "match": true,
+      "looseRefExists": false
+    },
+    {
+      "name": "HEAD منفصل",
+      "reader": {
+        "branch": null,
+        "commit": "9ea4b5f9dd47672b2d6fcef64711907c8c6ad122",
+        "detached": true,
+        "headSource": "HEAD منفصل",
+        "objectFormat": "sha1",
+        "packedRefs": 0,
+        "linkedWorktree": false,
+        "worktrees": 0,
+        "submodules": [],
+        "shallow": false,
+        "reflogAgrees": true,
+        "confidence": "مؤكد"
+      },
+      "git": {
+        "commit": "9ea4b5f9dd47672b2d6fcef64711907c8c6ad122",
+        "branch": null
+      },
+      "match": true
+    },
+    {
+      "name": "المستودع الرئيسي الذي له مساحة عمل إضافية",
+      "reader": {
+        "branch": "main",
+        "commit": "9ea4b5f9dd47672b2d6fcef64711907c8c6ad122",
+        "detached": false,
+        "headSource": "loose",
+        "objectFormat": "sha1",
+        "packedRefs": 0,
+        "linkedWorktree": false,
+        "worktrees": 1,
+        "submodules": [],
+        "shallow": false,
+        "reflogAgrees": true,
+        "confidence": "مؤكد"
+      },
+      "git": {
+        "commit": "9ea4b5f9dd47672b2d6fcef64711907c8c6ad122",
+        "branch": "main"
+      },
+      "match": true
+    },
+    {
+      "name": "مساحة العمل الإضافية (ملف .git بـ gitdir)",
+      "reader": {
+        "branch": "feature",
+        "commit": "fa75fb270a507dba9c731a5dde4304bd1864fe28",
+        "detached": false,
+        "headSource": "loose",
+        "objectFormat": "sha1",
+        "packedRefs": 0,
+        "linkedWorktree": true,
+        "worktrees": 1,
+        "submodules": [],
+        "shallow": false,
+        "reflogAgrees": true,
+        "confidence": "مؤكد"
+      },
+      "git": {
+        "commit": "fa75fb270a507dba9c731a5dde4304bd1864fe28",
+        "branch": "feature"
+      },
+      "match": true
+    },
+    {
+      "name": "وحدة فرعية (.gitmodules وملف .git في مجلدها)",
+      "reader": {
+        "branch": "main",
+        "commit": "f15f99ff3b2f23a733e728584ee3b0475e3c276d",
+        "detached": false,
+        "headSource": "loose",
+        "objectFormat": "sha1",
+        "packedRefs": 0,
+        "linkedWorktree": false,
+        "worktrees": 0,
+        "submodules": [
+          {
+            "path": "libs/sub",
+            "initialized": true,
+            "commit": "9ea4b5f9dd47"
+          }
+        ],
+        "shallow": false,
+        "reflogAgrees": true,
+        "confidence": "مؤكد"
+      },
+      "git": {
+        "commit": "f15f99ff3b2f23a733e728584ee3b0475e3c276d",
+        "branch": "main"
+      },
+      "match": true,
+      "submoduleGit": "9ea4b5f9dd47"
+    },
+    {
+      "name": "صيغة SHA-256 (extensions.objectFormat)",
+      "reader": {
+        "branch": "main",
+        "commit": "6a8d794be31ec6a3f63abcf547bdf1c54fef7b953e2c51a314deb78e33b4fe44",
+        "detached": false,
+        "headSource": "loose",
+        "objectFormat": "sha256",
+        "packedRefs": 0,
+        "linkedWorktree": false,
+        "worktrees": 0,
+        "submodules": [],
+        "shallow": false,
+        "reflogAgrees": true,
+        "confidence": "مؤكد"
+      },
+      "git": {
+        "commit": "6a8d794be31ec6a3f63abcf547bdf1c54fef7b953e2c51a314deb78e33b4fe44",
+        "branch": "main"
+      },
+      "match": true
+    },
+    {
+      "name": "نسخة سطحية (ملف shallow)",
+      "reader": {
+        "branch": "main",
+        "commit": "9ea4b5f9dd47672b2d6fcef64711907c8c6ad122",
+        "detached": false,
+        "headSource": "loose",
+        "objectFormat": "sha1",
+        "packedRefs": 1,
+        "linkedWorktree": false,
+        "worktrees": 0,
+        "submodules": [],
+        "shallow": true,
+        "reflogAgrees": true,
+        "confidence": "مؤكد"
+      },
+      "git": {
+        "commit": "9ea4b5f9dd47672b2d6fcef64711907c8c6ad122",
+        "branch": "main"
+      },
+      "match": true
+    },
+    {
+      "name": "مستودع جديد بلا التزام",
+      "reader": {
+        "branch": "main",
+        "commit": null,
+        "detached": false,
+        "headSource": "فرع بلا التزام بعد (مستودع جديد) أو مرجع مفقود",
+        "objectFormat": "sha1",
+        "packedRefs": 0,
+        "linkedWorktree": false,
+        "worktrees": 0,
+        "submodules": [],
+        "shallow": false,
+        "reflogAgrees": null,
+        "confidence": "غير معروف"
+      }
+    },
+    {
+      "name": "مجلد ليس مستودعًا",
+      "reader": {
+        "isRepo": false
+      }
+    }
+  ],
+  "self": {
+    "reader": {
+      "branch": "phase/DEV-2",
+      "commit": "9635bc32e43476f86e6bd6ac639155a2a6904a8e",
+      "detached": false,
+      "headSource": "loose",
+      "objectFormat": "sha1",
+      "packedRefs": 0,
+      "linkedWorktree": true,
+      "worktrees": 3,
+      "submodules": [],
+      "shallow": false,
+      "reflogAgrees": true,
+      "confidence": "مؤكد"
+    },
+    "git": {
+      "commit": "9635bc32e43476f86e6bd6ac639155a2a6904a8e",
+      "branch": "phase/DEV-2"
+    },
+    "match": true,
+    "gitdir": "/Volumes/iSltanXx/Projects/AYAR/.git/worktrees/DEV-2"
+  },
+  "malicious": {
+    "reader": {
+      "branch": "main",
+      "commit": "1cdf14c0845a55cc62862d348e0c4b35e40db7bc",
+      "detached": false,
+      "headSource": "loose",
+      "objectFormat": "sha1",
+      "packedRefs": 0,
+      "linkedWorktree": false,
+      "worktrees": 0,
+      "submodules": [],
+      "shallow": false,
+      "reflogAgrees": null,
+      "confidence": "مؤكد"
+    },
+    "generatorHead": "1cdf14c",
+    "match": true
+  },
+  "owner": [
+    {
+      "root": "/Volumes/iSltanXx/Projects/Brave/Rasd",
+      "reader": {
+        "branch": "main",
+        "commit": "49e6473c4d4d118d46d3c5b7ef5318d90395ac40",
+        "detached": false,
+        "headSource": "loose",
+        "objectFormat": "sha1",
+        "packedRefs": 26,
+        "linkedWorktree": false,
+        "worktrees": 0,
+        "submodules": [],
+        "shallow": false,
+        "reflogAgrees": true,
+        "confidence": "مؤكد",
+        "remoteHost": "github.com"
+      },
+      "gitFilesInventoried": 182,
+      "gitFilesChanged": []
+    },
+    {
+      "root": "/Volumes/iSltanXx/Projects/Tars",
+      "reader": {
+        "branch": "main",
+        "commit": "4fc4e791d83688f70043f3eda032d904da3554e3",
+        "detached": false,
+        "headSource": "loose",
+        "objectFormat": "sha1",
+        "packedRefs": 16,
+        "linkedWorktree": false,
+        "worktrees": 0,
+        "submodules": [],
+        "shallow": false,
+        "reflogAgrees": true,
+        "confidence": "مؤكد",
+        "remoteHost": "github.com"
+      },
+      "gitFilesInventoried": 83,
+      "gitFilesChanged": []
+    },
+    {
+      "root": "/Volumes/iSltanXx/Projects/Plugins/Wasl",
+      "reader": {
+        "branch": "main",
+        "commit": "1b82ee7d4cafd30e755bceac94c0aa5ea21290c7",
+        "detached": false,
+        "headSource": "loose",
+        "objectFormat": "sha1",
+        "packedRefs": 0,
+        "linkedWorktree": false,
+        "worktrees": 0,
+        "submodules": [],
+        "shallow": false,
+        "reflogAgrees": true,
+        "confidence": "مؤكد",
+        "remoteHost": "github.com"
+      },
+      "gitFilesInventoried": 544,
+      "gitFilesChanged": []
+    }
+  ]
+}
