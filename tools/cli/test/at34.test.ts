@@ -47,7 +47,9 @@ describe('AT-34 (engine): side effects and readiness', () => {
       const preview = ok<{ digest: string }>(await engine.invoke('setup.preview', { actionId: accept.id }));
       const g = confirmationGrant('setup.execute', accept.id, preview.digest);
       const done = ok<SetupExecuteResult>(await engine.invoke('setup.execute', { actionId: accept.id, confirmationToken: g.token }, g.grants));
-      expect(done.readiness.find((r) => r.instance === 'beh.unit@.')).toMatchObject({ readiness: 'ready', reasons: expect.arrayContaining([expect.objectContaining({ key: 'setup.reason.versionAccepted' })]) });
+      const after = done.readiness.find((r) => r.instance === 'beh.unit@.');
+      expect(after?.readiness).toBe('ready');
+      expect(after?.reasons.map((r) => r.key)).toContain('setup.reason.versionAccepted');
 
       // The side effects of beh.unit: two new files under the declared outputs, the tracked data/runs.json modified.
       const p = await plan(engine, projectId, { kind: 'check', instance: 'beh.unit@.' });
