@@ -132,4 +132,26 @@ describe('the launch gate (C-12 point 3, FR-55)', () => {
       expect(check(d, 'custom.optional@.').raw).toMatchObject({ ended: 'exited', exitCode: 0 });
     });
   }, 60_000);
+
+  it('a covered check whose covering check is stopped at its launch runs on its own (9.4 point 5)', async () => {
+    await withEngine(async (engine, dataDir) => {
+      const { projectId } = await addProject(engine, materialize('FX-PROC', 'good', join(root, 'fx')));
+      ok(await engine.invoke('profile.update', { projectId, patch: { checks: { 'beh.stability@.': { included: true } } } }));
+      await approveAll(engine, projectId);
+      const p = await plan(engine, projectId, { kind: 'group', instances: ['beh.unit@.', 'beh.stability@.'] });
+      expect(p.items.find((i) => i.instance === 'beh.unit@.')).toMatchObject({ status: 'covered', coveredBy: 'beh.stability@.' });
+      // Between the plan and «ابدأ», beh.stability loses its approval (as a changed spec would).
+      const db = new DatabaseSync(join(dataDir, 'ayar.db'));
+      try {
+        db.prepare("DELETE FROM approvals WHERE project_id = ? AND check_id = 'beh.stability'").run(projectId);
+      } finally {
+        db.close();
+      }
+      const d = await waitRun(engine, (await startRun(engine, p.id)).runId);
+      expect(check(d, 'beh.stability@.')).toMatchObject({ outcome: 'missing', outcomeReason: { key: 'run.reason.specChangedSinceApproval' }, raw: null });
+      // beh.unit does not inherit «ناقص»: it ran its own tests.
+      expect(check(d, 'beh.unit@.').raw).toMatchObject({ ended: 'exited', exitCode: 0 });
+      expect(check(d, 'beh.unit@.').outcome).not.toBe('missing');
+    });
+  }, 60_000);
 });

@@ -350,10 +350,16 @@ export class RunService {
         if (e.item.status === 'covered' || e.item.status === 'shared') {
           const source = e.item.status === 'covered' ? execs.get(e.item.coveredBy ?? '') : [...execs.values()].find((x) => x.item.status === 'run' && x.item.sharedInvocationKey === e.item.sharedInvocationKey);
           if (source && source.state !== 'done') continue;
-          this.#inherit(e, source ?? null);
-          pending.splice(n--, 1);
-          progressed = true;
-          continue;
+          // 9.4 point 5 at the launch: a source the gate stopped (it never ran: «ناقص» or «تعذّر» with no result)
+          // gives nothing to inherit, so the covered or shared instance runs on its own, through the same gate.
+          if (source && source.raw === null && (source.outcome === 'missing' || source.outcome === 'unavailable')) {
+            e.item = { ...e.item, status: 'run', coveredBy: null, sharedInvocationKey: null, reasons: [] };
+          } else {
+            this.#inherit(e, source ?? null);
+            pending.splice(n--, 1);
+            progressed = true;
+            continue;
+          }
         }
         const heavy = e.item.locks.includes('heavy');
         const locks = new Set(e.item.locks.filter((l) => l !== 'heavy'));

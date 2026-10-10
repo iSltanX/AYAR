@@ -204,18 +204,6 @@ export function buildPlan(i: PlanInput): RunPlan {
     }
   }
 
-  // 4. «يشمل»: the covered check does not run again; it inherits the covering execution's verdict (AT-07).
-  for (const it of running()) {
-    for (const inc of defOf(i.catalog, it.checkId)?.relations.includes ?? []) {
-      const covered = items.get(`${inc}@${it.component}`);
-      if (covered && covered.status === 'run') {
-        covered.status = 'covered';
-        covered.coveredBy = it.instance;
-        covered.reasons = [{ key: 'plan.reason.coveredBy', params: { by: it.instance } }];
-      }
-    }
-  }
-
   // Alternatives (10.3): never both; the first in the catalog that is ready, else the first.
   for (const it of running()) {
     for (const alt of defOf(i.catalog, it.checkId)?.relations.alternativeTo ?? []) {
@@ -230,13 +218,27 @@ export function buildPlan(i: PlanInput): RunPlan {
   }
 
   // 6. Readiness (9.4 point 5): a check that is not ready is «ناقص» in the plan and is never set up here.
-  for (const it of [...items.values()].filter((x) => x.status === 'run' || x.status === 'covered')) {
+  for (const it of running()) {
     const r = i.readiness.get(it.instance);
     const inner = r?.inner ?? 'ready';
-    if (it.status === 'run') it.readiness = inner === 'not_applicable' ? 'not_applicable' : inner;
-    if (it.status !== 'run' || inner === 'ready') continue;
+    it.readiness = inner === 'not_applicable' ? 'not_applicable' : inner;
+    if (inner === 'ready') continue;
     it.status = inner === 'untrusted' ? 'untrusted' : 'missing';
     it.reasons = [...(r?.reasons ?? []), ...it.reasons];
+  }
+
+  // 4, after the readiness (9.4 point 5): «يشمل» — the covered check does not run again and inherits the covering
+  //    execution's verdict (AT-07), but only from a check that will run. A covering check that is «ناقص» (not
+  //    approved, not set up, untrusted) covers nothing: the covered one runs on its own.
+  for (const it of running()) {
+    for (const inc of defOf(i.catalog, it.checkId)?.relations.includes ?? []) {
+      const covered = items.get(`${inc}@${it.component}`);
+      if (covered && covered.status === 'run') {
+        covered.status = 'covered';
+        covered.coveredBy = it.instance;
+        covered.reasons = [{ key: 'plan.reason.coveredBy', params: { by: it.instance } }];
+      }
+    }
   }
 
   // Shared execution (D-45): a declared pair with the very same invocation key runs once.

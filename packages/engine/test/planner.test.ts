@@ -106,7 +106,8 @@ describe('C-10 planner properties (plan 19)', () => {
             expect(new Set(plan.order).size).toBe(plan.order.length);
             for (const it of plan.items.filter((x) => x.status === 'covered')) {
               const by = plan.items.find((x) => x.instance === it.coveredBy);
-              expect(by && ['run', 'missing', 'untrusted'].includes(by.status), `${it.instance} covered by a check that is in the plan`).toBe(true);
+              // 9.4 point 5: only a check that will run covers another (never a «ناقص» one).
+              expect(by?.status, `${it.instance} covered by a check that runs`).toBe('run');
             }
             // Every dependency of what is in the plan, with the dependency first.
             for (const it of plan.items.filter((x) => ACTIVE.has(x.status))) {
@@ -157,5 +158,28 @@ describe('C-10 planner properties (plan 19)', () => {
         { numRuns: 40, seed: 7 },
       );
     }
+  });
+
+  it('a covering check that is not ready covers nothing: the covered one runs on its own (9.4 point 5)', () => {
+    const project = projects.find((p) => p.name === 'FX-EXT')!;
+    for (const included of [true, false]) {
+      const settings = { ...emptySettings(), overrides: { 'beh.stability@.': included ? { included: true } : { included: false, required: false } } };
+      const specs = proposeChecks({ catalog, components: project.components, facts: project.facts, settings, state: { reviews: false }, hash });
+      expect(specs.find((s) => s.instance === 'beh.stability@.')?.applicable).toBe(true);
+      // beh.stability needs its approval (changed after it, or chosen without being included); beh.unit is ready.
+      const ready = new Map<string, Readiness>([['beh.stability@.', 'needs_approval']]);
+      const resolved: ResolvedSelection = included ? { kind: 'full' } : { kind: 'instances', instances: ['beh.unit@.', 'beh.stability@.'], explicit: true };
+      const sel: RunSelection = included ? { kind: 'full' } : { kind: 'group', instances: ['beh.unit@.', 'beh.stability@.'] };
+      const plan = buildPlan(input(specs, project.facts, ready, resolved, sel));
+      const item = (x: string) => plan.items.find((i) => i.instance === x);
+      expect(item('beh.stability@.'), String(included)).toMatchObject({ status: 'missing', readiness: 'needs_approval' });
+      expect(item('beh.unit@.'), String(included)).toMatchObject({ status: 'run', readiness: 'ready', coveredBy: null });
+      expect(plan.order).toContain('beh.unit@.');
+    }
+    // Both ready: beh.unit is covered by beh.stability, as AT-07 shows.
+    const settings = { ...emptySettings(), overrides: { 'beh.stability@.': { included: true } } };
+    const specs = proposeChecks({ catalog, components: project.components, facts: project.facts, settings, state: { reviews: false }, hash });
+    const plan = buildPlan(input(specs, project.facts, new Map(), { kind: 'full' }, { kind: 'full' }));
+    expect(plan.items.find((i) => i.instance === 'beh.unit@.')).toMatchObject({ status: 'covered', coveredBy: 'beh.stability@.' });
   });
 });
