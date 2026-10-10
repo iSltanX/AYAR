@@ -42,7 +42,7 @@
     </label>
   </header>
 
-  <main>
+  <div class="sections">
     {#each shown as s (s.id)}
       <section class="section" data-section={s.id} aria-labelledby="h-{s.id}">
         <h2 id="h-{s.id}">{s.id} · {s.title} <code>{s.figma}</code></h2>
@@ -61,7 +61,7 @@
         </div>
       </section>
     {/each}
-  </main>
+  </div>
 </div>
 
 <style>
@@ -109,7 +109,7 @@
     background: var(--text-primary);
     color: var(--text-inverse);
   }
-  main {
+  .sections {
     display: flex;
     flex-direction: column;
     gap: var(--space-32);
