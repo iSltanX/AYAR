@@ -208,7 +208,7 @@
 | light | وسم «ادعاء نموذج» | `tag/model-claim/fg` #562BA3 | `tag/model-claim/bg` #F4F1FF | 8.31:1 | 4.5:1 | نجح | النص |
 | light | وسم «ادعاء نموذج» | `tag/model-claim/icon` #855BE5 | `tag/model-claim/bg` #F4F1FF | 4.08:1 | 3:1 | نجح | فقاعة الكلام |
 | light | وسم «مبدئي» | `text/secondary` #434F54 | `border/subtle (خط)` #D9D9D4 | 5.97:1 | 4.5:1 | نجح | النص فوق الخط المائل |
-| light | وسم «مبدئي» | `text/secondary` #434F54 | `bg/sunken` #EBEAE3 | 7.01:1 | 4.5:1 | نجح | النص بين الخطوط |
+| light | وسم «مبدئي» | `text/secondary` #434F54 | `bg/surface` #FFFCF4 | 8.24:1 | 4.5:1 | نجح | النص بين الخطوط (أساس الوسم bg/surface) |
 | light | «جارٍ» في التجهيز | `cycle/running/icon` #3170F9 | `bg/sunken` #EBEAE3 | 3.62:1 | 3:1 | نجح | المؤشر الأزرق داخل الوسم |
 | light | الشدة والدائرة | `text/primary` #141B20 | `bg/surface` #FFFCF4 | 16.96:1 | 3:1 | نجح | عمود أو قطعة مملوءة |
 | light | الشدة والدائرة | `border/strong` #7B8588 | `bg/surface` #FFFCF4 | 3.69:1 | 3:1 | نجح | عمود أو قطعة فارغة |
@@ -356,7 +356,7 @@
 | dark | وسم «ادعاء نموذج» | `tag/model-claim/fg` #D8CBFF | `tag/model-claim/bg` #292438 | 9.91:1 | 4.5:1 | نجح | النص |
 | dark | وسم «ادعاء نموذج» | `tag/model-claim/icon` #A68CE6 | `tag/model-claim/bg` #292438 | 5.35:1 | 3:1 | نجح | فقاعة الكلام |
 | dark | وسم «مبدئي» | `text/secondary` #BABFBD | `border/subtle (خط)` #3B454B | 5.27:1 | 4.5:1 | نجح | النص فوق الخط المائل |
-| dark | وسم «مبدئي» | `text/secondary` #BABFBD | `bg/sunken` #0B1116 | 10.19:1 | 4.5:1 | نجح | النص بين الخطوط |
+| dark | وسم «مبدئي» | `text/secondary` #BABFBD | `bg/surface` #1C2429 | 8.45:1 | 4.5:1 | نجح | النص بين الخطوط (أساس الوسم bg/surface) |
 | dark | «جارٍ» في التجهيز | `cycle/running/icon` #699DF9 | `bg/sunken` #0B1116 | 7.04:1 | 3:1 | نجح | المؤشر الأزرق داخل الوسم |
 | dark | الشدة والدائرة | `text/primary` #F7F4EC | `bg/surface` #1C2429 | 14.33:1 | 3:1 | نجح | عمود أو قطعة مملوءة |
 | dark | الشدة والدائرة | `border/strong` #728085 | `bg/surface` #1C2429 | 3.86:1 | 3:1 | نجح | عمود أو قطعة فارغة |
@@ -370,11 +370,11 @@
 
 ## معلوماتي (غير ملزم)
 
-الخط المائل في «مبدئي» زخرفة خفيفة يرافقها النص دائمًا، و«لا نطاق» في الدائرة يرافقه سطر «لا يوجد نطاق قابل للقياس» ولا رقم.
+الخط المائل في «مبدئي» زخرفة خفيفة يرافقها النص دائمًا، و«لا نطاق» في الدائرة يرافقه سطر «لا يوجد نطاق قابل للقياس» وكلمة «لا نطاق» في مركزها (نص text/tertiary)، ولا رقم.
 
 | الوضع | الثنائية | النسبة |
 |---|---|---|
-| light | border/subtle (خط «مبدئي») ↔ bg/sunken | 1.17:1 |
+| light | border/subtle (خط «مبدئي»، 2 بكسل كل 4) ↔ bg/surface | 1.38:1 |
 | light | border/subtle (دائرة «لا نطاق») ↔ bg/surface | 1.38:1 |
-| dark | border/subtle (خط «مبدئي») ↔ bg/sunken | 1.93:1 |
+| dark | border/subtle (خط «مبدئي»، 2 بكسل كل 4) ↔ bg/surface | 1.60:1 |
 | dark | border/subtle (دائرة «لا نطاق») ↔ bg/surface | 1.60:1 |

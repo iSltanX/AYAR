@@ -1650,13 +1650,13 @@
       "light",
       "وسم «مبدئي»",
       "text/secondary",
-      "bg/sunken",
+      "bg/surface",
       "#434F54",
-      "#EBEAE3",
-      7.01,
+      "#FFFCF4",
+      8.24,
       4.5,
       true,
-      "النص بين الخطوط"
+      "النص بين الخطوط (أساس الوسم bg/surface)"
     ],
     [
       "light",
@@ -3426,13 +3426,13 @@
       "dark",
       "وسم «مبدئي»",
       "text/secondary",
-      "bg/sunken",
+      "bg/surface",
       "#BABFBD",
-      "#0B1116",
-      10.19,
+      "#1C2429",
+      8.45,
       4.5,
       true,
-      "النص بين الخطوط"
+      "النص بين الخطوط (أساس الوسم bg/surface)"
     ],
     [
       "dark",
@@ -3558,8 +3558,8 @@
   "informational": [
     [
       "light",
-      "border/subtle (خط «مبدئي») ↔ bg/sunken",
-      1.17
+      "border/subtle (خط «مبدئي»، 2 بكسل كل 4) ↔ bg/surface",
+      1.38
     ],
     [
       "light",
@@ -3568,8 +3568,8 @@
     ],
     [
       "dark",
-      "border/subtle (خط «مبدئي») ↔ bg/sunken",
-      1.93
+      "border/subtle (خط «مبدئي»، 2 بكسل كل 4) ↔ bg/surface",
+      1.6
     ],
     [
       "dark",

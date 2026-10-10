@@ -82,7 +82,7 @@ for (const m of MODES) {
   add('وسم «ادعاء نموذج»', 'tag/model-claim/fg', 'tag/model-claim/bg', v('tag/model-claim/fg'), v('tag/model-claim/bg'), 4.5, 'النص');
   add('وسم «ادعاء نموذج»', 'tag/model-claim/icon', 'tag/model-claim/bg', v('tag/model-claim/icon'), v('tag/model-claim/bg'), 3, 'فقاعة الكلام');
   add('وسم «مبدئي»', 'text/secondary', 'border/subtle (خط)', v('text/secondary'), v('border/subtle'), 4.5, 'النص فوق الخط المائل');
-  add('وسم «مبدئي»', 'text/secondary', 'bg/sunken', v('text/secondary'), v('bg/sunken'), 4.5, 'النص بين الخطوط');
+  add('وسم «مبدئي»', 'text/secondary', 'bg/surface', v('text/secondary'), v('bg/surface'), 4.5, 'النص بين الخطوط (أساس الوسم bg/surface)');
   add('«جارٍ» في التجهيز', 'cycle/running/icon', 'bg/sunken', v('cycle/running/icon'), v('bg/sunken'), 3, 'المؤشر الأزرق داخل الوسم');
   // 7) الشدة ودائرة التدريج
   for (const b of ['bg/surface', 'bg/canvas']) {
@@ -101,7 +101,7 @@ for (const m of MODES) {
 const info = [];
 for (const m of MODES) {
   const s = TOK.semantic[m];
-  info.push({ mode: m, name: 'border/subtle (خط «مبدئي») ↔ bg/sunken', ratio: contrast(s['border/subtle'], s['bg/sunken']) });
+  info.push({ mode: m, name: 'border/subtle (خط «مبدئي»، 2 بكسل كل 4) ↔ bg/surface', ratio: contrast(s['border/subtle'], s['bg/surface']) });
   info.push({ mode: m, name: 'border/subtle (دائرة «لا نطاق») ↔ bg/surface', ratio: contrast(s['border/subtle'], s['bg/surface']) });
 }
 
@@ -152,7 +152,7 @@ md += '\n### الأشكال الداخلية لرموز النتائج\n\n| ال
 for (const [k, g] of Object.entries(GLYPHS)) md += `| ${k} | ${g} |\n`;
 md += '\n## الثنائيات كاملة\n\n| الوضع | المجموعة | المقدّم | الخلفية | النسبة | الحد | النتيجة | ملاحظة |\n|---|---|---|---|---|---|---|---|\n';
 for (const r of rows) md += `| ${r.mode} | ${r.group} | \`${r.fgName}\` ${r.fg} | \`${r.bgName}\` ${r.bg} | ${fmt(r.ratio)}:1 | ${r.min}:1 | ${r.pass ? 'نجح' : '**فشل**'} | ${r.note} |\n`;
-md += '\n## معلوماتي (غير ملزم)\n\nالخط المائل في «مبدئي» زخرفة خفيفة يرافقها النص دائمًا، و«لا نطاق» في الدائرة يرافقه سطر «لا يوجد نطاق قابل للقياس» ولا رقم.\n\n| الوضع | الثنائية | النسبة |\n|---|---|---|\n';
+md += '\n## معلوماتي (غير ملزم)\n\nالخط المائل في «مبدئي» زخرفة خفيفة يرافقها النص دائمًا، و«لا نطاق» في الدائرة يرافقه سطر «لا يوجد نطاق قابل للقياس» وكلمة «لا نطاق» في مركزها (نص text/tertiary)، ولا رقم.\n\n| الوضع | الثنائية | النسبة |\n|---|---|---|\n';
 for (const x of info) md += `| ${x.mode} | ${x.name} | ${fmt(x.ratio)}:1 |\n`;
 if (figmaMatch && figmaMatch.mismatches.length) { md += '\n## اختلافات Figma\n\n| الوضع | المتغير | tokens.json | Figma |\n|---|---|---|---|\n'; for (const x of figmaMatch.mismatches) md += `| ${x.join(' | ')} |\n`; }
 writeFileSync(join(HERE, 'checks.md'), md);
