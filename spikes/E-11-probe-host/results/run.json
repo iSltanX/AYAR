@@ -1,0 +1,204 @@
+{
+  "at": "2026-10-10T09:45:53.358Z",
+  "steps": {
+    "fxext": {
+      "install": 0,
+      "build": 0,
+      "dist": true
+    },
+    "chromium": {
+      "dir": "chromium-1248",
+      "sizeMB": 367,
+      "executablePath": "~/Library/Caches/ms-playwright/chromium-1248/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing"
+    },
+    "package": {
+      "exit": 0,
+      "ms": 7621,
+      "tail": "✔ Packaging application\n❯ Running postPackage hook\n✔ Running postPackage hook\n"
+    },
+    "open": {
+      "exit": 0,
+      "waitedMs": 7183,
+      "err": ""
+    }
+  },
+  "headlessVsHeaded": {
+    "differingPixels": 1998,
+    "size": "420x640"
+  },
+  "report": {
+    "spike": "E-11",
+    "at": "2026-10-10T09:46:05.684Z",
+    "buildInfo": {
+      "mode": "e11",
+      "bundleId": "com.bysltan.ayar.spike.e11",
+      "productName": "AYAR Spike E11",
+      "signed": "identity",
+      "buildTag": "",
+      "builtAt": "2026-10-10T09:45:58.514Z"
+    },
+    "main": {
+      "pid": 55488,
+      "ppid": 1,
+      "electron": "44.7.0",
+      "node": "24.21.0",
+      "chrome": "152.0.7977.130"
+    },
+    "engine": {
+      "pid": 55495,
+      "ppid": 55488,
+      "type": "utility",
+      "node": "24.21.0",
+      "electron": "44.7.0",
+      "execPath": "/Volumes/iSltanXx/Projects/AYAR-wt/DEV-2/spikes/E-01-electron-forge/out/AYAR Spike E11-darwin-arm64/AYAR Spike E11.app/Contents/Frameworks/AYAR Spike E11 Helper.app/Contents/MacOS/AYAR Spike E11 Helper",
+      "sandboxed": null
+    },
+    "runs": {
+      "playwrightVersion": "1.64.0",
+      "modes": [
+        {
+          "mode": "headless",
+          "profile": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e11-headless-wZn7ru",
+          "steps": {
+            "launchMs": 1144,
+            "browserVersion": "156.0.8078.4",
+            "serviceWorker": {
+              "url": "chrome-extension://<id>/background.js",
+              "extensionId": "molinpamgijcbgnkncnedgdafilhomgj",
+              "ms": 1163
+            },
+            "popup": {
+              "dir": "rtl",
+              "lang": "ar",
+              "title": "عدّاد الكلمات",
+              "consoleErrors": []
+            },
+            "axe": {
+              "violations": [],
+              "passes": 15,
+              "incomplete": 0,
+              "version": "4.14.0"
+            },
+            "screenshots": [
+              {
+                "sha256": "94782573581b3d643ea63d688e0390d4c53e63004dbc92d365b7f060622f3166",
+                "bytes": 6825
+              },
+              {
+                "sha256": "94782573581b3d643ea63d688e0390d4c53e63004dbc92d365b7f060622f3166",
+                "bytes": 6825
+              },
+              {
+                "sha256": "94782573581b3d643ea63d688e0390d4c53e63004dbc92d365b7f060622f3166",
+                "bytes": 6825
+              }
+            ],
+            "options": {
+              "consoleErrors": [],
+              "title": "خيارات عدّاد الكلمات"
+            },
+            "pagesOpened": 1
+          },
+          "errors": [],
+          "profileRemoved": true,
+          "totalMs": 3066,
+          "stability": {
+            "identicalHashes": true,
+            "pairs": [
+              {
+                "a": 1,
+                "b": 2,
+                "differingPixels": 0,
+                "pct": 0
+              },
+              {
+                "a": 1,
+                "b": 3,
+                "differingPixels": 0,
+                "pct": 0
+              },
+              {
+                "a": 2,
+                "b": 3,
+                "differingPixels": 0,
+                "pct": 0
+              }
+            ]
+          }
+        },
+        {
+          "mode": "headed",
+          "profile": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e11-headed-XRQvKK",
+          "steps": {
+            "launchMs": 330,
+            "browserVersion": "156.0.8078.4",
+            "serviceWorker": {
+              "url": "chrome-extension://<id>/background.js",
+              "extensionId": "molinpamgijcbgnkncnedgdafilhomgj",
+              "ms": 376
+            },
+            "popup": {
+              "dir": "rtl",
+              "lang": "ar",
+              "title": "عدّاد الكلمات",
+              "consoleErrors": []
+            },
+            "axe": {
+              "violations": [],
+              "passes": 15,
+              "incomplete": 0,
+              "version": "4.14.0"
+            },
+            "screenshots": [
+              {
+                "sha256": "af867300753e463bd489c29378dd014101d251bfb8c17a18f0378abff925e37b",
+                "bytes": 6836
+              },
+              {
+                "sha256": "af867300753e463bd489c29378dd014101d251bfb8c17a18f0378abff925e37b",
+                "bytes": 6836
+              },
+              {
+                "sha256": "af867300753e463bd489c29378dd014101d251bfb8c17a18f0378abff925e37b",
+                "bytes": 6836
+              }
+            ],
+            "options": {
+              "consoleErrors": [],
+              "title": "خيارات عدّاد الكلمات"
+            },
+            "pagesOpened": 1
+          },
+          "errors": [],
+          "profileRemoved": true,
+          "totalMs": 1968,
+          "stability": {
+            "identicalHashes": true,
+            "pairs": [
+              {
+                "a": 1,
+                "b": 2,
+                "differingPixels": 0,
+                "pct": 0
+              },
+              {
+                "a": 1,
+                "b": 3,
+                "differingPixels": 0,
+                "pct": 0
+              },
+              {
+                "a": 2,
+                "b": 3,
+                "differingPixels": 0,
+                "pct": 0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "engineStderr": "",
+    "finishedAt": "2026-10-10T09:46:10.864Z"
+  }
+}
