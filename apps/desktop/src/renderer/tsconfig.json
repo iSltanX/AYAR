@@ -1,10 +1,20 @@
 {
   "extends": "../../../../tsconfig.base.json",
   "compilerOptions": {
-    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2024",
+      "ES2025.Intl",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "types": ["svelte"]
+    "types": [
+      "svelte"
+    ]
   },
-  "include": ["./**/*.ts", "./**/*.svelte"]
+  "include": [
+    "./**/*.ts",
+    "./**/*.svelte"
+  ]
 }

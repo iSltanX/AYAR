@@ -1,5 +1,14 @@
 {
   "extends": "../../../../tsconfig.base.json",
-  "compilerOptions": { "lib": ["ES2024", "DOM"], "types": [] },
-  "include": ["./**/*.ts"]
+  "compilerOptions": {
+    "lib": [
+      "ES2024",
+      "ES2025.Intl",
+      "DOM"
+    ],
+    "types": []
+  },
+  "include": [
+    "./**/*.ts"
+  ]
 }
