@@ -97,10 +97,10 @@ closing_commit:
 ```text
 أنت تنفّذ مرحلة التصميم DES-4 لمشروع عِيَار AYAR: شاشات الرحلة الأساسية.
 1) اقرأ AGENTS.md، ثم docs/phases/design/DES-4-core-screens.md، ثم docs/design/README.md، ثم البرومبت §10 (الشاشات 1–8) و§11.
-2) تحقق قبل البدء: DES-3 مغلقة ومعتمدة. وتأكد أنك في مجلد العمل AYAR-wt/DES-4 على الفرع phase/DES-4 (docs/waves/README.md 3).
+2) تحقق قبل البدء: DES-3 مغلقة ومعتمدة. وتأكد أنك في مجلد العمل AYAR-wt/DES-4 على الفرع phase/DES-4 (docs/waves/README.md 4).
 3) في Figma: create_session، ومهارتا figma:figma-use وfigma:figma-generate-design. ركّب الشاشات من مكونات المكتبة وحدها.
 4) استخدم بيانات المثال والمعرّفات في §10، والمصطلحات في §11 حرفيًا، ولا عبارة ممنوعة.
-5) اعرض على المالك، وسجّل اعتماده. عند تحقق معايير القسم 8: سلّم وفق AGENTS.md 3.4 (ملف docs/handoffs/DES-4.md، وstatus: delivered)، ثم توقف. الدمج والوسم والدفع لجلسة التنسيق.
+5) اعرض على المالك، وسجّل اعتماده. عند تحقق معايير القسم 8: سلّم وفق AGENTS.md 3.4 (ملف docs/handoffs/DES-4.md، وstatus: delivered)، ثم توقف. الدمج والوسم والدفع للجلسة الرئيسية.
 ```
 
 ## 11. حالة التقدم ونقطة الاستئناف

@@ -99,10 +99,10 @@ closing_commit:
 ```text
 أنت تنفّذ مرحلة التصميم DES-3 لمشروع عِيَار AYAR: المكونات التسعة والعشرون.
 1) اقرأ AGENTS.md، ثم docs/phases/design/DES-3-components.md، ثم docs/design/README.md، ثم البرومبت §9 حرفيًا.
-2) تحقق قبل البدء: DES-2 مغلقة ومعتمدة. وتأكد أنك في مجلد العمل AYAR-wt/DES-3 على الفرع phase/DES-3 (docs/waves/README.md 3).
+2) تحقق قبل البدء: DES-2 مغلقة ومعتمدة. وتأكد أنك في مجلد العمل AYAR-wt/DES-3 على الفرع phase/DES-3 (docs/waves/README.md 4).
 3) في Figma: create_session، ومهارتا figma:figma-use وfigma:figma-generate-library. ابنِ المكونات بمتغيرات DES-1 وشارات DES-2 فقط.
 4) نسختا RTL وLTR لكل مكوّن، وزر نسخ واحد، ولا أحمر لإجراء هدام.
-5) اعرض على المالك، وسجّل اعتماده. عند تحقق معايير القسم 8: سلّم وفق AGENTS.md 3.4 (ملف docs/handoffs/DES-3.md، وstatus: delivered)، ثم توقف. الدمج والوسم والدفع لجلسة التنسيق.
+5) اعرض على المالك، وسجّل اعتماده. عند تحقق معايير القسم 8: سلّم وفق AGENTS.md 3.4 (ملف docs/handoffs/DES-3.md، وstatus: delivered)، ثم توقف. الدمج والوسم والدفع للجلسة الرئيسية.
 ```
 
 ## 11. حالة التقدم ونقطة الاستئناف

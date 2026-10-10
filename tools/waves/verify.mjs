@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// يتحقق من تسليم مرحلة قبل دمجها (docs/waves/README.md، القسم 5). قراءة فقط: لا يغيّر شيئًا.
+// يتحقق من تسليم مرحلة قبل دمجها (docs/waves/README.md، القسم 6). قراءة فقط: لا يغيّر شيئًا.
 //
 // الاستخدام (من أي مجلد داخل المستودع):
 //   /opt/homebrew/bin/node tools/waves/verify.mjs DEV-3
@@ -142,7 +142,7 @@ const shared = ['docs/tracking/', 'AGENTS.md', 'CLAUDE.md', 'README.md', 'docs/p
 const inside = (p, list) => list.some((s) => s && (s.endsWith('/') ? p.startsWith(s) : p === s));
 const touchedShared = changed.filter((p) => inside(p, shared) && !inside(p, always));
 const outOfScope = changed.filter((p) => !inside(p, [...scope, ...always]) && !inside(p, shared));
-if (touchedShared.length) warn(`عُدّلت ملفات مشتركة يملكها المنسّق: ${touchedShared.join('، ')}`);
+if (touchedShared.length) warn(`عُدّلت ملفات مشتركة تملكها الجلسة الرئيسية: ${touchedShared.join('، ')}`);
 if (scope.length && outOfScope.length) warn(`ملفات خارج نطاق المرحلة: ${outOfScope.slice(0, 15).join('، ')}${outOfScope.length > 15 ? '…' : ''}`);
 if (!scope.length) warn('لا حقل scope في ملف المرحلة، فلم يُفحص النطاق');
 pass(`الملفات المتغيرة منذ التفرع من main: ${changed.length}`);
@@ -160,7 +160,7 @@ function report() {
     process.exit(1);
   }
   if (handoff?.status === 'blocked') {
-    // رمز 3: تسليم سليم الصيغة لمرحلة معطّلة. ينقل المنسّق عوائقها إلى blockers.md ولا يدمجها
+    // رمز 3: تسليم سليم الصيغة لمرحلة معطّلة. تنقل الجلسة الرئيسية عوائقها إلى blockers.md ولا يدمجها
     console.log(`\nالنتيجة: ${id} معطّلة. لا تُدمج: انقل عوائقها إلى docs/tracking/blockers.md وأبلغ المالك.`);
     process.exit(3);
   }

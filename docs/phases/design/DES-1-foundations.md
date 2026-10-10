@@ -111,12 +111,12 @@ closing_commit:
 ```text
 أنت تنفّذ مرحلة التصميم DES-1 لمشروع عِيَار AYAR: تنظيم الملف وإكمال الهوية والأسس.
 1) اقرأ AGENTS.md، ثم docs/phases/design/DES-1-foundations.md، ثم docs/design/README.md، ثم أقسام البرومبت المذكورة في القسم 3.
-2) تحقق قبل البدء (AGENTS.md 3.1)، وتأكد أنك في مجلد العمل AYAR-wt/DES-1 على الفرع phase/DES-1 (docs/waves/README.md 3).
+2) تحقق قبل البدء (AGENTS.md 3.1)، وتأكد أنك في مجلد العمل AYAR-wt/DES-1 على الفرع phase/DES-1 (docs/waves/README.md 4).
 3) في Figma: استدعِ create_session بمفتاح الملف، وحمّل مهارة figma:figma-use قبل أي use_figma، وfigma:figma-generate-library للمتغيرات.
 4) لا تحذف ولا تعيد رسم شيئًا موجودًا. أضف فقط.
 5) لا تدخل لون العُرف في متغيرات الواجهة. أثبت التباين بأرقام.
 6) اعرض النتيجة على المالك ولا تعتبرها معتمدة قبل موافقته الصريحة.
-7) سجّل التقدم بعد كل مهمة. عند تحقق معايير القسم 8: سلّم وفق AGENTS.md 3.4 (ملف docs/handoffs/DES-1.md، وstatus: delivered)، ثم توقف. الدمج والوسم والدفع لجلسة التنسيق.
+7) سجّل التقدم بعد كل مهمة. عند تحقق معايير القسم 8: سلّم وفق AGENTS.md 3.4 (ملف docs/handoffs/DES-1.md، وstatus: delivered)، ثم توقف. الدمج والوسم والدفع للجلسة الرئيسية.
 ```
 
 ## 11. حالة التقدم ونقطة الاستئناف

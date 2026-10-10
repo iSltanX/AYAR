@@ -100,10 +100,10 @@ closing_commit:
 ```text
 أنت تنفّذ مرحلة التصميم DES-5 لمشروع عِيَار AYAR: بقية الشاشات والرحلات العشر وإرشادات المطور.
 1) اقرأ AGENTS.md، ثم docs/phases/design/DES-5-remaining-screens-flows.md، ثم docs/design/README.md، ثم البرومبت §10 (الشاشات 9–22 والرحلات) و§11–§14.
-2) تحقق قبل البدء: DES-4 مغلقة ومعتمدة. وتأكد أنك في مجلد العمل AYAR-wt/DES-5 على الفرع phase/DES-5 (docs/waves/README.md 3).
+2) تحقق قبل البدء: DES-4 مغلقة ومعتمدة. وتأكد أنك في مجلد العمل AYAR-wt/DES-5 على الفرع phase/DES-5 (docs/waves/README.md 4).
 3) في Figma: create_session، ومهارتا figma:figma-use وfigma:figma-generate-design. ركّب من المكتبة وحدها.
 4) استوفِ قائمة §14 بندًا بندًا، واجعل الرحلات العشر تفاعلية.
-5) اعرض على المالك، وسجّل اعتماده النهائي. عند تحقق معايير القسم 8: سلّم وفق AGENTS.md 3.4 (ملف docs/handoffs/DES-5.md، وstatus: delivered)، ثم توقف. الدمج والوسم والدفع لجلسة التنسيق.
+5) اعرض على المالك، وسجّل اعتماده النهائي. عند تحقق معايير القسم 8: سلّم وفق AGENTS.md 3.4 (ملف docs/handoffs/DES-5.md، وstatus: delivered)، ثم توقف. الدمج والوسم والدفع للجلسة الرئيسية.
 ```
 
 ## 11. حالة التقدم ونقطة الاستئناف
