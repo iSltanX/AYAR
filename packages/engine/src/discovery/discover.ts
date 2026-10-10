@@ -14,6 +14,8 @@ import { ProjectReader } from './reader.ts';
 import { DiscoveryCancelled, walk, type DiscoveryFs, type DiscoveryLimits, type WalkResult } from './walker.ts';
 
 export const SCANNER_VERSION = 'discovery/1.0.0';
+/** Configuration files C-06 knows by name (C-06 point 5). */
+const KNOWN_CONFIG = /^(package\.json|pnpm-workspace\.yaml|tsconfig(\.[\w-]+)?\.json|jsconfig\.json|pyproject\.toml|manifest\.json|biome\.jsonc?|\.eslintrc(\.\w+)?|eslint\.config\.\w+|(vite|vitest|playwright|jest|svelte|next|astro|nuxt|wxt)\.config\.\w+|mise\.toml|\.tool-versions|\.nvmrc|\.node-version|\.python-version|pytest\.ini|ruff\.toml|mypy\.ini|knip\.json)$/;
 const TEST_PATH_CAP = 500;
 
 export interface DiscoverOptions {
@@ -176,6 +178,10 @@ export async function discover(o: DiscoverOptions): Promise<DiscoveryResult> {
   }
 
   // 6. Configuration that could not be read or parsed: a fact (it explains «تعذّر»/«ناقص» later) and a warning.
+  //    A known configuration file over the limit is reported even when no detector needed it.
+  for (const [rel, f] of w.files) {
+    if (f.size > o.limits.maxConfigBytes && KNOWN_CONFIG.test(posix.basename(rel)) && !reader.problems.has(rel)) reader.problems.set(rel, { error: 'too_large' });
+  }
   const warnings: DiscoveryWarning[] = w.warnings.map((x) => ({ code: x.code, ...(x.path ? { path: x.path } : {}), ...(x.values ? { values: x.values } : {}) }));
   for (const [file, p] of [...reader.problems.entries()].sort(([a], [b]) => (a < b ? -1 : 1))) {
     project('config.invalid', { file, error: p.error, ...(p.message ? { message: p.message } : {}) }, { file, pointer: '', line: null }, 'declared', 'config@1');

@@ -166,7 +166,10 @@ export function proposeCommand(def: CheckDefinition, cf: ComponentFacts): Comman
         const s = fromScript(cf, 'build', 'build-script');
         if (s) return s;
       }
-      if (cf.own.some((f) => f.key === 'python.buildSystem')) {
+      const buildSystem = cf.own.find((f) => f.key === 'python.buildSystem');
+      if (buildSystem) {
+        // The project's own front end first (`python -m build`, in its environment), then the manager's.
+        if (rec(buildSystem.value).frontend === 'build') return pythonTool(cf, 'build', null, [], 'build');
         const manager = text(rec(cf.own.find((f) => f.key === 'python.manager')?.value).name, '');
         if (manager === 'uv' && !cf.own.some((f) => f.key === 'python.venv')) return { command: { argv: ['uv', 'build', '--offline'], cwd: cf.component, script: null, from: 'tool' }, tool: { key: 'uv', source: 'uv', runtime: runtimeOf(cf, 'python'), path: null } };
         if (manager === 'poetry') return { command: { argv: ['poetry', 'build'], cwd: cf.component, script: null, from: 'tool' }, tool: { key: 'poetry', source: 'poetry-env', runtime: runtimeOf(cf, 'python'), path: null } };
@@ -181,7 +184,9 @@ export function proposeCommand(def: CheckDefinition, cf: ComponentFacts): Comman
     default:
       break;
   }
-  // Managed tools (secrets, OSV, Semgrep, lychee, network audits): the adapter defines the invocation (DEV-6).
+  // The network audit uses the ecosystem's own tool: npm audit for npm, pip-audit for Python (10.3).
+  if (def.id === 'sec.deps.audit') return { command: null, tool: isNode(cf) ? { key: 'npm', source: 'system', runtime: null, path: null } : { key: 'pip-audit', source: 'system', runtime: null, path: null } };
+  // Managed tools (secrets, OSV, Semgrep, lychee): the adapter defines the invocation (DEV-6).
   if (def.runner.kind === 'adapter') {
     const managed = def.requirements.find((r) => r.kind === 'tool' && (r.from === 'managed' || r.from === 'system'));
     if (managed && managed.kind === 'tool') return { command: null, tool: { key: managed.tools[0]!, source: managed.from === 'managed' ? 'managed' : 'system', runtime: null, path: null } };

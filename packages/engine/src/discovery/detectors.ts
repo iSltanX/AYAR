@@ -186,7 +186,8 @@ export const python: Detector = {
       const devNames = Object.values(isRecord(v['dependency-groups']) ? v['dependency-groups'] : {}).flatMap((l): unknown[] => (Array.isArray(l) ? (l as unknown[]) : [])).filter((x): x is string => typeof x === 'string').map((x) => x.split(/[<>=!~ ;[]/)[0]!.toLowerCase());
       const allNames = [...devNames, ...(isRecord(v.project) && Array.isArray(v.project.dependencies) ? v.project.dependencies.filter((x): x is string => typeof x === 'string').map((x) => x.split(/[<>=!~ ;[]/)[0]!.toLowerCase()) : [])];
       add('python.dependencies', { count: runtimeDeps + Object.values(groups).reduce((a, b) => a + b, 0), runtime: runtimeDeps, groups }, src(pyFile, 'project.dependencies', lineOfToml(t, 'project', 'dependencies')), 'declared');
-      if (isRecord(v['build-system'])) add('python.buildSystem', { backend: str(v['build-system']['build-backend']) }, src(pyFile, 'build-system', lineOfToml(t, 'build-system')), 'declared');
+      // The build front end the project itself declares (`build` in its dependencies), if any.
+      if (isRecord(v['build-system'])) add('python.buildSystem', { backend: str(v['build-system']['build-backend']), frontend: allNames.includes('build') ? 'build' : null }, src(pyFile, 'build-system', lineOfToml(t, 'build-system')), 'declared');
       if (isRecord(tool.poetry)) manager = { name: 'poetry', source: src(pyFile, 'tool.poetry', lineOfToml(t, 'tool.poetry')), proof: 'declared' };
       else if (isRecord(tool.uv)) manager = { name: 'uv', source: src(pyFile, 'tool.uv', lineOfToml(t, 'tool.uv')), proof: 'declared' };
       // Tool configuration sections: test framework and quality tools.
@@ -339,7 +340,7 @@ export const web: Detector = {
     if (xcode) add('type.desktopApp', { kind: 'xcode' }, fileSource(xcode), 'declared');
     // Entry pages, and the right-to-left languages they declare.
     const pages = ctx.files.filter((f) => ext(f) === 'html' && [c, at(c, 'public'), at(c, 'src')].includes(posix.dirname(f)));
-    if (pages.length) add('ui.entryPages', { files: pages }, null, 'inferred');
+    if (pages.length) add('ui.entryPages', { files: pages }, fileSource(pages[0]!), 'inferred');
     const rtlFiles: string[] = [];
     const languages = new Set<string>();
     let first: FactSource | null = null;
