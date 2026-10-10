@@ -1,0 +1,11 @@
+{
+  "name": "huge-output",
+  "description": "اختبار ينجح ويطبع نحو 120 ميغابايت: يجب أن يقتطع عِيَار الخرج عند الحد دون استهلاك الذاكرة.",
+  "role": "neutral",
+  "defects": [
+    "beh.unit: خرج ضخم"
+  ],
+  "delete": [
+    "test/ok.test.js"
+  ]
+}

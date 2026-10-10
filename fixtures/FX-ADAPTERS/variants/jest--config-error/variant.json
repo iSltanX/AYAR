@@ -1,0 +1,9 @@
+{
+  "name": "jest--config-error",
+  "description": "إعداد Jest يطلب testEnvironment غير موجودة فتفشل الأداة.",
+  "defects": [
+    "beh.unit: فشل إعداد الأداة"
+  ],
+  "component": "jest",
+  "kind": "config-error"
+}

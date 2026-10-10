@@ -1,0 +1,7 @@
+{
+  "name": "complex-function",
+  "description": "دالة validatePayload بتعقيد 19 بقياس ESLint تتجاوز العتبة المعلنة 10 (AT-37).",
+  "defects": [
+    "code.complexity: validatePayload تتجاوز العتبة"
+  ]
+}

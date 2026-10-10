@@ -1,0 +1,59 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-EXT",
+  "variant": "failing-test",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "src/lib/count.test.ts",
+        "line": 11,
+        "anchor": "يفصل الكلمات بعلامات الترقيم"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "exit_code": 1
+    },
+    {
+      "check": "beh.stability",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "src/lib/count.test.ts",
+        "line": 11,
+        "anchor": "يفصل الكلمات بعلامات الترقيم"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "إخفاق ثابت في كل التكرارات، لا تذبذب"
+    },
+    {
+      "check": "code.build",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "code.types",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "code.lint",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    }
+  ]
+}

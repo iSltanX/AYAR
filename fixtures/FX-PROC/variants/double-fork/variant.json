@@ -1,0 +1,11 @@
+{
+  "name": "double-fork",
+  "description": "الاختبار يشغّل سكربت Python يتفرع تفرعًا مزدوجًا (شبح daemon) فيبقى الحفيد حيًّا بعد خروج الأب والابن.",
+  "role": "neutral",
+  "defects": [
+    "beh.unit: شبح بتفرع مزدوج"
+  ],
+  "delete": [
+    "test/ok.test.js"
+  ]
+}

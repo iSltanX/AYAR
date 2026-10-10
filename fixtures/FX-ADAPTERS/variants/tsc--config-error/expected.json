@@ -1,0 +1,24 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "tsc--config-error",
+  "expectations": [
+    {
+      "check": "code.types",
+      "component": "tsc",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "tool_rule": "TS5083",
+      "location": {
+        "path": "tsc/tsconfig.json",
+        "line": 2,
+        "anchor": "missing-base.json"
+      },
+      "confidence": null,
+      "origin": "الأداة",
+      "exit_code": 2,
+      "reason": "تشخيص إعداد معدود صراحة في خريطة المحول (TS5083)"
+    }
+  ]
+}

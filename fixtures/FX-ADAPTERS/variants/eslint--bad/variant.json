@@ -1,0 +1,9 @@
+{
+  "name": "eslint--bad",
+  "description": "متغير غير مستخدم (no-unused-vars) فيخرج ESLint برمز 1.",
+  "defects": [
+    "code.lint: no-unused-vars"
+  ],
+  "component": "eslint",
+  "kind": "bad"
+}

@@ -1,0 +1,39 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-PY",
+  "variant": "ruff-violation",
+  "expectations": [
+    {
+      "check": "code.lint",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "tool_rule": "F401",
+      "location": {
+        "path": "src/nusus/text.py",
+        "line": 5,
+        "anchor": "import os"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "exit_code": 1,
+      "reason": "Ruff 0.16.10: F401"
+    },
+    {
+      "check": "beh.unit",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "code.types",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    }
+  ]
+}

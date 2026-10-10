@@ -1,0 +1,7 @@
+{
+  "name": "junit-corrupt",
+  "description": "تقرير JUnit مبتور في منتصف وسم: XML غير سليم (AT-14: تعذّر).",
+  "defects": [
+    "beh.unit: JUnit تالف"
+  ]
+}

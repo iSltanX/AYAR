@@ -1,0 +1,11 @@
+{
+  "name": "integrity-baseline",
+  "description": "الجولة الأساسية لـ AT-24: أربعة عيوب — اختبار فاشل (الوسيط مرتب كنص)، وخطأ مدقق (no-console)، واختبار لقطة فاشل (تغيير الفاصل)، ودالة mean بلا اختبار (تظهر العتبة 90% غير محققة في integrity-threshold-lowered بعد إصلاح بقية العيوب؛ فمع الإخفاقات يتوقف Vitest عن تقييم العتبات).",
+  "derived_from": "integrity-real-fix",
+  "defects": [
+    "beh.unit: median([10, 9, 100])",
+    "code.lint: no-console في src/popup.ts",
+    "beh.unit: لقطة formatSummary تخالف الناتج",
+    "mean بلا اختبار: التغطية تحت عتبة vitest.config.ts عند نجاح بقية الاختبارات"
+  ]
+}

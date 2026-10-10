@@ -1,0 +1,20 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-EXT",
+  "variant": "flaky-playwright",
+  "expectations": [
+    {
+      "check": "beh.e2e",
+      "result": "متذبذب",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "e2e/flaky.spec.ts",
+        "line": 4,
+        "anchor": "رحلة متقطعة تنجح بعد إعادة"
+      },
+      "confidence": "مخالفة مثبتة",
+      "reason": "حالة flaky في تقرير Playwright: نجحت بعد إعادة من إعداد المشروع"
+    }
+  ]
+}

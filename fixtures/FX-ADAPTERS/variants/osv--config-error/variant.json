@@ -1,0 +1,9 @@
+{
+  "name": "osv--config-error",
+  "description": "ملف قفل تالف (JSON غير صالح): تعذّر قراءته.",
+  "defects": [
+    "sec.deps: ملف قفل تالف"
+  ],
+  "component": "osv",
+  "kind": "config-error"
+}

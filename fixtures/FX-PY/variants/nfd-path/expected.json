@@ -1,0 +1,46 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-PY",
+  "variant": "nfd-path",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "code.lint",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "code.types",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "code.build",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "nfd-path-roundtrip",
+      "statement": "توحيد المسارات قابل للعكس للمقارنة: المسار بصيغة NFD يطابق نظيره NFC عند المقارنة، ويُحفظ المسار الأصلي كما هو (الخطة 19، اختبارات الخصائص)",
+      "acceptance": "AT-16"
+    }
+  ]
+}

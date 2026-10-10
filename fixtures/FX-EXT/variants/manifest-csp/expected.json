@@ -1,0 +1,49 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-EXT",
+  "variant": "manifest-csp",
+  "expectations": [
+    {
+      "check": "sec.ext.manifest",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "public/manifest.json",
+        "line": 28,
+        "anchor": "'unsafe-eval'"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "MV3 يمنع 'unsafe-eval' في extension_pages"
+    },
+    {
+      "check": "beh.ext.host",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "public/manifest.json",
+        "line": 28,
+        "anchor": "'unsafe-eval'"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "Chromium يرفض تحميل الإضافة، فلا عامل خدمة ولا صفحات (يُثبت في SANITY.md)"
+    },
+    {
+      "check": "beh.e2e",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "e2e/extension.spec.ts",
+        "line": 9,
+        "anchor": "beforeAll"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "اختبارات الرحلات تعتمد على تحميل الإضافة"
+    }
+  ]
+}

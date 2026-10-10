@@ -1,0 +1,7 @@
+{
+  "name": "error-message-missing",
+  "description": "حالة الخطأ تعرض «حدث خطأ ما» بدل الرسالة المتوقعة المعلنة في design/states.json.",
+  "defects": [
+    "design.states: رسالة الخطأ المتوقعة لا تظهر"
+  ]
+}

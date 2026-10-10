@@ -1,0 +1,10 @@
+{
+  "name": "sigterm-grandchild",
+  "description": "الاختبار يطلق ابنًا ثم حفيدًا يتجاهل SIGTERM ثم يعلق: تنتهي المهلة ويلزم التصعيد إلى SIGKILL لشجرة العمليات.",
+  "defects": [
+    "beh.unit: حفيد يتجاهل SIGTERM"
+  ],
+  "delete": [
+    "test/ok.test.js"
+  ]
+}

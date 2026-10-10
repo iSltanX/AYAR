@@ -1,0 +1,51 @@
+{
+  "id": "FX-WEB-DESIGN",
+  "title": "FX-WEB-DESIGN — تطبيق ويب برموز DTCG",
+  "description": "تطبيق ويب صغير (سوق أجهزة): رموز DTCG، وثيمان، ولغتان، وحالات تحميل وخطأ وفراغ بمحاكاة شبكة، وحالة موسومة «حساسة»، وخط Cairo محلي، ولا صور مرجعية معتمدة. الخطة 20 وAT-17 وAT-31.",
+  "kind": "overlay",
+  "variants": {
+    "good": {
+      "description": "النسخة السليمة: كل فحوص التصميم تمر عدا design.visual «ناقص إعداد» لغياب المراجع المعتمدة."
+    },
+    "hardcoded-color": {
+      "description": "لون حرفي #1a73e8 خارج الرموز في شارة الحالة."
+    },
+    "off-scale-spacing": {
+      "description": "حشوة 15px في بطاقة العنصر خارج سلم المسافات (4/8/12/16/24/32)."
+    },
+    "undefined-var": {
+      "description": "var(--color-text-subtle) لرمز غير معرّف فيرجع اللون صامتًا إلى الموروث."
+    },
+    "error-message-missing": {
+      "description": "حالة الخطأ تعرض «حدث خطأ ما» بدل الرسالة المتوقعة المعلنة في design/states.json."
+    },
+    "visual-change": {
+      "description": "تغيير بصري مقصود: نصف قطر البطاقات والأزرار من 8px إلى 16px (متسق في tokens.json وtokens.css). يُطبَّق بعد اعتماد المراجع من النسخة السليمة (AT-17)."
+    },
+    "silent-font-fallback": {
+      "description": "ملف خط Cairo العربي في @font-face غير موجود، فيظهر خط النظام البديل صامتًا."
+    },
+    "low-contrast-default": {
+      "description": "لون النص الثانوي في الثيم الفاتح #9aa3af على الأبيض (نحو 2.5:1) في الحالة الافتراضية."
+    },
+    "external-font-host": {
+      "description": "الصفحة تطلب خط Cairo من مضيف خارجي (fonts.googleapis.com) بدل الملف المحلي (AT-31)."
+    }
+  },
+  "facts": {
+    "states": 5,
+    "sensitive_states": 1,
+    "themes": 2,
+    "languages": 2,
+    "viewports": 2,
+    "screenshots_expected": 32,
+    "screenshots_formula": "(الحالات − الحساسة) × الأحجام × الثيمات × اللغات = 4 × 2 × 2 × 2",
+    "approved_references": 0
+  },
+  "toolchain": {
+    "node": "24.16.0",
+    "chromium": "156.0.8078.4 (Playwright 1.64.0)",
+    "axe-core": "4.14.0",
+    "font": "@fontsource-variable/cairo 5.3.0 (OFL-1.1)"
+  }
+}

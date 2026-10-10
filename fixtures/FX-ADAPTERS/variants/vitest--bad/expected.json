@@ -1,0 +1,22 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "vitest--bad",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "component": "vitest",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "vitest/test/add.test.js",
+        "line": 4,
+        "anchor": "يجمع عددين"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "exit_code": 1
+    }
+  ]
+}

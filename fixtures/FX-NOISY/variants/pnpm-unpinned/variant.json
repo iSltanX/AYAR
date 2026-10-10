@@ -1,0 +1,5 @@
+{
+  "name": "pnpm-unpinned",
+  "description": "المشروع نفسه مع packageManager يطلب pnpm@9.15.4 وهو غير مثبت على الجهاز (المثبت 12.8.1). لاختبار AT-31: نقص جاهزية لا تنزيل تلقائي.",
+  "role": "neutral"
+}

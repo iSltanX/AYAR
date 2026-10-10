@@ -1,0 +1,7 @@
+{
+  "name": "usage-error",
+  "description": "خطأ استخدام pytest: خيار addopts غير موجود في إعداد المشروع فيخرج pytest برمز 4.",
+  "defects": [
+    "beh.unit: pytest برمز 4"
+  ]
+}

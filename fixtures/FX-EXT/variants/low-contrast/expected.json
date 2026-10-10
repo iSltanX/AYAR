@@ -1,0 +1,22 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-EXT",
+  "variant": "low-contrast",
+  "expectations": [
+    {
+      "check": "design.a11y",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "tool_rule": "color-contrast",
+      "location": {
+        "path": "src/popup.css",
+        "line": 2,
+        "anchor": "--fg"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "axe-core: color-contrast بأثر serious (يُثبت في SANITY.md)"
+    }
+  ]
+}

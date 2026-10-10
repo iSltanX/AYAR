@@ -1,0 +1,11 @@
+{
+  "name": "ayar-fx-mono",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FX-MONO: مساحة عمل pnpm بحزمتين — مشروع اختبار لعِيَار",
+  "type": "module",
+  "packageManager": "pnpm@12.8.1",
+  "scripts": {
+    "test": "pnpm -r test"
+  }
+}

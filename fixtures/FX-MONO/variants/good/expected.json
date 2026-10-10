@@ -1,0 +1,33 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-MONO",
+  "variant": "good",
+  "summary": "مثيلان beh.unit@packages/core وbeh.unit@packages/web يجتازان.",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "component": "packages/core",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "beh.unit",
+      "component": "packages/web",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "no-duplicate-runs",
+      "statement": "سكربت الجذر test (pnpm -r test) يشمل سكربتي الحزمتين: يخطط عِيَار مثيلين beh.unit@packages/core وbeh.unit@packages/web ولا يضيف مثيلًا ثالثًا للجذر ولا يشغّل الحزمتين مرتين (الخطة 7.1، C-10)",
+      "acceptance": "AT-16"
+    }
+  ]
+}

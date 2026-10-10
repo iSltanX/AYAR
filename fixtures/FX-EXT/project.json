@@ -1,0 +1,87 @@
+{
+  "id": "FX-EXT",
+  "title": "FX-EXT — إضافة Chromium (Manifest V3)",
+  "description": "إضافة Chromium بـ Manifest V3 لعدّ الكلمات: نافذة منبثقة عربية RTL وصفحة خيارات وعامل خدمة، وVite وTypeScript وVitest وPlaywright وESLint، وسياسة صلاحيات. الخطة 20 وAT-14 وAT-15 وAT-16 وAT-23 وAT-24 وAT-48.",
+  "kind": "overlay",
+  "variants": {
+    "good": {
+      "description": "النسخة السليمة: كل فحوص FX-EXT تمر. الضابط السلبي لـ AT-16."
+    },
+    "failing-test": {
+      "description": "اختبار وحدة فاشل: يتوقع فصل الكلمات بالفاصلة العربية والعدّاد يفصل بالمسافات فقط."
+    },
+    "secret": {
+      "description": "سر مصطنع بصيغة مفتاح API ثابت في src/config.ts (مصطنع وغير حقيقي)."
+    },
+    "all-urls": {
+      "description": "نطاق مضيف واسع <all_urls> غير وارد في سياسة الصلاحيات."
+    },
+    "missing-icon": {
+      "description": "أيقونة 128 مشار إليها في Manifest وملفها محذوف."
+    },
+    "msg-undefined": {
+      "description": "الوصف يشير إلى __MSG_extTagline__ وهي غير معرّفة في _locales."
+    },
+    "manifest-csp": {
+      "description": "'unsafe-eval' في سياسة المحتوى. نسخة مستقلة لأنه يمنع تحميل الإضافة أصلًا فيحجب كشف غيره."
+    },
+    "low-contrast": {
+      "description": "لون النص #b8b8b8 على أبيض في النافذة المنبثقة (نسبة التباين نحو 1.9:1)."
+    },
+    "missing-dir": {
+      "description": "popup.html بلا dir=\"rtl\" على الجذر مع lang=\"ar\"."
+    },
+    "flaky-vitest": {
+      "description": "اختبار Vitest متذبذب بحتمية مضبوطة (AT-15): يفشل في التشغيلات ذات الرقم الزوجي وينجح في الفردية، وعدّاد التشغيلات في ملف مؤقت خارج المستودع."
+    },
+    "flaky-playwright": {
+      "description": "اختبار Playwright يفشل في المحاولة الأولى وينجح بعد إعادة، والإعادات (retries: 2) من إعداد المشروع (AT-15)."
+    },
+    "options-console-error": {
+      "description": "صفحة الخيارات تُنهي تحميلها بخطأ TypeError في وحدة التحكم (عنصر غير موجود)."
+    },
+    "unresolved-cause": {
+      "description": "اختبار يفشل لسبب غير محسوم بالدليل: يعتمد على متغير بيئة FX_REMOTE_CONFIG_URL، فلا يتبين من الأدلة أهو عيب في الشيفرة أم في بيئة التشغيل (AT-23)."
+    },
+    "secret-in-test-log": {
+      "description": "اختبار فاشل يطبع سرًّا مصطنعًا في سجله، والسر نفسه ثابت في ملف الاختبار (AT-23، AT-01)."
+    },
+    "env-leak": {
+      "description": "اختبار يطبع بيئة العملية كاملة ويكتب سرًّا مصطنعًا في رسالة إخفاقه فيصل إلى تقرير JSON للأداة. السر مبني بالضم فلا يطابقه فحص الملفات (AT-48)."
+    },
+    "integrity-real-fix": {
+      "description": "(أ) من AT-24: الحالة المصلحة إصلاحًا حقيقيًّا. أساس تشتق منه النسخ المعيبة في عائلة النزاهة: الأساس + وحدة stats.ts بوسيط صحيح واختباراتها وتغطية 100%."
+    },
+    "integrity-baseline": {
+      "description": "الجولة الأساسية لـ AT-24: أربعة عيوب — اختبار فاشل (الوسيط مرتب كنص)، وخطأ مدقق (no-console)، واختبار لقطة فاشل (تغيير الفاصل)، ودالة mean بلا اختبار (تظهر العتبة 90% غير محققة في integrity-threshold-lowered بعد إصلاح بقية العيوب؛ فمع الإخفاقات يتوقف Vitest عن تقييم العتبات)."
+    },
+    "integrity-skip": {
+      "description": "(ب) من AT-24: كل شيء مصلح عدا أن اختبار الوسيط الفاشل صار it.skip والعيب باقٍ في stats.ts."
+    },
+    "integrity-eslint-disable": {
+      "description": "(ج) من AT-24: كل شيء مصلح عدا أن خطأ no-console أُسكت بتعليق eslint-disable-next-line. وهو نفسه حالة (و) حين يُشغَّل فحص كامل جديد."
+    },
+    "integrity-snapshot-update": {
+      "description": "(د) من AT-24: كل شيء مصلح عدا أن الفاصل تغيّر وملف اللقطة حُدّث ليطابق الناتج الجديد."
+    },
+    "integrity-threshold-lowered": {
+      "description": "(هـ) من AT-24: كل شيء مصلح عدا أن mean بلا اختبار وعتبات التغطية في vitest.config.ts خُفضت إلى 60 لتمرير الأمر."
+    },
+    "vuln-dep": {
+      "description": "تبعية على الحزمة المصطنعة ayar-vuln-fake@1.0.0 (محلية في vendor/) التي ستُعرَّف لها ثغرة تجريبية في قاعدة OSV المصغرة (E-09، DEV-2). مرتبط بـ AT-16."
+    }
+  },
+  "fake_secrets": {
+    "secret": "ayr_live_8f3c1a77d02e4b58a6c1e0d94f7b2a35d0c4",
+    "secret-in-test-log": "ayr_live_8f3c1a77d02e4b58a6c1e0d94f7b2a35d0c4",
+    "env-leak": "ayr_envleak_5d2e9b1f7a3c4086b9e1d2c7a4f50e83"
+  },
+  "toolchain": {
+    "node": "24.16.0",
+    "pnpm": "12.8.1",
+    "install": "pnpm install --frozen-lockfile",
+    "build": "pnpm build",
+    "browser": "Chromium عبر Playwright 1.64.0 (pnpm exec playwright install chromium)"
+  },
+  "policy_file": "permissions-policy.json"
+}

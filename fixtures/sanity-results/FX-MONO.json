@@ -1,0 +1,80 @@
+{
+  "project": "FX-MONO",
+  "variants": {
+    "good": [
+      {
+        "id": "root-test",
+        "cmd": "pnpm test",
+        "ok": true,
+        "code": 0,
+        "ms": 1726,
+        "proves": "beh.unit@packages/core وbeh.unit@packages/web: الاختباران يمران",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "$ pnpm -r test\nScope: 2 of 3 workspace projects\n$ vitest run\n\n RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-MONO-QKeCCH/p/packages/core\n\n\n Test Files  1 passed (1)\n      Tests  3 passed (3)\n   Start at  11:20:58\n   Duration  82ms (transform 54%, import 27%, worker 11%, tests 7%)\n\n$ vitest run\n\n RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-MONO-QKeCCH/p/packages/web\n\n\n Test Files  1 passed (1)\n      Tests  1 passed (1)\n   Start at  11:20:59\n   Duration  70ms (transform 55%, import 29%, worker 9%, tests 7%)"
+      },
+      {
+        "id": "core",
+        "cmd": "pnpm --filter @mono/core test",
+        "ok": true,
+        "code": 0,
+        "ms": 321,
+        "proves": "beh.unit@packages/core منفردًا",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "$ vitest run\n\n RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-MONO-QKeCCH/p/packages/core\n\n\n Test Files  1 passed (1)\n      Tests  3 passed (3)\n   Start at  11:20:59\n   Duration  68ms (transform 54%, import 27%, worker 10%, tests 8%)"
+      },
+      {
+        "id": "web",
+        "cmd": "pnpm --filter @mono/web test",
+        "ok": true,
+        "code": 0,
+        "ms": 323,
+        "proves": "beh.unit@packages/web منفردًا",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "$ vitest run\n\n RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-MONO-QKeCCH/p/packages/web\n\n\n Test Files  1 passed (1)\n      Tests  1 passed (1)\n   Start at  11:20:59\n   Duration  68ms (transform 57%, import 27%, worker 9%, tests 7%)"
+      }
+    ],
+    "failing-core": [
+      {
+        "id": "core",
+        "cmd": "pnpm --filter @mono/core test",
+        "ok": true,
+        "code": 1,
+        "ms": 1124,
+        "proves": "beh.unit@packages/core: يفشل اختبار «يحسب المتوسط»",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "$ vitest run\n\n RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-MONO-Lod9uM/p/packages/core\n\n ❯ test/index.test.js (3 tests | 1 failed) 3ms\n   ❯ core (3)\n     × يحسب المتوسط 2ms\n\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯\n\n FAIL  test/index.test.js > core > يحسب المتوسط\nAssertionError: expected 3 to be 4 // Object.is equality\n\n- Expected\n+ Received\n\n- 4\n+ 3\n\n ❯ test/index.test.js:9:29\n      7|   });\n      8|   it('يحسب المتوسط', () => {\n      9|     expect(average([2, 4])).toBe(4);\n       |                             ^\n     10|   });\n     11|   it('متوسط القائمة الفارغة صفر', () => {\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯\n\n\n Test Files  1 failed (1)\n      Tests  1 failed | 2 passed (3)\n   Start at  11:21:01\n   Duration  83ms (transform 45%, import 24%, tests 18%, worker 12%)\n\n[ELIFECYCLE] Test failed. See above for more details.\nError: ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL\n\n  × \"pnpm recursive run\" failed in /private/var/\n  │ folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-MONO-Lod9uM/\n  │ p/packages/core"
+      },
+      {
+        "id": "web",
+        "cmd": "pnpm --filter @mono/web test",
+        "ok": true,
+        "code": 0,
+        "ms": 455,
+        "proves": "beh.unit@packages/web: يمر رغم فشل core",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "$ vitest run\n\n RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-MONO-Lod9uM/p/packages/web\n\n\n Test Files  1 passed (1)\n      Tests  1 passed (1)\n   Start at  11:21:01\n   Duration  69ms (transform 55%, import 29%, worker 9%, tests 7%)"
+      },
+      {
+        "id": "root-test",
+        "cmd": "pnpm test",
+        "ok": true,
+        "code": 1,
+        "ms": 389,
+        "proves": "سكربت الجذر ينتهي بإخفاق من core",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "$ pnpm -r test\nScope: 2 of 3 workspace projects\n$ vitest run\n\n RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-MONO-Lod9uM/p/packages/core\n\n ❯ test/index.test.js (3 tests | 1 failed) 4ms\n   ❯ core (3)\n     × يحسب المتوسط 2ms\n\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯\n\n FAIL  test/index.test.js > core > يحسب المتوسط\nAssertionError: expected 3 to be 4 // Object.is equality\n\n- Expected\n+ Received\n\n- 4\n+ 3\n\n ❯ test/index.test.js:9:29\n      7|   });\n      8|   it('يحسب المتوسط', () => {\n      9|     expect(average([2, 4])).toBe(4);\n       |                             ^\n     10|   });\n     11|   it('متوسط القائمة الفارغة صفر', () => {\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯\n\n\n Test Files  1 failed (1)\n      Tests  1 failed | 2 passed (3)\n   Start at  11:21:01\n   Duration  75ms (transform 47%, import 24%, tests 20%, worker 9%)\n\n[ELIFECYCLE] Test failed. See above for more details.\nError: ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL\n\n  × \"pnpm recursive run\" failed in /private/var/\n  │ folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-MONO-Lod9uM/\n  │ p/packages/core\n\n[ELIFECYCLE] Test failed. See above for more details."
+      }
+    ]
+  },
+  "date": "2026-10-10",
+  "versions": {
+    "node": "v24.16.0",
+    "pnpm": "12.8.1"
+  }
+}

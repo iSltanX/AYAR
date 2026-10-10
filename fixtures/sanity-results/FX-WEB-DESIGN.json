@@ -1,0 +1,326 @@
+{
+  "project": "FX-WEB-DESIGN",
+  "variants": {
+    "good": [
+      {
+        "id": "tokens-build",
+        "cmd": "node tools/build-tokens.mjs --check",
+        "ok": true,
+        "code": 0,
+        "ms": 26,
+        "proves": "tokens.css مولَّد من tokens.json الحالي (اتساق الرموز)",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "tokens.css مطابق للرموز"
+      },
+      {
+        "id": "static",
+        "cmd": "node $FX_TOOLS/web-design-check.mjs static .",
+        "ok": true,
+        "code": 0,
+        "ms": 48,
+        "proves": "design.tokens.static/design.fonts.static/code.refs: لا مخالفات ساكنة",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "STATIC_TOTAL 0"
+      },
+      {
+        "id": "render",
+        "cmd": "node $FX_TOOLS/web-design-check.mjs render . | grep -v \"^STATE .* ok$\"",
+        "ok": true,
+        "code": 0,
+        "ms": 8713,
+        "proves": "الحالات الخمس × الثيمان × اللغتان × الحجمان تحقق توقعاتها، والخطوط محمّلة، والقيم ضمن الرموز، وصفر تباين، و32 لقطة بلا الحساسة (8 متخطاة)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "FONTS light ar arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nDIR light ar rtl/rtl\nFONTS light en arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nDIR light en ltr/ltr\nFONTS dark ar arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nDIR dark ar rtl/rtl\nFONTS dark en arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nDIR dark en ltr/ltr\nSHOTS 32 SENSITIVE_SKIPPED 8\nRENDER_PROBLEMS 0"
+      }
+    ],
+    "hardcoded-color": [
+      {
+        "id": "tokens-build",
+        "cmd": "node tools/build-tokens.mjs --check",
+        "ok": true,
+        "code": 0,
+        "ms": 32,
+        "proves": "tokens.css مولَّد من tokens.json الحالي (اتساق الرموز)",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "tokens.css مطابق للرموز"
+      },
+      {
+        "id": "static",
+        "cmd": "node $FX_TOOLS/web-design-check.mjs static .",
+        "ok": true,
+        "code": 0,
+        "ms": 47,
+        "proves": "design.tokens.static: لون حرفي #1a73e8",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "HARDCODED_COLOR styles/app.css:101 #1a73e8\nSTATIC_TOTAL 1"
+      },
+      {
+        "id": "render",
+        "cmd": "node $FX_TOOLS/web-design-check.mjs render . | grep -v \"^STATE .* ok$\"",
+        "ok": true,
+        "code": 0,
+        "ms": 8186,
+        "proves": "design.tokens.render: rgb(26, 115, 232) ليس من الرموز",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "FONTS light ar arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nRENDER_OFF_TOKEN light ar .status background-color rgb(26, 115, 232)\nDIR light ar rtl/rtl\nFONTS light en arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nRENDER_OFF_TOKEN light en .status background-color rgb(26, 115, 232)\nDIR light en ltr/ltr\nFONTS dark ar arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nRENDER_OFF_TOKEN dark ar .status background-color rgb(26, 115, 232)\nDIR dark ar rtl/rtl\nFONTS dark en arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nRENDER_OFF_TOKEN dark en .status background-color rgb(26, 115, 232)\nAXE color-contrast dark en 3 li:nth-child(1) > span — Element has insufficient color contrast of 4.16 (foreground color: #0a1220, background color: #1a73e8, font si\nDIR dark en ltr/ltr\nSHOTS 32 SENSITIVE_SKIPPED 8\nRENDER_PROBLEMS 5"
+      }
+    ],
+    "off-scale-spacing": [
+      {
+        "id": "tokens-build",
+        "cmd": "node tools/build-tokens.mjs --check",
+        "ok": true,
+        "code": 0,
+        "ms": 28,
+        "proves": "tokens.css مولَّد من tokens.json الحالي (اتساق الرموز)",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "tokens.css مطابق للرموز"
+      },
+      {
+        "id": "static",
+        "cmd": "node $FX_TOOLS/web-design-check.mjs static .",
+        "ok": true,
+        "code": 0,
+        "ms": 47,
+        "proves": "design.tokens.static: padding: 15px",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "OFF_SCALE_SPACING styles/app.css:87 padding: 15px\nSTATIC_TOTAL 1"
+      },
+      {
+        "id": "render",
+        "cmd": "node $FX_TOOLS/web-design-check.mjs render . | grep -v \"^STATE .* ok$\"",
+        "ok": true,
+        "code": 0,
+        "ms": 8288,
+        "proves": "design.tokens.render: padding-top 15px",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "FONTS light ar arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nRENDER_OFF_TOKEN light ar .item padding-top 15px\nRENDER_OFF_TOKEN light ar .item padding-left 15px\nDIR light ar rtl/rtl\nFONTS light en arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nRENDER_OFF_TOKEN light en .item padding-top 15px\nRENDER_OFF_TOKEN light en .item padding-left 15px\nDIR light en ltr/ltr\nFONTS dark ar arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nRENDER_OFF_TOKEN dark ar .item padding-top 15px\nRENDER_OFF_TOKEN dark ar .item padding-left 15px\nDIR dark ar rtl/rtl\nFONTS dark en arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nRENDER_OFF_TOKEN dark en .item padding-top 15px\nRENDER_OFF_TOKEN dark en .item padding-left 15px\nDIR dark en ltr/ltr\nSHOTS 32 SENSITIVE_SKIPPED 8\nRENDER_PROBLEMS 8"
+      }
+    ],
+    "undefined-var": [
+      {
+        "id": "tokens-build",
+        "cmd": "node tools/build-tokens.mjs --check",
+        "ok": true,
+        "code": 0,
+        "ms": 32,
+        "proves": "tokens.css مولَّد من tokens.json الحالي (اتساق الرموز)",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "tokens.css مطابق للرموز"
+      },
+      {
+        "id": "static",
+        "cmd": "node $FX_TOOLS/web-design-check.mjs static .",
+        "ok": true,
+        "code": 0,
+        "ms": 48,
+        "proves": "design.tokens.static: var() لرمز غير معرّف",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "UNDEFINED_VAR styles/app.css:94 --color-text-subtle\nSTATIC_TOTAL 1"
+      }
+    ],
+    "error-message-missing": [
+      {
+        "id": "tokens-build",
+        "cmd": "node tools/build-tokens.mjs --check",
+        "ok": true,
+        "code": 0,
+        "ms": 29,
+        "proves": "tokens.css مولَّد من tokens.json الحالي (اتساق الرموز)",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "tokens.css مطابق للرموز"
+      },
+      {
+        "id": "static",
+        "cmd": "node $FX_TOOLS/web-design-check.mjs static .",
+        "ok": true,
+        "code": 0,
+        "ms": 48,
+        "proves": "لا مخالفات ساكنة",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "STATIC_TOTAL 0"
+      },
+      {
+        "id": "render",
+        "cmd": "node $FX_TOOLS/web-design-check.mjs render . | grep -v \"^STATE .* ok$\"",
+        "ok": true,
+        "code": 0,
+        "ms": 8307,
+        "proves": "design.states: رسالة الخطأ المتوقعة لا تظهر",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "FONTS light ar arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nDIR light ar rtl/rtl\nFONTS light en arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nDIR light en ltr/ltr\nFONTS dark ar arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nDIR dark ar rtl/rtl\nFONTS dark en arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nDIR dark en ltr/ltr\nSTATE error light ar mobile MISSING_TEXT\nSTATE error light ar desktop MISSING_TEXT\nSTATE error light en mobile MISSING_TEXT\nSTATE error light en desktop MISSING_TEXT\nSTATE error dark ar mobile MISSING_TEXT\nSTATE error dark ar desktop MISSING_TEXT\nSTATE error dark en mobile MISSING_TEXT\nSTATE error dark en desktop MISSING_TEXT\nSHOTS 32 SENSITIVE_SKIPPED 8\nRENDER_PROBLEMS 8"
+      }
+    ],
+    "visual-change": [
+      {
+        "id": "tokens-build",
+        "cmd": "node tools/build-tokens.mjs --check",
+        "ok": true,
+        "code": 0,
+        "ms": 33,
+        "proves": "tokens.css مولَّد من tokens.json الحالي (اتساق الرموز)",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "tokens.css مطابق للرموز"
+      },
+      {
+        "id": "static",
+        "cmd": "node $FX_TOOLS/web-design-check.mjs static .",
+        "ok": true,
+        "code": 0,
+        "ms": 51,
+        "proves": "لا مخالفات ساكنة (التغيير مقصود ومتسق)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "STATIC_TOTAL 0"
+      },
+      {
+        "id": "render",
+        "cmd": "node $FX_TOOLS/web-design-check.mjs render . | grep -v \"^STATE .* ok$\"",
+        "ok": true,
+        "code": 0,
+        "ms": 8744,
+        "proves": "الحالات تمر؛ والفرق في المظهر فقط",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "FONTS light ar arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nDIR light ar rtl/rtl\nFONTS light en arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nDIR light en ltr/ltr\nFONTS dark ar arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nDIR dark ar rtl/rtl\nFONTS dark en arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nDIR dark en ltr/ltr\nSHOTS 32 SENSITIVE_SKIPPED 8\nRENDER_PROBLEMS 0"
+      },
+      {
+        "id": "radius",
+        "cmd": "grep -n -- \"--radius-md\" styles/tokens.css",
+        "ok": true,
+        "code": 0,
+        "ms": 6,
+        "proves": "design.visual: نصف القطر 16px بدل 8px",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "18:  --radius-md: 16px;"
+      }
+    ],
+    "silent-font-fallback": [
+      {
+        "id": "tokens-build",
+        "cmd": "node tools/build-tokens.mjs --check",
+        "ok": true,
+        "code": 0,
+        "ms": 33,
+        "proves": "tokens.css مولَّد من tokens.json الحالي (اتساق الرموز)",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "tokens.css مطابق للرموز"
+      },
+      {
+        "id": "static",
+        "cmd": "node $FX_TOOLS/web-design-check.mjs static .",
+        "ok": true,
+        "code": 0,
+        "ms": 51,
+        "proves": "design.fonts.static: ملف @font-face مفقود",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "FONT_FACE_MISSING styles/app.css:7 ../fonts/cairo-arabic-wght-normal-missing.woff2\nSTATIC_TOTAL 1"
+      },
+      {
+        "id": "render",
+        "cmd": "node $FX_TOOLS/web-design-check.mjs render . | grep -v \"^STATE .* ok$\"",
+        "ok": true,
+        "code": 0,
+        "ms": 8529,
+        "proves": "design.fonts.render: الوجه العربي غير محمّل",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "FONTS light ar arabic_cairo_loaded=false faces=Cairo:error,Cairo:loaded\nDIR light ar rtl/rtl\nFONTS light en arabic_cairo_loaded=false faces=Cairo:error,Cairo:loaded\nDIR light en ltr/ltr\nFONTS dark ar arabic_cairo_loaded=false faces=Cairo:error,Cairo:loaded\nDIR dark ar rtl/rtl\nFONTS dark en arabic_cairo_loaded=false faces=Cairo:error,Cairo:loaded\nDIR dark en ltr/ltr\nSHOTS 32 SENSITIVE_SKIPPED 8\nRENDER_PROBLEMS 0"
+      }
+    ],
+    "low-contrast-default": [
+      {
+        "id": "tokens-build",
+        "cmd": "node tools/build-tokens.mjs --check",
+        "ok": true,
+        "code": 0,
+        "ms": 37,
+        "proves": "tokens.css مولَّد من tokens.json الحالي (اتساق الرموز)",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "tokens.css مطابق للرموز"
+      },
+      {
+        "id": "static",
+        "cmd": "node $FX_TOOLS/web-design-check.mjs static .",
+        "ok": true,
+        "code": 0,
+        "ms": 54,
+        "proves": "لا مخالفات ساكنة",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "STATIC_TOTAL 0"
+      },
+      {
+        "id": "render",
+        "cmd": "node $FX_TOOLS/web-design-check.mjs render . | grep -v \"^STATE .* ok$\"",
+        "ok": true,
+        "code": 0,
+        "ms": 8795,
+        "proves": "design.a11y: color-contrast في الحالة الافتراضية (الثيم الفاتح)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "FONTS light ar arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nAXE color-contrast light ar 3 li:nth-child(1) > div > .item-meta — Element has insufficient color contrast of 2.33 (foreground color: #9aa3af, background color: #f3f5f8, font si\nDIR light ar rtl/rtl\nFONTS light en arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nAXE color-contrast light en 3 li:nth-child(1) > div > .item-meta — Element has insufficient color contrast of 2.33 (foreground color: #9aa3af, background color: #f3f5f8, font si\nDIR light en ltr/ltr\nFONTS dark ar arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nDIR dark ar rtl/rtl\nFONTS dark en arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nDIR dark en ltr/ltr\nSHOTS 32 SENSITIVE_SKIPPED 8\nRENDER_PROBLEMS 2"
+      }
+    ],
+    "external-font-host": [
+      {
+        "id": "tokens-build",
+        "cmd": "node tools/build-tokens.mjs --check",
+        "ok": true,
+        "code": 0,
+        "ms": 30,
+        "proves": "tokens.css مولَّد من tokens.json الحالي (اتساق الرموز)",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "tokens.css مطابق للرموز"
+      },
+      {
+        "id": "static",
+        "cmd": "node $FX_TOOLS/web-design-check.mjs static .",
+        "ok": true,
+        "code": 0,
+        "ms": 47,
+        "proves": "design.fonts.static: مضيف خارجي",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "EXTERNAL_HOST index.html:7 https://fonts.googleapis.com\nEXTERNAL_HOST index.html:8 https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap\nSTATIC_TOTAL 2"
+      },
+      {
+        "id": "render",
+        "cmd": "node $FX_TOOLS/web-design-check.mjs render . | grep -v \"^STATE .* ok$\"",
+        "ok": true,
+        "code": 0,
+        "ms": 9004,
+        "proves": "AT-31: الطلب الخارجي يُمنع ويُسجَّل",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "FONTS light ar arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nDIR light ar rtl/rtl\nFONTS light en arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nDIR light en ltr/ltr\nFONTS dark ar arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nDIR dark ar rtl/rtl\nFONTS dark en arabic_cairo_loaded=true faces=Cairo:loaded,Cairo:loaded\nDIR dark en ltr/ltr\nBLOCKED_EXTERNAL GET https://fonts.googleapis.com/css2\nSHOTS 32 SENSITIVE_SKIPPED 8\nRENDER_PROBLEMS 0"
+      }
+    ]
+  },
+  "date": "2026-10-10",
+  "versions": {
+    "node": "v24.16.0",
+    "chromium": "Chromium 156.0.8078.4 (Playwright 1.64.0)",
+    "axe-core": "axe-core 4.14.0"
+  }
+}

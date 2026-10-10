@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-PROC",
+  "variant": "launchctl-submit",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "reason": "الاختبار نفسه ينجح؛ والوظيفة تبقى في launchd خارج الحد المعلن"
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "launchd-out-of-scope",
+      "statement": "وظيفة launchd لا تدخل شجرة عمليات عِيَار: خارج الحد المعلن (الخطة 15.3)؛ يُذكر في التقرير ولا يُدّعى منعها، ويزيلها الاختبار بـ procs/launchctl-cleanup.sh",
+      "acceptance": "AT-11"
+    }
+  ]
+}

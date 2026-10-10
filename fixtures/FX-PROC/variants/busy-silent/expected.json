@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-PROC",
+  "variant": "busy-silent",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "reason": "يكمل بعد انشغال متواصل بلا خرج"
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "busy-not-idle",
+      "statement": "نشاط المعالج يمنع مهلة الخمول: الفحص الصامت المشغول لا يُنهى بسبب «خمول»",
+      "acceptance": "AT-12"
+    }
+  ]
+}

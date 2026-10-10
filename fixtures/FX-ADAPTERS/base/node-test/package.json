@@ -1,0 +1,10 @@
+{
+  "name": "ayar-fx-adapter-node-test",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.8.1",
+  "scripts": {
+    "test": "node --test"
+  }
+}

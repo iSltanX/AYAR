@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-PROC",
+  "variant": "setsid-detach",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "reason": "الاختبار نفسه ينجح؛ والمخالفة سلوكية: عملية يتيمة بعده"
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "orphan-reported",
+      "statement": "يرصد عِيَار العملية المنفصلة (من الدفتر ولقطات العمليات ولو غيّرت مجموعتها وجلستها) ويُنهيها، أو يعرضها «عملية باقية خارج الحد» إن تعذر",
+      "acceptance": "AT-11"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+line-length = "wide"
+
+[lint]
+select = ["E", "F"]

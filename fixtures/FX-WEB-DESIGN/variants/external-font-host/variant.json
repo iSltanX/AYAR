@@ -1,0 +1,7 @@
+{
+  "name": "external-font-host",
+  "description": "الصفحة تطلب خط Cairo من مضيف خارجي (fonts.googleapis.com) بدل الملف المحلي (AT-31).",
+  "defects": [
+    "design.fonts.static: خط من مضيف خارجي"
+  ]
+}

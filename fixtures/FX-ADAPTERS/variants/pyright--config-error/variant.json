@@ -1,0 +1,9 @@
+{
+  "name": "pyright--config-error",
+  "description": "pyrightconfig.json غير صالح JSON.",
+  "defects": [
+    "code.types: إعداد غير صالح"
+  ],
+  "component": "pyright",
+  "kind": "config-error"
+}

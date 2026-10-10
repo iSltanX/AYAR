@@ -1,0 +1,7 @@
+{
+  "name": "ruff-violation",
+  "description": "مخالفة Ruff: import غير مستخدم (F401) في text.py.",
+  "defects": [
+    "code.lint: F401 import os غير مستخدم"
+  ]
+}

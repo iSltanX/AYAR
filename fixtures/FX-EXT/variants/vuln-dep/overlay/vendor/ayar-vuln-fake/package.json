@@ -1,0 +1,8 @@
+{
+  "name": "ayar-vuln-fake",
+  "version": "1.0.0",
+  "description": "حزمة مصطنعة لاختبار عِيَار (ليست على أي سجل). الثغرة المقابلة تُعرَّف في قاعدة OSV المصغرة التي تُصنع في DEV-2 (E-09).",
+  "license": "MIT",
+  "main": "index.js",
+  "types": "index.d.ts"
+}

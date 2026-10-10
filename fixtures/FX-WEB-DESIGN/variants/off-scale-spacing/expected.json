@@ -1,0 +1,35 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-WEB-DESIGN",
+  "variant": "off-scale-spacing",
+  "expectations": [
+    {
+      "check": "design.tokens.static",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "styles/app.css",
+        "line": 87,
+        "anchor": "padding: 15px"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "15px خارج سلم المسافات"
+    },
+    {
+      "check": "design.tokens.render",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "styles/app.css",
+        "line": 87,
+        "anchor": "padding: 15px"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "padding المحسوب 15px خارج السلم"
+    }
+  ]
+}

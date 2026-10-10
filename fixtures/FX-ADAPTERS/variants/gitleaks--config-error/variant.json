@@ -1,0 +1,9 @@
+{
+  "name": "gitleaks--config-error",
+  "description": "gitleaks.toml غير صالح TOML.",
+  "defects": [
+    "sec.secrets.files: إعداد غير صالح"
+  ],
+  "component": "gitleaks",
+  "kind": "config-error"
+}

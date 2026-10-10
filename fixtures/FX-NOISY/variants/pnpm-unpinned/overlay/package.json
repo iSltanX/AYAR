@@ -1,0 +1,14 @@
+{
+  "name": "ayar-fx-noisy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FX-NOISY: مشروع يترك آثارًا جانبية أثناء الاختبار، وسكربت اختبار مركب، و.nvmrc يطلب نسخة Node غير مثبتة",
+  "type": "module",
+  "engines": {
+    "node": ">=22.11.0"
+  },
+  "scripts": {
+    "test": "node scripts/prepare.mjs && node --test --test-reporter=spec"
+  },
+  "packageManager": "pnpm@9.15.4"
+}

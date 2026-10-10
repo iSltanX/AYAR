@@ -1,0 +1,29 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-NOTEST",
+  "variant": "complex-function",
+  "expectations": [
+    {
+      "check": "code.complexity",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "tool_rule": "complexity",
+      "location": {
+        "path": "src/validate.js",
+        "line": 18,
+        "anchor": "export function validatePayload"
+      },
+      "confidence": "اقتراح تحسين",
+      "reason": "ESLint complexity: التعقيد أكبر من 10؛ والفحص لا يحكم: النتيجة «اجتاز» مع ملاحظة اقتراح وبطاقة إعادة هيكلة"
+    },
+    {
+      "check": "beh.unit",
+      "result": "ناقص",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    }
+  ]
+}

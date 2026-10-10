@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "playwright--config-error",
+  "expectations": [
+    {
+      "check": "beh.e2e",
+      "component": "playwright",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "playwright/playwright.config.js",
+        "line": 6,
+        "anchor": "retries: 0,,"
+      },
+      "confidence": null,
+      "origin": "الأداة",
+      "exit_code": 1,
+      "reason": "خطأ صياغة في ملف الإعداد يمنع تحميله"
+    }
+  ]
+}

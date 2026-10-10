@@ -1,0 +1,22 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-REPORTS",
+  "variant": "sarif-incomplete",
+  "expectations": [
+    {
+      "check": "sec.sast",
+      "component": "semgrep-sarif",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "reports/semgrep.sarif",
+        "line": 12,
+        "anchor": "\"tool\""
+      },
+      "confidence": null,
+      "origin": "الأداة",
+      "reason": "runs[0].tool.driver.name غائب: لا يمكن نسب النتائج إلى أداة"
+    }
+  ]
+}

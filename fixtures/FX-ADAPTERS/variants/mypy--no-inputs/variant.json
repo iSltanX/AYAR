@@ -1,0 +1,12 @@
+{
+  "name": "mypy--no-inputs",
+  "description": "لا ملفات .py في files=src.",
+  "defects": [
+    "code.types: لا مدخلات"
+  ],
+  "delete": [
+    "mypy/src/a.py"
+  ],
+  "component": "mypy",
+  "kind": "no-inputs"
+}

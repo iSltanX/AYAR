@@ -1,0 +1,9 @@
+{
+  "name": "pytest--usage-error",
+  "description": "خيار addopts غير موجود في إعداد المشروع فيخرج pytest برمز 4 (AT-14: تعذّر).",
+  "defects": [
+    "beh.unit: pytest برمز 4"
+  ],
+  "component": "pytest",
+  "kind": "usage-error"
+}

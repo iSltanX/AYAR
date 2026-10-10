@@ -1,0 +1,5 @@
+rules:
+  - id: ayar-test.no-eval
+    languages: [javascript]
+    severity: ERROR
+    message: "قاعدة بلا نمط"

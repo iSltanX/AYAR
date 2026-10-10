@@ -1,0 +1,10 @@
+{
+  "name": "idle-silent",
+  "description": "اختبار صامت خامل: ينام بلا أي خرج ولا حساب (120 ثانية افتراضيًّا، ويُقصَّر بـ FX_PROC_SECONDS): تنهيه مهلة الخمول بسبب «خمول» (AT-12).",
+  "defects": [
+    "beh.unit: خمول صامت"
+  ],
+  "delete": [
+    "test/ok.test.js"
+  ]
+}

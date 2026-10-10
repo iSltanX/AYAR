@@ -1,0 +1,58 @@
+{
+  "project": "FX-MALICIOUS",
+  "variants": {
+    "default": [
+      {
+        "id": "generator-test",
+        "cmd": "node $FX_TOOLS/malicious/test.mjs",
+        "ok": true,
+        "code": 0,
+        "ms": 239,
+        "proves": "المولّد لا يشغّل git، والفخاخ مكتوبة وفعّالة، والعلامات غائبة، وبنية المستودع سليمة (نسخة بلا فخاخ)، والسر القديم مكشوف بـ gitleaks git",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "✓ المولّد لا يستورد child_process ولا يستدعي أمرًا (الشيفرة بلا تعليقاتها)\n✓ المولّد ينتهي بنجاح\n✓ لم يُستدعَ git أثناء التوليد (سجل الـshim فارغ)\n✓ core.fsmonitor معرّف في .git/config\n✓ [diff \"evildiff\"] command معرّف\n✓ [diff \"eviltext\"] textconv معرّف\n✓ .gitattributes يربط *.js بالفرق و*.py بالتحو\n… [اقتُطع] …\nفتاح، والثاني يحذفه\n✓ السر القديم في التزام الأول\n✓ السر القديم غائب عن شجرة HEAD\n✓ محتوى HEAD:src/app.js مطابق للملف\n✓ لا مستودع متداخل غير .git الجذري\n✓ gitleaks git يكشف السر القديم (رمز 42) في config/old-credentials.js\n✓ تقرير gitleaks مُخفى القيمة (لا يحوي السر)\n\nنجحت كل فحوص مولّد FX-MALICIOUS"
+      },
+      {
+        "id": "semgrep-from-repo-cwd",
+        "cmd": "SH=$(mktemp -d); printf '#!/bin/sh\\necho \"cwd=$(pwd) $@\" >> \"%s/git.log\"\\nexit 99\\n' \"$SH\" > \"$SH/git\"; chmod +x \"$SH/git\"; REPO=$(pwd -P); PATH=\"$SH:$PATH\" semgrep scan --no-git-ignore --config $FX_TOOLS/../FX-ADAPTERS/base/semgrep/rules/ayar-eval.yml --metrics=off --disable-version-check --quiet src; echo \"SEMGREP_EXIT=$?\"; n=0; m=0; [ -f \"$SH/git.log\" ] && n=$(wc -l < \"$SH/git.log\" | tr -d \" \") && m=$(grep -c \"cwd=$REPO\" \"$SH/git.log\"); echo \"GIT_CALLS=$n\"; echo \"GIT_CALLS_IN_REPO=$m\"; echo \"MARKERS=$(ls \"$REPO/../markers\" | wc -l | tr -d \" \")\"; cat \"$SH/git.log\"",
+        "ok": true,
+        "code": 0,
+        "ms": 1533,
+        "proves": "اكتشاف: Semgrep 1.180.0 يستدعي git (ls-remote --get-url) من مجلد العمل الحالي ولو مع --no-git-ignore و--metrics=off و--disable-version-check؛ فلو شُغّل من داخل المستودع المفخخ لمسه git (يُمنع هنا بـ git مزيف)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "┌────────────────┐\n│ 1 Code Finding │\n└────────────────┘\n              \n    src/app.js\n   ❯❯❱ Volumes.iSltanXx.Projects.AYAR-wt.DEV-1.fixtures.tools....FX-ADAPTERS.base.semgrep.rules.ayar-test.no-eval\n          ❰❰ Blocking ❱❱\n          استخدام eval بقيمة غير ثابتة (قاعدة اختبار مصغرة، ليست من حزمة عِيَار)\n                                                                              \n            3┆ return eval(code);\n\nSEMGREP_EXIT=0\nGIT_CALLS=2\nGIT_CALLS_IN_REPO=1\nMARKERS=0\ncwd=~/.cache/ayar-fixtures-toolchain/py/lib/python3.12/site-packages/semgrep/app remote get-url origin\ncwd=/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-MALICIOUS-X8n0D1/p/repo ls-remote --get-url"
+      },
+      {
+        "id": "semgrep-from-neutral-cwd",
+        "cmd": "SH=$(mktemp -d); printf '#!/bin/sh\\necho \"cwd=$(pwd) $@\" >> \"%s/git.log\"\\nexit 99\\n' \"$SH\" > \"$SH/git\"; chmod +x \"$SH/git\"; REPO=$(pwd -P); N=$(mktemp -d); cd \"$N\" && PATH=\"$SH:$PATH\" semgrep scan --no-git-ignore --config $FX_TOOLS/../FX-ADAPTERS/base/semgrep/rules/ayar-eval.yml --metrics=off --disable-version-check --quiet \"$REPO/src\"; echo \"SEMGREP_EXIT=$?\"; n=0; m=0; [ -f \"$SH/git.log\" ] && n=$(wc -l < \"$SH/git.log\" | tr -d \" \") && m=$(grep -c \"cwd=$REPO\" \"$SH/git.log\"); echo \"GIT_CALLS=$n\"; echo \"GIT_CALLS_IN_REPO=$m\"; echo \"MARKERS=$(ls \"$REPO/../markers\" | wc -l | tr -d \" \")\"",
+        "ok": true,
+        "code": 0,
+        "ms": 1182,
+        "proves": "التخفيف: تشغيل Semgrep من مجلد عمل محايد وهدف مطلق يبقي استدعاءي git خارج المستودع (GIT_CALLS_IN_REPO=0) ولا علامات",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "┌────────────────┐\n│ 1 Code Finding │\n└────────────────┘\n                                                                                                                 \n    /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-MALICIOUS-X8n0D1/p/repo/src/app.js\n   ❯❯❱ Volumes.iSltanXx.Projects.AYAR-wt.DEV-1.fixtures.tools....FX-ADAPTERS.base.semgrep.rules.ayar-test.no-eval\n          ❰❰ Blocking ❱❱\n          استخدام eval بقيمة غير ثابتة (قاعدة اختبار مصغرة، ليست من حزمة عِيَار)\n                                                                              \n            3┆ return eval(code);\n\nSEMGREP_EXIT=0\nGIT_CALLS=2\nGIT_CALLS_IN_REPO=0\nMARKERS=0"
+      },
+      {
+        "id": "gitleaks-dir-no-git",
+        "cmd": "SH=$(mktemp -d); printf '#!/bin/sh\\necho \"cwd=$(pwd) $@\" >> \"%s/git.log\"\\nexit 99\\n' \"$SH\" > \"$SH/git\"; chmod +x \"$SH/git\"; REPO=$(pwd -P); PATH=\"$SH:$PATH\" gitleaks dir src --redact=100 --no-banner --exit-code 42; echo \"GITLEAKS_EXIT=$?\"; n=0; m=0; [ -f \"$SH/git.log\" ] && n=$(wc -l < \"$SH/git.log\" | tr -d \" \") && m=$(grep -c \"cwd=$REPO\" \"$SH/git.log\"); echo \"GIT_CALLS=$n\"; echo \"GIT_CALLS_IN_REPO=$m\"; echo \"MARKERS=$(ls \"$REPO/../markers\" | wc -l | tr -d \" \")\"",
+        "ok": true,
+        "code": 0,
+        "ms": 28,
+        "proves": "فاحص الأسرار في وضع dir لا يستدعي git، ولا سر في src",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "11:20AM INF scanned ~387 bytes (387 bytes) in 1.24ms\n11:20AM INF no leaks found\nGITLEAKS_EXIT=0\nGIT_CALLS=0\nGIT_CALLS_IN_REPO=0\nMARKERS=0"
+      }
+    ]
+  },
+  "date": "2026-10-10",
+  "versions": {
+    "node": "v24.16.0",
+    "git": "git version 2.54.0 (Apple Git-157)",
+    "semgrep": "1.180.0",
+    "gitleaks": "8.30.1"
+  }
+}

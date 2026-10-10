@@ -1,0 +1,9 @@
+{
+  "name": "vitest--timeout",
+  "description": "اختبار لا ينتهي (وعد معلّق) وtestTimeout ضخم: تقتله مهلة عِيَار.",
+  "defects": [
+    "beh.unit: يتجاوز المهلة"
+  ],
+  "component": "vitest",
+  "kind": "timeout"
+}

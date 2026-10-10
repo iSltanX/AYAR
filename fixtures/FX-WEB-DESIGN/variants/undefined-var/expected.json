@@ -1,0 +1,21 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-WEB-DESIGN",
+  "variant": "undefined-var",
+  "expectations": [
+    {
+      "check": "design.tokens.static",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "styles/app.css",
+        "line": 94,
+        "anchor": "--color-text-subtle"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "var() لرمز غير معرّف في الرموز ولا في الأنماط"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-REPORTS",
+  "variant": "exit0-with-failures",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "component": "vitest-json",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "reports/vitest.json",
+        "line": 8,
+        "anchor": "\"numFailedTests\": 1"
+      },
+      "confidence": null,
+      "origin": "الأداة",
+      "exit_code": 0,
+      "reason": "تعارض الأدلة: خروج 0 والتقرير فيه إخفاق (الخطة 7.3 القاعدة 5)"
+    }
+  ]
+}

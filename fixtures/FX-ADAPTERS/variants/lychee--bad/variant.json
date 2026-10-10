@@ -1,0 +1,9 @@
+{
+  "name": "lychee--bad",
+  "description": "رابط يعيد 404: lychee برمز 2 (404 مخالفة مثبتة).",
+  "defects": [
+    "code.refs.external: 404"
+  ],
+  "component": "lychee",
+  "kind": "bad"
+}

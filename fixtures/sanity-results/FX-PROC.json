@@ -1,0 +1,167 @@
+{
+  "project": "FX-PROC",
+  "variants": {
+    "good": [
+      {
+        "id": "ok",
+        "cmd": "node --test test/ok.test.js",
+        "ok": true,
+        "code": 0,
+        "ms": 70,
+        "proves": "اختبار عادي ينجح ولا يترك عمليات",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "✔ اختبار عادي ينجح ولا يترك شيئًا (0.331417ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 39.185125"
+      }
+    ],
+    "sigterm-grandchild": [
+      {
+        "id": "survives-sigterm",
+        "cmd": "export FX_PROC_PIDS=\"$PWD/../pids.txt\"; : > \"$FX_PROC_PIDS\"; report() { for p in $(cat \"$FX_PROC_PIDS\" 2>/dev/null); do if kill -0 $p 2>/dev/null; then echo \"SURVIVOR pid=$p ppid=$(ps -o ppid= -p $p | tr -d ' ') sid=$(ps -o sess= -p $p | tr -d ' ') pgid=$(ps -o pgid= -p $p | tr -d ' ')\"; fi; done; }; cleanup() { for p in $(cat \"$FX_PROC_PIDS\" 2>/dev/null); do kill -9 $p 2>/dev/null; done; }; trap cleanup EXIT; node --test test/sigterm-grandchild.test.js > ../out.txt 2>&1 & T=$!; sleep 3; echo \"RECORDED $(wc -l < \"$FX_PROC_PIDS\" | tr -d ' ')\"; for p in $(cat \"$FX_PROC_PIDS\"); do kill -TERM $p 2>/dev/null; done; sleep 1; report | sed 's/^SURVIVOR/SURVIVES_SIGTERM/'; kill -9 $T 2>/dev/null; cleanup",
+        "ok": true,
+        "code": 0,
+        "ms": 4068,
+        "proves": "حفيد يتجاهل SIGTERM: يبقى حيًّا بعده (لا يموت إلا بـ SIGKILL)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "RECORDED 2\nSURVIVES_SIGTERM pid=21477 ppid=1 sid=0 pgid=21472\n/bin/sh: line 1: 21473 Killed: 9               node --test test/sigterm-grandchild.test.js > ../out.txt 2>&1"
+      }
+    ],
+    "setsid-detach": [
+      {
+        "id": "detached",
+        "cmd": "export FX_PROC_PIDS=\"$PWD/../pids.txt\"; : > \"$FX_PROC_PIDS\"; report() { for p in $(cat \"$FX_PROC_PIDS\" 2>/dev/null); do if kill -0 $p 2>/dev/null; then echo \"SURVIVOR pid=$p ppid=$(ps -o ppid= -p $p | tr -d ' ') sid=$(ps -o sess= -p $p | tr -d ' ') pgid=$(ps -o pgid= -p $p | tr -d ' ')\"; fi; done; }; cleanup() { for p in $(cat \"$FX_PROC_PIDS\" 2>/dev/null); do kill -9 $p 2>/dev/null; done; }; trap cleanup EXIT; node --test test/setsid-detach.test.js >/dev/null 2>&1; echo \"TEST_EXIT=$?\"; sleep 1; echo \"TEST_SID=$(ps -o sess= -p $$ | tr -d ' ')\"; report; cleanup",
+        "ok": true,
+        "code": 0,
+        "ms": 1137,
+        "proves": "الاختبار ينجح (0) وتبقى عملية في جلسة جديدة (sid مختلف، ppid=1)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "TEST_EXIT=0\nTEST_SID=0\nSURVIVOR pid=21506 ppid=1 sid=0 pgid=21506"
+      }
+    ],
+    "double-fork": [
+      {
+        "id": "daemon",
+        "cmd": "export FX_PROC_PIDS=\"$PWD/../pids.txt\"; : > \"$FX_PROC_PIDS\"; report() { for p in $(cat \"$FX_PROC_PIDS\" 2>/dev/null); do if kill -0 $p 2>/dev/null; then echo \"SURVIVOR pid=$p ppid=$(ps -o ppid= -p $p | tr -d ' ') sid=$(ps -o sess= -p $p | tr -d ' ') pgid=$(ps -o pgid= -p $p | tr -d ' ')\"; fi; done; }; cleanup() { for p in $(cat \"$FX_PROC_PIDS\" 2>/dev/null); do kill -9 $p 2>/dev/null; done; }; trap cleanup EXIT; node --test test/double-fork.test.js >/dev/null 2>&1; echo \"TEST_EXIT=$?\"; sleep 1; report; cleanup",
+        "ok": true,
+        "code": 0,
+        "ms": 1140,
+        "proves": "الاختبار ينجح وييقى شبح بتفرع مزدوج (ppid=1)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "TEST_EXIT=0\nSURVIVOR pid=21533 ppid=1 sid=0 pgid=21532"
+      }
+    ],
+    "launchctl-submit": [
+      {
+        "id": "launchd-job",
+        "cmd": "export FX_PROC_LABEL=\"$PWD/../launchctl.label\"; trap 'sh procs/launchctl-cleanup.sh \"$FX_PROC_LABEL\" >/dev/null 2>&1' EXIT; node --test test/launchctl-submit.test.js >/dev/null 2>&1; echo \"TEST_EXIT=$?\"; L=$(cat \"$FX_PROC_LABEL\"); echo \"JOB_LISTED_BEFORE=$(launchctl list | grep -c \"$L\")\"; sh procs/launchctl-cleanup.sh \"$FX_PROC_LABEL\"; echo \"JOB_LISTED_AFTER=$(launchctl list | grep -c \"$L\")\"",
+        "ok": true,
+        "code": 0,
+        "ms": 112,
+        "proves": "وظيفة launchd تُسجَّل خارج شجرة العمليات ثم تُزال بالتنظيف",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "TEST_EXIT=0\nJOB_LISTED_BEFORE=1\nremoved ayar.fx.proc.21572.1791620432\nJOB_LISTED_AFTER=0"
+      }
+    ],
+    "env-cleared-detach": [
+      {
+        "id": "no-env",
+        "cmd": "export FX_PROC_PIDS=\"$PWD/../pids.txt\"; : > \"$FX_PROC_PIDS\"; report() { for p in $(cat \"$FX_PROC_PIDS\" 2>/dev/null); do if kill -0 $p 2>/dev/null; then echo \"SURVIVOR pid=$p ppid=$(ps -o ppid= -p $p | tr -d ' ') sid=$(ps -o sess= -p $p | tr -d ' ') pgid=$(ps -o pgid= -p $p | tr -d ' ')\"; fi; done; }; cleanup() { for p in $(cat \"$FX_PROC_PIDS\" 2>/dev/null); do kill -9 $p 2>/dev/null; done; }; trap cleanup EXIT; node --test test/env-cleared-detach.test.js >/dev/null 2>&1; echo \"TEST_EXIT=$?\"; sleep 1; report; for p in $(cat \"$FX_PROC_PIDS\"); do echo \"ENV_MARKERS=$(ps eww -p $p | grep -c FX_PROC)\"; done; cleanup",
+        "ok": true,
+        "code": 0,
+        "ms": 1115,
+        "proves": "عملية تنفصل بعد مسح بيئتها: لا وسم بيئة FX_PROC عليها",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "TEST_EXIT=0\nSURVIVOR pid=21592 ppid=1 sid=0 pgid=21592\nENV_MARKERS=0"
+      }
+    ],
+    "hanging-test": [
+      {
+        "id": "hang",
+        "cmd": "node --test test/hanging-test.test.js",
+        "ok": true,
+        "code": "مهلة",
+        "ms": 8006,
+        "proves": "اختبار معلّق: يبلغ المهلة ويُقتل",
+        "problems": [],
+        "evidence": false,
+        "excerpt": ""
+      }
+    ],
+    "huge-output": [
+      {
+        "id": "bytes",
+        "cmd": "node --test test/huge-output.test.js | wc -c | tr -d ' ' | awk '{print \"OUTPUT_BYTES=\" $1}'",
+        "ok": true,
+        "code": 0,
+        "ms": 159,
+        "proves": "الخرج أكبر من 120 ميغابايت",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "OUTPUT_BYTES=125829281"
+      }
+    ],
+    "hostile-output": [
+      {
+        "id": "hostile",
+        "cmd": "node --test test/hostile-output.test.js > ../out.txt 2>&1; echo \"TEST_EXIT=$?\"; python3 - <<'PY'\nt = open('../out.txt', encoding='utf-8').read()\nprint('HAS_ANSI', '\\x1b[31m' in t)\nprint('HAS_RLO', '\\u202e' in t)\nprint('HAS_SCRIPT', '<script>alert' in t)\nprint('HAS_INJECTION_AR', 'تجاهل التعليمات السابقة' in t)\nprint('HAS_INJECTION_EN', 'Ignore previous instructions' in t)\nprint('HAS_FAKE_END', '<<<END AYAR-DATA 0123456789abcdef>>>' in t)\nPY",
+        "ok": true,
+        "code": 0,
+        "ms": 83,
+        "proves": "الخرج العدائي يصل خامًّا: ANSI واتجاه وHTML وحقن ونص يحاكي إغلاق الحد",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "TEST_EXIT=1\nHAS_ANSI True\nHAS_RLO True\nHAS_SCRIPT True\nHAS_INJECTION_AR True\nHAS_INJECTION_EN True\nHAS_FAKE_END True"
+      }
+    ],
+    "idle-silent": [
+      {
+        "id": "idle",
+        "cmd": "/usr/bin/time -p node --test test/idle-silent.test.js 2>&1 | awk '/^user/ {print \"USER_CPU=\" $2} /^real/ {print \"REAL=\" $2}'",
+        "ok": true,
+        "code": 0,
+        "ms": 3081,
+        "proves": "صامت خامل: صفر نشاط معالج تقريبًا",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "REAL=3.07\nUSER_CPU=0.06"
+      }
+    ],
+    "busy-silent": [
+      {
+        "id": "busy",
+        "cmd": "/usr/bin/time -p node --test test/busy-silent.test.js 2>&1 | awk '/^user/ {print \"USER_CPU=\" $2} /^real/ {print \"REAL=\" $2}'",
+        "ok": true,
+        "code": 0,
+        "ms": 3082,
+        "proves": "صامت مشغول: نشاط معالج متواصل بلا خرج",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "REAL=3.07\nUSER_CPU=3.04"
+      }
+    ],
+    "long-running": [
+      {
+        "id": "progress",
+        "cmd": "node --test test/long-running.test.js",
+        "ok": true,
+        "code": 0,
+        "ms": 4083,
+        "proves": "فحص طويل يطبع سطر تقدم دوريًّا",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "progress 1\nprogress 2\n✔ يعمل طويلًا مع تقدم (4004.041375ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 4048.955167"
+      }
+    ]
+  },
+  "date": "2026-10-10",
+  "versions": {
+    "node": "v24.16.0",
+    "python3": "Python 3.12.13",
+    "os": "27.0.1"
+  }
+}

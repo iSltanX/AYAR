@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "mypy--bad",
+  "expectations": [
+    {
+      "check": "code.types",
+      "component": "mypy",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "tool_rule": "arg-type",
+      "location": {
+        "path": "mypy/src/a.py",
+        "line": 5,
+        "anchor": "double(\"2\")"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "exit_code": 1
+    }
+  ]
+}

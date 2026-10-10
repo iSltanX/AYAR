@@ -1,0 +1,316 @@
+{
+  "project": "FX-PY",
+  "variants": {
+    "good": [
+      {
+        "id": "types",
+        "cmd": ".venv/bin/python -m mypy --cache-dir=/dev/null",
+        "ok": true,
+        "code": 0,
+        "ms": 2905,
+        "proves": "code.types: mypy strict بلا أخطاء",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "Success: no issues found in 4 source files"
+      },
+      {
+        "id": "lint",
+        "cmd": ".venv/bin/ruff check --no-cache --output-format concise .",
+        "ok": true,
+        "code": 0,
+        "ms": 364,
+        "proves": "code.lint: Ruff بلا مخالفات",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "All checks passed!"
+      },
+      {
+        "id": "unit",
+        "cmd": ".venv/bin/python -m pytest -p no:cacheprovider",
+        "ok": true,
+        "code": 0,
+        "ms": 1438,
+        "proves": "beh.unit: pytest يمر",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-HBfsYw/p/مشاريع تجريبية/مكتبة «النصوص»\nconfigfile: pyproject.toml\ntestpaths: tests\nplugins: hypothesis-6.168.5\ncollected 10 items\n\ntests/test_text.py ..........                                            [100%]\n\n============================== 10 passed in 0.59s =============================="
+      },
+      {
+        "id": "build",
+        "cmd": ".venv/bin/python -m build --no-isolation --outdir \"$TMPDIR/ayar-fx-py-dist\"",
+        "ok": true,
+        "code": 0,
+        "ms": 1111,
+        "proves": "code.build: build --no-isolation ينتج sdist وwheel",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "WARNING Both NO_COLOR and FORCE_COLOR environment variables are set, disabling color\n* Getting build dependencies for sdist...\nrunning egg_info\nwriting src/nusus.egg-info/PKG-INFO\nwriting dependency_links to src/nusus.egg-info/dependency_links.txt\nwriting top-level names to src/nusus.egg-info/top_level.txt\nreading manifest file 'src/nusus.egg-info/SOURCES.txt'\nwriting manifest file 'src/nusus.egg-info/SOURCES.txt'\n* Building sdist...\nrunning sdist\nrunning egg_info\nwriting src/nusus.egg-info/PKG-INFO\nwriting dependency_links to src/nusus.egg-info/dependency_links.txt\nwriting top-level names to \n… [اقتُطع] …\npts\ncreating build/bdist.macosx-26.0-arm64/wheel/nusus-1.0.0.dist-info/WHEEL\ncreating '/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-py-dist/.tmp-8rxq4gfi/nusus-1.0.0-py3-none-any.whl' and adding 'build/bdist.macosx-26.0-arm64/wheel' to it\nadding 'nusus/__init__.py'\nadding 'nusus/py.typed'\nadding 'nusus/text.py'\nadding 'nusus-1.0.0.dist-info/METADATA'\nadding 'nusus-1.0.0.dist-info/WHEEL'\nadding 'nusus-1.0.0.dist-info/top_level.txt'\nadding 'nusus-1.0.0.dist-info/RECORD'\nremoving build/bdist.macosx-26.0-arm64/wheel\nSuccessfully built nusus-1.0.0.tar.gz and nusus-1.0.0-py3-none-any.whl"
+      },
+      {
+        "id": "secrets",
+        "cmd": "gitleaks dir . --config $FX_TOOLS/gitleaks-fixtures.toml --redact=100 --no-banner --exit-code 42",
+        "ok": true,
+        "code": 0,
+        "ms": 64,
+        "proves": "sec.secrets.files: لا تسريبات",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "11:18AM INF scanned ~6200 bytes (6.20 KB) in 3.22ms\n11:18AM INF no leaks found"
+      },
+      {
+        "id": "sec.deps",
+        "ok": true,
+        "pending": true,
+        "proves": "sec.deps: صفر ثغرات",
+        "reason": "ينتظر E-09 (قاعدة OSV المصغرة في DEV-2)"
+      },
+      {
+        "id": "arabic-path",
+        "cmd": "pwd",
+        "ok": true,
+        "code": 0,
+        "ms": 3,
+        "proves": "الجذر مسار عربي بمسافات وعلامات تنصيص",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-HBfsYw/p/مشاريع تجريبية/مكتبة «النصوص»"
+      }
+    ],
+    "failing-test": [
+      {
+        "id": "types",
+        "cmd": ".venv/bin/python -m mypy --cache-dir=/dev/null",
+        "ok": true,
+        "code": 0,
+        "ms": 2223,
+        "proves": "code.types: mypy strict بلا أخطاء",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "Success: no issues found in 4 source files"
+      },
+      {
+        "id": "lint",
+        "cmd": ".venv/bin/ruff check --no-cache --output-format concise .",
+        "ok": true,
+        "code": 0,
+        "ms": 380,
+        "proves": "code.lint: Ruff بلا مخالفات",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "All checks passed!"
+      },
+      {
+        "id": "unit",
+        "cmd": ".venv/bin/python -m pytest -p no:cacheprovider",
+        "ok": true,
+        "code": 1,
+        "ms": 1367,
+        "proves": "beh.unit: test_normalize_taa_marbuta يفشل",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-jZyb3E/p/مشاريع تجريبية/مكتبة «النصوص»\nconfigfile: pyproject.toml\ntestpaths: tests\nplugins: hypothesis-6.168.5\ncollected 11 items\n\ntests/test_text.py ..........F                                           [100%]\n\n=================================== FAILURES ===================================\n__________________________ test_normalize_taa_marbuta __________________________\n\n    def test_normalize_taa_marbuta() -> None:\n>       assert normalize(\"مدرسة\") == \"مدرسه\"\nE       AssertionError: assert 'مدرسة' == 'مدرسه'\nE         \nE         - مدرسه\nE         ?     ^\nE         + مدرسة\nE         ?     ^\n\ntests/test_text.py:46: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_text.py::test_normalize_taa_marbuta - AssertionError: assert 'مدرسة' == 'مدرسه'\n  \n  - مدرسه\n  ?     ^\n  + مدرسة\n  ?     ^\n========================= 1 failed, 10 passed in 0.63s ========================="
+      }
+    ],
+    "no-tests": [
+      {
+        "id": "unit",
+        "cmd": ".venv/bin/python -m pytest -p no:cacheprovider",
+        "ok": true,
+        "code": 5,
+        "ms": 821,
+        "proves": "beh.unit: pytest برمز 5 (ناقص)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-fUcbMw/p/مشاريع تجريبية/مكتبة «النصوص»\nconfigfile: pyproject.toml\ntestpaths: tests\nplugins: hypothesis-6.168.5\ncollected 0 items\n\n============================ no tests ran in 0.00s ============================="
+      },
+      {
+        "id": "lint",
+        "cmd": ".venv/bin/ruff check --no-cache --output-format concise .",
+        "ok": true,
+        "code": 0,
+        "ms": 365,
+        "proves": "code.lint: Ruff بلا مخالفات",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "All checks passed!"
+      }
+    ],
+    "usage-error": [
+      {
+        "id": "unit",
+        "cmd": ".venv/bin/python -m pytest -p no:cacheprovider",
+        "ok": true,
+        "code": 4,
+        "ms": 698,
+        "proves": "beh.unit: pytest برمز 4 (خطأ استخدام ← تعذّر)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "ERROR: usage: python -m pytest [options] [file_or_dir] [file_or_dir] [...]\npython -m pytest: error: unrecognized arguments: --no-such-option\n  inifile: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-DQZ3d3/p/مشاريع تجريبية/مكتبة «النصوص»/pyproject.toml\n  rootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-DQZ3d3/p/مشاريع تجريبية/مكتبة «النصوص»"
+      }
+    ],
+    "ruff-violation": [
+      {
+        "id": "types",
+        "cmd": ".venv/bin/python -m mypy --cache-dir=/dev/null",
+        "ok": true,
+        "code": 0,
+        "ms": 2165,
+        "proves": "code.types: mypy strict بلا أخطاء",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "Success: no issues found in 4 source files"
+      },
+      {
+        "id": "unit",
+        "cmd": ".venv/bin/python -m pytest -p no:cacheprovider",
+        "ok": true,
+        "code": 0,
+        "ms": 1336,
+        "proves": "beh.unit: pytest يمر",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-UYRt6W/p/مشاريع تجريبية/مكتبة «النصوص»\nconfigfile: pyproject.toml\ntestpaths: tests\nplugins: hypothesis-6.168.5\ncollected 10 items\n\ntests/test_text.py ..........                                            [100%]\n\n============================== 10 passed in 0.59s =============================="
+      },
+      {
+        "id": "lint",
+        "cmd": ".venv/bin/ruff check --no-cache --output-format concise .",
+        "ok": true,
+        "code": 1,
+        "ms": 365,
+        "proves": "code.lint: F401 في src/nusus/text.py",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "src/nusus/text.py:5:8: F401 [*] `os` imported but unused\nFound 1 error.\n[*] 1 fixable with the `--fix` option."
+      }
+    ],
+    "vuln-dep": [
+      {
+        "id": "types",
+        "cmd": ".venv/bin/python -m mypy --cache-dir=/dev/null",
+        "ok": true,
+        "code": 0,
+        "ms": 2220,
+        "proves": "code.types: mypy strict بلا أخطاء",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "Success: no issues found in 4 source files"
+      },
+      {
+        "id": "lint",
+        "cmd": ".venv/bin/ruff check --no-cache --output-format concise .",
+        "ok": true,
+        "code": 0,
+        "ms": 362,
+        "proves": "code.lint: Ruff بلا مخالفات",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "All checks passed!"
+      },
+      {
+        "id": "unit",
+        "cmd": ".venv/bin/python -m pytest -p no:cacheprovider",
+        "ok": true,
+        "code": 0,
+        "ms": 1375,
+        "proves": "beh.unit: يمر والتبعية مثبتة",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-Uu3ib0/p/مشاريع تجريبية/مكتبة «النصوص»\nconfigfile: pyproject.toml\ntestpaths: tests\nplugins: hypothesis-6.168.5\ncollected 10 items\n\ntests/test_text.py ..........                                            [100%]\n\n============================== 10 passed in 0.63s =============================="
+      },
+      {
+        "id": "dep-locked",
+        "cmd": "grep -n -A2 'name = \"ayar-vuln-fake\"' uv.lock",
+        "ok": true,
+        "code": 0,
+        "ms": 5,
+        "proves": "sec.deps: ayar-vuln-fake@1.0.0 في uv.lock",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "74:name = \"ayar-vuln-fake\"\n75-version = \"1.0.0\"\n76-source = { directory = \"vendor/ayar-vuln-fake\" }\n--\n355:    { name = \"ayar-vuln-fake\" },\n356-]\n357-\n--\n369:requires-dist = [{ name = \"ayar-vuln-fake\", directory = \"vendor/ayar-vuln-fake\" }]\n370-\n371-[package.metadata.requires-dev]"
+      },
+      {
+        "id": "sec.deps",
+        "ok": true,
+        "pending": true,
+        "proves": "sec.deps: ثغرة تجريبية في ayar-vuln-fake@1.0.0",
+        "reason": "ينتظر E-09 (قاعدة OSV المصغرة في DEV-2)"
+      }
+    ],
+    "nfd-path": [
+      {
+        "id": "types",
+        "cmd": ".venv/bin/python -m mypy --cache-dir=/dev/null",
+        "ok": true,
+        "code": 0,
+        "ms": 2187,
+        "proves": "code.types: mypy strict بلا أخطاء",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "Success: no issues found in 4 source files"
+      },
+      {
+        "id": "lint",
+        "cmd": ".venv/bin/ruff check --no-cache --output-format concise .",
+        "ok": true,
+        "code": 0,
+        "ms": 370,
+        "proves": "code.lint: Ruff بلا مخالفات",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "All checks passed!"
+      },
+      {
+        "id": "unit",
+        "cmd": ".venv/bin/python -m pytest -p no:cacheprovider",
+        "ok": true,
+        "code": 0,
+        "ms": 1306,
+        "proves": "beh.unit: pytest يمر",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-PY-sWzf6G/p/مشاريع تجريبية/مكتبة «النصوص» (إصدار أول)\nconfigfile: pyproject.toml\ntestpaths: tests\nplugins: hypothesis-6.168.5\ncollected 10 items\n\ntests/test_text.py ..........                                            [100%]\n\n============================== 10 passed in 0.59s =============================="
+      },
+      {
+        "id": "build",
+        "cmd": ".venv/bin/python -m build --no-isolation --outdir \"$TMPDIR/ayar-fx-py-dist\"",
+        "ok": true,
+        "code": 0,
+        "ms": 1003,
+        "proves": "code.build: build --no-isolation ينتج sdist وwheel",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "WARNING Both NO_COLOR and FORCE_COLOR environment variables are set, disabling color\n* Getting build dependencies for sdist...\nrunning egg_info\nwriting src/nusus.egg-info/PKG-INFO\nwriting dependency_links to src/nusus.egg-info/dependency_links.txt\nwriting top-level names to src/nusus.egg-info/top_level.txt\nreading manifest file 'src/nusus.egg-info/SOURCES.txt'\nwriting manifest file 'src/nusus.egg-info/SOURCES.txt'\n* Building sdist...\nrunning sdist\nrunning egg_info\nwriting src/nusus.egg-info/PKG-INFO\nwriting dependency_links to src/nusus.egg-info/dependency_links.txt\nwriting top-level names to \n… [اقتُطع] …\npts\ncreating build/bdist.macosx-26.0-arm64/wheel/nusus-1.0.0.dist-info/WHEEL\ncreating '/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-py-dist/.tmp-zj4p_fkv/nusus-1.0.0-py3-none-any.whl' and adding 'build/bdist.macosx-26.0-arm64/wheel' to it\nadding 'nusus/__init__.py'\nadding 'nusus/py.typed'\nadding 'nusus/text.py'\nadding 'nusus-1.0.0.dist-info/METADATA'\nadding 'nusus-1.0.0.dist-info/WHEEL'\nadding 'nusus-1.0.0.dist-info/top_level.txt'\nadding 'nusus-1.0.0.dist-info/RECORD'\nremoving build/bdist.macosx-26.0-arm64/wheel\nSuccessfully built nusus-1.0.0.tar.gz and nusus-1.0.0-py3-none-any.whl"
+      },
+      {
+        "id": "secrets",
+        "cmd": "gitleaks dir . --config $FX_TOOLS/gitleaks-fixtures.toml --redact=100 --no-banner --exit-code 42",
+        "ok": true,
+        "code": 0,
+        "ms": 64,
+        "proves": "sec.secrets.files: لا تسريبات",
+        "problems": [],
+        "evidence": false,
+        "excerpt": "11:19AM INF scanned ~6248 bytes (6.25 KB) in 3.07ms\n11:19AM INF no leaks found"
+      },
+      {
+        "id": "nfd-path",
+        "cmd": "python3 -c \"import os,unicodedata as u; p=os.getcwd(); print('PATH_IS_NFD' if u.is_normalized('NFD',p) and not u.is_normalized('NFC',p) else 'PATH_NOT_NFD')\"",
+        "ok": true,
+        "code": 0,
+        "ms": 20,
+        "proves": "الجذر مكتوب بصيغة NFD فعلًا ويختلف عن NFC",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "PATH_IS_NFD"
+      }
+    ]
+  },
+  "date": "2026-10-10",
+  "versions": {
+    "python": "/bin/sh: .venv/bin/python: No such file or directory",
+    "uv": "uv 0.13.0 (4ecd0eff2 2026-10-09 aarch64-apple-darwin)",
+    "pytest": "pytest 9.1.1",
+    "ruff": "ruff 0.16.10",
+    "mypy": "mypy 2.4.0"
+  }
+}

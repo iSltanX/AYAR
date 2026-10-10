@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "knip--config-error",
+  "expectations": [
+    {
+      "check": "code.unused",
+      "component": "knip",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "knip/knip.json",
+        "line": 2,
+        "anchor": "\"entry\""
+      },
+      "confidence": null,
+      "origin": "الأداة",
+      "exit_code": 2,
+      "reason": "Knip برمز 2 (الخطة 7.3 القاعدة 4)"
+    }
+  ]
+}

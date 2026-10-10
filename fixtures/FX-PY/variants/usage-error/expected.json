@@ -1,0 +1,22 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-PY",
+  "variant": "usage-error",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "pyproject.toml",
+        "line": 31,
+        "anchor": "--no-such-option"
+      },
+      "confidence": null,
+      "origin": "الأداة",
+      "exit_code": 4,
+      "reason": "pytest برمز 4 (خطأ استخدام) يعني تعذّر (AT-14)"
+    }
+  ]
+}

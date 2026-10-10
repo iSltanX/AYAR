@@ -1,0 +1,32 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-PROC",
+  "variant": "sigterm-grandchild",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "انتهت المهلة",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "test/sigterm-grandchild.test.js",
+        "line": 5,
+        "anchor": "يتجاهل SIGTERM"
+      },
+      "confidence": "مخالفة مثبتة",
+      "reason": "الاختبار معلّق؛ ينتهي بمهلة عِيَار"
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "escalate-to-sigkill",
+      "statement": "عند المهلة: SIGTERM لشجرة العمليات، فإن بقي الحفيد حيًّا بعد مهلة سماح فـ SIGKILL، ولا عملية باقية من الشجرة بعد الفحص (الحفيد يتجاهل SIGTERM)",
+      "acceptance": "AT-11"
+    },
+    {
+      "id": "ledger-clean",
+      "statement": "دفتر العمليات يفرغ بعد انتهاء التنظيف",
+      "acceptance": "AT-01"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "no-tests",
+  "description": "لا اختبارات: ملف الاختبار محذوف فيخرج pytest برمز 5 («no tests ran»).",
+  "defects": [
+    "beh.unit: pytest برمز 5"
+  ],
+  "delete": [
+    "tests/test_text.py"
+  ]
+}

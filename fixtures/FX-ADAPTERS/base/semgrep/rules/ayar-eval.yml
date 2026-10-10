@@ -1,0 +1,6 @@
+rules:
+  - id: ayar-test.no-eval
+    languages: [javascript]
+    severity: ERROR
+    message: "استخدام eval بقيمة غير ثابتة (قاعدة اختبار مصغرة، ليست من حزمة عِيَار)"
+    pattern: eval($X)

@@ -1,0 +1,58 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-EXT",
+  "variant": "integrity-baseline",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "src/lib/stats.test.ts",
+        "line": 11,
+        "anchor": "الوسيط لأعداد متعددة الخانات"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "الترتيب الافتراضي لـ sort() نصّي"
+    },
+    {
+      "check": "beh.unit",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "src/lib/count.test.ts",
+        "line": 33,
+        "anchor": "يصوغ الناتج بالأرقام العربية"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "اختبار اللقطة يخالف الناتج بعد تغيير الفاصل"
+    },
+    {
+      "check": "code.lint",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "tool_rule": "no-console",
+      "location": {
+        "path": "src/popup.ts",
+        "line": 8,
+        "anchor": "console.log('render')"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع"
+    },
+    {
+      "check": "integ.guard",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "reason": "اجتاز (لا أساس للمقارنة): الجولة الأولى تسجل جردة فقط"
+    }
+  ]
+}

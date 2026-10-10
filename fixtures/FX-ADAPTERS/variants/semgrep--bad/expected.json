@@ -1,0 +1,24 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "semgrep--bad",
+  "expectations": [
+    {
+      "check": "sec.sast",
+      "component": "semgrep",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "tool_rule": "ayar-test.no-eval",
+      "location": {
+        "path": "semgrep/src/a.js",
+        "line": 2,
+        "anchor": "eval(userInput)"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "exit_code": 0,
+      "reason": "الرمز 0 لا يعني الاجتياز: النتيجة من تقرير JSON وبحسب سياسة قاعدة «محظور»"
+    }
+  ]
+}

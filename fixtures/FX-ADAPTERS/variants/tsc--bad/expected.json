@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "tsc--bad",
+  "expectations": [
+    {
+      "check": "code.types",
+      "component": "tsc",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "tool_rule": "TS6133",
+      "location": {
+        "path": "tsc/src/index.ts",
+        "line": 2,
+        "anchor": "const unused"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "exit_code": 2
+    }
+  ]
+}

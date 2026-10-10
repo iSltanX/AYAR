@@ -1,0 +1,12 @@
+{
+  "name": "biome--no-inputs",
+  "description": "لا ملفات في الهدف src.",
+  "defects": [
+    "code.lint: لا مدخلات"
+  ],
+  "delete": [
+    "biome/src/a.js"
+  ],
+  "component": "biome",
+  "kind": "no-inputs"
+}

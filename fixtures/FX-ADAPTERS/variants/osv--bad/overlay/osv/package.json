@@ -1,0 +1,9 @@
+{
+  "name": "ayar-fx-adapter-osv",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "left-pad": "1.3.0",
+    "ayar-vuln-fake": "1.0.0"
+  }
+}

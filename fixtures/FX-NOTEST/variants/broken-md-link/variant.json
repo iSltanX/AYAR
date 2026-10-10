@@ -1,0 +1,7 @@
+{
+  "name": "broken-md-link",
+  "description": "رابط محلي مكسور في README: يشير إلى docs/usage.md وهو غير موجود.",
+  "defects": [
+    "code.refs.local: docs/usage.md غير موجود"
+  ]
+}

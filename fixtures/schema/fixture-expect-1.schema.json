@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayar.local/schemas/fixture-expect-1.schema.json",
+  "title": "fixture-expect/1",
+  "description": "ملف النتائج المتوقعة لنسخة من مشروع اختبار (الخطة 20). الحقول الخمسة المطلوبة لكل توقع: الفحص check، والنتيجة result، والقاعدة rule، والموضع location، ودرجة الثبوت confidence.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "project",
+    "variant",
+    "expectations"
+  ],
+  "properties": {
+    "schema": {
+      "const": "fixture-expect/1"
+    },
+    "project": {
+      "type": "string",
+      "pattern": "^FX-[A-Z0-9-]+$"
+    },
+    "variant": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "component": {
+      "description": "مكوّن النسخة حين يخص الملف مكونًا واحدًا من مساحة عمل؛ الافتراضي «.»",
+      "type": "string"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "expectations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/expectation"
+      }
+    },
+    "pending": {
+      "description": "ما لا يمكن إثباته الآن وسببه (مثل انتظار E-09). لا يُحتسب توقعًا.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "waits_for",
+          "reason"
+        ],
+        "properties": {
+          "waits_for": {
+            "type": "string",
+            "minLength": 1
+          },
+          "check": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "engine_expectations": {
+      "description": "سلوك يُتوقع من المحرك لا من فحص بعينه (مثل عمليات FX-PROC أو بيئة AT-48): معرّف قصير وعبارة يختبرها DEV-5 وما بعدها.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "statement"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "acceptance": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "expectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "check",
+        "result",
+        "rule",
+        "location",
+        "confidence"
+      ],
+      "properties": {
+        "check": {
+          "description": "معرّف الفحص في كتالوج الخطة 10.3، مثل beh.unit",
+          "type": "string",
+          "pattern": "^(design|sec|code|beh|perf|integ|ai|custom)\\.[a-z0-9.\\-<>]+$"
+        },
+        "component": {
+          "type": "string"
+        },
+        "result": {
+          "type": "string",
+          "enum": [
+            "اجتاز",
+            "أخفق",
+            "تحذير",
+            "يحتاج مراجعة",
+            "متذبذب",
+            "ناقص",
+            "ناقص إعداد",
+            "تعذّر",
+            "غير منطبق",
+            "غير مضمّن",
+            "أُلغي",
+            "انتهت المهلة"
+          ]
+        },
+        "rule": {
+          "description": "معرّف قاعدة عِيَار. null مع rule_pending=true حتى تُعرَّف في الكتالوج (ORG-06، DEV-6).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "rule_pending": {
+          "type": "boolean"
+        },
+        "tool_rule": {
+          "description": "معرّف القاعدة أو الرمز في الأداة الأصلية، مثل F401 أو TS6133 أو no-unused-vars",
+          "type": "string"
+        },
+        "location": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "path"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "line": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "column": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "anchor": {
+                  "description": "نص يجب أن يرد في السطر المحدد (أو في الملف إن لم يحدد سطر)، فيتحقق المدقق من أن الموضع حقيقي",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "history": {
+                  "description": "بادئة التزام Git يوجد فيه الموضع (لملف حُذف من الشجرة الحالية وبقي في التاريخ)؛ يتحقق المدقق منها من MANIFEST.json المولَّد",
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{7,40}$"
+                }
+              }
+            }
+          ]
+        },
+        "confidence": {
+          "description": "درجة الثبوت (الخطة 7.2): مخالفة مثبتة، أو اشتباه، أو اقتراح تحسين. وnull لما لا اكتشاف فيه (اجتاز وغير منطبق ونحوهما).",
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "مخالفة مثبتة",
+            "اشتباه",
+            "اقتراح تحسين",
+            null
+          ]
+        },
+        "origin": {
+          "description": "منشأ الإخفاق أو التعذّر: المشروع أو الأداة (الخطة AT-14)",
+          "type": "string",
+          "enum": [
+            "المشروع",
+            "الأداة"
+          ]
+        },
+        "exit_code": {
+          "description": "رمز خروج الأداة الأصلية كما سُجل في SANITY.md",
+          "type": "integer"
+        },
+        "reason": {
+          "description": "السبب المكتوب للنتيجة",
+          "type": "string",
+          "minLength": 1
+        },
+        "requires": {
+          "description": "مدخلات يحتاجها الفحص ليصل إلى النتيجة (مثل قاعدة OSV)",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

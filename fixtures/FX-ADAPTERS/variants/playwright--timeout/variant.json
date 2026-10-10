@@ -1,0 +1,9 @@
+{
+  "name": "playwright--timeout",
+  "description": "اختبار لا ينتهي بمهلة اختبار معطلة (test.setTimeout(0)): تقتله مهلة عِيَار.",
+  "defects": [
+    "beh.e2e: يتجاوز المهلة"
+  ],
+  "component": "playwright",
+  "kind": "timeout"
+}

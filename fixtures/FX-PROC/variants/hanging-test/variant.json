@@ -1,0 +1,10 @@
+{
+  "name": "hanging-test",
+  "description": "اختبار معلّق لا ينتهي ولا يطلق عمليات: تقتله مهلة عِيَار.",
+  "defects": [
+    "beh.unit: يتجاوز المهلة"
+  ],
+  "delete": [
+    "test/ok.test.js"
+  ]
+}

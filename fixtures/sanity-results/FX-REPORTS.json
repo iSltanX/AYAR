@@ -1,0 +1,88 @@
+{
+  "project": "FX-REPORTS",
+  "variants": {
+    "good": [
+      {
+        "id": "reports",
+        "cmd": "node $FX_TOOLS/reports-check.mjs .",
+        "ok": true,
+        "code": 0,
+        "ms": 29,
+        "proves": "التقارير الأربعة تُقرأ سليمة",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "CASE vitest-json OK\nCASE pytest-junit OK\nCASE eslint-json OK\nCASE semgrep-sarif OK"
+      }
+    ],
+    "junit-corrupt": [
+      {
+        "id": "reports",
+        "cmd": "node $FX_TOOLS/reports-check.mjs .",
+        "ok": true,
+        "code": 0,
+        "ms": 32,
+        "proves": "beh.unit: JUnit تالف ← تعذّر",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "CASE vitest-json OK\nCASE pytest-junit BAD malformed-xml /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-REPORTS-KkjhZL/p/reports/pytest.junit.xml:1: parser error : AttValue: \" or ' expected\nCASE eslint-json OK\nCASE semgrep-sarif OK"
+      }
+    ],
+    "sarif-incomplete": [
+      {
+        "id": "reports",
+        "cmd": "node $FX_TOOLS/reports-check.mjs .",
+        "ok": true,
+        "code": 0,
+        "ms": 29,
+        "proves": "sec.sast: SARIF ناقص ← تعذّر",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "CASE vitest-json OK\nCASE pytest-junit OK\nCASE eslint-json OK\nCASE semgrep-sarif BAD sarif-incomplete missing runs[0].tool.driver.name"
+      }
+    ],
+    "json-too-deep": [
+      {
+        "id": "reports",
+        "cmd": "node $FX_TOOLS/reports-check.mjs .",
+        "ok": true,
+        "code": 0,
+        "ms": 33,
+        "proves": "code.lint: JSON أعمق من الحد ← تعذّر",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "CASE vitest-json OK\nCASE pytest-junit OK\nCASE eslint-json BAD json-too-deep 5000 > 64\nCASE semgrep-sarif OK"
+      }
+    ],
+    "oversize": [
+      {
+        "id": "reports",
+        "cmd": "node $FX_TOOLS/reports-check.mjs .",
+        "ok": true,
+        "code": 0,
+        "ms": 29,
+        "proves": "beh.unit: تقرير أكبر من الحد ← تعذّر",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "CASE vitest-json BAD report-too-large 53477474 > 52428800\nCASE pytest-junit OK\nCASE eslint-json OK\nCASE semgrep-sarif OK"
+      }
+    ],
+    "exit0-with-failures": [
+      {
+        "id": "reports",
+        "cmd": "node $FX_TOOLS/reports-check.mjs .",
+        "ok": true,
+        "code": 0,
+        "ms": 29,
+        "proves": "beh.unit: خروج 0 مع إخفاق في التقرير ← تعذّر (تعارض الأدلة)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "CASE vitest-json BAD evidence-conflict exit_code=0 numFailedTests=1\nCASE pytest-junit OK\nCASE eslint-json OK\nCASE semgrep-sarif OK"
+      }
+    ]
+  },
+  "date": "2026-10-10",
+  "versions": {
+    "node": "v24.16.0",
+    "xmllint": "xmllint: using libxml version 20913"
+  }
+}

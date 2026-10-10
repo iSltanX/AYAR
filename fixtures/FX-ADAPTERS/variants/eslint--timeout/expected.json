@@ -1,0 +1,21 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "eslint--timeout",
+  "expectations": [
+    {
+      "check": "code.lint",
+      "component": "eslint",
+      "result": "انتهت المهلة",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "eslint/eslint.config.js",
+        "line": 2,
+        "anchor": "for (;;)"
+      },
+      "confidence": "مخالفة مثبتة",
+      "reason": "العملية لا تنتهي ضمن مهلة الفحص"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "FX-PY",
+  "title": "FX-PY — مكتبة Python في مسار عربي",
+  "description": "مكتبة نصوص عربية صغيرة بـ pytest وHypothesis وRuff وmypy وuv، تُركَّب في مسار عربي فيه مسافات وعلامات تنصيص: مشاريع تجريبية/مكتبة «النصوص». الخطة 20.",
+  "kind": "overlay",
+  "variants": {
+    "good": {
+      "description": "النسخة السليمة: كل الفحوص تمر في المسار العربي."
+    },
+    "failing-test": {
+      "description": "اختبار فاشل: يتوقع تحويل التاء المربوطة إلى هاء والمكتبة لا تفعل."
+    },
+    "no-tests": {
+      "description": "لا اختبارات: ملف الاختبار محذوف فيخرج pytest برمز 5 («no tests ran»)."
+    },
+    "usage-error": {
+      "description": "خطأ استخدام pytest: خيار addopts غير موجود في إعداد المشروع فيخرج pytest برمز 4."
+    },
+    "ruff-violation": {
+      "description": "مخالفة Ruff: import غير مستخدم (F401) في text.py."
+    },
+    "vuln-dep": {
+      "description": "تبعية على الحزمة المصطنعة ayar-vuln-fake@1.0.0 (محلية في vendor/) التي ستُعرَّف لها ثغرة تجريبية في قاعدة OSV المصغرة (E-09)."
+    },
+    "nfd-path": {
+      "description": "السليمة نفسها في مسار مكتوب بصيغة Unicode NFD: «مشاريع تجريبية/مكتبة «النصوص» (إصدار أول)». ملحق (إصدار أول) يحمل همزة تحت الألف، فتختلف صيغتا NFC وNFD (المسار الأصلي في الخطة بلا حرف مركّب، D-DEV1-02)."
+    }
+  },
+  "install_path": "مشاريع تجريبية/مكتبة «النصوص»",
+  "toolchain": {
+    "python": "3.12.13",
+    "uv": "0.13.0",
+    "install": "uv sync --frozen",
+    "pytest": "9.1.1",
+    "hypothesis": "6.168.5",
+    "ruff": "0.16.10",
+    "mypy": "2.4.0",
+    "build": "1.6.1"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "silent-font-fallback",
+  "description": "ملف خط Cairo العربي في @font-face غير موجود، فيظهر خط النظام البديل صامتًا.",
+  "defects": [
+    "design.fonts.static: @font-face لملف مفقود",
+    "design.fonts.render: الخط العربي غير محمّل"
+  ]
+}

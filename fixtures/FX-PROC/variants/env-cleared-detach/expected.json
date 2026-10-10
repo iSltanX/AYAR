@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-PROC",
+  "variant": "env-cleared-detach",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "reason": "الاختبار نفسه ينجح؛ والمخالفة سلوكية: عملية بلا أي وسم بيئة"
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "env-marker-limit",
+      "statement": "العملية الممسوحة البيئة لا تُنسب بوسم البيئة؛ تُرصد فقط بسلسلة الأصل في الدفتر وقت النشوء، وإلا فهي ضمن الحد المعلن (لاختبار الحد)",
+      "acceptance": "AT-11"
+    }
+  ]
+}

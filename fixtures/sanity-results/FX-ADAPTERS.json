@@ -1,0 +1,943 @@
+{
+  "project": "FX-ADAPTERS",
+  "variants": {
+    "good:vitest": [
+      {
+        "id": "vitest",
+        "cmd": "pnpm exec vitest run",
+        "ok": true,
+        "code": 0,
+        "ms": 1276,
+        "proves": "beh.unit: اجتاز",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-8agnby/p/vitest\n\n\n Test Files  1 passed (1)\n      Tests  1 passed (1)\n   Start at  11:21:04\n   Duration  87ms (transform 51%, import 28%, worker 15%, tests 6%)"
+      }
+    ],
+    "vitest--bad": [
+      {
+        "id": "vitest",
+        "cmd": "pnpm exec vitest run",
+        "ok": true,
+        "code": 1,
+        "ms": 1108,
+        "proves": "beh.unit: أخفق (منشأ المشروع)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-FjHy2L/p/vitest\n\n ❯ test/add.test.js (1 test | 1 failed) 3ms\n   × يجمع عددين 3ms\n\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯\n\n FAIL  test/add.test.js > يجمع عددين\nAssertionError: expected 5 to be 6 // Object.is equality\n\n- Expected\n+ Received\n\n- 6\n+ 5\n\n ❯ test/add.test.js:5:21\n      3|\n      4| it('يجمع عددين', () => {\n      5|   expect(add(2, 3)).toBe(6);\n       |                     ^\n      6| });\n      7|\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯\n\n\n Test Files  1 failed (1)\n      Tests  1 failed (1)\n   Start at  11:21:05\n   Duration  84ms (transform 45%, import 24%, tests 18%, worker 13%)"
+      }
+    ],
+    "vitest--config-error": [
+      {
+        "id": "vitest",
+        "cmd": "pnpm exec vitest run",
+        "ok": true,
+        "code": 1,
+        "ms": 1095,
+        "proves": "beh.unit: تعذّر (منشأ الأداة)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "MISSING DEPENDENCY  Cannot find dependency 'vitest-environment-no-such-environment'\n\n\n RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-3HPqtn/p/vitest\n\n⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯\n\nVitest caught 1 unhandled error during the test run.\nThis might cause false positive tests. Resolve unhandled errors t\n… [اقتُطع] …\ndules/.pnpm/vitest@5.0.3_vite@8.3.4/node_modules/vitest/dist/chunks/base.DhkQeZwd.js:158:34\n ❯ process.onMessage node_modules/.pnpm/vitest@5.0.3_vite@8.3.4/node_modules/vitest/dist/chunks/init.D0qF-GGk.js:288:23\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n\n\n Test Files  no tests\n      Tests  no tests\n     Errors  1 error\n   Start at  11:21:07\n   Duration  62ms"
+      }
+    ],
+    "vitest--no-inputs": [
+      {
+        "id": "vitest",
+        "cmd": "pnpm exec vitest run",
+        "ok": true,
+        "code": 1,
+        "ms": 990,
+        "proves": "beh.unit: ناقص",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-xQ7wND/p/vitest\n\nNo test files found, exiting with code 1\n\ninclude: test/**/*.test.js\nexclude:  **/node_modules/**, **/.git/**"
+      }
+    ],
+    "vitest--timeout": [
+      {
+        "id": "vitest",
+        "cmd": "pnpm exec vitest run",
+        "ok": true,
+        "code": "مهلة",
+        "ms": 12016,
+        "proves": "beh.unit: انتهت المهلة",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-eouKmk/p/vitest"
+      }
+    ],
+    "vitest--conflict": [
+      {
+        "id": "vitest",
+        "cmd": "pnpm exec vitest run",
+        "ok": true,
+        "code": 0,
+        "ms": 1107,
+        "proves": "beh.unit: تعارض الأدلة (خروج 0 مع إخفاق)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-eDxuOe/p/vitest\n\n ❯ test/add.test.js (1 test | 1 failed) 3ms\n   × يجمع عددين 3ms\n\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯\n\n FAIL  test/add.test.js > يجمع عددين\nAssertionError: expected 5 to be 6 // Object.is equality\n\n- Expected\n+ Received\n\n- 6\n+ 5\n\n ❯ test/add.test.js:5:21\n      3|\n      4| it('يجمع عددين', () => {\n      5|   expect(add(2, 3)).toBe(6);\n       |                     ^\n      6| });\n      7|\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯\n\n\n Test Files  1 failed (1)\n      Tests  1 failed (1)\n   Start at  11:21:21\n   Duration  83ms (transform 30%, import 29%, tests 23%, worker 18%)"
+      }
+    ],
+    "good:jest": [
+      {
+        "id": "jest",
+        "cmd": "pnpm exec jest --ci",
+        "ok": true,
+        "code": 0,
+        "ms": 1021,
+        "proves": "beh.unit: اجتاز",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Test Suites: 1 passed, 1 total\nTests:       1 passed, 1 total\nSnapshots:   0 total\nTime:        0.224 s\nRan all test suites."
+      }
+    ],
+    "jest--bad": [
+      {
+        "id": "jest",
+        "cmd": "pnpm exec jest --ci",
+        "ok": true,
+        "code": 1,
+        "ms": 859,
+        "proves": "beh.unit: أخفق",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "FAIL test/add.test.js\n  ● يجمع عددين\n\n    expect(received).toBe(expected) // Object.is equality\n\n    Expected: 6\n    Received: 5\n\n      2 |\n      3 | test('يجمع عددين', () => {\n    > 4 |   expect(add(2, 3)).toBe(6);\n        |                     ^\n      5 | });\n      6 |\n\n      at Object.toBe (test/add.test.js:4:21)\n\nTest Suites: 1 failed, 1 total\nTests:       1 failed, 1 total\nSnapshots:   0 total\nTime:        0.204 s\nRan all test suites."
+      }
+    ],
+    "jest--config-error": [
+      {
+        "id": "jest",
+        "cmd": "pnpm exec jest --ci",
+        "ok": true,
+        "code": 1,
+        "ms": 442,
+        "proves": "beh.unit: تعذّر",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "● Validation Error:\n\n  Test environment no-such-environment cannot be found. Make sure the testEnvironment configuration option points to an existing node module.\n\n  Configuration Documentation:\n  https://jestjs.io/docs/configuration"
+      }
+    ],
+    "jest--no-inputs": [
+      {
+        "id": "jest",
+        "cmd": "pnpm exec jest --ci",
+        "ok": true,
+        "code": 1,
+        "ms": 557,
+        "proves": "beh.unit: ناقص",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "No tests found, exiting with code 1\nRun with `--passWithNoTests` to exit with code 0\nIn /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-BDROYv/p/jest\n  3 files checked.\n  testMatch: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-BDROYv/p/jest/test/**/*.test.js - 0 matches\n  testPathIgnorePatterns: /node_modules/ - 3 matches\n  testRegex:  - 0 matches\nPattern:  - 0 matches"
+      }
+    ],
+    "jest--timeout": [
+      {
+        "id": "jest",
+        "cmd": "pnpm exec jest --ci",
+        "ok": true,
+        "code": "مهلة",
+        "ms": 12012,
+        "proves": "beh.unit: انتهت المهلة",
+        "problems": [],
+        "evidence": true,
+        "excerpt": ""
+      }
+    ],
+    "good:node-test": [
+      {
+        "id": "node-test",
+        "cmd": "node --test",
+        "ok": true,
+        "code": 0,
+        "ms": 71,
+        "proves": "beh.unit: اجتاز",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "✔ يجمع عددين (0.27525ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 39.330041"
+      }
+    ],
+    "node-test--bad": [
+      {
+        "id": "node-test",
+        "cmd": "node --test",
+        "ok": true,
+        "code": 1,
+        "ms": 68,
+        "proves": "beh.unit: أخفق",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "✖ يجمع عددين (0.562042ms)\nℹ tests 1\nℹ suites 0\nℹ pass 0\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 39.29575\n\n✖ failing tests:\n\ntest at test/add.test.js:5:1\n✖ يجمع عددين (0.562042ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  5 !== 6\n  \n      at TestContext.<anonymous> (file:///private/var/folders/39/\n… [اقتُطع] …\nks:227:14)\n      at Test.run (node:internal/test_runner/test:1306:25)\n      at Test.start (node:internal/test_runner/test:1177:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 5,\n    expected: 6,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }"
+      }
+    ],
+    "node-test--no-inputs": [
+      {
+        "id": "node-test",
+        "cmd": "node --test",
+        "ok": true,
+        "code": 0,
+        "ms": 43,
+        "proves": "beh.unit: ناقص (خروج 0 وصفر اختبار)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "ℹ tests 0\nℹ suites 0\nℹ pass 0\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 5.241542"
+      }
+    ],
+    "node-test--timeout": [
+      {
+        "id": "node-test",
+        "cmd": "node --test",
+        "ok": true,
+        "code": "مهلة",
+        "ms": 12014,
+        "proves": "beh.unit: انتهت المهلة",
+        "problems": [],
+        "evidence": true,
+        "excerpt": ""
+      }
+    ],
+    "good:playwright": [
+      {
+        "id": "playwright",
+        "cmd": "pnpm exec playwright test",
+        "ok": true,
+        "code": 0,
+        "ms": 800,
+        "proves": "beh.e2e: اجتاز",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Running 1 test using 1 worker\n\n(node:23695) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n  ✓  1 tests/basic.spec.js:4:1 › يجمع عددين (1ms)\n\n  1 passed (213ms)"
+      }
+    ],
+    "playwright--bad": [
+      {
+        "id": "playwright",
+        "cmd": "pnpm exec playwright test",
+        "ok": true,
+        "code": 1,
+        "ms": 659,
+        "proves": "beh.e2e: أخفق",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Running 1 test using 1 worker\n\n(node:23732) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n  ✘  1 tests/basic.spec.js:4:1 › يجمع عددين (3ms)\n\n\n  1) tests/basic.spec.js:4:1 › يجمع عددين ──────────────────────────────────────────────────────────\n\n \n… [اقتُطع] …\n     ^\n      6 | });\n      7 |\n        at /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-NYYc05/p/playwright/tests/basic.spec.js:5:17\n\n    Error Context: test-results/basic-يجمع-عددين/error-context.md\n\n  1 failed\n    tests/basic.spec.js:4:1 › يجمع عددين ───────────────────────────────────────────────────────────"
+      }
+    ],
+    "playwright--config-error": [
+      {
+        "id": "playwright",
+        "cmd": "pnpm exec playwright test",
+        "ok": true,
+        "code": 1,
+        "ms": 449,
+        "proves": "beh.e2e: تعذّر",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "SyntaxError: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-dNcOoD/p/playwright/playwright.config.js: Unexpected token (6:13)\n\n  4 |   testDir: 'tests',\n  5 |   reporter: 'list',\n> 6 |   retries: 0,,\n    |              ^\n  7 | });\n  8 |\n    at constructor (/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T\n… [اقتُطع] …\nymous> (/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-dNcOoD/p/playwright/node_modules/.pnpm/playwright@1.64.0/node_modules/playwright/lib/program.js:55:7) {\n  code: 'BABEL_PARSE_ERROR',\n  reasonCode: 'UnexpectedToken',\n  loc: Position { line: 6, column: 13, index: 133 },\n  pos: 133,\n  syntaxPlugin: undefined\n}"
+      }
+    ],
+    "playwright--no-inputs": [
+      {
+        "id": "playwright",
+        "cmd": "pnpm exec playwright test",
+        "ok": true,
+        "code": 1,
+        "ms": 455,
+        "proves": "beh.e2e: ناقص",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Error: No tests found"
+      }
+    ],
+    "playwright--timeout": [
+      {
+        "id": "playwright",
+        "cmd": "pnpm exec playwright test",
+        "ok": true,
+        "code": "مهلة",
+        "ms": 12020,
+        "proves": "beh.e2e: انتهت المهلة",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Running 1 test using 1 worker\n\n(node:23835) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)"
+      }
+    ],
+    "good:eslint": [
+      {
+        "id": "eslint",
+        "cmd": "pnpm exec eslint src",
+        "ok": true,
+        "code": 0,
+        "ms": 591,
+        "proves": "code.lint: اجتاز",
+        "problems": [],
+        "evidence": true,
+        "excerpt": ""
+      }
+    ],
+    "eslint--bad": [
+      {
+        "id": "eslint",
+        "cmd": "pnpm exec eslint src",
+        "ok": true,
+        "code": 1,
+        "ms": 448,
+        "proves": "code.lint: أخفق",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-ff4gke/p/eslint/src/a.js\n  2:9  error  'unused' is assigned a value but never used  no-unused-vars\n\n✖ 1 problem (1 error, 0 warnings)"
+      }
+    ],
+    "eslint--config-error": [
+      {
+        "id": "eslint",
+        "cmd": "pnpm exec eslint src",
+        "ok": true,
+        "code": 2,
+        "ms": 441,
+        "proves": "code.lint: تعذّر (رمز 2)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Oops! Something went wrong! :(\n\nESLint: 10.12.0\n\nTypeError: Key \"rules\": Key \"no-such-rule-xyz\": Could not find \"no-such-rule-xyz\" in plugin \"@\".\n    at throwRuleNotFoundError (/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-8gHR43/p/eslint/node_modules/.pnpm/eslint@10.12.0/node_modules/eslint/lib/config/config.j\n… [اقتُطع] …\n00gn/T/ayar-fx-sanity-FX-ADAPTERS-8gHR43/p/eslint/node_modules/.pnpm/@humanfs+core@0.19.2/node_modules/@humanfs/core/src/hfs.js:614:3)\n    at async globSearch (/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-8gHR43/p/eslint/node_modules/.pnpm/eslint@10.12.0/node_modules/eslint/lib/eslint/eslint-helpers.js:366:20)"
+      }
+    ],
+    "eslint--no-inputs": [
+      {
+        "id": "eslint",
+        "cmd": "pnpm exec eslint src",
+        "ok": true,
+        "code": 2,
+        "ms": 346,
+        "proves": "code.lint: تعذّر (لا مدخلات، رمز 2)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Oops! Something went wrong! :(\n\nESLint: 10.12.0\n\nYou are linting \"src\", but all of the files matching the glob pattern \"src\" are ignored.\n\nIf you don't want to lint these files, remove the pattern \"src\" from the list of arguments passed to ESLint.\n\nIf you do want to lint these files, explicitly list one or more of the files from this glob that you'\n… [اقتُطع] …\nignored because no matching configuration was supplied, check file patterns in your config file.\n    https://eslint.org/docs/latest/use/configure/configuration-files#specify-files-with-arbitrary-extensions\n\n  * If the file is ignored because it is located outside of the base path, change the location of your config file to be in a parent directory."
+      }
+    ],
+    "eslint--timeout": [
+      {
+        "id": "eslint",
+        "cmd": "pnpm exec eslint src",
+        "ok": true,
+        "code": "مهلة",
+        "ms": 12004,
+        "proves": "code.lint: انتهت المهلة",
+        "problems": [],
+        "evidence": true,
+        "excerpt": ""
+      }
+    ],
+    "good:biome": [
+      {
+        "id": "biome",
+        "cmd": "pnpm exec biome lint src",
+        "ok": true,
+        "code": 0,
+        "ms": 1052,
+        "proves": "code.lint: اجتاز",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Checked 1 file in 6ms. No fixes applied."
+      }
+    ],
+    "biome--bad": [
+      {
+        "id": "biome",
+        "cmd": "pnpm exec biome lint src",
+        "ok": true,
+        "code": 1,
+        "ms": 931,
+        "proves": "code.lint: أخفق",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "src/a.js:2:3 lint/suspicious/noDebugger  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n  × This is an unexpected use of the debugger statement.\n  \n    1 │ export function f() {\n  > 2 │   debugger;\n      │   ^^^^^^^^^\n    3 │   return 2;\n    4 │ }\n  \n  i Unsafe fix: Remove debugger statement\n  \n    1 1 │   export function f() {\n    2   │ - ··debugger;\n    3 2 │     return 2;\n    4 3 │   }\n  \n\nChecked 1 file in 6ms. No fixes applied.\nFound 1 error.\nlint ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n  × Some errors were emitted while running checks."
+      }
+    ],
+    "biome--config-error": [
+      {
+        "id": "biome",
+        "cmd": "pnpm exec biome lint src",
+        "ok": true,
+        "code": 1,
+        "ms": 918,
+        "proves": "code.lint: تعذّر",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-YL7E0R/p/biome/biome.json:4:5 deserialize ━━━━━━━━━━\n\n  × Found an unknown key `rulez`.\n  \n    2 │   \"linter\": {\n    3 │     \"enabled\": true,\n  > 4 │     \"rulez\": {\n      │     ^^^^^^^\n    5 │       \"recommended\": true\n    6 │     }\n  \n  i Known keys:\n  \n  - enabled\n  - rules\n  - includes\n  - domains\n  \n\nconfiguration ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n  × Biome exited because the configuration resulted in errors. Please fix them."
+      }
+    ],
+    "biome--no-inputs": [
+      {
+        "id": "biome",
+        "cmd": "pnpm exec biome lint src",
+        "ok": true,
+        "code": 1,
+        "ms": 918,
+        "proves": "code.lint: لا مدخلات (رمز 1)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Checked 0 files in 1303µs. No fixes applied.\nlint ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n  × No files were processed in the specified paths.\n  \n  i Check your biome.json or biome.jsonc to ensure the paths are not ignored by the configuration.\n  \n  i These paths were provided but ignored:\n  \n  - src"
+      }
+    ],
+    "good:tsc": [
+      {
+        "id": "tsc",
+        "cmd": "pnpm exec tsc --noEmit -p tsconfig.json --pretty false",
+        "ok": true,
+        "code": 0,
+        "ms": 522,
+        "proves": "code.types: اجتاز",
+        "problems": [],
+        "evidence": true,
+        "excerpt": ""
+      }
+    ],
+    "tsc--bad": [
+      {
+        "id": "tsc",
+        "cmd": "pnpm exec tsc --noEmit -p tsconfig.json --pretty false",
+        "ok": true,
+        "code": 2,
+        "ms": 395,
+        "proves": "code.types: أخفق (TS6133)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "src/index.ts(2,9): error TS6133: 'unused' is declared but its value is never read."
+      }
+    ],
+    "tsc--config-error": [
+      {
+        "id": "tsc",
+        "cmd": "pnpm exec tsc --noEmit -p tsconfig.json --pretty false",
+        "ok": true,
+        "code": 2,
+        "ms": 659,
+        "proves": "code.types: تعذّر (TS5083)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "error TS5083: Cannot read file '/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-v4yn9U/p/tsc/missing-base.json'."
+      }
+    ],
+    "tsc--no-inputs": [
+      {
+        "id": "tsc",
+        "cmd": "pnpm exec tsc --noEmit -p tsconfig.json --pretty false",
+        "ok": true,
+        "code": 2,
+        "ms": 274,
+        "proves": "code.types: تعذّر (TS18003)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "error TS18003: No inputs were found in config file '/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-A37rPV/p/tsc/tsconfig.json'. Specified 'include' paths were '[\"src\"]' and 'exclude' paths were '[]'."
+      }
+    ],
+    "good:knip": [
+      {
+        "id": "knip",
+        "cmd": "pnpm exec knip",
+        "ok": true,
+        "code": 0,
+        "ms": 1166,
+        "proves": "code.unused: اجتاز",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Configuration hints (1)\nsrc/index.js    knip.json  Remove redundant entry pattern"
+      }
+    ],
+    "knip--bad": [
+      {
+        "id": "knip",
+        "cmd": "pnpm exec knip",
+        "ok": true,
+        "code": 1,
+        "ms": 826,
+        "proves": "code.unused: أخفق (ملف غير مستخدم)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Unused files (1)\nsrc/orphan.js\nConfiguration hints (1)\nsrc/index.js    knip.json  Remove redundant entry pattern"
+      }
+    ],
+    "knip--config-error": [
+      {
+        "id": "knip",
+        "cmd": "pnpm exec knip",
+        "ok": true,
+        "code": 2,
+        "ms": 795,
+        "proves": "code.unused: تعذّر (رمز 2)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "ERROR: Invalid input (location: entry)"
+      }
+    ],
+    "good:pyright": [
+      {
+        "id": "pyright",
+        "cmd": "pnpm exec pyright",
+        "ok": true,
+        "code": 0,
+        "ms": 842,
+        "proves": "code.types: اجتاز",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "0 errors, 0 warnings, 0 informations"
+      }
+    ],
+    "pyright--bad": [
+      {
+        "id": "pyright",
+        "cmd": "pnpm exec pyright",
+        "ok": true,
+        "code": 1,
+        "ms": 729,
+        "proves": "code.types: أخفق",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-phtSIR/p/pyright/src/a.py\n  /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-phtSIR/p/pyright/src/a.py:5:17 - error: Argument of type \"Literal['2']\" cannot be assigned to parameter \"n\" of type \"int\" in function \"double\"\n    \"Literal['2']\" is not assignable to \"int\" (reportArgumentType)\n1 error, 0 warnings, 0 informations"
+      }
+    ],
+    "pyright--config-error": [
+      {
+        "id": "pyright",
+        "cmd": "pnpm exec pyright",
+        "ok": true,
+        "code": 3,
+        "ms": 739,
+        "proves": "code.types: تعذّر (رمز 3)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Config file \"/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-bDDgLk/p/pyright/pyrightconfig.json\" could not be parsed. Verify that format is correct.\n0 errors, 0 warnings, 0 informations"
+      }
+    ],
+    "pyright--no-inputs": [
+      {
+        "id": "pyright",
+        "cmd": "pnpm exec pyright",
+        "ok": true,
+        "code": 0,
+        "ms": 630,
+        "proves": "code.types: ناقص (رمز 0 بلا ملفات مصدر)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "0 errors, 0 warnings, 0 informations"
+      }
+    ],
+    "good:pytest": [
+      {
+        "id": "pytest",
+        "cmd": ".venv/bin/python -m pytest -p no:cacheprovider",
+        "ok": true,
+        "code": 0,
+        "ms": 276,
+        "proves": "beh.unit: اجتاز",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-UzULyZ/p/pytest\nconfigfile: pyproject.toml\ntestpaths: tests\ncollected 1 item\n\ntests/test_add.py .                                                      [100%]\n\n============================== 1 passed in 0.00s ==============================="
+      }
+    ],
+    "pytest--bad": [
+      {
+        "id": "pytest",
+        "cmd": ".venv/bin/python -m pytest -p no:cacheprovider",
+        "ok": true,
+        "code": 1,
+        "ms": 250,
+        "proves": "beh.unit: أخفق",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-vlktwz/p/pytest\nconfigfile: pyproject.toml\ntestpaths: tests\ncollected 1 item\n\ntests/test_add.py F                 \n… [اقتُطع] …\n assert add(2, 3) == 6\nE       assert 5 == 6\nE        +  where 5 = add(2, 3)\n\ntests/test_add.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_add.py::test_add - assert 5 == 6\n +  where 5 = add(2, 3)\n============================== 1 failed in 0.01s ==============================="
+      }
+    ],
+    "pytest--collection-error": [
+      {
+        "id": "pytest",
+        "cmd": ".venv/bin/python -m pytest -p no:cacheprovider",
+        "ok": true,
+        "code": 2,
+        "ms": 313,
+        "proves": "beh.unit: أخفق (خطأ جمع، رمز 2، منشأ المشروع)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-Gx9bbG/p/pytest\nconfigfile: pyproject.toml\ntestpaths: tests\ncollected 0 items / 1 error\n\n=========================\n… [اقتُطع] …\nef test_add() -> None\nE                             ^\nE   SyntaxError: expected ':'\n=========================== short test summary info ============================\nERROR tests/test_add.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n=============================== 1 error in 0.07s ==============================="
+      }
+    ],
+    "pytest--usage-error": [
+      {
+        "id": "pytest",
+        "cmd": ".venv/bin/python -m pytest -p no:cacheprovider",
+        "ok": true,
+        "code": 4,
+        "ms": 227,
+        "proves": "beh.unit: تعذّر (رمز 4)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "ERROR: usage: python -m pytest [options] [file_or_dir] [file_or_dir] [...]\npython -m pytest: error: unrecognized arguments: --no-such-option\n  inifile: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-38HsxU/p/pytest/pyproject.toml\n  rootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-38HsxU/p/pytest"
+      }
+    ],
+    "pytest--no-tests": [
+      {
+        "id": "pytest",
+        "cmd": ".venv/bin/python -m pytest -p no:cacheprovider",
+        "ok": true,
+        "code": 5,
+        "ms": 244,
+        "proves": "beh.unit: ناقص (رمز 5)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-hyESfX/p/pytest\nconfigfile: pyproject.toml\ntestpaths: tests\ncollected 0 items\n\n============================ no tests ran in 0.00s ============================="
+      }
+    ],
+    "pytest--timeout": [
+      {
+        "id": "pytest",
+        "cmd": ".venv/bin/python -m pytest -p no:cacheprovider",
+        "ok": true,
+        "code": "مهلة",
+        "ms": 12014,
+        "proves": "beh.unit: انتهت المهلة",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-rmF0dG/p/pytest\nconfigfile: pyproject.toml\ntestpaths: tests\ncollected 1 item\n\ntests/test_add.py"
+      }
+    ],
+    "pytest--conflict": [
+      {
+        "id": "pytest",
+        "cmd": ".venv/bin/python -m pytest -p no:cacheprovider",
+        "ok": true,
+        "code": 0,
+        "ms": 306,
+        "proves": "beh.unit: تعارض الأدلة (خروج 0 مع إخفاق)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-Mo6mhc/p/pytest\nconfigfile: pyproject.toml\ntestpaths: tests\ncollected 1 item\n\ntests/test_add.py F                 \n… [اقتُطع] …\n assert add(2, 3) == 6\nE       assert 5 == 6\nE        +  where 5 = add(2, 3)\n\ntests/test_add.py:5: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_add.py::test_add - assert 5 == 6\n +  where 5 = add(2, 3)\n============================== 1 failed in 0.01s ==============================="
+      }
+    ],
+    "good:ruff": [
+      {
+        "id": "ruff",
+        "cmd": ".venv/bin/ruff check --no-cache src",
+        "ok": true,
+        "code": 0,
+        "ms": 363,
+        "proves": "code.lint: اجتاز",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "All checks passed!"
+      }
+    ],
+    "ruff--bad": [
+      {
+        "id": "ruff",
+        "cmd": ".venv/bin/ruff check --no-cache src",
+        "ok": true,
+        "code": 1,
+        "ms": 353,
+        "proves": "code.lint: أخفق",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "F401 [*] `os` imported but unused\n --> src/a.py:1:8\n  |\n1 | import os\n  |        ^^\nhelp: Remove unused import: `os`\n  |\n  - import os\n1 |\n  |\n\nFound 1 error.\n[*] 1 fixable with the `--fix` option."
+      }
+    ],
+    "ruff--config-error": [
+      {
+        "id": "ruff",
+        "cmd": ".venv/bin/ruff check --no-cache src",
+        "ok": true,
+        "code": 2,
+        "ms": 356,
+        "proves": "code.lint: تعذّر (رمز 2)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "ruff failed\n  Cause: Failed to load configuration `/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-DFj2Wh/p/ruff/ruff.toml`\n  Cause: Failed to parse /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-DFj2Wh/p/ruff/ruff.toml\n  Cause: TOML parse error at line 1, column 15\n  |\n1 | line-length = \"wide\"\n  |               ^^^^^^\ninvalid type: string \"wide\", expected i64"
+      }
+    ],
+    "ruff--no-inputs": [
+      {
+        "id": "ruff",
+        "cmd": ".venv/bin/ruff check --no-cache src",
+        "ok": true,
+        "code": 0,
+        "ms": 394,
+        "proves": "code.lint: ناقص (رمز 0 بلا ملفات)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "warning: No Python files found under the given path(s)\nAll checks passed!"
+      }
+    ],
+    "good:mypy": [
+      {
+        "id": "mypy",
+        "cmd": ".venv/bin/python -m mypy --cache-dir=/dev/null",
+        "ok": true,
+        "code": 0,
+        "ms": 1736,
+        "proves": "code.types: اجتاز",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Success: no issues found in 1 source file"
+      }
+    ],
+    "mypy--bad": [
+      {
+        "id": "mypy",
+        "cmd": ".venv/bin/python -m mypy --cache-dir=/dev/null",
+        "ok": true,
+        "code": 1,
+        "ms": 1732,
+        "proves": "code.types: أخفق",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "src/a.py:5: error: Argument 1 to \"double\" has incompatible type \"str\"; expected \"int\"  [arg-type]\nFound 1 error in 1 file (checked 1 source file)"
+      }
+    ],
+    "mypy--syntax-error": [
+      {
+        "id": "mypy",
+        "cmd": ".venv/bin/python -m mypy --cache-dir=/dev/null",
+        "ok": true,
+        "code": 2,
+        "ms": 1511,
+        "proves": "code.types: أخفق (رمز 2 مع تشخيص [syntax] بموضع ملف)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "src/a.py:1: error: Expected `:`, found newline  [syntax]\nFound 1 error in 1 file (errors prevented further checking)"
+      }
+    ],
+    "mypy--config-error": [
+      {
+        "id": "mypy",
+        "cmd": ".venv/bin/python -m mypy --cache-dir=/dev/null",
+        "ok": true,
+        "code": 2,
+        "ms": 1324,
+        "proves": "code.types: تعذّر (رمز 2 بلا تشخيص بموضع ملف مصدر)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "mypy.ini: File contains no section headers.\nfile: 'mypy.ini', line: 1\n'[mypy\\n'\nusage: mypy [-h] [-v] [-V] [more options; see below]\n            [-m MODULE] [-p PACKAGE] [-c PROGRAM_TEXT] [files ...]\nmypy: error: Missing target module, package, files, or command."
+      }
+    ],
+    "mypy--no-inputs": [
+      {
+        "id": "mypy",
+        "cmd": ".venv/bin/python -m mypy --cache-dir=/dev/null",
+        "ok": true,
+        "code": 2,
+        "ms": 1329,
+        "proves": "code.types: تعذّر (رمز 2)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "There are no .py[i] files in directory 'src'"
+      }
+    ],
+    "good:semgrep": [
+      {
+        "id": "semgrep",
+        "cmd": "semgrep scan --no-git-ignore --config rules/ayar-eval.yml --metrics=off --disable-version-check --quiet src",
+        "ok": true,
+        "code": 0,
+        "ms": 1455,
+        "proves": "sec.sast: اجتاز (رمز 0 بلا نتائج)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": ""
+      }
+    ],
+    "semgrep--bad": [
+      {
+        "id": "semgrep",
+        "cmd": "semgrep scan --no-git-ignore --config rules/ayar-eval.yml --metrics=off --disable-version-check --quiet src",
+        "ok": true,
+        "code": 0,
+        "ms": 912,
+        "proves": "sec.sast: رمز 0 مع نتائج (ليس اجتيازًا)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "┌────────────────┐\n│ 1 Code Finding │\n└────────────────┘\n            \n    src/a.js\n   ❯❯❱ rules.ayar-test.no-eval\n          ❰❰ Blocking ❱❱\n          استخدام eval بقيمة غير ثابتة (قاعدة اختبار مصغرة، ليست من حزمة عِيَار)\n                                                                              \n            2┆ return eval(userInput);"
+      }
+    ],
+    "semgrep--config-error": [
+      {
+        "id": "semgrep",
+        "cmd": "semgrep scan --no-git-ignore --config rules/ayar-eval.yml --metrics=off --disable-version-check --quiet src",
+        "ok": true,
+        "code": 7,
+        "ms": 797,
+        "proves": "sec.sast: تعذّر (رمز 7)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": ""
+      }
+    ],
+    "semgrep--no-inputs": [
+      {
+        "id": "semgrep",
+        "cmd": "semgrep scan --no-git-ignore --config rules/ayar-eval.yml --metrics=off --disable-version-check --quiet src",
+        "ok": true,
+        "code": 0,
+        "ms": 916,
+        "proves": "sec.sast: غير منطبق (لا ملفات، رمز 0)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": ""
+      }
+    ],
+    "osv--no-lockfiles": [
+      {
+        "id": "osv",
+        "cmd": "osv-scanner scan source -r . --offline",
+        "ok": true,
+        "code": 128,
+        "ms": 231,
+        "proves": "sec.deps: ناقص (رمز 128)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Scanning dir .\nStarting filesystem walk for root: /\nEnd status: 1 dirs visited, 2 inodes visited, 0 Extract calls, 134.375µs elapsed, 135µs wall time\nNo package sources found, --help for usage information."
+      }
+    ],
+    "osv--config-error": [
+      {
+        "id": "osv",
+        "cmd": "osv-scanner scan source -r . --offline",
+        "ok": true,
+        "code": 128,
+        "ms": 39,
+        "proves": "sec.deps: تعذّر (رمز 128 مع Error during extraction)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Scanning dir .\nStarting filesystem walk for root: /\nEnd status: 1 dirs visited, 3 inodes visited, 1 Extract calls, 144.833µs elapsed, 145µs wall time\nError during extraction: (extracting as javascript/packagelockjson) private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-sanity-FX-ADAPTERS-a8UjwG/p/osv/package-lock.json: could not extract: unexpected end of JSON input\nNo package sources found, --help for usage information."
+      }
+    ],
+    "good:gitleaks": [
+      {
+        "id": "gitleaks",
+        "cmd": "gitleaks dir . --config gitleaks.toml --redact=100 --no-banner --exit-code 42",
+        "ok": true,
+        "code": 0,
+        "ms": 63,
+        "proves": "sec.secrets.files: اجتاز",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "11:23AM INF scanned ~46 bytes (46 bytes) in 2.61ms\n11:23AM INF no leaks found"
+      }
+    ],
+    "gitleaks--bad": [
+      {
+        "id": "gitleaks",
+        "cmd": "gitleaks dir . --config gitleaks.toml --redact=100 --no-banner --exit-code 42",
+        "ok": true,
+        "code": 42,
+        "ms": 20,
+        "proves": "sec.secrets.files: أخفق (رمز 42)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "11:23AM INF scanned ~174 bytes (174 bytes) in 967µs\n11:23AM WRN leaks found: 1"
+      }
+    ],
+    "gitleaks--config-error": [
+      {
+        "id": "gitleaks",
+        "cmd": "gitleaks dir . --config gitleaks.toml --redact=100 --no-banner --exit-code 42",
+        "ok": true,
+        "code": 1,
+        "ms": 8,
+        "proves": "sec.secrets.files: تعذّر (رمز 1)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "11:23AM FTL unable to load gitleaks config, err: While parsing config: toml: expected character ]"
+      }
+    ],
+    "good:lychee": [
+      {
+        "id": "lychee",
+        "cmd": "lychee --config lychee.toml README.md",
+        "ok": true,
+        "code": 0,
+        "ms": 272,
+        "proves": "code.refs.external: اجتاز",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "🔍 2 Total (in 208ms) 🔗 2 Unique ✅ 2 OK 🚫 0 Errors"
+      }
+    ],
+    "lychee--bad": [
+      {
+        "id": "lychee",
+        "cmd": "lychee --config lychee.toml README.md",
+        "ok": true,
+        "code": 2,
+        "ms": 239,
+        "proves": "code.refs.external: أخفق (404)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Issues found in 1 input. Find details below.\n\n[README.md]:\n[404] http://127.0.0.1:18231/gone (at 3:3) | Rejected status code: 404 Not Found\n\n🔍 2 Total (in 203ms) 🔗 2 Unique ✅ 1 OK 🚫 1 Error\n\nHint: You can configure accepted/rejected response codes with `-a` or `--accept`"
+      }
+    ],
+    "lychee--timeout": [
+      {
+        "id": "lychee",
+        "cmd": "lychee --config lychee.toml README.md",
+        "ok": true,
+        "code": 2,
+        "ms": 3236,
+        "proves": "code.refs.external: مهلة (ليست رابطًا مكسورًا)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Issues found in 1 input. Find details below.\n\n[README.md]:\n[TIMEOUT] http://127.0.0.1:18231/hang (at 3:3) | Request timed out\n\n🔍 2 Total (in 3s 204ms) 🔗 2 Unique ✅ 1 OK 🚫 0 Errors ⏳ 1 Timeouts"
+      }
+    ],
+    "lychee--needs-review": [
+      {
+        "id": "lychee",
+        "cmd": "lychee --config lychee.toml README.md",
+        "ok": true,
+        "code": 2,
+        "ms": 223,
+        "proves": "code.refs.external: 403 يحتاج مراجعة",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "Issues found in 1 input. Find details below.\n\n[README.md]:\n[403] http://127.0.0.1:18231/forbidden (at 3:3) | Rejected status code: 403 Forbidden\n\n🔍 2 Total (in 203ms) 🔗 2 Unique ✅ 1 OK 🚫 1 Error\n\nHint: You can configure accepted/rejected response codes with `-a` or `--accept`"
+      }
+    ],
+    "lychee--config-error": [
+      {
+        "id": "lychee",
+        "cmd": "lychee --config lychee.toml README.md",
+        "ok": true,
+        "code": 3,
+        "ms": 26,
+        "proves": "code.refs.external: تعذّر (رمز 3)",
+        "problems": [],
+        "evidence": true,
+        "excerpt": "[ERROR] Error while loading config: Cannot load configuration file `lychee.toml`: Failed to load config from lychee.toml\n\nCaused by:\n    0: Failed to parse configuration file\n    1: TOML parse error at line 1, column 11\n         |\n       1 | timeout = \"soon\"\n         |           ^^^^^^\n       invalid type: string \"soon\", expected u64\n       \nSee: https://github.com/lycheeverse/lychee/blob/lychee-v0.24.2/lychee.example.toml"
+      }
+    ],
+    "osv--bad": [
+      {
+        "id": "osv",
+        "ok": true,
+        "pending": true,
+        "proves": "sec.deps: ثغرة تجريبية في ayar-vuln-fake@1.0.0",
+        "reason": "ينتظر E-09 (قاعدة OSV المصغرة في DEV-2)"
+      }
+    ],
+    "good:osv": [
+      {
+        "id": "osv",
+        "ok": true,
+        "pending": true,
+        "proves": "sec.deps: اجتاز (صفر ثغرات)",
+        "reason": "ينتظر E-09 (قاعدة OSV المصغرة في DEV-2)"
+      }
+    ]
+  },
+  "date": "2026-10-10",
+  "versions": {
+    "node": "v24.16.0",
+    "pnpm": "12.8.1",
+    "uv": "uv 0.13.0 (4ecd0eff2 2026-10-09 aarch64-apple-darwin)",
+    "semgrep": "1.180.0",
+    "osv-scanner": "osv-scanner version: 2.6.0",
+    "lychee": "lychee 0.24.2",
+    "gitleaks": "8.30.1"
+  }
+}

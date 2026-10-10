@@ -1,0 +1,9 @@
+{
+  "name": "eslint--timeout",
+  "description": "قاعدة مخصصة بحلقة لا تنتهي: تقتل مهلة عِيَار العملية.",
+  "defects": [
+    "code.lint: يتجاوز المهلة"
+  ],
+  "component": "eslint",
+  "kind": "timeout"
+}

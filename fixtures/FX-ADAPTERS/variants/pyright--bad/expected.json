@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "pyright--bad",
+  "expectations": [
+    {
+      "check": "code.types",
+      "component": "pyright",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "tool_rule": "reportArgumentType",
+      "location": {
+        "path": "pyright/src/a.py",
+        "line": 5,
+        "anchor": "double(\"2\")"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "exit_code": 1
+    }
+  ]
+}

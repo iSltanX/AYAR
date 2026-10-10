@@ -1,0 +1,18 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "pyright--no-inputs",
+  "expectations": [
+    {
+      "check": "code.types",
+      "component": "pyright",
+      "result": "ناقص",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "exit_code": 0,
+      "reason": "رمز 0 و«0 errors» لكن لا ملفات مصدر في include؛ المدخلات المنفذة صفر فهو ناقص لا اجتياز"
+    }
+  ]
+}

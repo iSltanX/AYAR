@@ -1,0 +1,44 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-REPORTS",
+  "variant": "good",
+  "summary": "كل تقرير يُقرأ بلا مشكلة.",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "component": "vitest-json",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "beh.unit",
+      "component": "pytest-junit",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "code.lint",
+      "component": "eslint-json",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "sec.sast",
+      "component": "semgrep-sarif",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    }
+  ]
+}

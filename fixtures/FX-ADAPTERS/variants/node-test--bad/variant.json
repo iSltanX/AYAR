@@ -1,0 +1,9 @@
+{
+  "name": "node-test--bad",
+  "description": "اختبار فاشل: assert.equal(add(2, 3), 6).",
+  "defects": [
+    "beh.unit: اختبار فاشل"
+  ],
+  "component": "node-test",
+  "kind": "bad"
+}

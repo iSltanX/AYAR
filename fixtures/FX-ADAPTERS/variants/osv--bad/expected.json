@@ -1,0 +1,33 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "osv--bad",
+  "expectations": [
+    {
+      "check": "sec.deps",
+      "component": "osv",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "osv/package-lock.json",
+        "line": 12,
+        "anchor": "ayar-vuln-fake"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "exit_code": 1,
+      "reason": "ثغرة تجريبية في ayar-vuln-fake@1.0.0",
+      "requires": [
+        "osv-mini-db"
+      ]
+    }
+  ],
+  "pending": [
+    {
+      "waits_for": "E-09",
+      "check": "sec.deps",
+      "reason": "يحتاج قاعدة OSV المصغرة من DEV-2"
+    }
+  ]
+}

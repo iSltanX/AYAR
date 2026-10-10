@@ -1,0 +1,7 @@
+{
+  "name": "msg-undefined",
+  "description": "الوصف يشير إلى __MSG_extTagline__ وهي غير معرّفة في _locales.",
+  "defects": [
+    "sec.ext.manifest: __MSG_extTagline__ غير معرّف"
+  ]
+}

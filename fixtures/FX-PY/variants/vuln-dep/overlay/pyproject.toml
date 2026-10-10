@@ -1,0 +1,46 @@
+[project]
+name = "nusus"
+version = "1.0.0"
+description = "مكتبة صغيرة لتطبيع النصوص العربية وعدّ كلماتها — مشروع اختبار لعِيَار (FX-PY)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["ayar-vuln-fake"]
+
+[dependency-groups]
+dev = [
+    "build==1.6.1",
+    "hypothesis==6.168.5",
+    "mypy==2.4.0",
+    "pytest==9.1.1",
+    "ruff==0.16.10",
+    "setuptools==84.0.0",
+]
+
+[build-system]
+requires = ["setuptools==84.0.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+nusus = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.uv.sources]
+ayar-vuln-fake = { path = "vendor/ayar-vuln-fake" }
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src", "tests"]

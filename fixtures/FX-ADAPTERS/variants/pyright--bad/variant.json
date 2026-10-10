@@ -1,0 +1,9 @@
+{
+  "name": "pyright--bad",
+  "description": "خطأ نوع: تمرير نص حيث يُنتظر int.",
+  "defects": [
+    "code.types: reportArgumentType"
+  ],
+  "component": "pyright",
+  "kind": "bad"
+}

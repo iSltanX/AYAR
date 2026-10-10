@@ -1,0 +1,11 @@
+{
+  "name": "ayar-fx-notest",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FX-NOTEST: مكتبة JavaScript صغيرة بلا أي اختبارات ولا مرجع تصميم — مشروع اختبار لعِيَار",
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    "./*": "./src/*.js"
+  }
+}

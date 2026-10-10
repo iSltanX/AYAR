@@ -1,0 +1,9 @@
+{
+  "name": "pytest--bad",
+  "description": "اختبار فاشل: assert add(2, 3) == 6 (رمز 1).",
+  "defects": [
+    "beh.unit: اختبار فاشل"
+  ],
+  "component": "pytest",
+  "kind": "bad"
+}

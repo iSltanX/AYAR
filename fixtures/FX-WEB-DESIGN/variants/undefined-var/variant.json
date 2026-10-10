@@ -1,0 +1,7 @@
+{
+  "name": "undefined-var",
+  "description": "var(--color-text-subtle) لرمز غير معرّف فيرجع اللون صامتًا إلى الموروث.",
+  "defects": [
+    "design.tokens.static: var() لرمز غير معرّف"
+  ]
+}

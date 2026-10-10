@@ -1,0 +1,13 @@
+{
+  "name": "ayar-fx-adapter-tsc",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.8.1",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json --pretty false"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3"
+  }
+}

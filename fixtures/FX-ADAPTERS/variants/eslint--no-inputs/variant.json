@@ -1,0 +1,12 @@
+{
+  "name": "eslint--no-inputs",
+  "description": "لا ملفات في الهدف src: ESLint يخرج برمز 2 مع «No files matching the pattern».",
+  "defects": [
+    "code.lint: لا مدخلات"
+  ],
+  "delete": [
+    "eslint/src/a.js"
+  ],
+  "component": "eslint",
+  "kind": "no-inputs"
+}

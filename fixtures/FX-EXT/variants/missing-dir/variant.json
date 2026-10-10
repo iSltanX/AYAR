@@ -1,0 +1,7 @@
+{
+  "name": "missing-dir",
+  "description": "popup.html بلا dir=\"rtl\" على الجذر مع lang=\"ar\".",
+  "defects": [
+    "design.rtl.static: dir مفقود في popup.html"
+  ]
+}

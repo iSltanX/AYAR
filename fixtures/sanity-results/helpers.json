@@ -1,0 +1,67 @@
+{
+  "project": "المساعدات (fixtures/tools)",
+  "date": "2026-10-10",
+  "versions": {
+    "node": "v24.16.0"
+  },
+  "variants": {
+    "validate": [
+      {
+        "id": "validate-all",
+        "cmd": "node fixtures/tools/validate.mjs",
+        "ok": true,
+        "code": 0,
+        "proves": "كل ملفات fixture-expect/1 صالحة المخطط ومواضعها حقيقية",
+        "problems": [],
+        "excerpt": "generated /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-validate-0JgDbt/out/repo · HEAD 1cdf14c\nنجح التحقق: 123 ملف توقع في 10 مشروع",
+        "evidence": true
+      }
+    ],
+    "tool-server": [
+      {
+        "id": "test",
+        "cmd": "node fixtures/tools/tool-server/test.mjs",
+        "ok": true,
+        "code": 0,
+        "proves": "AT-35: الخادم يقدّم ملفًا بصمته لا تطابق الكتالوج، وتاريخ تحقق أقدم من 180 يومًا، وضابط سلبي --honest",
+        "problems": [],
+        "excerpt": "✓ الوضع الافتراضي: بصمة الملف المقدَّم لا تطابق بصمة الكتالوج\n✓ الخادم يربط 127.0.0.1 فقط\n✓ تاريخ التحقق أقدم من 180 يومًا (تنبيه التقادم)\n✓ tar tzf يقرأ الأرشيف المعدَّل (bin/ayar-fake-tool)\n✓ --honest: البصمة تطابق (ضابط سلبي)\n✓ --verified-days-ago 10: لا تقادم\n✓ الأرشيف المعدَّل أكبر بايتات من الأصلي لكنه ما زال gzip صالحًا\n\nنجحت فحوص خادم الأداة المعدّلة",
+        "evidence": true
+      }
+    ],
+    "synth-repo": [
+      {
+        "id": "test",
+        "cmd": "node fixtures/tools/synth-repo/test.mjs",
+        "ok": true,
+        "code": 0,
+        "proves": "AT-36: مولّد حتمي بأعداد دقيقة (1000 و10000)",
+        "problems": [],
+        "excerpt": "✓ 1000 ملف بالضبط\n✓ حتمي: البذرة نفسها تعطي شجرة مطابقة بايتًا لبايت\n✓ بذرة مختلفة تعطي محتوى مختلفًا\n✓ لا .git ولا node_modules\n✓ أكبر ملف أقل من 2 كيلوبايت\n✓ 10000 ملف (medium)\n✓ يرفض مجلدًا غير فارغ\n\nنجحت فحوص مولّد المستودعات الاصطناعية",
+        "evidence": true
+      },
+      {
+        "id": "large-50000",
+        "cmd": "node fixtures/tools/synth-repo/generate.mjs --preset large --out /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-fx-helpers-dHOpfg/large",
+        "ok": true,
+        "code": 0,
+        "proves": "AT-36: المستوى الأكبر 50000 ملف يُولَّد (الزمن والحجم أدناه)",
+        "problems": [],
+        "excerpt": "{\"files\":50000,\"bytes\":6718729,\"seed\":1,\"ms\":3734}\ndu -sk: 200000 KiB على القرص",
+        "evidence": true
+      }
+    ],
+    "malicious": [
+      {
+        "id": "generator-test",
+        "cmd": "node fixtures/tools/malicious/test.mjs",
+        "ok": true,
+        "code": 0,
+        "proves": "D-38: المولّد لا يشغّل git، والفخاخ مكتوبة وفعّالة، والعلامات غائبة",
+        "problems": [],
+        "excerpt": "✓ المولّد لا يستورد child_process ولا يستدعي أمرًا (الشيفرة بلا تعليقاتها)\n✓ المولّد ينتهي بنجاح\n✓ لم يُستدعَ git أثناء التوليد (سجل الـshim فارغ)\n✓ core.fsmonitor معرّف في .git/config\n✓ [diff \"evildiff\"] command معرّف\n✓ [diff \"eviltext\"] textconv معرّف\n✓ .gitattributes يربط *.js بالفرق و*.py بالتحويل النصي\n✓ لا ملفات علامة في أي مكان بعد التوليد\n✓ مجلد العلامات فارغ\n✓ core.fsmonitor: القيمة المقروءة من الإعداد = أمر MANIFEST\n✓ core.fsmonitor: تنفيذ نص الأمر بـ sh يكتب علامته (إثبات أن الفخ فعّال لو استدعاه git)\n✓ diff.evildiff.command: القيمة المقروءة من الإعداد = أمر MANIFEST\n✓ diff.evildiff.command: تنفيذ نص الأمر بـ sh يكتب علامته (إثبات أن الفخ فعّال لو استدعاه git)\n✓ diff.eviltext.text\n… [اقتُطع] …\nدعاه git)\n✓ العلامات حُذفت بعد التجربة\n✓ src/app.js وsrc/util.py موجودان\n✓ .env بقيمة مصطنعة معروفة\n✓ .env مستبعد بـ .gitignore\n✓ external رابط رمزي إلى خارج الجذر\n✓ huge.bin بالحجم المطلوب\n✓ السر القديم غائب عن الشجرة الحالية\n✓ النسخة بلا فخاخ تولَّد\n✓ .git/objects مطابقة بايتًا لبايت\n✓ HEAD والمراجع مطابقة\n✓ ملف config وحده يختلف (الفخاخ)\n✓ git fsck --full --strict نظيف\n✓ التزامان: الأول يضم المفتاح، والثاني يحذفه\n✓ السر القديم في التزام الأول\n✓ السر القديم غائب عن شجرة HEAD\n✓ محتوى HEAD:src/app.js مطابق للملف\n✓ لا مستودع متداخل غير .git الجذري\n✓ gitleaks git يكشف السر القديم (رمز 42) في config/old-credentials.js\n✓ تقرير gitleaks مُخفى القيمة (لا يحوي السر)\n\nنجحت كل فحوص مولّد FX-MALICIOUS",
+        "evidence": true
+      }
+    ]
+  }
+}

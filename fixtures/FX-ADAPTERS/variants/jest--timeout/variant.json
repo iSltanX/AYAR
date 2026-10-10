@@ -1,0 +1,9 @@
+{
+  "name": "jest--timeout",
+  "description": "اختبار لا ينتهي وtestTimeout ضخم: تقتله مهلة عِيَار.",
+  "defects": [
+    "beh.unit: يتجاوز المهلة"
+  ],
+  "component": "jest",
+  "kind": "timeout"
+}

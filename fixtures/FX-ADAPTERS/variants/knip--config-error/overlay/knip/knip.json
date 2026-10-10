@@ -1,0 +1,6 @@
+{
+  "entry": 5,
+  "project": [
+    "src/**/*.js"
+  ]
+}

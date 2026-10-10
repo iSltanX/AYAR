@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "lychee--bad",
+  "expectations": [
+    {
+      "check": "code.refs.external",
+      "component": "lychee",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "lychee/README.md",
+        "line": 3,
+        "anchor": "/gone"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "exit_code": 2,
+      "reason": "404: مخالفة مثبتة"
+    }
+  ]
+}

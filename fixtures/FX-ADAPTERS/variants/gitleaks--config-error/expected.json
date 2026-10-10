@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "gitleaks--config-error",
+  "expectations": [
+    {
+      "check": "sec.secrets.files",
+      "component": "gitleaks",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "gitleaks/gitleaks.toml",
+        "line": 3,
+        "anchor": "[extend"
+      },
+      "confidence": null,
+      "origin": "الأداة",
+      "exit_code": 1,
+      "reason": "رمز 1 يعني تعذّر في خريطة المحول"
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-MALICIOUS",
+  "variant": "default",
+  "summary": "الفحص الكامل ينفذ الفحوص الساكنة على ملفي JS وPython، ويكشف السر القديم بفحص التاريخ، دون تنفيذ أي إعداد مستودع ودون استدعاء git على المستودع.",
+  "expectations": [
+    {
+      "check": "sec.secrets.files",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "reason": ".env مستبعد بـ .gitignore ولا يقرأه الاكتشاف؛ ولا سر في الملفات المقروءة (قيمة .env لا تُحفظ في أي مكان)"
+    },
+    {
+      "check": "sec.secrets.history",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "config/old-credentials.js",
+        "history": "29cc486a1a6f"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "tool_rule": "generic-api-key",
+      "reason": "سر قديم في الالتزام الأول وحُذف من الشجرة الحالية؛ يُكشف بفحص التاريخ المنفصل دون إنشاء أي ملف علامة (AT-42)، وقيمته مُخفاة"
+    },
+    {
+      "check": "sec.sast",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "src/app.js",
+        "line": 3,
+        "anchor": "return eval(code)"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "tool_rule": "eval",
+      "reason": "eval بقيمة غير ثابتة؛ Semgrep بلا --config auto وبلا استدعاء git (AT-01)"
+    },
+    {
+      "check": "sec.sast",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "src/util.py",
+        "line": 6,
+        "anchor": "shell=True"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "tool_rule": "subprocess-shell-true",
+      "reason": "أمر صدفة بقيمة متغيرة"
+    },
+    {
+      "check": "beh.unit",
+      "result": "ناقص",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "reason": "لا اختبارات في المستودع المفخخ"
+    },
+    {
+      "check": "code.lint",
+      "result": "غير منطبق",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "reason": "لا مدقق معلن"
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "AT-01-no-child-process",
+      "statement": "لا عملية فرعية للمحرك أثناء الاكتشاف: الدفتر فارغ ولقطات ps بلا أبناء",
+      "acceptance": "AT-01"
+    },
+    {
+      "id": "AT-01-no-marker-files",
+      "statement": "ملفات العلامة التي يكتبها core.fsmonitor وبرنامج الفرق وتحويل النص (markers/*.marker) لم تُنشأ، لا في الاكتشاف ولا في الفحص الكامل",
+      "acceptance": "AT-01"
+    },
+    {
+      "id": "AT-01-no-git-on-repo",
+      "statement": "لا عملية git على المستودع في الاكتشاف ولا في الفحص الكامل بتتبع وسائط كل العمليات، ومنها Semgrep",
+      "acceptance": "AT-01"
+    },
+    {
+      "id": "AT-01-symlink-not-followed",
+      "statement": "الرابط الرمزي external → ../outside لم يُتبع (outside-secret.txt لا يُقرأ) ويظهر تحذيره",
+      "acceptance": "AT-01"
+    },
+    {
+      "id": "AT-01-huge-not-read",
+      "statement": "huge.bin (300 ميغابايت متناثر) لم يُقرأ كاملًا",
+      "acceptance": "AT-01"
+    },
+    {
+      "id": "AT-01-env-by-name",
+      "statement": ".env مسجل باسمه دون قيمته، وفي لقطة الحالة ببصمة HMAC فقط",
+      "acceptance": "AT-01"
+    },
+    {
+      "id": "AT-01-secret-absent",
+      "statement": "قيمة ayr_env_7c1d… غائبة من كل ملفات مجلد بيانات عِيَار (القاعدة ونسخها والأدلة واللقطات والسجلات والمؤقت)",
+      "acceptance": "AT-01"
+    },
+    {
+      "id": "AT-42-history-scan",
+      "statement": "sec.secrets.history يعمل في وضع «مشروع غير موثوق»: السر القديم ayr_hist_… مكشوف بالالتزام والملف وقيمته مُخفاة، ولا ملف علامة، والتنفيذ عبر مستودع ظلي أو قراءة كائنات بلا git حسب E-24",
+      "acceptance": "AT-42"
+    }
+  ]
+}

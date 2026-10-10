@@ -1,0 +1,8 @@
+{
+  "name": "manifest-csp",
+  "description": "'unsafe-eval' في سياسة المحتوى. نسخة مستقلة لأنه يمنع تحميل الإضافة أصلًا فيحجب كشف غيره.",
+  "defects": [
+    "sec.ext.manifest: 'unsafe-eval' في content_security_policy",
+    "beh.ext.host: الإضافة لا تُحمَّل"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "tsc--no-inputs",
+  "expectations": [
+    {
+      "check": "code.types",
+      "component": "tsc",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "tool_rule": "TS18003",
+      "location": {
+        "path": "tsc/tsconfig.json",
+        "line": 11,
+        "anchor": "\"include\""
+      },
+      "confidence": null,
+      "origin": "الأداة",
+      "exit_code": 2,
+      "reason": "No inputs were found in config file (AT-14)"
+    }
+  ]
+}

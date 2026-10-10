@@ -1,0 +1,12 @@
+{
+  "name": "pyright--no-inputs",
+  "description": "لا ملفات مصدر في include.",
+  "defects": [
+    "code.types: لا مدخلات"
+  ],
+  "delete": [
+    "pyright/src/a.py"
+  ],
+  "component": "pyright",
+  "kind": "no-inputs"
+}

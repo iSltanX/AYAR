@@ -1,0 +1,12 @@
+{
+  "name": "pytest--no-tests",
+  "description": "لا اختبارات: pytest برمز 5 (AT-14: ناقص).",
+  "defects": [
+    "beh.unit: pytest برمز 5"
+  ],
+  "delete": [
+    "pytest/tests/test_add.py"
+  ],
+  "component": "pytest",
+  "kind": "no-tests"
+}

@@ -1,0 +1,12 @@
+{
+  "name": "osv--no-lockfiles",
+  "description": "تبعيات معلنة في package.json بلا ملف قفل: OSV-Scanner برمز 128 (AT-14: ناقص: لا ملفات قفل).",
+  "defects": [
+    "sec.deps: لا ملفات قفل"
+  ],
+  "delete": [
+    "osv/package-lock.json"
+  ],
+  "component": "osv",
+  "kind": "no-lockfiles"
+}

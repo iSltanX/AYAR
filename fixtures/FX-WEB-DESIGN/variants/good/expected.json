@@ -1,0 +1,118 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-WEB-DESIGN",
+  "variant": "good",
+  "summary": "لا اكتشافات؛ 32 لقطة مرشحة للاعتماد.",
+  "expectations": [
+    {
+      "check": "design.tokens.static",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "design.tokens.render",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "design.fonts.static",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "design.fonts.render",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "design.a11y",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "design.rtl.static",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "design.rtl.render",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "design.states",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "design.visual",
+      "result": "ناقص إعداد",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "reason": "لا صورة مرجعية معتمدة؛ اللقطات مرشحة للاعتماد (AT-17)"
+    },
+    {
+      "check": "code.refs.local",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "sec.secrets.files",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "integ.guard",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "reason": "الجولة الأولى: لا أساس للمقارنة"
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "AT-17-shots",
+      "statement": "عدد اللقطات 32 = (5 حالات − 1 حساسة) × حجمان × ثيمان × لغتان، والحالة «account» تظهر في المعرض بسببها دون لقطة",
+      "acceptance": "AT-17"
+    },
+    {
+      "id": "AT-17-references",
+      "statement": "أول تشغيل: design.visual «ناقص إعداد: لا صورة مرجعية معتمدة» واللقطات مرشحة للاعتماد، ولا كتابة في المستودع ولا تحديث تلقائي للمراجع",
+      "acceptance": "AT-17"
+    }
+  ]
+}

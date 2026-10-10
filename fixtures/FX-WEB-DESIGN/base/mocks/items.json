@@ -1,0 +1,5 @@
+[
+  { "id": 1, "name": { "ar": "هاتف ذكي", "en": "Smartphone" }, "price": 1899, "inStock": true },
+  { "id": 2, "name": { "ar": "حاسوب محمول", "en": "Laptop" }, "price": 4250, "inStock": true },
+  { "id": 3, "name": { "ar": "سماعات لاسلكية", "en": "Wireless headphones" }, "price": 349, "inStock": false }
+]

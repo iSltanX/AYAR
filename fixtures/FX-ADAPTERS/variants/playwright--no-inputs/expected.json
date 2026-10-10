@@ -1,0 +1,18 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "playwright--no-inputs",
+  "expectations": [
+    {
+      "check": "beh.e2e",
+      "component": "playwright",
+      "result": "ناقص",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "exit_code": 1,
+      "reason": "No tests found"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "biome--bad",
+  "expectations": [
+    {
+      "check": "code.lint",
+      "component": "biome",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "tool_rule": "lint/suspicious/noDebugger",
+      "location": {
+        "path": "biome/src/a.js",
+        "line": 2,
+        "anchor": "debugger;"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "exit_code": 1
+    }
+  ]
+}

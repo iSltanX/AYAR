@@ -1,0 +1,7 @@
+{
+  "name": "all-urls",
+  "description": "نطاق مضيف واسع <all_urls> غير وارد في سياسة الصلاحيات.",
+  "defects": [
+    "sec.ext.permissions: <all_urls> خارج السياسة"
+  ]
+}

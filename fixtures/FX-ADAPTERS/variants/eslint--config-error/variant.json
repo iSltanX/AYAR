@@ -1,0 +1,9 @@
+{
+  "name": "eslint--config-error",
+  "description": "قاعدة غير موجودة في ملف الإعداد: يخرج ESLint برمز 2 (AT-14: تعذّر، والمنشأ الأداة).",
+  "defects": [
+    "code.lint: إعداد غير صالح"
+  ],
+  "component": "eslint",
+  "kind": "config-error"
+}

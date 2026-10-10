@@ -1,0 +1,18 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "node-test--no-inputs",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "component": "node-test",
+      "result": "ناقص",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "exit_code": 0,
+      "reason": "خروج 0 لكن عدد الاختبارات المنفذة صفر (الخطة 7.3 القاعدة 3)"
+    }
+  ]
+}

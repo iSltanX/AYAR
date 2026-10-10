@@ -1,0 +1,15 @@
+[project]
+name = "ayar-vuln-fake"
+version = "1.0.0"
+description = "حزمة مصطنعة لاختبار عِيَار (ليست على أي سجل). الثغرة المقابلة تُعرَّف في قاعدة OSV المصغرة (E-09، DEV-2)."
+requires-python = ">=3.12"
+
+[build-system]
+requires = ["setuptools==84.0.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+ayar_vuln_fake = ["py.typed"]

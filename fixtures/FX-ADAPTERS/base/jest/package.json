@@ -1,0 +1,13 @@
+{
+  "name": "ayar-fx-adapter-jest",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "packageManager": "pnpm@12.8.1",
+  "scripts": {
+    "test": "jest --ci"
+  },
+  "devDependencies": {
+    "jest": "30.5.2"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-EXT",
+  "variant": "all-urls",
+  "expectations": [
+    {
+      "check": "sec.ext.permissions",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "public/manifest.json",
+        "line": 26,
+        "anchor": "<all_urls>"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "نطاق مضيف غير وارد في permissions-policy.json، وهو من النطاقات الواسعة"
+    },
+    {
+      "check": "sec.ext.manifest",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    }
+  ]
+}

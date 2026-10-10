@@ -1,0 +1,7 @@
+{
+  "name": "failing-test",
+  "description": "اختبار فاشل: يتوقع تحويل التاء المربوطة إلى هاء والمكتبة لا تفعل.",
+  "defects": [
+    "beh.unit: test_normalize_taa_marbuta يفشل"
+  ]
+}

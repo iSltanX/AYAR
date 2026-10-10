@@ -1,0 +1,13 @@
+{
+  "name": "ayar-fx-adapter-biome",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.8.1",
+  "scripts": {
+    "lint": "biome lint src"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15"
+  }
+}

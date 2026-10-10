@@ -1,0 +1,12 @@
+{
+  "name": "node-test--no-inputs",
+  "description": "لا ملفات اختبار: node --test يخرج برمز 0 مع «tests 0» (عدد الاختبارات المنفذة صفر ← ناقص).",
+  "defects": [
+    "beh.unit: صفر اختبار منفذ"
+  ],
+  "delete": [
+    "node-test/test/add.test.js"
+  ],
+  "component": "node-test",
+  "kind": "no-inputs"
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-PY",
+  "variant": "vuln-dep",
+  "expectations": [
+    {
+      "check": "sec.deps",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "pyproject.toml",
+        "line": 7,
+        "anchor": "ayar-vuln-fake"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "ثغرة تجريبية في ayar-vuln-fake@1.0.0 تُعرَّف في DEV-2",
+      "requires": [
+        "osv-mini-db"
+      ]
+    }
+  ],
+  "pending": [
+    {
+      "waits_for": "E-09",
+      "check": "sec.deps",
+      "reason": "يحتاج قاعدة OSV المصغرة؛ وقراءة OSV-Scanner لتبعية directory من uv.lock تُتحقق هناك"
+    }
+  ]
+}

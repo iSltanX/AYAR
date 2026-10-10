@@ -1,0 +1,8 @@
+{
+  "name": "integrity-skip",
+  "description": "(ب) من AT-24: كل شيء مصلح عدا أن اختبار الوسيط الفاشل صار it.skip والعيب باقٍ في stats.ts.",
+  "derived_from": "integrity-real-fix",
+  "defects": [
+    "integ.guard: it.skip أُضيف على اختبار فاشل"
+  ]
+}
