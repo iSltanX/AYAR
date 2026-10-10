@@ -4,7 +4,7 @@ track: design
 number: 4
 stage: design
 title: شاشات الرحلة الأساسية
-status: delivered
+status: closed
 status_date: 2026-10-10
 depends_on: [DES-3]
 design_gates: []
@@ -21,7 +21,7 @@ start:
 outputs:
   - الشاشات 1 إلى 8 في صفحات Screens الثلاث بمتغيراتها
   - اعتماد المالك مسجل
-closing_commit:
+closing_commit: b2f4fcb
 ---
 
 # DES-4 — شاشات الرحلة الأساسية
