@@ -1,0 +1,53 @@
+{
+  "source": "Figma UXkPakdqRuHDVTs78DO4uC — use_figma audit script, DES-2, 2026-10-10 (final run after the independent visual review fixes)",
+  "rule": {
+    "bound": "every visible SOLID fill and stroke on the page is bound to a variable (no hand-written colour)",
+    "nonSolid": "no gradient or image paints",
+    "greenRed": "a paint bound to a variable that aliases green/* or red/* in any mode is allowed only for result/passed/*, result/failed/*, verdict/pure/*, verdict/blocked/* (D-16)",
+    "dashed": "no node with strokes has a non-empty dashPattern",
+    "effects": "effects only through the DES-1 effect style shadow/overlay",
+    "textSegments": "no text segment with an unbound fill"
+  },
+  "pages": [
+    {
+      "page": "Status System",
+      "id": "49:1054",
+      "nodes": 8618,
+      "components": 164,
+      "componentSets": 9,
+      "instances": 1339,
+      "paints": 6091,
+      "bound": 6091,
+      "hardcoded": 0,
+      "nonSolid": 0,
+      "greenRedOutsideAllowed": 0,
+      "greenRedAllowedUses": 452,
+      "dashed": 0,
+      "effectsWithoutStyle": 0,
+      "textSegmentsUnbound": 0,
+      "emojiOrArrowGlyphsInText": 0
+    },
+    {
+      "page": "Icons",
+      "id": "49:1055",
+      "nodes": 2630,
+      "components": 104,
+      "componentSets": 1,
+      "instances": 399,
+      "paints": 1478,
+      "bound": 1478,
+      "hardcoded": 0,
+      "nonSolid": 0,
+      "greenRedOutsideAllowed": 0,
+      "greenRedAllowedUses": 49,
+      "dashed": 0,
+      "effectsWithoutStyle": 0,
+      "statusSymbolVariantsWithBilingualScreenReaderAnnotation": 51
+    }
+  ],
+  "notes": [
+    "The first audit run flagged the two library Section nodes (default white fill and stroke). Their fill was bound to bg/canvas and the stroke removed; the run above is after that fix.",
+    "Resolved Semantic and Status values per mode are in figma-values.json and match docs/design/DES-1/tokens.json 176/176 (status-check.mjs).",
+    "Re-run after the review fixes (provisional stripes, tooltip caret, no-scope label, English narrow-scope card): Status System 6091/6091 bound, 0 violations; Icons unchanged at 1478/1478."
+  ]
+}

@@ -1,0 +1,4207 @@
+{
+  "generatedBy": "docs/design/DES-2/status-check.mjs",
+  "source": "docs/design/DES-1/tokens.json (alternative A)",
+  "pairs": [
+    [
+      "light",
+      "شارة النتيجة",
+      "result/passed/fg",
+      "result/passed/bg",
+      "#025D35",
+      "#EDF6F0",
+      7.27,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/passed/icon",
+      "result/passed/bg",
+      "#388F60",
+      "#EDF6F0",
+      3.62,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/failed/fg",
+      "result/failed/bg",
+      "#92002C",
+      "#FFEFEF",
+      8.34,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/failed/icon",
+      "result/failed/bg",
+      "#D53954",
+      "#FFEFEF",
+      4.15,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/warning/fg",
+      "result/warning/bg",
+      "#6F4100",
+      "#FBF2E9",
+      7.8,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/warning/icon",
+      "result/warning/bg",
+      "#AD6A13",
+      "#FBF2E9",
+      3.91,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/needs-review/fg",
+      "result/needs-review/bg",
+      "#562BA3",
+      "#F4F1FF",
+      8.31,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/needs-review/icon",
+      "result/needs-review/bg",
+      "#855BE5",
+      "#F4F1FF",
+      4.08,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/flaky/fg",
+      "result/flaky/bg",
+      "#6F4100",
+      "#FBF2E9",
+      7.8,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/flaky/icon",
+      "result/flaky/bg",
+      "#AD6A13",
+      "#FBF2E9",
+      3.91,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/missing/fg",
+      "result/missing/bg",
+      "#21292E",
+      "#EBEAE3",
+      12.25,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/missing/icon",
+      "result/missing/bg",
+      "#59676C",
+      "#EBEAE3",
+      4.86,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/unavailable/fg",
+      "result/unavailable/bg",
+      "#141B20",
+      "#B8BCB9",
+      9.05,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/unavailable/icon",
+      "result/unavailable/bg",
+      "#313B40",
+      "#B8BCB9",
+      5.97,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/timed-out/fg",
+      "result/timed-out/bg",
+      "#6F4100",
+      "#EBCAAB",
+      5.58,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/timed-out/icon",
+      "result/timed-out/bg",
+      "#8D5400",
+      "#EBCAAB",
+      3.99,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/cancelled/fg",
+      "result/cancelled/bg",
+      "#141B20",
+      "#D9D9D4",
+      12.28,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/cancelled/icon",
+      "result/cancelled/bg",
+      "#434F54",
+      "#D9D9D4",
+      5.97,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/interrupted/fg",
+      "result/interrupted/bg",
+      "#141B20",
+      "#D9D9D4",
+      12.28,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/interrupted/icon",
+      "result/interrupted/bg",
+      "#434F54",
+      "#D9D9D4",
+      5.97,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/skipped/fg",
+      "result/skipped/bg",
+      "#313B40",
+      "#EBEAE3",
+      9.51,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/skipped/icon",
+      "result/skipped/bg",
+      "#59676C",
+      "#EBEAE3",
+      4.86,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/not-applicable/fg",
+      "result/not-applicable/bg",
+      "#434F54",
+      "#F7F4EC",
+      7.69,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "light",
+      "شارة النتيجة",
+      "result/not-applicable/icon",
+      "result/not-applicable/bg",
+      "#59676C",
+      "#F7F4EC",
+      5.33,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/passed/icon",
+      "bg/canvas",
+      "#388F60",
+      "#F7F4EC",
+      3.63,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/passed/icon",
+      "bg/surface",
+      "#388F60",
+      "#FFFCF4",
+      3.89,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/passed/icon",
+      "bg/elevated",
+      "#388F60",
+      "#FFFCF4",
+      3.89,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/passed/icon",
+      "bg/sunken",
+      "#388F60",
+      "#EBEAE3",
+      3.31,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/passed/icon",
+      "selection",
+      "#388F60",
+      "#EBEAE3",
+      3.31,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/failed/icon",
+      "bg/canvas",
+      "#D53954",
+      "#F7F4EC",
+      4.21,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/failed/icon",
+      "bg/surface",
+      "#D53954",
+      "#FFFCF4",
+      4.51,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/failed/icon",
+      "bg/elevated",
+      "#D53954",
+      "#FFFCF4",
+      4.51,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/failed/icon",
+      "bg/sunken",
+      "#D53954",
+      "#EBEAE3",
+      3.83,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/failed/icon",
+      "selection",
+      "#D53954",
+      "#EBEAE3",
+      3.83,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/warning/icon",
+      "bg/canvas",
+      "#AD6A13",
+      "#F7F4EC",
+      3.94,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/warning/icon",
+      "bg/surface",
+      "#AD6A13",
+      "#FFFCF4",
+      4.23,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/warning/icon",
+      "bg/elevated",
+      "#AD6A13",
+      "#FFFCF4",
+      4.23,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/warning/icon",
+      "bg/sunken",
+      "#AD6A13",
+      "#EBEAE3",
+      3.59,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/warning/icon",
+      "selection",
+      "#AD6A13",
+      "#EBEAE3",
+      3.59,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/needs-review/icon",
+      "bg/canvas",
+      "#855BE5",
+      "#F7F4EC",
+      4.13,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/needs-review/icon",
+      "bg/surface",
+      "#855BE5",
+      "#FFFCF4",
+      4.43,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/needs-review/icon",
+      "bg/elevated",
+      "#855BE5",
+      "#FFFCF4",
+      4.43,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/needs-review/icon",
+      "bg/sunken",
+      "#855BE5",
+      "#EBEAE3",
+      3.76,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/needs-review/icon",
+      "selection",
+      "#855BE5",
+      "#EBEAE3",
+      3.76,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/flaky/icon",
+      "bg/canvas",
+      "#AD6A13",
+      "#F7F4EC",
+      3.94,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/flaky/icon",
+      "bg/surface",
+      "#AD6A13",
+      "#FFFCF4",
+      4.23,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/flaky/icon",
+      "bg/elevated",
+      "#AD6A13",
+      "#FFFCF4",
+      4.23,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/flaky/icon",
+      "bg/sunken",
+      "#AD6A13",
+      "#EBEAE3",
+      3.59,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/flaky/icon",
+      "selection",
+      "#AD6A13",
+      "#EBEAE3",
+      3.59,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/missing/icon",
+      "bg/canvas",
+      "#59676C",
+      "#F7F4EC",
+      5.33,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/missing/icon",
+      "bg/surface",
+      "#59676C",
+      "#FFFCF4",
+      5.72,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/missing/icon",
+      "bg/elevated",
+      "#59676C",
+      "#FFFCF4",
+      5.72,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/missing/icon",
+      "bg/sunken",
+      "#59676C",
+      "#EBEAE3",
+      4.86,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/missing/icon",
+      "selection",
+      "#59676C",
+      "#EBEAE3",
+      4.86,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/unavailable/icon",
+      "bg/canvas",
+      "#313B40",
+      "#F7F4EC",
+      10.44,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/unavailable/icon",
+      "bg/surface",
+      "#313B40",
+      "#FFFCF4",
+      11.19,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/unavailable/icon",
+      "bg/elevated",
+      "#313B40",
+      "#FFFCF4",
+      11.19,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/unavailable/icon",
+      "bg/sunken",
+      "#313B40",
+      "#EBEAE3",
+      9.51,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/unavailable/icon",
+      "selection",
+      "#313B40",
+      "#EBEAE3",
+      9.51,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/timed-out/icon",
+      "bg/canvas",
+      "#8D5400",
+      "#F7F4EC",
+      5.62,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/timed-out/icon",
+      "bg/surface",
+      "#8D5400",
+      "#FFFCF4",
+      6.02,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/timed-out/icon",
+      "bg/elevated",
+      "#8D5400",
+      "#FFFCF4",
+      6.02,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/timed-out/icon",
+      "bg/sunken",
+      "#8D5400",
+      "#EBEAE3",
+      5.12,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/timed-out/icon",
+      "selection",
+      "#8D5400",
+      "#EBEAE3",
+      5.12,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/cancelled/icon",
+      "bg/canvas",
+      "#434F54",
+      "#F7F4EC",
+      7.69,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/cancelled/icon",
+      "bg/surface",
+      "#434F54",
+      "#FFFCF4",
+      8.24,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/cancelled/icon",
+      "bg/elevated",
+      "#434F54",
+      "#FFFCF4",
+      8.24,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/cancelled/icon",
+      "bg/sunken",
+      "#434F54",
+      "#EBEAE3",
+      7.01,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/cancelled/icon",
+      "selection",
+      "#434F54",
+      "#EBEAE3",
+      7.01,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/interrupted/icon",
+      "bg/canvas",
+      "#434F54",
+      "#F7F4EC",
+      7.69,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/interrupted/icon",
+      "bg/surface",
+      "#434F54",
+      "#FFFCF4",
+      8.24,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/interrupted/icon",
+      "bg/elevated",
+      "#434F54",
+      "#FFFCF4",
+      8.24,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/interrupted/icon",
+      "bg/sunken",
+      "#434F54",
+      "#EBEAE3",
+      7.01,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/interrupted/icon",
+      "selection",
+      "#434F54",
+      "#EBEAE3",
+      7.01,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/skipped/icon",
+      "bg/canvas",
+      "#59676C",
+      "#F7F4EC",
+      5.33,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/skipped/icon",
+      "bg/surface",
+      "#59676C",
+      "#FFFCF4",
+      5.72,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/skipped/icon",
+      "bg/elevated",
+      "#59676C",
+      "#FFFCF4",
+      5.72,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/skipped/icon",
+      "bg/sunken",
+      "#59676C",
+      "#EBEAE3",
+      4.86,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/skipped/icon",
+      "selection",
+      "#59676C",
+      "#EBEAE3",
+      4.86,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/not-applicable/icon",
+      "bg/canvas",
+      "#59676C",
+      "#F7F4EC",
+      5.33,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/not-applicable/icon",
+      "bg/surface",
+      "#59676C",
+      "#FFFCF4",
+      5.72,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/not-applicable/icon",
+      "bg/elevated",
+      "#59676C",
+      "#FFFCF4",
+      5.72,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/not-applicable/icon",
+      "bg/sunken",
+      "#59676C",
+      "#EBEAE3",
+      4.86,
+      3,
+      true,
+      ""
+    ],
+    [
+      "light",
+      "الرمز منفردًا",
+      "result/not-applicable/icon",
+      "selection",
+      "#59676C",
+      "#EBEAE3",
+      4.86,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/queued/fg",
+      "bg/canvas",
+      "#313B40",
+      "#F7F4EC",
+      10.44,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/queued/icon",
+      "bg/canvas",
+      "#59676C",
+      "#F7F4EC",
+      5.33,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/queued/fg",
+      "bg/surface",
+      "#313B40",
+      "#FFFCF4",
+      11.19,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/queued/icon",
+      "bg/surface",
+      "#59676C",
+      "#FFFCF4",
+      5.72,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/queued/fg",
+      "bg/elevated",
+      "#313B40",
+      "#FFFCF4",
+      11.19,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/queued/icon",
+      "bg/elevated",
+      "#59676C",
+      "#FFFCF4",
+      5.72,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/queued/fg",
+      "bg/sunken",
+      "#313B40",
+      "#EBEAE3",
+      9.51,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/queued/icon",
+      "bg/sunken",
+      "#59676C",
+      "#EBEAE3",
+      4.86,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/queued/fg",
+      "selection",
+      "#313B40",
+      "#EBEAE3",
+      9.51,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/queued/icon",
+      "selection",
+      "#59676C",
+      "#EBEAE3",
+      4.86,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/running/fg",
+      "bg/canvas",
+      "#083EB4",
+      "#F7F4EC",
+      8.1,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/running/icon",
+      "bg/canvas",
+      "#3170F9",
+      "#F7F4EC",
+      3.97,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/running/fg",
+      "bg/surface",
+      "#083EB4",
+      "#FFFCF4",
+      8.68,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/running/icon",
+      "bg/surface",
+      "#3170F9",
+      "#FFFCF4",
+      4.25,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/running/fg",
+      "bg/elevated",
+      "#083EB4",
+      "#FFFCF4",
+      8.68,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/running/icon",
+      "bg/elevated",
+      "#3170F9",
+      "#FFFCF4",
+      4.25,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/running/fg",
+      "bg/sunken",
+      "#083EB4",
+      "#EBEAE3",
+      7.38,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/running/icon",
+      "bg/sunken",
+      "#3170F9",
+      "#EBEAE3",
+      3.62,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/running/fg",
+      "selection",
+      "#083EB4",
+      "#EBEAE3",
+      7.38,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/running/icon",
+      "selection",
+      "#3170F9",
+      "#EBEAE3",
+      3.62,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/cancelling/fg",
+      "bg/canvas",
+      "#21292E",
+      "#F7F4EC",
+      13.44,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/cancelling/icon",
+      "bg/canvas",
+      "#434F54",
+      "#F7F4EC",
+      7.69,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/cancelling/fg",
+      "bg/surface",
+      "#21292E",
+      "#FFFCF4",
+      14.41,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/cancelling/icon",
+      "bg/surface",
+      "#434F54",
+      "#FFFCF4",
+      8.24,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/cancelling/fg",
+      "bg/elevated",
+      "#21292E",
+      "#FFFCF4",
+      14.41,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/cancelling/icon",
+      "bg/elevated",
+      "#434F54",
+      "#FFFCF4",
+      8.24,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/cancelling/fg",
+      "bg/sunken",
+      "#21292E",
+      "#EBEAE3",
+      12.25,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/cancelling/icon",
+      "bg/sunken",
+      "#434F54",
+      "#EBEAE3",
+      7.01,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/cancelling/fg",
+      "selection",
+      "#21292E",
+      "#EBEAE3",
+      12.25,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "مؤشر الدورة",
+      "cycle/cancelling/icon",
+      "selection",
+      "#434F54",
+      "#EBEAE3",
+      7.01,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "light",
+      "شارة الجاهزية",
+      "text/secondary",
+      "bg/canvas",
+      "#434F54",
+      "#F7F4EC",
+      7.69,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "شارة الجاهزية",
+      "border/strong",
+      "bg/canvas",
+      "#7B8588",
+      "#F7F4EC",
+      3.44,
+      3,
+      true,
+      "الحد"
+    ],
+    [
+      "light",
+      "شارة الجاهزية",
+      "text/secondary",
+      "bg/surface",
+      "#434F54",
+      "#FFFCF4",
+      8.24,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "شارة الجاهزية",
+      "border/strong",
+      "bg/surface",
+      "#7B8588",
+      "#FFFCF4",
+      3.69,
+      3,
+      true,
+      "الحد"
+    ],
+    [
+      "light",
+      "شارة الجاهزية",
+      "text/secondary",
+      "bg/elevated",
+      "#434F54",
+      "#FFFCF4",
+      8.24,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "شارة الجاهزية",
+      "border/strong",
+      "bg/elevated",
+      "#7B8588",
+      "#FFFCF4",
+      3.69,
+      3,
+      true,
+      "الحد"
+    ],
+    [
+      "light",
+      "شارة الجاهزية",
+      "text/secondary",
+      "bg/sunken",
+      "#434F54",
+      "#EBEAE3",
+      7.01,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "شارة الجاهزية",
+      "border/strong",
+      "bg/sunken",
+      "#7B8588",
+      "#EBEAE3",
+      3.14,
+      3,
+      true,
+      "الحد"
+    ],
+    [
+      "light",
+      "شارة الجاهزية",
+      "text/secondary",
+      "selection",
+      "#434F54",
+      "#EBEAE3",
+      7.01,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "شارة الجاهزية",
+      "border/strong",
+      "selection",
+      "#7B8588",
+      "#EBEAE3",
+      3.14,
+      3,
+      true,
+      "الحد"
+    ],
+    [
+      "light",
+      "شارة الحكم",
+      "verdict/pure/fg",
+      "verdict/pure/bg",
+      "#025D35",
+      "#EDF6F0",
+      7.27,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "شارة الحكم",
+      "verdict/pure/icon",
+      "verdict/pure/bg",
+      "#388F60",
+      "#EDF6F0",
+      3.62,
+      3,
+      true,
+      "رمز Lucide"
+    ],
+    [
+      "light",
+      "شارة الحكم",
+      "verdict/incomplete/fg",
+      "verdict/incomplete/bg",
+      "#141B20",
+      "#FFFCF4",
+      16.96,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "شارة الحكم",
+      "verdict/incomplete/icon",
+      "verdict/incomplete/bg",
+      "#434F54",
+      "#FFFCF4",
+      8.24,
+      3,
+      true,
+      "رمز Lucide"
+    ],
+    [
+      "light",
+      "شارة الحكم",
+      "verdict/blocked/fg",
+      "verdict/blocked/bg",
+      "#92002C",
+      "#FFEFEF",
+      8.34,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "شارة الحكم",
+      "verdict/blocked/icon",
+      "verdict/blocked/bg",
+      "#D53954",
+      "#FFEFEF",
+      4.15,
+      3,
+      true,
+      "رمز Lucide"
+    ],
+    [
+      "light",
+      "شارة الحكم",
+      "verdict/incomplete/border",
+      "bg/canvas",
+      "#7B8588",
+      "#F7F4EC",
+      3.44,
+      3,
+      true,
+      "حد «غير مكتمل»"
+    ],
+    [
+      "light",
+      "شارة الحكم",
+      "verdict/incomplete/border",
+      "bg/surface",
+      "#7B8588",
+      "#FFFCF4",
+      3.69,
+      3,
+      true,
+      "حد «غير مكتمل»"
+    ],
+    [
+      "light",
+      "الوسم المحايد",
+      "text/secondary",
+      "bg/sunken",
+      "#434F54",
+      "#EBEAE3",
+      7.01,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "الوسم المحايد",
+      "text/secondary (icon)",
+      "bg/sunken",
+      "#434F54",
+      "#EBEAE3",
+      7.01,
+      3,
+      true,
+      "رمز Lucide بلون النص"
+    ],
+    [
+      "light",
+      "وسم «ادعاء نموذج»",
+      "tag/model-claim/fg",
+      "tag/model-claim/bg",
+      "#562BA3",
+      "#F4F1FF",
+      8.31,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "light",
+      "وسم «ادعاء نموذج»",
+      "tag/model-claim/icon",
+      "tag/model-claim/bg",
+      "#855BE5",
+      "#F4F1FF",
+      4.08,
+      3,
+      true,
+      "فقاعة الكلام"
+    ],
+    [
+      "light",
+      "وسم «مبدئي»",
+      "text/secondary",
+      "border/subtle (خط)",
+      "#434F54",
+      "#D9D9D4",
+      5.97,
+      4.5,
+      true,
+      "النص فوق الخط المائل"
+    ],
+    [
+      "light",
+      "وسم «مبدئي»",
+      "text/secondary",
+      "bg/surface",
+      "#434F54",
+      "#FFFCF4",
+      8.24,
+      4.5,
+      true,
+      "النص بين الخطوط (أساس الوسم bg/surface)"
+    ],
+    [
+      "light",
+      "«جارٍ» في التجهيز",
+      "cycle/running/icon",
+      "bg/sunken",
+      "#3170F9",
+      "#EBEAE3",
+      3.62,
+      3,
+      true,
+      "المؤشر الأزرق داخل الوسم"
+    ],
+    [
+      "light",
+      "الشدة والدائرة",
+      "text/primary",
+      "bg/surface",
+      "#141B20",
+      "#FFFCF4",
+      16.96,
+      3,
+      true,
+      "عمود أو قطعة مملوءة"
+    ],
+    [
+      "light",
+      "الشدة والدائرة",
+      "border/strong",
+      "bg/surface",
+      "#7B8588",
+      "#FFFCF4",
+      3.69,
+      3,
+      true,
+      "عمود أو قطعة فارغة"
+    ],
+    [
+      "light",
+      "الشدة والدائرة",
+      "text/primary",
+      "bg/canvas",
+      "#141B20",
+      "#F7F4EC",
+      15.82,
+      3,
+      true,
+      "عمود أو قطعة مملوءة"
+    ],
+    [
+      "light",
+      "الشدة والدائرة",
+      "border/strong",
+      "bg/canvas",
+      "#7B8588",
+      "#F7F4EC",
+      3.44,
+      3,
+      true,
+      "عمود أو قطعة فارغة"
+    ],
+    [
+      "light",
+      "الشدة والدائرة",
+      "text/primary",
+      "border/strong",
+      "#141B20",
+      "#7B8588",
+      4.6,
+      3,
+      true,
+      "المملوء مقابل الفارغ"
+    ],
+    [
+      "light",
+      "بطاقة «قديم»",
+      "text/secondary",
+      "bg/surface",
+      "#434F54",
+      "#FFFCF4",
+      8.24,
+      3,
+      true,
+      "رقم العيار 48 (نص كبير)"
+    ],
+    [
+      "light",
+      "بطاقة «قديم»",
+      "text/tertiary",
+      "bg/surface",
+      "#59676C",
+      "#FFFCF4",
+      5.72,
+      4.5,
+      true,
+      "«من 24»"
+    ],
+    [
+      "light",
+      "بطاقة «قديم»",
+      "text/tertiary",
+      "bg/surface",
+      "#59676C",
+      "#FFFCF4",
+      5.72,
+      3,
+      true,
+      "الدائرة الباهتة: قطعة مملوءة"
+    ],
+    [
+      "light",
+      "بطاقة «قديم»",
+      "text/tertiary",
+      "border/subtle",
+      "#59676C",
+      "#D9D9D4",
+      4.14,
+      3,
+      true,
+      "الدائرة الباهتة: المملوء مقابل الفارغ"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/passed/fg",
+      "result/passed/bg",
+      "#A6E5C1",
+      "#162D21",
+      10.2,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/passed/icon",
+      "result/passed/bg",
+      "#3FB87F",
+      "#162D21",
+      5.85,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/failed/fg",
+      "result/failed/bg",
+      "#FFC2C5",
+      "#3C1D1F",
+      9.93,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/failed/icon",
+      "result/failed/bg",
+      "#F66A79",
+      "#3C1D1F",
+      5.23,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/warning/fg",
+      "result/warning/bg",
+      "#F7CC96",
+      "#342410",
+      9.98,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/warning/icon",
+      "result/warning/bg",
+      "#D48E1F",
+      "#342410",
+      5.47,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/needs-review/fg",
+      "result/needs-review/bg",
+      "#D8CBFF",
+      "#292438",
+      9.91,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/needs-review/icon",
+      "result/needs-review/bg",
+      "#A68CE6",
+      "#292438",
+      5.35,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/flaky/fg",
+      "result/flaky/bg",
+      "#F7CC96",
+      "#342410",
+      9.98,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/flaky/icon",
+      "result/flaky/bg",
+      "#D48E1F",
+      "#342410",
+      5.47,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/missing/fg",
+      "result/missing/bg",
+      "#F7F4EC",
+      "#3B454B",
+      8.93,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/missing/icon",
+      "result/missing/bg",
+      "#BABFBD",
+      "#3B454B",
+      5.27,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/unavailable/fg",
+      "result/unavailable/bg",
+      "#F7F4EC",
+      "#515D62",
+      6.18,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/unavailable/icon",
+      "result/unavailable/bg",
+      "#DADBD6",
+      "#515D62",
+      4.88,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/timed-out/fg",
+      "result/timed-out/bg",
+      "#F7CC96",
+      "#633F02",
+      6.26,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/timed-out/icon",
+      "result/timed-out/bg",
+      "#EAAD5E",
+      "#633F02",
+      4.74,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/cancelled/fg",
+      "result/cancelled/bg",
+      "#F7F4EC",
+      "#3B454B",
+      8.93,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/cancelled/icon",
+      "result/cancelled/bg",
+      "#BABFBD",
+      "#3B454B",
+      5.27,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/interrupted/fg",
+      "result/interrupted/bg",
+      "#F7F4EC",
+      "#3B454B",
+      8.93,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/interrupted/icon",
+      "result/interrupted/bg",
+      "#BABFBD",
+      "#3B454B",
+      5.27,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/skipped/fg",
+      "result/skipped/bg",
+      "#DADBD6",
+      "#272F34",
+      9.78,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/skipped/icon",
+      "result/skipped/bg",
+      "#97A0A2",
+      "#272F34",
+      5.1,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/not-applicable/fg",
+      "result/not-applicable/bg",
+      "#BABFBD",
+      "#272F34",
+      7.31,
+      4.5,
+      true,
+      "نص الشارة"
+    ],
+    [
+      "dark",
+      "شارة النتيجة",
+      "result/not-applicable/icon",
+      "result/not-applicable/bg",
+      "#97A0A2",
+      "#272F34",
+      5.1,
+      3,
+      true,
+      "الرمز وقطعه المفرّغ"
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/passed/icon",
+      "bg/canvas",
+      "#3FB87F",
+      "#141B20",
+      6.94,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/passed/icon",
+      "bg/surface",
+      "#3FB87F",
+      "#1C2429",
+      6.28,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/passed/icon",
+      "bg/elevated",
+      "#3FB87F",
+      "#272F34",
+      5.43,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/passed/icon",
+      "bg/sunken",
+      "#3FB87F",
+      "#0B1116",
+      7.57,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/passed/icon",
+      "selection",
+      "#3FB87F",
+      "#272F34",
+      5.43,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/failed/icon",
+      "bg/canvas",
+      "#F66A79",
+      "#141B20",
+      6.01,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/failed/icon",
+      "bg/surface",
+      "#F66A79",
+      "#1C2429",
+      5.44,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/failed/icon",
+      "bg/elevated",
+      "#F66A79",
+      "#272F34",
+      4.7,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/failed/icon",
+      "bg/sunken",
+      "#F66A79",
+      "#0B1116",
+      6.56,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/failed/icon",
+      "selection",
+      "#F66A79",
+      "#272F34",
+      4.7,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/warning/icon",
+      "bg/canvas",
+      "#D48E1F",
+      "#141B20",
+      6.37,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/warning/icon",
+      "bg/surface",
+      "#D48E1F",
+      "#1C2429",
+      5.76,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/warning/icon",
+      "bg/elevated",
+      "#D48E1F",
+      "#272F34",
+      4.98,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/warning/icon",
+      "bg/sunken",
+      "#D48E1F",
+      "#0B1116",
+      6.95,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/warning/icon",
+      "selection",
+      "#D48E1F",
+      "#272F34",
+      4.98,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/needs-review/icon",
+      "bg/canvas",
+      "#A68CE6",
+      "#141B20",
+      6.22,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/needs-review/icon",
+      "bg/surface",
+      "#A68CE6",
+      "#1C2429",
+      5.63,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/needs-review/icon",
+      "bg/elevated",
+      "#A68CE6",
+      "#272F34",
+      4.87,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/needs-review/icon",
+      "bg/sunken",
+      "#A68CE6",
+      "#0B1116",
+      6.8,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/needs-review/icon",
+      "selection",
+      "#A68CE6",
+      "#272F34",
+      4.87,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/flaky/icon",
+      "bg/canvas",
+      "#D48E1F",
+      "#141B20",
+      6.37,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/flaky/icon",
+      "bg/surface",
+      "#D48E1F",
+      "#1C2429",
+      5.76,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/flaky/icon",
+      "bg/elevated",
+      "#D48E1F",
+      "#272F34",
+      4.98,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/flaky/icon",
+      "bg/sunken",
+      "#D48E1F",
+      "#0B1116",
+      6.95,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/flaky/icon",
+      "selection",
+      "#D48E1F",
+      "#272F34",
+      4.98,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/missing/icon",
+      "bg/canvas",
+      "#BABFBD",
+      "#141B20",
+      9.34,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/missing/icon",
+      "bg/surface",
+      "#BABFBD",
+      "#1C2429",
+      8.45,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/missing/icon",
+      "bg/elevated",
+      "#BABFBD",
+      "#272F34",
+      7.31,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/missing/icon",
+      "bg/sunken",
+      "#BABFBD",
+      "#0B1116",
+      10.19,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/missing/icon",
+      "selection",
+      "#BABFBD",
+      "#272F34",
+      7.31,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/unavailable/icon",
+      "bg/canvas",
+      "#DADBD6",
+      "#141B20",
+      12.49,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/unavailable/icon",
+      "bg/surface",
+      "#DADBD6",
+      "#1C2429",
+      11.31,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/unavailable/icon",
+      "bg/elevated",
+      "#DADBD6",
+      "#272F34",
+      9.78,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/unavailable/icon",
+      "bg/sunken",
+      "#DADBD6",
+      "#0B1116",
+      13.64,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/unavailable/icon",
+      "selection",
+      "#DADBD6",
+      "#272F34",
+      9.78,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/timed-out/icon",
+      "bg/canvas",
+      "#EAAD5E",
+      "#141B20",
+      8.81,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/timed-out/icon",
+      "bg/surface",
+      "#EAAD5E",
+      "#1C2429",
+      7.98,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/timed-out/icon",
+      "bg/elevated",
+      "#EAAD5E",
+      "#272F34",
+      6.9,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/timed-out/icon",
+      "bg/sunken",
+      "#EAAD5E",
+      "#0B1116",
+      9.62,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/timed-out/icon",
+      "selection",
+      "#EAAD5E",
+      "#272F34",
+      6.9,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/cancelled/icon",
+      "bg/canvas",
+      "#BABFBD",
+      "#141B20",
+      9.34,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/cancelled/icon",
+      "bg/surface",
+      "#BABFBD",
+      "#1C2429",
+      8.45,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/cancelled/icon",
+      "bg/elevated",
+      "#BABFBD",
+      "#272F34",
+      7.31,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/cancelled/icon",
+      "bg/sunken",
+      "#BABFBD",
+      "#0B1116",
+      10.19,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/cancelled/icon",
+      "selection",
+      "#BABFBD",
+      "#272F34",
+      7.31,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/interrupted/icon",
+      "bg/canvas",
+      "#BABFBD",
+      "#141B20",
+      9.34,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/interrupted/icon",
+      "bg/surface",
+      "#BABFBD",
+      "#1C2429",
+      8.45,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/interrupted/icon",
+      "bg/elevated",
+      "#BABFBD",
+      "#272F34",
+      7.31,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/interrupted/icon",
+      "bg/sunken",
+      "#BABFBD",
+      "#0B1116",
+      10.19,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/interrupted/icon",
+      "selection",
+      "#BABFBD",
+      "#272F34",
+      7.31,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/skipped/icon",
+      "bg/canvas",
+      "#97A0A2",
+      "#141B20",
+      6.51,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/skipped/icon",
+      "bg/surface",
+      "#97A0A2",
+      "#1C2429",
+      5.9,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/skipped/icon",
+      "bg/elevated",
+      "#97A0A2",
+      "#272F34",
+      5.1,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/skipped/icon",
+      "bg/sunken",
+      "#97A0A2",
+      "#0B1116",
+      7.11,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/skipped/icon",
+      "selection",
+      "#97A0A2",
+      "#272F34",
+      5.1,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/not-applicable/icon",
+      "bg/canvas",
+      "#97A0A2",
+      "#141B20",
+      6.51,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/not-applicable/icon",
+      "bg/surface",
+      "#97A0A2",
+      "#1C2429",
+      5.9,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/not-applicable/icon",
+      "bg/elevated",
+      "#97A0A2",
+      "#272F34",
+      5.1,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/not-applicable/icon",
+      "bg/sunken",
+      "#97A0A2",
+      "#0B1116",
+      7.11,
+      3,
+      true,
+      ""
+    ],
+    [
+      "dark",
+      "الرمز منفردًا",
+      "result/not-applicable/icon",
+      "selection",
+      "#97A0A2",
+      "#272F34",
+      5.1,
+      3,
+      true,
+      "صف محدد"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/queued/fg",
+      "bg/canvas",
+      "#BABFBD",
+      "#141B20",
+      9.34,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/queued/icon",
+      "bg/canvas",
+      "#97A0A2",
+      "#141B20",
+      6.51,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/queued/fg",
+      "bg/surface",
+      "#BABFBD",
+      "#1C2429",
+      8.45,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/queued/icon",
+      "bg/surface",
+      "#97A0A2",
+      "#1C2429",
+      5.9,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/queued/fg",
+      "bg/elevated",
+      "#BABFBD",
+      "#272F34",
+      7.31,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/queued/icon",
+      "bg/elevated",
+      "#97A0A2",
+      "#272F34",
+      5.1,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/queued/fg",
+      "bg/sunken",
+      "#BABFBD",
+      "#0B1116",
+      10.19,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/queued/icon",
+      "bg/sunken",
+      "#97A0A2",
+      "#0B1116",
+      7.11,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/queued/fg",
+      "selection",
+      "#BABFBD",
+      "#272F34",
+      7.31,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/queued/icon",
+      "selection",
+      "#97A0A2",
+      "#272F34",
+      5.1,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/running/fg",
+      "bg/canvas",
+      "#BDD5FF",
+      "#141B20",
+      11.7,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/running/icon",
+      "bg/canvas",
+      "#699DF9",
+      "#141B20",
+      6.45,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/running/fg",
+      "bg/surface",
+      "#BDD5FF",
+      "#1C2429",
+      10.59,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/running/icon",
+      "bg/surface",
+      "#699DF9",
+      "#1C2429",
+      5.84,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/running/fg",
+      "bg/elevated",
+      "#BDD5FF",
+      "#272F34",
+      9.16,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/running/icon",
+      "bg/elevated",
+      "#699DF9",
+      "#272F34",
+      5.05,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/running/fg",
+      "bg/sunken",
+      "#BDD5FF",
+      "#0B1116",
+      12.77,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/running/icon",
+      "bg/sunken",
+      "#699DF9",
+      "#0B1116",
+      7.04,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/running/fg",
+      "selection",
+      "#BDD5FF",
+      "#272F34",
+      9.16,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/running/icon",
+      "selection",
+      "#699DF9",
+      "#272F34",
+      5.05,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/cancelling/fg",
+      "bg/canvas",
+      "#F7F4EC",
+      "#141B20",
+      15.82,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/cancelling/icon",
+      "bg/canvas",
+      "#BABFBD",
+      "#141B20",
+      9.34,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/cancelling/fg",
+      "bg/surface",
+      "#F7F4EC",
+      "#1C2429",
+      14.33,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/cancelling/icon",
+      "bg/surface",
+      "#BABFBD",
+      "#1C2429",
+      8.45,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/cancelling/fg",
+      "bg/elevated",
+      "#F7F4EC",
+      "#272F34",
+      12.39,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/cancelling/icon",
+      "bg/elevated",
+      "#BABFBD",
+      "#272F34",
+      7.31,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/cancelling/fg",
+      "bg/sunken",
+      "#F7F4EC",
+      "#0B1116",
+      17.28,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/cancelling/icon",
+      "bg/sunken",
+      "#BABFBD",
+      "#0B1116",
+      10.19,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/cancelling/fg",
+      "selection",
+      "#F7F4EC",
+      "#272F34",
+      12.39,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "مؤشر الدورة",
+      "cycle/cancelling/icon",
+      "selection",
+      "#BABFBD",
+      "#272F34",
+      7.31,
+      3,
+      true,
+      "الرمز"
+    ],
+    [
+      "dark",
+      "شارة الجاهزية",
+      "text/secondary",
+      "bg/canvas",
+      "#BABFBD",
+      "#141B20",
+      9.34,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "شارة الجاهزية",
+      "border/strong",
+      "bg/canvas",
+      "#728085",
+      "#141B20",
+      4.26,
+      3,
+      true,
+      "الحد"
+    ],
+    [
+      "dark",
+      "شارة الجاهزية",
+      "text/secondary",
+      "bg/surface",
+      "#BABFBD",
+      "#1C2429",
+      8.45,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "شارة الجاهزية",
+      "border/strong",
+      "bg/surface",
+      "#728085",
+      "#1C2429",
+      3.86,
+      3,
+      true,
+      "الحد"
+    ],
+    [
+      "dark",
+      "شارة الجاهزية",
+      "text/secondary",
+      "bg/elevated",
+      "#BABFBD",
+      "#272F34",
+      7.31,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "شارة الجاهزية",
+      "border/strong",
+      "bg/elevated",
+      "#728085",
+      "#272F34",
+      3.33,
+      3,
+      true,
+      "الحد"
+    ],
+    [
+      "dark",
+      "شارة الجاهزية",
+      "text/secondary",
+      "bg/sunken",
+      "#BABFBD",
+      "#0B1116",
+      10.19,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "شارة الجاهزية",
+      "border/strong",
+      "bg/sunken",
+      "#728085",
+      "#0B1116",
+      4.65,
+      3,
+      true,
+      "الحد"
+    ],
+    [
+      "dark",
+      "شارة الجاهزية",
+      "text/secondary",
+      "selection",
+      "#BABFBD",
+      "#272F34",
+      7.31,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "شارة الجاهزية",
+      "border/strong",
+      "selection",
+      "#728085",
+      "#272F34",
+      3.33,
+      3,
+      true,
+      "الحد"
+    ],
+    [
+      "dark",
+      "شارة الحكم",
+      "verdict/pure/fg",
+      "verdict/pure/bg",
+      "#A6E5C1",
+      "#162D21",
+      10.2,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "شارة الحكم",
+      "verdict/pure/icon",
+      "verdict/pure/bg",
+      "#3FB87F",
+      "#162D21",
+      5.85,
+      3,
+      true,
+      "رمز Lucide"
+    ],
+    [
+      "dark",
+      "شارة الحكم",
+      "verdict/incomplete/fg",
+      "verdict/incomplete/bg",
+      "#F7F4EC",
+      "#1C2429",
+      14.33,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "شارة الحكم",
+      "verdict/incomplete/icon",
+      "verdict/incomplete/bg",
+      "#BABFBD",
+      "#1C2429",
+      8.45,
+      3,
+      true,
+      "رمز Lucide"
+    ],
+    [
+      "dark",
+      "شارة الحكم",
+      "verdict/blocked/fg",
+      "verdict/blocked/bg",
+      "#FFC2C5",
+      "#3C1D1F",
+      9.93,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "شارة الحكم",
+      "verdict/blocked/icon",
+      "verdict/blocked/bg",
+      "#F66A79",
+      "#3C1D1F",
+      5.23,
+      3,
+      true,
+      "رمز Lucide"
+    ],
+    [
+      "dark",
+      "شارة الحكم",
+      "verdict/incomplete/border",
+      "bg/canvas",
+      "#728085",
+      "#141B20",
+      4.26,
+      3,
+      true,
+      "حد «غير مكتمل»"
+    ],
+    [
+      "dark",
+      "شارة الحكم",
+      "verdict/incomplete/border",
+      "bg/surface",
+      "#728085",
+      "#1C2429",
+      3.86,
+      3,
+      true,
+      "حد «غير مكتمل»"
+    ],
+    [
+      "dark",
+      "الوسم المحايد",
+      "text/secondary",
+      "bg/sunken",
+      "#BABFBD",
+      "#0B1116",
+      10.19,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "الوسم المحايد",
+      "text/secondary (icon)",
+      "bg/sunken",
+      "#BABFBD",
+      "#0B1116",
+      10.19,
+      3,
+      true,
+      "رمز Lucide بلون النص"
+    ],
+    [
+      "dark",
+      "وسم «ادعاء نموذج»",
+      "tag/model-claim/fg",
+      "tag/model-claim/bg",
+      "#D8CBFF",
+      "#292438",
+      9.91,
+      4.5,
+      true,
+      "النص"
+    ],
+    [
+      "dark",
+      "وسم «ادعاء نموذج»",
+      "tag/model-claim/icon",
+      "tag/model-claim/bg",
+      "#A68CE6",
+      "#292438",
+      5.35,
+      3,
+      true,
+      "فقاعة الكلام"
+    ],
+    [
+      "dark",
+      "وسم «مبدئي»",
+      "text/secondary",
+      "border/subtle (خط)",
+      "#BABFBD",
+      "#3B454B",
+      5.27,
+      4.5,
+      true,
+      "النص فوق الخط المائل"
+    ],
+    [
+      "dark",
+      "وسم «مبدئي»",
+      "text/secondary",
+      "bg/surface",
+      "#BABFBD",
+      "#1C2429",
+      8.45,
+      4.5,
+      true,
+      "النص بين الخطوط (أساس الوسم bg/surface)"
+    ],
+    [
+      "dark",
+      "«جارٍ» في التجهيز",
+      "cycle/running/icon",
+      "bg/sunken",
+      "#699DF9",
+      "#0B1116",
+      7.04,
+      3,
+      true,
+      "المؤشر الأزرق داخل الوسم"
+    ],
+    [
+      "dark",
+      "الشدة والدائرة",
+      "text/primary",
+      "bg/surface",
+      "#F7F4EC",
+      "#1C2429",
+      14.33,
+      3,
+      true,
+      "عمود أو قطعة مملوءة"
+    ],
+    [
+      "dark",
+      "الشدة والدائرة",
+      "border/strong",
+      "bg/surface",
+      "#728085",
+      "#1C2429",
+      3.86,
+      3,
+      true,
+      "عمود أو قطعة فارغة"
+    ],
+    [
+      "dark",
+      "الشدة والدائرة",
+      "text/primary",
+      "bg/canvas",
+      "#F7F4EC",
+      "#141B20",
+      15.82,
+      3,
+      true,
+      "عمود أو قطعة مملوءة"
+    ],
+    [
+      "dark",
+      "الشدة والدائرة",
+      "border/strong",
+      "bg/canvas",
+      "#728085",
+      "#141B20",
+      4.26,
+      3,
+      true,
+      "عمود أو قطعة فارغة"
+    ],
+    [
+      "dark",
+      "الشدة والدائرة",
+      "text/primary",
+      "border/strong",
+      "#F7F4EC",
+      "#728085",
+      3.72,
+      3,
+      true,
+      "المملوء مقابل الفارغ"
+    ],
+    [
+      "dark",
+      "بطاقة «قديم»",
+      "text/secondary",
+      "bg/surface",
+      "#BABFBD",
+      "#1C2429",
+      8.45,
+      3,
+      true,
+      "رقم العيار 48 (نص كبير)"
+    ],
+    [
+      "dark",
+      "بطاقة «قديم»",
+      "text/tertiary",
+      "bg/surface",
+      "#97A0A2",
+      "#1C2429",
+      5.9,
+      4.5,
+      true,
+      "«من 24»"
+    ],
+    [
+      "dark",
+      "بطاقة «قديم»",
+      "text/tertiary",
+      "bg/surface",
+      "#97A0A2",
+      "#1C2429",
+      5.9,
+      3,
+      true,
+      "الدائرة الباهتة: قطعة مملوءة"
+    ],
+    [
+      "dark",
+      "بطاقة «قديم»",
+      "text/tertiary",
+      "border/subtle",
+      "#97A0A2",
+      "#3B454B",
+      3.68,
+      3,
+      true,
+      "الدائرة الباهتة: المملوء مقابل الفارغ"
+    ]
+  ],
+  "informational": [
+    [
+      "light",
+      "border/subtle (خط «مبدئي»، 2 بكسل كل 4) ↔ bg/surface",
+      1.38
+    ],
+    [
+      "light",
+      "border/subtle (دائرة «لا نطاق») ↔ bg/surface",
+      1.38
+    ],
+    [
+      "dark",
+      "border/subtle (خط «مبدئي»، 2 بكسل كل 4) ↔ bg/surface",
+      1.6
+    ],
+    [
+      "dark",
+      "border/subtle (دائرة «لا نطاق») ↔ bg/surface",
+      1.6
+    ]
+  ],
+  "cvd": [
+    {
+      "mode": "light",
+      "kind": "protanopia",
+      "passedVsFailed": 16.8,
+      "closePairs": [
+        [
+          "warning",
+          "flaky",
+          0
+        ],
+        [
+          "warning",
+          "timed-out",
+          8.8
+        ],
+        [
+          "flaky",
+          "timed-out",
+          8.8
+        ],
+        [
+          "missing",
+          "cancelled",
+          8.6
+        ],
+        [
+          "missing",
+          "interrupted",
+          8.6
+        ],
+        [
+          "missing",
+          "skipped",
+          0
+        ],
+        [
+          "missing",
+          "not-applicable",
+          0
+        ],
+        [
+          "unavailable",
+          "cancelled",
+          6.7
+        ],
+        [
+          "unavailable",
+          "interrupted",
+          6.7
+        ],
+        [
+          "cancelled",
+          "interrupted",
+          0
+        ],
+        [
+          "cancelled",
+          "skipped",
+          8.6
+        ],
+        [
+          "cancelled",
+          "not-applicable",
+          8.6
+        ],
+        [
+          "interrupted",
+          "skipped",
+          8.6
+        ],
+        [
+          "interrupted",
+          "not-applicable",
+          8.6
+        ],
+        [
+          "skipped",
+          "not-applicable",
+          0
+        ]
+      ],
+      "simulated": {
+        "passed": "#8E845D",
+        "failed": "#646054",
+        "warning": "#7F7000",
+        "needs-review": "#0078E9",
+        "flaky": "#7F7000",
+        "missing": "#64666C",
+        "unavailable": "#383A40",
+        "timed-out": "#665900",
+        "cancelled": "#4C4E54",
+        "interrupted": "#4C4E54",
+        "skipped": "#64666C",
+        "not-applicable": "#64666C"
+      }
+    },
+    {
+      "mode": "light",
+      "kind": "deuteranopia",
+      "passedVsFailed": 7.1,
+      "closePairs": [
+        [
+          "passed",
+          "failed",
+          7.1
+        ],
+        [
+          "failed",
+          "warning",
+          9.2
+        ],
+        [
+          "failed",
+          "flaky",
+          9.2
+        ],
+        [
+          "warning",
+          "flaky",
+          0
+        ],
+        [
+          "missing",
+          "cancelled",
+          8.5
+        ],
+        [
+          "missing",
+          "interrupted",
+          8.5
+        ],
+        [
+          "missing",
+          "skipped",
+          0
+        ],
+        [
+          "missing",
+          "not-applicable",
+          0
+        ],
+        [
+          "unavailable",
+          "cancelled",
+          6.5
+        ],
+        [
+          "unavailable",
+          "interrupted",
+          6.5
+        ],
+        [
+          "cancelled",
+          "interrupted",
+          0
+        ],
+        [
+          "cancelled",
+          "skipped",
+          8.5
+        ],
+        [
+          "cancelled",
+          "not-applicable",
+          8.5
+        ],
+        [
+          "interrupted",
+          "skipped",
+          8.5
+        ],
+        [
+          "interrupted",
+          "not-applicable",
+          8.5
+        ],
+        [
+          "skipped",
+          "not-applicable",
+          0
+        ]
+      ],
+      "simulated": {
+        "passed": "#827C63",
+        "failed": "#8B8150",
+        "warning": "#8F8015",
+        "needs-review": "#0074E2",
+        "flaky": "#8F8015",
+        "missing": "#61646C",
+        "unavailable": "#363940",
+        "timed-out": "#746602",
+        "cancelled": "#4A4C54",
+        "interrupted": "#4A4C54",
+        "skipped": "#61646C",
+        "not-applicable": "#61646C"
+      }
+    },
+    {
+      "mode": "light",
+      "kind": "tritanopia",
+      "passedVsFailed": 63.5,
+      "closePairs": [
+        [
+          "warning",
+          "flaky",
+          0
+        ],
+        [
+          "warning",
+          "timed-out",
+          9.6
+        ],
+        [
+          "flaky",
+          "timed-out",
+          9.6
+        ],
+        [
+          "missing",
+          "cancelled",
+          8.4
+        ],
+        [
+          "missing",
+          "interrupted",
+          8.4
+        ],
+        [
+          "missing",
+          "skipped",
+          0
+        ],
+        [
+          "missing",
+          "not-applicable",
+          0
+        ],
+        [
+          "unavailable",
+          "cancelled",
+          6.9
+        ],
+        [
+          "unavailable",
+          "interrupted",
+          6.9
+        ],
+        [
+          "cancelled",
+          "interrupted",
+          0
+        ],
+        [
+          "cancelled",
+          "skipped",
+          8.4
+        ],
+        [
+          "cancelled",
+          "not-applicable",
+          8.4
+        ],
+        [
+          "interrupted",
+          "skipped",
+          8.4
+        ],
+        [
+          "interrupted",
+          "not-applicable",
+          8.4
+        ],
+        [
+          "skipped",
+          "not-applicable",
+          0
+        ]
+      ],
+      "simulated": {
+        "passed": "#158E83",
+        "failed": "#E90044",
+        "warning": "#BE5A5B",
+        "needs-review": "#6B7A97",
+        "flaky": "#BE5A5B",
+        "missing": "#546968",
+        "unavailable": "#2D3C3D",
+        "timed-out": "#9B4647",
+        "cancelled": "#3E5151",
+        "interrupted": "#3E5151",
+        "skipped": "#546968",
+        "not-applicable": "#546968"
+      }
+    },
+    {
+      "mode": "dark",
+      "kind": "protanopia",
+      "passedVsFailed": 15.5,
+      "closePairs": [
+        [
+          "passed",
+          "timed-out",
+          8.5
+        ],
+        [
+          "warning",
+          "flaky",
+          0
+        ],
+        [
+          "missing",
+          "unavailable",
+          7
+        ],
+        [
+          "missing",
+          "cancelled",
+          0
+        ],
+        [
+          "missing",
+          "interrupted",
+          0
+        ],
+        [
+          "missing",
+          "skipped",
+          9.1
+        ],
+        [
+          "missing",
+          "not-applicable",
+          9.1
+        ],
+        [
+          "unavailable",
+          "cancelled",
+          7
+        ],
+        [
+          "unavailable",
+          "interrupted",
+          7
+        ],
+        [
+          "cancelled",
+          "interrupted",
+          0
+        ],
+        [
+          "cancelled",
+          "skipped",
+          9.1
+        ],
+        [
+          "cancelled",
+          "not-applicable",
+          9.1
+        ],
+        [
+          "interrupted",
+          "skipped",
+          9.1
+        ],
+        [
+          "interrupted",
+          "not-applicable",
+          9.1
+        ],
+        [
+          "skipped",
+          "not-applicable",
+          0
+        ]
+      ],
+      "simulated": {
+        "passed": "#B6AA7C",
+        "failed": "#8A8679",
+        "warning": "#A69200",
+        "needs-review": "#739BE9",
+        "flaky": "#A69200",
+        "missing": "#BFBEBD",
+        "unavailable": "#DCDAD6",
+        "timed-out": "#C2B057",
+        "cancelled": "#BFBEBD",
+        "interrupted": "#BFBEBD",
+        "skipped": "#9E9FA2",
+        "not-applicable": "#9E9FA2"
+      }
+    },
+    {
+      "mode": "dark",
+      "kind": "deuteranopia",
+      "passedVsFailed": 5,
+      "closePairs": [
+        [
+          "passed",
+          "failed",
+          5
+        ],
+        [
+          "warning",
+          "flaky",
+          0
+        ],
+        [
+          "warning",
+          "timed-out",
+          8.5
+        ],
+        [
+          "flaky",
+          "timed-out",
+          8.5
+        ],
+        [
+          "missing",
+          "unavailable",
+          7.1
+        ],
+        [
+          "missing",
+          "cancelled",
+          0
+        ],
+        [
+          "missing",
+          "interrupted",
+          0
+        ],
+        [
+          "missing",
+          "skipped",
+          9.5
+        ],
+        [
+          "missing",
+          "not-applicable",
+          9.5
+        ],
+        [
+          "unavailable",
+          "cancelled",
+          7.1
+        ],
+        [
+          "unavailable",
+          "interrupted",
+          7.1
+        ],
+        [
+          "cancelled",
+          "interrupted",
+          0
+        ],
+        [
+          "cancelled",
+          "skipped",
+          9.5
+        ],
+        [
+          "cancelled",
+          "not-applicable",
+          9.5
+        ],
+        [
+          "interrupted",
+          "skipped",
+          9.5
+        ],
+        [
+          "interrupted",
+          "not-applicable",
+          9.5
+        ],
+        [
+          "skipped",
+          "not-applicable",
+          0
+        ]
+      ],
+      "simulated": {
+        "passed": "#A69F83",
+        "failed": "#ADA376",
+        "warning": "#B7A323",
+        "needs-review": "#7799E4",
+        "flaky": "#B7A323",
+        "missing": "#BEBEBD",
+        "unavailable": "#DCDAD6",
+        "timed-out": "#D1BE60",
+        "cancelled": "#BEBEBD",
+        "interrupted": "#BEBEBD",
+        "skipped": "#9C9EA2",
+        "not-applicable": "#9C9EA2"
+      }
+    },
+    {
+      "mode": "dark",
+      "kind": "tritanopia",
+      "passedVsFailed": 66.7,
+      "closePairs": [
+        [
+          "failed",
+          "warning",
+          8.3
+        ],
+        [
+          "failed",
+          "flaky",
+          8.3
+        ],
+        [
+          "warning",
+          "flaky",
+          0
+        ],
+        [
+          "warning",
+          "timed-out",
+          8.6
+        ],
+        [
+          "flaky",
+          "timed-out",
+          8.6
+        ],
+        [
+          "missing",
+          "unavailable",
+          7.8
+        ],
+        [
+          "missing",
+          "cancelled",
+          0
+        ],
+        [
+          "missing",
+          "interrupted",
+          0
+        ],
+        [
+          "missing",
+          "skipped",
+          9.4
+        ],
+        [
+          "missing",
+          "not-applicable",
+          9.4
+        ],
+        [
+          "unavailable",
+          "cancelled",
+          7.8
+        ],
+        [
+          "unavailable",
+          "interrupted",
+          7.8
+        ],
+        [
+          "cancelled",
+          "interrupted",
+          0
+        ],
+        [
+          "cancelled",
+          "skipped",
+          9.4
+        ],
+        [
+          "cancelled",
+          "not-applicable",
+          9.4
+        ],
+        [
+          "interrupted",
+          "skipped",
+          9.4
+        ],
+        [
+          "interrupted",
+          "not-applicable",
+          9.4
+        ],
+        [
+          "skipped",
+          "not-applicable",
+          0
+        ]
+      ],
+      "simulated": {
+        "passed": "#00B7A9",
+        "failed": "#FF5570",
+        "warning": "#E87C7A",
+        "needs-review": "#999CAE",
+        "flaky": "#E87C7A",
+        "missing": "#B9BFBE",
+        "unavailable": "#DBDAD9",
+        "timed-out": "#FD9E9B",
+        "cancelled": "#B9BFBE",
+        "interrupted": "#B9BFBE",
+        "skipped": "#94A1A1",
+        "not-applicable": "#94A1A1"
+      }
+    }
+  ],
+  "glyphs": {
+    "passed": "علامة صح",
+    "failed": "علامة ×",
+    "warning": "مثلث مصمت",
+    "needs-review": "عين",
+    "flaky": "موجة",
+    "missing": "علامة زائد",
+    "unavailable": "مفتاح ربط مائل",
+    "timed-out": "ساعة رملية",
+    "cancelled": "مربع إيقاف",
+    "interrupted": "وصلة مكسورة",
+    "skipped": "سهم التفاف",
+    "not-applicable": "شرطة"
+  },
+  "uniqueGlyphs": true,
+  "figmaMatch": {
+    "compared": 176,
+    "mismatches": []
+  }
+}

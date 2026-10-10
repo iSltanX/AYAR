@@ -11,7 +11,7 @@
 | المواصفة | [docs/plan/AYAR-figma-prompt.md](../plan/AYAR-figma-prompt.md)، مع القرارين D-48 وD-49 |
 | المنفّذ | Claude عبر Figma MCP (انظر [CLAUDE.md](../../CLAUDE.md))، أو مصمم بشري يتسلم ملف المرحلة والبرومبت |
 
-## 2. الحالة الفعلية للملف (تحديث DES-1، 2026-10-10)
+## 2. الحالة الفعلية للملف (تحديث DES-2، 2026-10-10)
 
 **التدقيق الأولي (DES-1 المهمة 1، 2026-10-10، قراءة فقط):** طابق الملف ما سجله تدقيق 2026-10-09 حرفيًا: صفحتان فقط (`0:1` و`13:2`)، ولا متغيرات ولا أنماط. وعدد عقد الأرشيف 5336 (7 عقد عليا)، وعقد الهوية 420. وهذان الرقمان خط الأساس لفحص «لم يتغير».
 
@@ -20,8 +20,8 @@
 | 1 | `Cover` | `49:1052` | الإطار `58:2`: الاسم والرمز الملون (مادة تعريفية، D-49)، والإصدار والتاريخ، وفهرس الصفحات بحالاتها | معتمدة (DES-1، 2026-10-10) |
 | 2 | `Identity` (كانت `AYAR — Final Identity`) | `13:2` | الأصل دون تغيير: قسم `30:1052` (الغلاف `30:1053` وإطار الهوية `30:1066`) وقسم المكونات `29:1052` (`AYAR / Symbol` `29:1077`). والإضافة: قسم `57:66` بإطار `57:67` «الاستخدام والنبرة»: الاستخدام الصحيح والخاطئ، ونطاق لون العُرف (D-49)، والنبرة، وإحالة D-48 | الأصل **معتمد (D-48)**، والإضافة معتمدة (DES-1، 2026-10-10) |
 | 3 | `Foundations` | `49:1053` | `51:2` المقدمة، و`51:10` Primitives، و`52:2` Semantic، و`52:177` Status، و`53:2` جدول التباين، و`54:2` توفيق G-03، و`55:2` الطباعة، و`56:2` التخطيط والحركة | معتمدة (DES-1، 2026-10-10) |
-| 4 | `Status System` | `49:1054` | فارغة | DES-2 |
-| 5 | `Icons` | `49:1055` | فارغة | DES-2 |
+| 4 | `Status System` | `49:1054` | تسعة إطارات `S-00`…`S-08` من `74:668` إلى `84:4530`: العائلات الخمس، والنتائج الاثنتا عشرة، ودورة التنفيذ، والجاهزية، ووسوم الاكتشاف، وفحوص النموذج والحالات الأخرى، والحكم وبطاقة النقاء، ودائرة التدريج، وأدلة التمييز والتباين. وقسم المكتبة `84:7055` بتسع مجموعات مكوّنات (الجدول أدناه) | معتمدة (DES-2، 2026-10-10) |
+| 5 | `Icons` | `49:1055` | ستة إطارات `I-00`…`I-05` (`81:4` و`81:138` و`81:775` و`82:277` و`82:417` و`82:1200`): رموز الحالات، ومراجعة حجم 12، والبناء، وقواعد Lucide وأيقونات الوسوم، والانعكاس. وقسم المكتبة `84:7054`: مجموعة `Status symbol` `67:394` (51 متغيرًا)، وأيقونات الوسوم `68:4` (34)، ورموز الأحكام `68:182` (3)، وأمثلة Lucide العامة `68:196` (16) | معتمدة (DES-2، 2026-10-10) |
 | 6 | `Components` | `49:1056` | فارغة | DES-3 |
 | 7 | `Screens — AR Light` | `49:1057` | فارغة | DES-4 وDES-5 |
 | 8 | `Screens — AR Dark` | `49:1058` | فارغة | DES-4 وDES-5 |
@@ -48,13 +48,30 @@
 | مصدر القيم | [DES-1/tokens.mjs](DES-1/tokens.mjs) يشتق القيم ويفحص التباين وقرب لون العُرف، ويكتب [tokens.json](DES-1/tokens.json) و[contrast.md](DES-1/contrast.md) |
 | اللقطات المعتمدة | [approved/DES-1/](approved/DES-1/) (اعتمدها المالك 2026-10-10) |
 
+**مكتبة DES-2 في الملف** (مكوّنات مربوطة بمتغيرات DES-1، و`Direction=RTL|LTR` كاتفاقية DES-3):
+
+| المجموعة | المعرّف | الخصائص | المتغيرات |
+|---|---|---|---|
+| `Status symbol` (صفحة Icons) | `67:394` | `Symbol` (15 رمزًا وصيغتان ثابتتان) × `Size` (12، 16، 20) | 51 |
+| `Result badge` | `70:276` | `Result` (12 نتيجة، و`missing-configuration`، و`passed-reviewed`، و`failed-reviewed`) × `Size` (sm، md) × `Direction` | 60 |
+| `Readiness badge` | `70:317` | `Readiness` (5) × `Size` × `Direction` | 20 |
+| `Cycle indicator` | `70:426` | `Cycle` (3) × `Motion` (animated، static) × `Size` × `Direction` | 24 |
+| `Verdict badge` | `70:465` | `Verdict` (pure، incomplete، blocked) × `Direction` | 6 |
+| `Tag` | `71:194` | `Kind` (neutral، neutral-icon، model-claim، provisional) × `Direction`؛ النص بتجاوز، والأيقونة بتبديل المكوّن المتداخل | 8 |
+| `Severity` | `71:275` | `Severity` (5) × `Direction` | 10 |
+| `Karat dial` | `71:536` | `Value` (0، 12، 19، 24، none) × `Size` (lg 120، sm 28) × `Tone` (default، muted) | 20 |
+| `Section karat` | `71:627` | `Direction` | 2 |
+| `Purity card` | `72:1070` | `Variant` (pure، incomplete، blocked، stale، integrity-hold، no-scope، narrow-scope) × `Direction` | 14 |
+
+مصدر الفحوص: [DES-2/status-check.mjs](DES-2/status-check.mjs) يحسب ثنائيات DES-2 من `DES-1/tokens.json` ويطابقها مع قيم Figma ([figma-values.json](DES-2/figma-values.json))، ويكتب [checks.md](DES-2/checks.md). وفحص Figma الآلي في [figma-audit.json](DES-2/figma-audit.json)، وصور المراجعة ومحاكاة عمى الألوان في [DES-2/review/](DES-2/review/) و[DES-2/cvd/](DES-2/cvd/).
+
 ## 3. المراحل والاعتمادات
 
 | المرحلة | ما تنتجه | تفتح للتطوير | الحالة | تاريخ الاعتماد | ملاحظات المالك |
 |---|---|---|---|---|---|
 | (قبل التنظيم) | الهوية: الرمز، والأيقونة، والتراكيب | — | معتمدة (D-48) | 2026-10-09 | «معتمد نقار الخشب» |
 | [DES-1](../phases/design/DES-1-foundations.md) | تنظيم الملف، وإكمال الهوية، والأسس | DEV-10 (مع DES-2 وDES-3) | معتمدة | 2026-10-10 | «معتمد، بجواب المالك للجلسة الرئيسية». دون تعديلات، بعد عرض اللقطات العشر النهائية ورابط Figma. وقرارات G-03 وmono والتباين حسمتها الجلسة الرئيسية بتفويض المالك (ORG-13) |
-| [DES-2](../phases/design/DES-2-status-icons.md) | نظام الحالات والرموز ودائرة العيار | DEV-10 (مع DES-1 وDES-3) | لم تبدأ | — | — |
+| [DES-2](../phases/design/DES-2-status-icons.md) | نظام الحالات والرموز ودائرة العيار | DEV-10 (مع DES-1 وDES-3) | معتمدة | 2026-10-10 | «معتمد»: المالك صراحةً، عبر الجلسة الرئيسية، دون تعديلات، على الحالة عند `13e017b`، بعد عرض النقاط الأربع (زوج ناقص وغير منطبق بحجم 12، وخطوط «مبدئي»، وبطاقة «قديم»، وتعبئة «غير منطبق» في الفاتح) واللقطات S-01 وI-01 وI-02 وS-04 وS-06 وS-07. وقرارات D-DES2-02 و05 و06 أكدتها الجلسة الرئيسية بتفويض المالك (ORG-13) |
 | [DES-3](../phases/design/DES-3-components.md) | المكونات التسعة والعشرون | DEV-10 | لم تبدأ | — | — |
 | [DES-4](../phases/design/DES-4-core-screens.md) | الشاشات 1–8 | DEV-11 | لم تبدأ | — | — |
 | [DES-5](../phases/design/DES-5-remaining-screens-flows.md) | الشاشات 9–22، والرحلات، والإرشادات | DEV-12 | لم تبدأ | — | — |
@@ -100,3 +117,20 @@
 | DES-1 | `Foundations` | توفيق G-03 | `54:2` | `approved/DES-1/F-05-g03-reconciliation.png` |
 | DES-1 | `Foundations` | الطباعة | `55:2` | `approved/DES-1/F-06-typography.png` |
 | DES-1 | `Foundations` | التخطيط والحركة | `56:2` | `approved/DES-1/F-07-layout-motion.png` |
+| DES-2 | `Status System` | العائلات الخمس والقواعد | `74:668` | `approved/DES-2/S-00-status-system.png` |
+| DES-2 | `Status System` | النتائج الاثنتا عشرة | `75:821` | `approved/DES-2/S-01-results.png` |
+| DES-2 | `Status System` | دورة التنفيذ | `76:1317` | `approved/DES-2/S-02-run-cycle.png` |
+| DES-2 | `Status System` | الجاهزية | `76:1696` | `approved/DES-2/S-03-readiness.png` |
+| DES-2 | `Status System` | وسوم الاكتشاف | `77:1541` | `approved/DES-2/S-04-finding-tags.png` |
+| DES-2 | `Status System` | فحوص النموذج والحالات الأخرى | `77:2266` | `approved/DES-2/S-05-model-checks-other-states.png` |
+| DES-2 | `Status System` | الحكم وبطاقة النقاء | `78:2593` | `approved/DES-2/S-06-verdict-purity-card.png` |
+| DES-2 | `Status System` | دائرة التدريج | `78:4097` | `approved/DES-2/S-07-karat-dial.png` |
+| DES-2 | `Status System` | أدلة التمييز والتباين | `84:4530` | `approved/DES-2/S-08-distinction-contrast.png` |
+| DES-2 | `Status System` | قسم المكتبة (9 مجموعات، الجدول في §2) | `84:7055` | `approved/DES-2/L-status-library.png` |
+| DES-2 | `Icons` | نظرة عامة | `81:4` | `approved/DES-2/I-00-icons.png` |
+| DES-2 | `Icons` | رموز الحالات | `81:138` | `approved/DES-2/I-01-status-symbols.png` |
+| DES-2 | `Icons` | مراجعة حجم 12 | `81:775` | `approved/DES-2/I-02-12px-review.png` |
+| DES-2 | `Icons` | البناء | `82:277` | `approved/DES-2/I-03-construction.png` |
+| DES-2 | `Icons` | Lucide وأيقونات الوسوم | `82:417` | `approved/DES-2/I-04-lucide.png` |
+| DES-2 | `Icons` | الانعكاس | `82:1200` | `approved/DES-2/I-05-mirroring.png` |
+| DES-2 | `Icons` | قسم المكتبة: `Status symbol` `67:394`، وأيقونات الوسوم `68:4`، ورموز الأحكام `68:182`، وأمثلة Lucide `68:196` | `84:7054` | `approved/DES-2/L-icons-library.png` |
