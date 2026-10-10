@@ -5,7 +5,7 @@
 // Pure: no I/O. The card's lifecycle and its verification are DEV-9's.
 import type { Catalog, CardTemplate, Kb } from '@ayar/catalog';
 import { kbRef } from '@ayar/catalog';
-import { createTranslator, type MessageKey } from '@ayar/i18n';
+import { createTranslator, type MessageKey, type Translate } from '@ayar/i18n';
 import type { CardType, TaskCard, TaskSource } from '@ayar/protocol';
 import { suggest, type AdvisorFacts } from '../advisor/advisor.ts';
 import { literal } from '../advisor/render.ts';
@@ -27,6 +27,10 @@ export interface CardProjectContext {
 
 /** A card before its text: every field but `text`, plus which strings came from the user. */
 type CardFields = Omit<TaskCard, 'text'>;
+
+let ar: Translate | null = null;
+/** The card is Arabic, like its template and the knowledge base (D-DEV8-10). */
+const arabic = (): Translate => (ar ??= createTranslator('ar'));
 
 const fill = (s: string, values: Record<string, string>) => s.replace(/\{([a-zA-Z]+)\}/g, (m, k: string) => values[k] ?? m);
 
@@ -120,7 +124,7 @@ export function cardFromCheck(source: Extract<TaskSource, { kind: 'check' }>, ca
   if (!check) throw new CardSourceError('unknown_check', source.checkId);
   const kb = catalog.kb;
   const tpl = kb.cards.template;
-  const t = createTranslator('ar');
+  const t = arabic();
   const key = check.id.replace('*', 'any');
   const title = t(`catalog.check.${key}.title` as MessageKey);
   const type: CardType = source.outcome === 'missing_tests' ? (TEST_CARD_FOR_CHECK[check.id] ?? 'unit_test') : 'check_setup';

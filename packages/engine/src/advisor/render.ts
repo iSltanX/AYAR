@@ -3,13 +3,21 @@
 // And the advice exported as Markdown (28.12 case 11): labelled «توصية لم تُنفَّذ», never claiming a test ran.
 import type { AdvisorResult, Explanation } from '@ayar/protocol';
 import type { Kb } from '@ayar/catalog';
-import { createTranslator, MESSAGES, type Lang, type MessageKey } from '@ayar/i18n';
+import { createTranslator, MESSAGES, type Lang, type MessageKey, type Translate } from '@ayar/i18n';
+
+const translators = new Map<Lang, Translate>();
+/** One translator per language: it compiles each message once. */
+function translator(lang: Lang): Translate {
+  let t = translators.get(lang);
+  if (!t) translators.set(lang, (t = createTranslator(lang)));
+  return t;
+}
 
 /** Value names whose labels come from another list (`area` is one of `areas`). */
 const LABEL_LIST: Record<string, string> = { area: 'areas', min: 'level', max: 'level', priority: 'priority' };
 
 export function explanationText(x: Explanation, lang: Lang): string {
-  const t = createTranslator(lang);
+  const t = translator(lang);
   const table = MESSAGES[lang] as Record<string, string>;
   const values: Record<string, string | number> = { ...x.values };
   for (const [k, v] of Object.entries(x.values)) {
@@ -33,7 +41,7 @@ export function literal(text: string): string {
 
 /** The advice as Markdown, in the UI language for the advisor's own sentences; the knowledge base text is Arabic. */
 export function adviceMarkdown(r: AdvisorResult, kb: Kb, lang: Lang): string {
-  const t = createTranslator(lang);
+  const t = translator(lang);
   const ex = (x: Explanation) => explanationText(x, lang);
   const out: string[] = [];
   out.push(`# ${t('advisor.md.title')}`, '', t('advisor.md.notRun'), '');

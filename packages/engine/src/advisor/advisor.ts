@@ -130,7 +130,7 @@ function unknownKeys(given: AdvisorContext): SensitiveKey[] {
   return SENSITIVE_KEYS.filter((k) => given[k] === undefined && (k !== 'expected' || APPLIES_EXPECTED.includes(given.situation)));
 }
 
-const withValue = (given: AdvisorContext, k: SensitiveKey, v: string | number): AdvisorContext => ({ ...given, [k]: v }) as AdvisorContext;
+const withValue = (given: AdvisorContext, k: SensitiveKey, v: string | number): AdvisorContext => ({ ...given, [k]: v });
 
 function ecosystemsOf(given: AdvisorContext, kb: Kb, facts: AdvisorFacts): AdvisorResult['ecosystems'] {
   const known = new Set(kb.data.ecosystems.ecosystems.map((e) => e.id));

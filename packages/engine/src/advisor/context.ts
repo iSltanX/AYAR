@@ -62,7 +62,7 @@ export function normalize(given: AdvisorContext, facts: AdvisorFacts = {}): Norm
   const areas = given.areas ?? [];
   const platform = given.platform ?? [];
 
-  const impact = given.impact ?? assume('impact', 3 as AdvisorImpact);
+  const impact = given.impact ?? assume('impact', 3);
   const audience = given.audience ?? assume('audience', 'small' as const);
   const scope = given.scope ?? assume('scope', WIDE_BY_DEFAULT.includes(given.situation) ? ('wide' as const) : ('module' as const), { situation: given.situation });
   const evidence = given.evidence ?? assume('evidence', 'weak' as const);

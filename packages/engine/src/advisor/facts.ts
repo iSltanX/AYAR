@@ -5,7 +5,7 @@ import type { DiscoverySnapshot, Fact } from '@ayar/protocol';
 import type { CardProjectContext } from '../tasks/cards.ts';
 import type { AdvisorFacts } from './context.ts';
 
-const obj = (f: Fact): Record<string, unknown> => (f.value !== null && typeof f.value === 'object' && !Array.isArray(f.value) ? (f.value as Record<string, unknown>) : {});
+const obj = (f: Fact): Record<string, unknown> => (f.value !== null && typeof f.value === 'object' && !Array.isArray(f.value) ? (f.value) : {});
 
 /** C-06 fact → 28.9 ecosystem id. */
 function ecosystemOf(f: Fact): string | null {
