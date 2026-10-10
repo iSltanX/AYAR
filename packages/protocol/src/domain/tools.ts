@@ -41,6 +41,12 @@ export const ToolView = z.strictObject({
   /** The last re-verification of the installed files against the pinned hash (tools.verify). */
   verifiedOk: z.boolean().nullable(),
   verification: ToolVerification,
+  /**
+   * Whether its install checked the publisher's signature (Developer ID, or sigstore through cosign), or stood on
+   * the pinned hash alone because cosign was not available (C-11 «حيث يتاح»); null when not installed by AYAR or
+   * the tool has no signature to check.
+   */
+  signatureChecked: z.boolean().nullable(),
   /** The catalog entry's own verification date, and whether it is older than the staleness limit (NFR-06). */
   catalogVerifiedAt: z.iso.date(),
   stale: z.boolean(),

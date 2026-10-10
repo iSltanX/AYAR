@@ -150,7 +150,10 @@ export class SetupService {
         const p = this.#o.tools.preview(seed.tool).preview;
         title = { key: 'setup.action.installTool', params: { tool: seed.tool, version: p.version } };
         target = { ...target, tool: seed.tool, version: p.version };
-        preview = { command: null, cwd: null, network: { host: p.host, url: p.url }, sizeBytes: p.sizeBytes, writes: [{ location: 'ayar', path: p.writes }], runsScripts: false, warnings: [{ key: 'setup.warning.pinnedHash', params: { sha256: p.sha256 } }] };
+        const warnings: Reason[] = [{ key: 'setup.warning.pinnedHash', params: { sha256: p.sha256 } }];
+        // C-11 «حيث يتاح»: a sigstore signature needs cosign; without it, the preview says the hash alone is checked.
+        if ((await this.#o.tools.signatureCheckable(seed.tool)) === false) warnings.push({ key: 'setup.warning.signatureNotChecked', params: { tool: seed.tool } });
+        preview = { command: null, cwd: null, network: { host: p.host, url: p.url }, sizeBytes: p.sizeBytes, writes: [{ location: 'ayar', path: p.writes }], runsScripts: false, warnings };
         break;
       }
       case 'install_dependencies': {
@@ -278,9 +281,16 @@ export class SetupService {
     if (!grantDigest || grantDigest !== this.#digest(action)) throw new CommandError('confirmation_mismatch', { reason: 'preview_digest' });
     if (this.#busy) throw new CommandError('busy', { reason: 'setup_running' });
     if (this.#o.runActive(action.projectId!)) throw new CommandError('busy', { reason: 'run_active' });
-    const project = await this.#o.projects.view(action.projectId!);
-    if (action.kind === 'install_dependencies' && project.untrusted) throw new CommandError('untrusted_project');
+    // Taken in the same turn as the check: a second confirmation (a double click) finds it busy (one at a time).
     this.#busy = actionId;
+    let project: Awaited<ReturnType<ProjectsService['view']>>;
+    try {
+      project = await this.#o.projects.view(action.projectId!);
+      if (action.kind === 'install_dependencies' && project.untrusted) throw new CommandError('untrusted_project');
+    } catch (e) {
+      this.#busy = null;
+      throw e;
+    }
     const { db, ports } = this.#o;
     const now = () => ports.clock.now().toISOString();
     db.transaction(() => {
@@ -323,6 +333,11 @@ export class SetupService {
           break;
         }
       }
+    } catch (e) {
+      // Whatever went wrong, the action ends «failed» with its reason, never stays «running».
+      this.#o.logger.log('error', 'setup action failed unexpectedly', { actionId, error: e instanceof Error ? e.message.slice(0, 300) : String(e) });
+      state = 'failed';
+      reasons.push({ key: e instanceof CommandError && e.error.code === 'busy' ? 'setup.failed.busy' : 'setup.failed.internal' });
     } finally {
       this.#busy = null;
     }

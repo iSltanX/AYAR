@@ -4,7 +4,7 @@ import { closeSync, existsSync, mkdirSync, openSync, readdirSync, readFileSync, 
 import { DatabaseSync } from 'node:sqlite';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { boot, BOOT_STEPS } from '../src/host/boot.ts';
+import { boot, BOOT_STEPS, markInterrupted } from '../src/host/boot.ts';
 import { LEDGER_FROZEN_COLUMNS, reapLedger } from '../src/host/ledger.ts';
 import { nodeFileSystem } from '../src/node/fs.ts';
 import { nodePorts } from '../src/node/ports.ts';
@@ -77,6 +77,27 @@ function ledgerRow(db: Db, id: string, pid: number, start: string, state = 'runn
     id, pid, pid, start, 'sha256:x', `tok-${id}`, tempDir, state, '2026-10-09T23:00:00.000Z',
   );
 }
+
+describe('a setup action an unexpected stop cut short (independent review of DEV-5)', () => {
+  it('ends «failed» with its reason at the next boot, never stays «running»', async () => {
+    const { dir, cleanup } = tempRoot('ayar-DEV-5-boot-setup-');
+    try {
+      const { layout } = await ensureDataDir(nodeFileSystem, join(dir, 'AYAR'), process.getuid!());
+      const db = openDatabase(layout.db);
+      await migrate(db, { fs: nodeFileSystem, clock: fakeClock(), backupsDir: layout.backups, appVersion: '0.1.0' });
+      db.run("INSERT INTO projects (id, display_name, root_path, root_realpath, created_at) VALUES ('p', 'P', '/p', '/p', 'x')");
+      db.run("INSERT INTO setup_actions (id, project_id, kind, preview_json, state) VALUES ('a-run', 'p', 'install_tool', '{}', 'running'), ('a-done', 'p', 'install_tool', '{}', 'done')");
+      expect(markInterrupted(db, new Date('2026-10-10T00:00:00Z'))).toMatchObject({ setupActions: 1 });
+      expect(db.all('SELECT id, state, reasons_json AS r FROM setup_actions ORDER BY id')).toEqual([
+        { id: 'a-done', state: 'done', r: null },
+        { id: 'a-run', state: 'failed', r: '[{"key":"setup.failed.interrupted"}]' },
+      ]);
+      db.close();
+    } finally {
+      cleanup();
+    }
+  });
+});
 
 describe('boot order (C-04, G-27)', () => {
   it('settles the ledger, then deletes tmp/, then backs up and migrates, then marks interrupted runs', async () => {

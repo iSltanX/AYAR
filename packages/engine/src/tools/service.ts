@@ -39,6 +39,7 @@ interface ToolRow {
   installed_at: string | null;
   verified_at: string | null;
   status: string;
+  signature_checked: number | null;
 }
 
 export interface ToolsServiceOptions {
@@ -164,6 +165,7 @@ export class ToolsService {
       verifiedAt: row?.verified_at ?? null,
       verifiedOk: row ? row.status === 'installed' : null,
       verification: def.verification,
+      signatureChecked: row?.status === 'installed' && row.signature_checked !== null ? row.signature_checked === 1 : null,
       catalogVerifiedAt: def.verifiedAt,
       stale: isStale(def, this.#o.ports.clock.now(), this.#o.staleAfterDays),
     };
@@ -264,7 +266,7 @@ export class ToolsService {
       if (!bin?.isFile) return { status: 'failed', reason: 'extract', tool: await this.view(def.key), detail: 'executable missing' };
       await fs.chmod(binTarget, 0o755);
       // 4. The signature where one exists (D-DEV2-04): a Developer ID team, or sigstore through cosign.
-      await this.#verifySignature(def, binTarget, work, f.sha256, f.url);
+      const signatureChecked = await this.#verifySignature(def, binTarget, work, f.sha256, f.url);
       // 5. AYAR downloaded and verified it: only now may a quarantine flag go (E-20). A programmatic download sets
       //    none; this only matters if the system added one.
       await this.#o.ports.processes.spawn('/usr/bin/xattr', ['-r', '-d', 'com.apple.quarantine', unpacked], { cwd: work, env: { PATH: '/usr/bin:/bin' }, timeoutMs: 15_000, maxOutputBytes: 4096 });
@@ -282,8 +284,8 @@ export class ToolsService {
       const at = clock.now().toISOString();
       this.#o.db.transaction(() => {
         this.#o.db.run(
-          `INSERT INTO tools (id, tool_key, version, source, path, sha256, license, installed_at, verified_at, status) VALUES (?, ?, ?, 'managed', ?, ?, ?, ?, ?, 'installed')
-           ON CONFLICT (tool_key, version) DO UPDATE SET source = 'managed', path = excluded.path, sha256 = excluded.sha256, license = excluded.license, installed_at = excluded.installed_at, verified_at = excluded.verified_at, status = 'installed'`,
+          `INSERT INTO tools (id, tool_key, version, source, path, sha256, license, installed_at, verified_at, status, signature_checked) VALUES (?, ?, ?, 'managed', ?, ?, ?, ?, ?, 'installed', ?)
+           ON CONFLICT (tool_key, version) DO UPDATE SET source = 'managed', path = excluded.path, sha256 = excluded.sha256, license = excluded.license, installed_at = excluded.installed_at, verified_at = excluded.verified_at, status = 'installed', signature_checked = excluded.signature_checked`,
           newId(random, 'tol'),
           def.key,
           def.version,
@@ -292,12 +294,15 @@ export class ToolsService {
           def.license,
           at,
           at,
+          signatureChecked === null ? null : signatureChecked ? 1 : 0,
         );
-        recordAudit(this.#o.db, { id: newId(random, 'aud'), at: clock.now(), action: 'tool.installed', projectId: null, details: { tool: def.key, version: def.version, url: f.url, sha256: f.sha256, verification: def.verification.kind } });
+        recordAudit(this.#o.db, { id: newId(random, 'aud'), at: clock.now(), action: 'tool.installed', projectId: null, details: { tool: def.key, version: def.version, url: f.url, sha256: f.sha256, verification: def.verification.kind, signatureChecked: signatureChecked === null ? 'none' : signatureChecked ? 'yes' : 'no' } });
       });
       this.#progress(actionId, 'done');
       return { status: 'installed', tool: await this.view(def.key), downloadedBytes: got.size, durationMs: Math.round(clock.monotonicMs() - started) };
     } catch (e) {
+      // The signature's own files (sigstore) could not be fetched: a network failure, not a rejection.
+      if (e instanceof DownloadError) return { status: 'failed', reason: 'network', tool: await this.view(def.key), detail: e.code };
       if (!(e instanceof ToolRejected)) throw e;
       // C-11 «الأخطاء»: stop, delete, alert, audit.
       await fs.remove(work);
@@ -324,7 +329,8 @@ export class ToolsService {
     }
   }
 
-  async #verifySignature(def: ManagedToolDef, bin: string, work: string, archiveSha: string, archiveUrl: string): Promise<void> {
+  /** true: the signature was checked; false: sigstore without cosign, the pinned hash alone; null: none to check. */
+  async #verifySignature(def: ManagedToolDef, bin: string, work: string, archiveSha: string, archiveUrl: string): Promise<boolean | null> {
     const v = def.verification;
     const run = (cmd: string, args: string[]) => this.#o.ports.processes.spawn(cmd, args, { cwd: work, env: { PATH: '/usr/bin:/bin' }, timeoutMs: 60_000, maxOutputBytes: 256 * 1024 });
     if (v.kind === 'developer_id') {
@@ -332,15 +338,15 @@ export class ToolsService {
       const info = await run('/usr/bin/codesign', ['-dv', bin]);
       const team = /TeamIdentifier=(\S+)/.exec(new TextDecoder().decode(info.stderr))?.[1] ?? null;
       if (check.code !== 0 || team !== v.teamId) throw new ToolRejected('signature_invalid', { expectedTeam: v.teamId, team: team ?? 'none' });
-      return;
+      return true;
     }
-    if (v.kind !== 'sigstore' || !def.signature) return;
+    if (v.kind !== 'sigstore' || !def.signature) return null;
     // sigstore «حيث يتاح»: with a cosign AYAR trusts (managed, or a system one in range); otherwise the pinned hash
     // alone stands, and the register says the signature was not checked.
     const cosign = await this.locate('cosign').catch(() => null);
     if (!cosign) {
-      this.#o.logger.log('info', 'sigstore signature not checked: cosign is not available (the pinned hash stands)', { tool: def.key });
-      return;
+      this.#o.logger.log('warn', 'sigstore signature not checked: cosign is not available (the pinned hash stands)', { tool: def.key });
+      return false;
     }
     const checksums = posix.join(work, 'checksums.txt');
     const bundle = posix.join(work, 'checksums.sigstore.json');
@@ -349,6 +355,15 @@ export class ToolsService {
     const r = await run(cosign.path, ['verify-blob', '--bundle', bundle, '--certificate-identity', v.identity, '--certificate-oidc-issuer', v.issuer, checksums]);
     const listed = new TextDecoder().decode(await this.#o.ports.fs.readFile(checksums)).split('\n').some((l) => l.trim().startsWith(archiveSha) && l.trim().endsWith(posix.basename(new URL(archiveUrl).pathname)));
     if (r.code !== 0 || !listed) throw new ToolRejected('signature_invalid', { cosignExit: r.code ?? -1, listed: listed ? 1 : 0 });
+    return true;
+  }
+
+  /** Whether an install of this tool would check a signature now (the preview says so before the confirmation). */
+  async signatureCheckable(key: string): Promise<boolean | null> {
+    const v = this.def(key).verification;
+    if (v.kind === 'developer_id') return true;
+    if (v.kind !== 'sigstore' || !this.def(key).signature) return null;
+    return (await this.locate('cosign').catch(() => null)) !== null;
   }
 
   /** The installed files' own hash: what tools.verify recomputes later (a file changed after install shows). */

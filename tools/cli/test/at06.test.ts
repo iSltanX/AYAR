@@ -83,7 +83,7 @@ function registry(file: string, url: string, body: Buffer, version = '1.9.0'): v
 
 const INSTANCE = 'sec.secrets.files@.';
 
-async function setupFlow(engine: EngineConnection, projectId: string, dataDir: string): Promise<{ actionId: string; result: SetupExecuteResult }> {
+async function setupFlow(engine: EngineConnection, projectId: string, dataDir: string): Promise<{ actionId: string; result: SetupExecuteResult; warnings: string[] }> {
   // Readiness: «يحتاج تجهيزًا: أداة غير مثبتة», with the action that would fix it.
   const readiness = ok<ReadinessReport>(await engine.invoke('readiness.evaluate', { projectId }));
   const item = readiness.items.find((i) => i.instance === INSTANCE)!;
@@ -99,7 +99,7 @@ async function setupFlow(engine: EngineConnection, projectId: string, dataDir: s
   expect(existsSync(join(dataDir, 'tools', 'betterleaks'))).toBe(false);
 
   // The preview (FR-17): what runs, the host, the size, what is written and where.
-  const preview = ok<{ target: string; digest: string; preview: { preview: { network: { host: string; url: string }; sizeBytes: number; writes: { location: string; path: string }[]; runsScripts: boolean } } }>(await engine.invoke('setup.preview', { actionId: action.id }));
+  const preview = ok<{ target: string; digest: string; preview: { preview: { network: { host: string; url: string }; sizeBytes: number; writes: { location: string; path: string }[]; runsScripts: boolean; warnings: { key: string }[] } } }>(await engine.invoke('setup.preview', { actionId: action.id }));
   expect(preview.target).toBe(action.id);
   expect(preview.preview.preview).toMatchObject({ writes: [{ location: 'ayar', path: 'tools/betterleaks/1.9.0/' }], runsScripts: false });
   expect(preview.preview.preview.sizeBytes).toBeGreaterThan(0);
@@ -107,10 +107,15 @@ async function setupFlow(engine: EngineConnection, projectId: string, dataDir: s
   expect(await engine.invoke('setup.execute', { actionId: action.id, confirmationToken: `cfm_${'A'.repeat(43)}` })).toMatchObject({ ok: false, error: { code: 'grant_missing' } });
   const stale = confirmationGrant('setup.execute', action.id, '0'.repeat(64));
   expect(await engine.invoke('setup.execute', { actionId: action.id, confirmationToken: stale.token }, stale.grants)).toMatchObject({ ok: false, error: { code: 'confirmation_mismatch' } });
+  // Confirmed twice at once (a double click): one runs, the other finds it busy (one setup at a time).
   const g = confirmationGrant('setup.execute', action.id, preview.digest);
-  const result = ok<SetupExecuteResult>(await engine.invoke('setup.execute', { actionId: action.id, confirmationToken: g.token }, g.grants));
+  const g2 = confirmationGrant('setup.execute', action.id, preview.digest);
+  const both = await Promise.all([engine.invoke('setup.execute', { actionId: action.id, confirmationToken: g.token }, g.grants), engine.invoke('setup.execute', { actionId: action.id, confirmationToken: g2.token }, g2.grants)]);
+  expect(both.filter((r) => r.ok)).toHaveLength(1);
+  expect(both.find((r) => !r.ok)).toMatchObject({ ok: false, error: { code: 'busy', details: { reason: 'setup_running' } } });
+  const result = ok<SetupExecuteResult>(both.find((r) => r.ok)!);
   expect(preview.preview.preview.network.host).toBeTruthy();
-  return { actionId: action.id, result };
+  return { actionId: action.id, result, warnings: preview.preview.preview.warnings.map((w) => w.key) };
 }
 
 describe('AT-06 (engine): readiness apart from the outcome, and setup only as an explicit action', () => {
@@ -126,9 +131,10 @@ describe('AT-06 (engine): readiness apart from the outcome, and setup only as an
       await engine.waitForEvent('engine.health');
       const { projectId } = await addProject(engine, materialize('FX-EXT', 'good', join(root, 'fx')));
       await approveAll(engine, projectId);
-      const { result } = await setupFlow(engine, projectId, dataDir);
+      const { result, warnings } = await setupFlow(engine, projectId, dataDir);
       expect(hits).toEqual(['/betterleaks.tar.gz']); // exactly one download, and only after the confirmation
-      expect(result.install).toMatchObject({ status: 'installed', tool: { source: 'managed', installedVersion: '1.9.0' } });
+      expect(result.install).toMatchObject({ status: 'installed', tool: { source: 'managed', installedVersion: '1.9.0', signatureChecked: null } });
+      expect(warnings).toEqual(['setup.warning.pinnedHash']); // this test entry has no signature to check
       expect(result.action.state).toBe('done');
       // «جاهز» from the tool itself.
       expect(result.readiness).toEqual([expect.objectContaining({ instance: INSTANCE, readiness: 'ready', reasons: [{ key: 'setup.reason.ready.managed', params: { tool: 'betterleaks', version: '1.9.0' } }] })]);
@@ -175,8 +181,13 @@ describe('AT-06 (engine): readiness apart from the outcome, and setup only as an
       await engine.waitForEvent('engine.health');
       const { projectId } = await addProject(engine, materialize('FX-EXT', 'secret', join(root, 'fx')));
       await approveAll(engine, projectId);
-      const { result } = await setupFlow(engine, projectId, dataDir);
+      const { result, warnings } = await setupFlow(engine, projectId, dataDir);
       expect(result.install).toMatchObject({ status: 'installed', tool: { installedVersion: '1.9.0', sizeBytes: 9389819 } });
+      // Without cosign on this login PATH, the sigstore signature is not checked: the preview said so, and the
+      // register says so (C-11 «حيث يتاح»).
+      const signed = result.install && 'tool' in result.install ? result.install.tool.signatureChecked : undefined;
+      expect(warnings.includes('setup.warning.signatureNotChecked')).toBe(signed === false);
+      expect(typeof signed).toBe('boolean');
       expect(result.readiness[0]).toMatchObject({ readiness: 'ready' });
       const runs = ok<{ runs: { runId: string }[] }>(await engine.invoke('runs.list', { projectId }));
       const again = ok<RunPlan>(await engine.invoke('run.rerun', { runId: runs.runs[0]!.runId, filter: { mode: 'incomplete' } }));

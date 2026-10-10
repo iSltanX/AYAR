@@ -72,6 +72,10 @@ ALTER TABLE setup_actions ADD COLUMN reasons_json TEXT CHECK (reasons_json IS NU
 ALTER TABLE setup_actions ADD COLUMN log_path TEXT;
 ALTER TABLE setup_actions ADD COLUMN log_sha256 TEXT;
 
+-- Whether the install checked the publisher's signature (1), or stood on the pinned hash alone (0, sigstore
+-- without cosign); NULL where the tool has no signature to check.
+ALTER TABLE tools ADD COLUMN signature_checked INTEGER;
+
 CREATE INDEX evidence_check_run ON evidence (check_run_id);
 CREATE INDEX check_runs_previous ON check_runs (previous_check_run_id);
 CREATE INDEX snapshots_project ON snapshots (project_id, created_at);
