@@ -4,13 +4,13 @@ track: design
 number: 2
 stage: design
 title: نظام الحالات ورموزه ودائرة العيار
-status: awaiting-owner
+status: delivered
 status_date: 2026-10-10
 depends_on: [DES-1]
 design_gates: []
 owner_gates: []
 owner_inputs: []
-owner_request: "اعتماد DES-2: صفحتا Status System وIcons (اللقطات في docs/design/DES-2/review/)، بعد مراجعة بصرية مستقلة بلا ملاحظة حاجبة وفحوص ناجحة"
+owner_request:
 model: Claude Opus 5.5
 effort: xhigh
 model_reason: أخطر نقطة دلالية: تمييز الحالات بالشكل والنص دون اللون
@@ -109,7 +109,7 @@ closing_commit:
 
 ## 11. حالة التقدم ونقطة الاستئناف
 
-- **الحالة:** `awaiting-owner`. المهام 1–8 منجزة، والمراجعة البصرية المستقلة أُكملت وأُصلح ما يلزم منها (بطلب الجلسة الرئيسية)، والمهمة 9 (العرض على المالك) مرفوعة إلى الجلسة الرئيسية.
+- **الحالة:** `delivered`. المهام 1–9 منجزة، واعتمد المالك المرحلة «معتمد» دون تعديلات في 2026-10-10 على الحالة عند `13e017b` (عبر الجلسة الرئيسية). والتسليم في `docs/handoffs/DES-2.md`، وينتظر الدمج.
 - **آخر تحديث:** 2026-10-10.
 - **جلسة Figma:** `create_session` بالملف `UXkPakdqRuHDVTs78DO4uC`، ومهارة `figma:figma-use`. وLucide مثبتة على lucide-static 1.48.0 (ISC)، نُزّلت ملفات SVG للأيقونات المستخدمة وحدها (نحو 190 KB) إلى مجلد مؤقت خارج المستودع.
 
@@ -197,5 +197,5 @@ closing_commit:
 
 ### نقطة الاستئناف
 
-- **آخر commit:** انظر `git log` على `phase/DES-2` (`871a2ba` الفحوص، و`3b06af3` اللقطات الأولى، ثم إصلاحات المراجعة).
-- **الخطوة التالية:** بعد جواب المالك: نفّذ تعديلاته إن طلب، ثم سجّل الاعتماد في `docs/design/README.md` §3 و§7، وانسخ اللقطات إلى `docs/design/approved/DES-2/`، وغيّر سطري الغلاف `58:44` و`58:49` إلى «DES-2 · معتمدة». ثم اكتب `docs/handoffs/DES-2.md` بالقرارات أعلاه، واجعل الحالة `delivered`، والتزم «phase(DES-2): تسليم المرحلة».
+- **آخر commit:** `eb0f91b` (العمل وتسجيل الاعتماد)، ثم commit التسليم.
+- **الخطوة التالية:** لا شيء للوكيل. الدمج والوسم والإغلاق للجلسة الرئيسية. والاعتماد مسجل في `docs/design/README.md` §3 و§7، واللقطات في `docs/design/approved/DES-2/`، وسطرا الغلاف «DES-2 · معتمدة».
