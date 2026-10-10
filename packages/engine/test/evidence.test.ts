@@ -192,6 +192,32 @@ describe('content store and collector (C-17 «مجمّع مخلفات بعدّ �
     expect(blobCount()).toBe(0);
   });
 
+  it('never removes a content stored or reused while a collection runs (independent review)', async () => {
+    // A removal slow enough for the store to run in the middle of it.
+    const slow = { ...nodeFileSystem, remove: async (p: string) => (await new Promise((r) => setTimeout(r, 50)), nodeFileSystem.remove(p)) };
+    const store = new BlobStore(slow, layout.blobs);
+    const data = new TextEncoder().encode('a content no snapshot names');
+    const b = await store.put(db, data);
+    store.unpin([b.sha256]);
+    // The collection finds it unused; the same content is stored again meanwhile (a new snapshot).
+    await Promise.all([store.collect(db), store.put(db, data)]);
+    expect(await store.get(b.sha256)).toEqual(data);
+    expect(db.get('SELECT sha256 FROM snapshot_blobs WHERE sha256 = ?', b.sha256)).toBeTruthy();
+
+    // An inventory that reuses a content collected since (E-25 shortcut) reads the file again, never names a gone blob.
+    write('kept.txt', 'kept\n');
+    const first = await take({ full: true });
+    const s1 = await ev.snapshots.persist('p1', first, 'a');
+    db.run('DELETE FROM snapshots WHERE id = ?', s1);
+    await ev.blobs.collect(db);
+    const sha = entry(first, 'kept.txt')![5].slice(7);
+    expect(() => statSync(ev.blobs.path(sha))).toThrow();
+    const second = await take({ full: false, previous: first });
+    expect(second.fastPath.reused).toBe(0);
+    await ev.snapshots.persist('p1', second, 'b');
+    expect(await ev.snapshots.content(entry(second, 'kept.txt')!)).toBe('kept\n');
+  });
+
   it('refuses a damaged content instead of returning wrong bytes', async () => {
     const store = new BlobStore(nodeFileSystem, layout.blobs);
     const b = await store.put(db, new TextEncoder().encode('hello'));

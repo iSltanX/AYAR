@@ -2,7 +2,8 @@
 // A blob's row (snapshot_blobs) is written with it; its reference count is the number of state snapshots that
 // name it (snapshot_refs), recomputed by the collector, so a snapshot deleted by any path (a run, retention, a
 // project) frees what only it used. Blobs written by a snapshot still being taken are pinned, so the collector
-// never takes them from under it.
+// never takes them from under it. A collection runs alone: a content stored or reused while it runs waits for it,
+// then pins; so nothing is pinned, found present, and then removed by a collection already under way.
 import { createHash } from 'node:crypto';
 import { posix } from 'node:path';
 import { gunzipSync, gzipSync } from 'node:zlib';
@@ -15,6 +16,7 @@ export class BlobStore {
   readonly #fs: FileSystem;
   readonly #dir: string;
   readonly #pinned = new Map<string, number>();
+  #collecting: Promise<unknown> | null = null;
 
   constructor(fs: FileSystem, dir: string) {
     this.#fs = fs;
@@ -28,6 +30,8 @@ export class BlobStore {
   /** Stores a content and returns its address. Pinned until unpin(): a collection does not see it as unused. */
   async put(db: Db, data: Uint8Array): Promise<{ sha256: string; size: number; compressedSize: number }> {
     const sha256 = createHash('sha256').update(data).digest('hex');
+    // Checked and pinned in the same turn (no await between them when no collection runs).
+    while (this.#collecting) await this.#collecting.catch(() => {});
     this.pin(sha256);
     const existing = db.get<{ compressed_size: number }>('SELECT compressed_size FROM snapshot_blobs WHERE sha256 = ?', sha256);
     const file = this.path(sha256);
@@ -47,6 +51,17 @@ export class BlobStore {
     const data = new Uint8Array(gunzipSync(await this.#fs.readFile(this.path(sha256))));
     if (createHash('sha256').update(data).digest('hex') !== sha256) throw Object.assign(new Error('blob damaged'), { code: 'EBLOB' });
     return data;
+  }
+
+  /**
+   * A content a new snapshot reuses from the previous one (E-25): pinned if it is still stored, or false when a
+   * collection took it since (the caller then reads the file again).
+   */
+  async hold(db: Db, sha256: string): Promise<boolean> {
+    while (this.#collecting) await this.#collecting.catch(() => {});
+    if (!db.get<{ x: number }>('SELECT 1 AS x FROM snapshot_blobs WHERE sha256 = ?', sha256)) return false;
+    this.pin(sha256);
+    return true;
   }
 
   /** Keeps a blob from the collector until unpin(). Returns the address. */
@@ -69,12 +84,28 @@ export class BlobStore {
    * pinned. Returns what it freed (compressed bytes on disk).
    */
   async collect(db: Db): Promise<{ blobs: number; freedBytes: number }> {
-    db.run('UPDATE snapshot_blobs SET refcount = (SELECT count(*) FROM snapshot_refs r WHERE r.sha256 = snapshot_blobs.sha256)');
-    const unused = db.all<{ sha256: string; compressed_size: number }>('SELECT sha256, compressed_size FROM snapshot_blobs WHERE refcount = 0').filter((b) => !this.#pinned.has(b.sha256));
+    while (this.#collecting) await this.#collecting.catch(() => {});
+    const job = this.#collect(db);
+    this.#collecting = job;
+    try {
+      return await job;
+    } finally {
+      if (this.#collecting === job) this.#collecting = null;
+    }
+  }
+
+  async #collect(db: Db): Promise<{ blobs: number; freedBytes: number }> {
+    // Pins only fall while it runs (new ones wait), so the ones it sees now are enough.
+    const unused = db.transaction(() => {
+      db.run('UPDATE snapshot_blobs SET refcount = (SELECT count(*) FROM snapshot_refs r WHERE r.sha256 = snapshot_blobs.sha256)');
+      const rows = db.all<{ sha256: string; compressed_size: number }>('SELECT sha256, compressed_size FROM snapshot_blobs WHERE refcount = 0').filter((b) => !this.#pinned.has(b.sha256));
+      // The row goes first: a file left by a failed removal is unnamed and harmless; a row without its file is not.
+      for (const b of rows) db.run('DELETE FROM snapshot_blobs WHERE sha256 = ? AND refcount = 0', b.sha256);
+      return rows;
+    });
     let freedBytes = 0;
     for (const b of unused) {
       await this.#fs.remove(this.path(b.sha256));
-      db.run('DELETE FROM snapshot_blobs WHERE sha256 = ? AND refcount = 0', b.sha256);
       freedBytes += b.compressed_size;
     }
     return { blobs: unused.length, freedBytes };

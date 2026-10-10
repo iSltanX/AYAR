@@ -180,11 +180,15 @@ export class SnapshotService {
       const key = [st.size, st.mtimeMs, st.ctimeMs, st.ino] as const;
       const prev = previous?.get(rel);
       if (prev && prev[1] === key[0] && prev[2] === key[1] && prev[3] === key[2] && prev[4] === key[3]) {
-        reused++;
         const stored = o.storeContent && prev[7];
-        // A content reused from the previous inventory is pinned like a new one until this snapshot is saved.
-        if (stored) pinned.push(this.#d.blobs.pin(prev[5].slice('sha256:'.length)));
-        return [rel, ...key, prev[5], prev[6], stored];
+        // A content reused from the previous inventory is pinned like a new one until this snapshot is saved; one a
+        // collection took since (its snapshot was deleted) is read again below.
+        const sha256 = prev[5].slice('sha256:'.length);
+        if (!stored || (await this.#d.blobs.hold(this.#d.db, sha256))) {
+          if (stored) pinned.push(sha256);
+          reused++;
+          return [rel, ...key, prev[5], prev[6], stored];
+        }
       }
       if (st.isSymbolicLink) return [rel, ...key, `link:${st.size}:${st.mtimeMs}`, 'link', false];
       const path = full(rel);
@@ -212,16 +216,21 @@ export class SnapshotService {
         return null; // vanished or unreadable between the listing and the read: not part of this state
       }
     };
-    await Promise.all(
-      Array.from({ length: CONCURRENCY }, async () => {
-        while (next < work.length) {
-          if (o.signal?.aborted) throw new SnapshotCancelled();
-          const w = work[next++]!;
-          const entry = await one(w.rel, w.st);
-          if (entry) files.push(entry);
-        }
-      }),
-    );
+    try {
+      await Promise.all(
+        Array.from({ length: CONCURRENCY }, async () => {
+          while (next < work.length) {
+            if (o.signal?.aborted) throw new SnapshotCancelled();
+            const w = work[next++]!;
+            const entry = await one(w.rel, w.st);
+            if (entry) files.push(entry);
+          }
+        }),
+      );
+    } catch (e) {
+      this.#d.blobs.unpin(pinned); // an abandoned inventory keeps nothing from the collector
+      throw e;
+    }
     files.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
     return {
       schema: 'ayar-snapshot/1',
@@ -243,28 +252,37 @@ export class SnapshotService {
     const { pinned, ...manifest } = m;
     const { db, blobs } = this.#d;
     const data = new TextEncoder().encode(JSON.stringify(manifest));
-    const blob = await blobs.put(db, data);
+    let blob: Awaited<ReturnType<BlobStore['put']>>;
+    try {
+      blob = await blobs.put(db, data);
+    } catch (e) {
+      blobs.unpin(pinned ?? []);
+      throw e;
+    }
     const id = this.#d.newId();
     const refs = new Set([blob.sha256, ...manifest.files.filter((f) => f[7]).map((f) => f[5].slice('sha256:'.length))]);
-    db.transaction(() => {
-      db.run(
-        'INSERT INTO snapshots (id, project_id, manifest_blob_sha, file_count, total_size, hash, created_at, purpose, fs_type, fast_path, content_stored) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        id,
-        projectId,
-        blob.sha256,
-        manifest.files.length,
-        manifest.totalSize,
-        manifest.hash,
-        this.#d.now().toISOString(),
-        purpose,
-        manifest.fsType,
-        manifest.fastPath.reused > 0 ? 1 : 0,
-        manifest.contentStored ? 1 : 0,
-      );
-      for (const s of refs) db.run('INSERT INTO snapshot_refs (snapshot_id, sha256) VALUES (?, ?) ON CONFLICT DO NOTHING', id, s);
-      db.run(`UPDATE snapshot_blobs SET refcount = (SELECT count(*) FROM snapshot_refs r WHERE r.sha256 = snapshot_blobs.sha256) WHERE sha256 IN (${[...refs].map(() => '?').join(',')})`, ...refs);
-    });
-    blobs.unpin([blob.sha256, ...(pinned ?? [])]);
+    try {
+      db.transaction(() => {
+        db.run(
+          'INSERT INTO snapshots (id, project_id, manifest_blob_sha, file_count, total_size, hash, created_at, purpose, fs_type, fast_path, content_stored) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+          id,
+          projectId,
+          blob.sha256,
+          manifest.files.length,
+          manifest.totalSize,
+          manifest.hash,
+          this.#d.now().toISOString(),
+          purpose,
+          manifest.fsType,
+          manifest.fastPath.reused > 0 ? 1 : 0,
+          manifest.contentStored ? 1 : 0,
+        );
+        for (const s of refs) db.run('INSERT INTO snapshot_refs (snapshot_id, sha256) VALUES (?, ?) ON CONFLICT DO NOTHING', id, s);
+        db.run(`UPDATE snapshot_blobs SET refcount = (SELECT count(*) FROM snapshot_refs r WHERE r.sha256 = snapshot_blobs.sha256) WHERE sha256 IN (${[...refs].map(() => '?').join(',')})`, ...refs);
+      });
+    } finally {
+      blobs.unpin([blob.sha256, ...(pinned ?? [])]);
+    }
     return id;
   }
 
