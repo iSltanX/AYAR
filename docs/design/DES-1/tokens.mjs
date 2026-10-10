@@ -205,6 +205,8 @@ function build(alt) {
     add('نص', 'text/inverse', 'text/primary (الزر الرئيسي)', s['text/inverse'], s['text/primary'], 4.5, m);
     for (const b of ['bg/canvas', 'bg/surface', 'bg/sunken', 'bg/elevated']) add('حد وتركيز', 'border/strong', b, s['border/strong'], s[b], 3, m);
     for (const b of ['bg/canvas', 'bg/surface', 'bg/sunken', 'bg/elevated', 'selection']) add('حد وتركيز', 'focus/ring', b, s['focus/ring'], s[b], 3, m);
+    // مؤشر التحديد (D-DES1-03): شريط بعرض 2px على الحافة البادئة بلون border/strong يرافق تعبئة selection
+    add('حد وتركيز', 'border/strong', 'selection (مؤشر التحديد)', s['border/strong'], s['selection'], 3, m);
     for (const k of Object.keys(STATUS)) {
       const st = status[m], bg = st[`${k}/bg`];
       add('حالة', `${k}/fg`, `${k}/bg`, st[`${k}/fg`], bg, 4.5, m);
@@ -213,7 +215,7 @@ function build(alt) {
       add('حالة', `${k}/border`, 'bg/surface', st[`${k}/border`], s['bg/surface'], 3, m);
     }
   }
-  // معلوماتي غير ملزم (D-DES1-03): الحد الخفيف فاصل زخرفي، والتحديد تعبئة يرافقها تغير المفتش
+  // معلوماتي غير ملزم (D-DES1-03): الحد الخفيف فاصل زخرفي مستثنى، وتعبئة التحديد لا تكفي وحدها فيرافقها مؤشر border/strong (ثنائيته ملزمة أعلاه)
   const info = [];
   for (const m of modes) {
     info.push({ name: 'border/subtle ↔ bg/surface', ratio: contrast(sem[m]['border/subtle'], sem[m]['bg/surface']), mode: m });
@@ -252,7 +254,7 @@ for (const alt of ['A', 'B']) {
   for (const s of NSTEPS) md += `| neutral/${s} | \`${R.prim.light[`neutral/${s}`]}\` | \`${R.prim.dark[`neutral/${s}`]}\` |\n`;
   md += '\n### الثنائيات\n\n| الوضع | المجموعة | المقدّم | الخلفية | النسبة | الحد | النتيجة |\n|---|---|---|---|---|---|---|\n';
   for (const r of R.rows) md += `| ${r.mode} | ${r.group} | \`${r.fgName}\` ${r.fg} | \`${r.bgName}\` ${r.bg} | ${fmt(r.ratio)}:1 | ${r.min}:1 | ${r.pass ? 'نجح' : '**فشل**'} |\n`;
-  md += '\n### معلوماتي (غير ملزم، D-DES1-03)\n\n| الوضع | الثنائية | النسبة |\n|---|---|---|\n';
+  md += '\n### معلوماتي (غير ملزم، D-DES1-03)\n\nborder/subtle فاصل زخرفي مستثنى من حد 3:1. وتعبئة selection وحدها لا تكفي دليلًا على التحديد، فيرافقها دائمًا شريط بعرض 2px على الحافة البادئة بلون border/strong، وثنائيته مع selection ومع bg/surface ملزمة في جدول الثنائيات أعلاه.\n\n| الوضع | الثنائية | النسبة |\n|---|---|---|\n';
   for (const x of R.info) md += `| ${x.mode} | ${x.name} | ${fmt(x.ratio)}:1 |\n`;
 }
 md += '\n## سلالم الدلالة (مشتركة بين البديلين)\n\n| الدرجة | فاتح | داكن |\n|---|---|---|\n';

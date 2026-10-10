@@ -6,8 +6,8 @@
 
 | البديل | الثنائيات | ناجحة | أدنى ΔE2000 عن العُرف `#A33D2F` |
 |---|---|---|---|
-| A — الهوية | 202 | 202 | 10.14 (`red/400` dark) |
-| B — البرومبت | 202 | 202 | 10.14 (`red/400` dark) |
+| A — الهوية | 204 | 204 | 10.14 (`red/400` dark) |
+| B — البرومبت | 204 | 204 | 10.14 (`red/400` dark) |
 
 حد القرب من لون العُرف: ΔE2000 ≥ 10 لكل متغير واجهة في الوضعين (D-49).
 
@@ -58,6 +58,7 @@
 | light | حد وتركيز | `focus/ring` #141B20 | `bg/sunken` #EBEAE3 | 14.42:1 | 3:1 | نجح |
 | light | حد وتركيز | `focus/ring` #141B20 | `bg/elevated` #FFFCF4 | 16.96:1 | 3:1 | نجح |
 | light | حد وتركيز | `focus/ring` #141B20 | `selection` #EBEAE3 | 14.42:1 | 3:1 | نجح |
+| light | حد وتركيز | `border/strong` #7B8588 | `selection (مؤشر التحديد)` #EBEAE3 | 3.14:1 | 3:1 | نجح |
 | light | حالة | `result/passed/fg` #025D35 | `result/passed/bg` #EDF6F0 | 7.27:1 | 4.5:1 | نجح |
 | light | حالة | `result/passed/icon` #388F60 | `result/passed/bg` #EDF6F0 | 3.62:1 | 3:1 | نجح |
 | light | حالة | `result/passed/icon` #388F60 | `bg/surface` #FFFCF4 | 3.89:1 | 3:1 | نجح |
@@ -159,6 +160,7 @@
 | dark | حد وتركيز | `focus/ring` #F7F4EC | `bg/sunken` #0B1116 | 17.28:1 | 3:1 | نجح |
 | dark | حد وتركيز | `focus/ring` #F7F4EC | `bg/elevated` #272F34 | 12.39:1 | 3:1 | نجح |
 | dark | حد وتركيز | `focus/ring` #F7F4EC | `selection` #272F34 | 12.39:1 | 3:1 | نجح |
+| dark | حد وتركيز | `border/strong` #728085 | `selection (مؤشر التحديد)` #272F34 | 3.33:1 | 3:1 | نجح |
 | dark | حالة | `result/passed/fg` #A6E5C1 | `result/passed/bg` #162D21 | 10.20:1 | 4.5:1 | نجح |
 | dark | حالة | `result/passed/icon` #3FB87F | `result/passed/bg` #162D21 | 5.85:1 | 3:1 | نجح |
 | dark | حالة | `result/passed/icon` #3FB87F | `bg/surface` #1C2429 | 6.28:1 | 3:1 | نجح |
@@ -238,6 +240,8 @@
 
 ### معلوماتي (غير ملزم، D-DES1-03)
 
+border/subtle فاصل زخرفي مستثنى من حد 3:1. وتعبئة selection وحدها لا تكفي دليلًا على التحديد، فيرافقها دائمًا شريط بعرض 2px على الحافة البادئة بلون border/strong، وثنائيته مع selection ومع bg/surface ملزمة في جدول الثنائيات أعلاه.
+
 | الوضع | الثنائية | النسبة |
 |---|---|---|
 | light | border/subtle ↔ bg/surface | 1.38:1 |
@@ -292,6 +296,7 @@
 | light | حد وتركيز | `focus/ring` #14161A | `bg/sunken` #EAE9E6 | 14.92:1 | 3:1 | نجح |
 | light | حد وتركيز | `focus/ring` #14161A | `bg/elevated` #FEFCF7 | 17.67:1 | 3:1 | نجح |
 | light | حد وتركيز | `focus/ring` #14161A | `selection` #EAE9E6 | 14.92:1 | 3:1 | نجح |
+| light | حد وتركيز | `border/strong` #7D848E | `selection (مؤشر التحديد)` #EAE9E6 | 3.11:1 | 3:1 | نجح |
 | light | حالة | `result/passed/fg` #025D35 | `result/passed/bg` #EDF6F0 | 7.27:1 | 4.5:1 | نجح |
 | light | حالة | `result/passed/icon` #388F60 | `result/passed/bg` #EDF6F0 | 3.62:1 | 3:1 | نجح |
 | light | حالة | `result/passed/icon` #388F60 | `bg/surface` #FEFCF7 | 3.89:1 | 3:1 | نجح |
@@ -393,6 +398,7 @@
 | dark | حد وتركيز | `focus/ring` #F3F1EC | `bg/sunken` #0F1114 | 16.75:1 | 3:1 | نجح |
 | dark | حد وتركيز | `focus/ring` #F3F1EC | `bg/elevated` #2B2E34 | 12.06:1 | 3:1 | نجح |
 | dark | حد وتركيز | `focus/ring` #F3F1EC | `selection` #2B2E34 | 12.06:1 | 3:1 | نجح |
+| dark | حد وتركيز | `border/strong` #767E8A | `selection (مؤشر التحديد)` #2B2E34 | 3.32:1 | 3:1 | نجح |
 | dark | حالة | `result/passed/fg` #A6E5C1 | `result/passed/bg` #162D21 | 10.20:1 | 4.5:1 | نجح |
 | dark | حالة | `result/passed/icon` #3FB87F | `result/passed/bg` #162D21 | 5.85:1 | 3:1 | نجح |
 | dark | حالة | `result/passed/icon` #3FB87F | `bg/surface` #202328 | 6.28:1 | 3:1 | نجح |
@@ -471,6 +477,8 @@
 | dark | حالة | `tag/model-claim/border` #A68CE6 | `bg/surface` #202328 | 5.64:1 | 3:1 | نجح |
 
 ### معلوماتي (غير ملزم، D-DES1-03)
+
+border/subtle فاصل زخرفي مستثنى من حد 3:1. وتعبئة selection وحدها لا تكفي دليلًا على التحديد، فيرافقها دائمًا شريط بعرض 2px على الحافة البادئة بلون border/strong، وثنائيته مع selection ومع bg/surface ملزمة في جدول الثنائيات أعلاه.
 
 | الوضع | الثنائية | النسبة |
 |---|---|---|
