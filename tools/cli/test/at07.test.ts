@@ -44,10 +44,13 @@ describe('AT-07: composing the full scan without duplicates', () => {
       expect(await engine.invoke('run.plan', { projectId: ext.projectId, selection: { kind: 'fullExcluding', exclude: ['beh.unit@.'] } })).toMatchObject({ ok: false, error: { code: 'plan_invalid', details: { reason: 'required_excluded', instance: 'beh.unit@.' } } });
       // An optional check excluded is fine.
       expect((await plan(engine, ext.projectId, { kind: 'fullExcluding', exclude: ['beh.stability@.'] })).items.some((i) => i.instance === 'beh.stability@.')).toBe(false);
-      // beh.stability included: beh.unit is covered by it, not run again.
+      // beh.stability included but not ready (not approved, dependencies not installed): it covers nothing (9.4
+      // point 5, ORG-15 K1), and beh.unit gives its own reason. Both ready, beh.unit is covered: the next test.
       ok(await engine.invoke('profile.update', { projectId: ext.projectId, patch: { checks: { 'beh.stability@.': { included: true } } } }));
       const withStability = await plan(engine, ext.projectId, { kind: 'full' });
-      expect(item(withStability, 'beh.unit@.')).toMatchObject({ status: 'covered', coveredBy: 'beh.stability@.', reasons: [{ key: 'plan.reason.coveredBy', params: { by: 'beh.stability@.' } }] });
+      expect(item(withStability, 'beh.stability@.')?.status).toBe('missing');
+      expect(item(withStability, 'beh.unit@.')).toMatchObject({ status: 'missing', coveredBy: null });
+      expect(item(withStability, 'beh.unit@.')?.reasons.some((r) => r.key === 'plan.reason.coveredBy')).toBe(false);
 
       // FX-MONO: the packages are components, each with its own instances.
       const mono = await addProject(engine, materialize('FX-MONO', 'good', join(root, 'mono')));
