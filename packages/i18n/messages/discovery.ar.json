@@ -1,0 +1,15 @@
+{
+  "discovery.progress": "مُسح {files, plural, =0 {لا ملف} one {ملف واحد} two {ملفان} few {# ملفات} many {# ملفًا} other {# ملف}} حتى الآن",
+  "discovery.cancelled": "أُلغي الاكتشاف، ولم تُحفظ منه لقطة.",
+  "discovery.failed": "تعذّر الاكتشاف.",
+  "discovery.partial": "مسح جزئي: بلغ الاكتشاف حدًا معلنًا.",
+  "discovery.warning.unreadable": "تعذّرت قراءة «{path}»، فتُرك.",
+  "discovery.warning.symlinkOutside": "الرابط الرمزي «{path}» يشير إلى خارج المشروع، فلم يُتبع.",
+  "discovery.warning.symlinkDirNotFollowed": "الرابط الرمزي «{path}» يشير إلى مجلد، والاكتشاف لا يتبع روابط المجلدات.",
+  "discovery.warning.partialScan": "مسح جزئي ({reasons}): قُرئ {entries} مدخل ثم توقف الاكتشاف عند الحد.",
+  "discovery.warning.configTooLarge": "ملف الإعداد «{path}» أكبر من الحد، فلم يُقرأ.",
+  "discovery.warning.configInvalid": "ملف الإعداد «{path}» غير صالح، فقد تتعذر الفحوص التي تعتمد عليه.",
+  "discovery.sensitive.named": "سُجّل «{path}» باسمه فقط، ولم تُقرأ قيمه.",
+  "discovery.warning.symlinkTargetSkipped": "الرابط الرمزي «{path}» يشير إلى ملف لا يقرؤه الاكتشاف (مستثنى أو مُتجاهَل أو ليس ملفًا عاديًا)، فلم يُقرأ.",
+  "discovery.warning.gitignoreTruncated": "في «{path}» {rules} قاعدة؛ قُرئت أول ألف منها فقط."
+}

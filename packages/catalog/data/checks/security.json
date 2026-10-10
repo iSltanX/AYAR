@@ -1,0 +1,426 @@
+{
+  "section": "security",
+  "checks": [
+    {
+      "id": "sec.secrets.files",
+      "version": "1.0.0",
+      "section": "security",
+      "criterion": "secrets",
+      "inIndex": true,
+      "scope": "project",
+      "text": {
+        "title": "catalog.check.sec.secrets.files.title",
+        "why": "catalog.check.sec.secrets.files.why",
+        "limits": "catalog.check.sec.secrets.files.limits"
+      },
+      "applies": {
+        "always": true
+      },
+      "default": {
+        "kind": "required",
+        "blocking": true
+      },
+      "requirements": [
+        {
+          "kind": "tool",
+          "tools": [
+            "betterleaks",
+            "gitleaks"
+          ],
+          "from": "managed"
+        }
+      ],
+      "runner": {
+        "kind": "adapter",
+        "ids": [
+          "betterleaks",
+          "gitleaks"
+        ]
+      },
+      "resourceClass": "medium",
+      "sideEffects": {
+        "runsProjectCode": false,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-37"
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "sec.secrets.history",
+      "version": "1.0.0",
+      "section": "security",
+      "criterion": "secrets",
+      "inIndex": true,
+      "scope": "project",
+      "text": {
+        "title": "catalog.check.sec.secrets.history.title",
+        "why": "catalog.check.sec.secrets.history.why",
+        "limits": "catalog.check.sec.secrets.history.limits"
+      },
+      "applies": {
+        "signal": "git.repo"
+      },
+      "default": {
+        "kind": "optional"
+      },
+      "requirements": [
+        {
+          "kind": "tool",
+          "tools": [
+            "betterleaks",
+            "gitleaks"
+          ],
+          "from": "managed"
+        },
+        {
+          "kind": "tool",
+          "tools": [
+            "git"
+          ],
+          "from": "system"
+        }
+      ],
+      "runner": {
+        "kind": "adapter",
+        "ids": [
+          "betterleaks",
+          "gitleaks"
+        ]
+      },
+      "resourceClass": "heavy",
+      "sideEffects": {
+        "runsProjectCode": false,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-37"
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "sec.deps",
+      "version": "1.0.0",
+      "section": "security",
+      "criterion": "vulnerabilities",
+      "inIndex": true,
+      "scope": "project",
+      "text": {
+        "title": "catalog.check.sec.deps.title",
+        "why": "catalog.check.sec.deps.why",
+        "limits": "catalog.check.sec.deps.limits"
+      },
+      "applies": {
+        "signal": "deps.external"
+      },
+      "default": {
+        "kind": "required",
+        "blocking": false
+      },
+      "requirements": [
+        {
+          "kind": "tool",
+          "tools": [
+            "osv-scanner"
+          ],
+          "from": "managed"
+        },
+        {
+          "kind": "lockfile"
+        },
+        {
+          "kind": "dataAsset",
+          "asset": "osv-db"
+        }
+      ],
+      "runner": {
+        "kind": "adapter",
+        "ids": [
+          "osv-scanner"
+        ]
+      },
+      "resourceClass": "medium",
+      "sideEffects": {
+        "runsProjectCode": false,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": [
+          "sec.deps.audit"
+        ]
+      },
+      "sources": [
+        "S-36"
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "sec.deps.audit",
+      "version": "1.0.0",
+      "section": "security",
+      "criterion": "vulnerabilities",
+      "inIndex": true,
+      "scope": "project",
+      "text": {
+        "title": "catalog.check.sec.deps.audit.title",
+        "why": "catalog.check.sec.deps.audit.why",
+        "limits": "catalog.check.sec.deps.audit.limits"
+      },
+      "applies": {
+        "all": [
+          {
+            "signal": "deps.external"
+          },
+          {
+            "signal": "deps.ecosystem"
+          }
+        ]
+      },
+      "default": {
+        "kind": "optional"
+      },
+      "requirements": [
+        {
+          "kind": "network"
+        },
+        {
+          "kind": "tool",
+          "tools": [
+            "npm",
+            "pip-audit"
+          ],
+          "from": "system"
+        }
+      ],
+      "runner": {
+        "kind": "adapter",
+        "ids": [
+          "npm-audit",
+          "pip-audit"
+        ]
+      },
+      "resourceClass": "medium",
+      "sideEffects": {
+        "runsProjectCode": false,
+        "writesRepo": "no"
+      },
+      "network": "required",
+      "cost": "network",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": [
+          "sec.deps"
+        ]
+      },
+      "sources": [
+        "S-41"
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "sec.sast",
+      "version": "1.0.0",
+      "section": "security",
+      "criterion": "security-patterns",
+      "inIndex": true,
+      "scope": "project",
+      "text": {
+        "title": "catalog.check.sec.sast.title",
+        "why": "catalog.check.sec.sast.why",
+        "limits": "catalog.check.sec.sast.limits"
+      },
+      "applies": {
+        "any": [
+          {
+            "signal": "lang.js"
+          },
+          {
+            "signal": "lang.ts"
+          },
+          {
+            "signal": "lang.python"
+          }
+        ]
+      },
+      "default": {
+        "kind": "conditional",
+        "when": {
+          "audience": [
+            "public"
+          ]
+        }
+      },
+      "requirements": [
+        {
+          "kind": "tool",
+          "tools": [
+            "semgrep"
+          ],
+          "from": "managed"
+        }
+      ],
+      "runner": {
+        "kind": "adapter",
+        "ids": [
+          "semgrep"
+        ]
+      },
+      "resourceClass": "medium",
+      "sideEffects": {
+        "runsProjectCode": false,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-35"
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "sec.ext.manifest",
+      "version": "1.0.0",
+      "section": "security",
+      "criterion": "manifest",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.sec.ext.manifest.title",
+        "why": "catalog.check.sec.ext.manifest.why",
+        "limits": "catalog.check.sec.ext.manifest.limits"
+      },
+      "applies": {
+        "signal": "type.browserExtension"
+      },
+      "default": {
+        "kind": "required",
+        "blocking": true
+      },
+      "requirements": [],
+      "runner": {
+        "kind": "analyzer",
+        "ids": [
+          "ext-manifest"
+        ]
+      },
+      "resourceClass": "light",
+      "sideEffects": {
+        "runsProjectCode": false,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [
+          {
+            "check": "code.build",
+            "when": {
+              "signal": "ext.manifestGenerated"
+            }
+          }
+        ],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-44",
+        "S-45"
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "sec.ext.permissions",
+      "version": "1.0.0",
+      "section": "security",
+      "criterion": "permissions",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.sec.ext.permissions.title",
+        "why": "catalog.check.sec.ext.permissions.why",
+        "limits": "catalog.check.sec.ext.permissions.limits"
+      },
+      "applies": {
+        "signal": "type.browserExtension"
+      },
+      "default": {
+        "kind": "required",
+        "blocking": false
+      },
+      "requirements": [
+        {
+          "kind": "reference",
+          "ref": "permissionsPolicy"
+        }
+      ],
+      "runner": {
+        "kind": "analyzer",
+        "ids": [
+          "ext-permissions"
+        ]
+      },
+      "resourceClass": "light",
+      "sideEffects": {
+        "runsProjectCode": false,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [
+          {
+            "check": "code.build",
+            "when": {
+              "signal": "ext.manifestGenerated"
+            }
+          }
+        ],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-43"
+      ],
+      "verifiedAt": "2026-10-09"
+    }
+  ]
+}

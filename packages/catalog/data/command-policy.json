@@ -1,0 +1,44 @@
+{
+  "version": "1.0.2",
+  "verifiedAt": "2026-10-10",
+  "refused": [
+    { "id": "sudo", "regex": { "pattern": "(?:^|[\\s;&|()`'\"=]|\\$\\()(?:/[^\\s;&|()`'\"]*/)?(?:sudo|doas)(?=\\s|$|['\"])", "flags": "" }, "label": "catalog.command.refused.sudo" }
+  ],
+  "dangerous": [
+    {
+      "id": "mass-delete",
+      "label": "catalog.command.dangerous.mass-delete",
+      "regexes": [
+        { "pattern": "\\brm\\s+(?:-{1,2}[A-Za-z-]+\\s+)*(?:-[A-Za-z]*[rR][A-Za-z]*|--recursive)(?:\\s|$)", "flags": "" },
+        { "pattern": "\\bfind\\b[^|;&]*\\s-delete\\b", "flags": "" },
+        { "pattern": "\\bgit\\s+clean\\s+(?:-{1,2}[A-Za-z-]+\\s+)*-[A-Za-z]*[fdxX]", "flags": "" },
+        { "pattern": "\\brimraf\\b", "flags": "" },
+        { "pattern": "\\bshred\\b|\\bmkfs\\b|\\bdd\\s+[^|;&]*of=", "flags": "" }
+      ]
+    },
+    {
+      "id": "publish",
+      "label": "catalog.command.dangerous.publish",
+      "regexes": [
+        { "pattern": "\\b(?:npm|pnpm|yarn|bun)\\b[^|;&\\n]*\\spublish\\b", "flags": "" },
+        { "pattern": "\\b(?:twine|flit)\\s+(?:upload|publish)\\b|\\b(?:poetry|uv|cargo|vsce|ovsx)\\b[^|;&\\n]*\\spublish\\b", "flags": "" },
+        { "pattern": "\\bgh\\s+release\\s+(?:create|upload)\\b|\\bdocker\\s+push\\b", "flags": "" }
+      ]
+    },
+    {
+      "id": "push",
+      "label": "catalog.command.dangerous.push",
+      "regexes": [{ "pattern": "\\bgit\\s+(?:[^|;&]*\\s)?push\\b", "flags": "" }]
+    },
+    {
+      "id": "download-execute",
+      "label": "catalog.command.dangerous.download-execute",
+      "regexes": [
+        { "pattern": "\\b(?:curl|wget)\\b[^|;&]*\\|\\s*(?:sudo\\s+)?(?:\\S*/)?(?:ba|z|da|k|fi)?sh\\b", "flags": "" },
+        { "pattern": "\\b(?:\\S*/)?(?:ba|z)?sh\\s+<\\(\\s*(?:curl|wget)\\b", "flags": "" },
+        { "pattern": "\\b(?:curl|wget)\\b[^|;&]*\\|\\s*(?:\\S*/)?(?:python3?|node|perl|ruby)\\b", "flags": "" },
+        { "pattern": "\\b(?:curl|wget)\\b[^\\n]*(?:&&|;)\\s*(?:sudo\\s+)?(?:\\S*/)?(?:ba|z|da|k)?sh\\s+\\S", "flags": "" }
+      ]
+    }
+  ]
+}

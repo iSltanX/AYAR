@@ -1,0 +1,16 @@
+{
+  "environment.source.login_shell": "From the login shell",
+  "environment.source.fallback": "Fallback",
+  "environment.fallback.timeout": "Reading the login shell timed out, so a fallback PATH from known folders is used.",
+  "environment.fallback.exit": "The login shell exited with an error, so a fallback PATH is used.",
+  "environment.fallback.no_markers": "The login shell did not print the whole environment, so a fallback PATH is used.",
+  "environment.fallback.spawn_failed": "The login shell could not be started, so a fallback PATH is used.",
+  "environment.tool.status.ok": "Matches",
+  "environment.tool.status.mismatch": "Needs setup: version {required} is required, {available} is available",
+  "environment.tool.status.missing": "Needs setup: the tool is not installed",
+  "environment.tool.status.unknown": "The version is unknown until the version check",
+  "environment.tool.proposed": "A matching version is installed by {manager}, proposed explicitly in the standards profile: {path}",
+  "environment.tool.corepack": "{tool} here is a corepack shim, which may download the declared version. It is checked without the network; if that version is missing, the check needs setup.",
+  "environment.tool.shellFunction": "In your terminal “{tool}” is a shell function (nvm), so it runs {terminal} there, while PATH gives {path}.",
+  "environment.probe.failed": "The version check was unavailable"
+}

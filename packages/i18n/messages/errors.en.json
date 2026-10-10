@@ -18,5 +18,12 @@
   "errors.busy": "Another run is active; this one waits its turn in the queue.",
   "errors.not_found": "Not found.",
   "errors.cancelled": "Cancelled.",
-  "errors.internal": "Internal AYAR error. Details are in the log."
+  "errors.internal": "Internal AYAR error. Details are in the log.",
+  "errors.catalog_invalid": "The catalog shipped with this version is invalid, so no check can run. Reinstall AYAR and see the log.",
+  "errors.permission_denied": "macOS refused to read this folder. Give AYAR access in the privacy settings, then try again.",
+  "errors.path_missing": "The path no longer exists. The project may have moved or been deleted; locate it again.",
+  "errors.not_a_directory": "The selected path is not a folder.",
+  "errors.profile_invalid": "The standards profile was rejected because it breaks a rule; the current profile is unchanged.",
+  "errors.stale_change_set": "What needs approval changed since it was shown. Review the updated differences, then approve.",
+  "errors.preview_required": "The file is not written before you preview the differences. Show the preview, then export."
 }

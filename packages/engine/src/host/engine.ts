@@ -6,6 +6,7 @@ import {
   protocolError,
   PROTOCOL_VERSION,
   type EngineHealth,
+  type ErrorCode,
   type Hello,
   type ParsedCommand,
 } from '@ayar/protocol';
@@ -23,6 +24,7 @@ import { Dispatcher, type HandlerTable, type ServiceState } from './dispatcher.t
 import { EXIT } from './errors.ts';
 import { EventBus } from './event-bus.ts';
 import { RunGate } from './run-gate.ts';
+import { createServices, type EngineServices } from './services.ts';
 
 export interface StartEngineOptions {
   ports: EnginePorts;
@@ -32,6 +34,8 @@ export interface StartEngineOptions {
   catalog?: CatalogLoader;
   /** How often the weekly integrity check and backup are considered (default: daily). */
   maintenanceIntervalMs?: number;
+  /** tools/cli's test hook (Node entry only): the login shell C-07 reads. */
+  testLoginShell?: string | null;
 }
 
 export interface EngineHandle {
@@ -74,15 +78,16 @@ export function startEngine(o: StartEngineOptions): EngineHandle {
   let hmacKey: HmacKey | null = null;
   let bus: EventBus | null = null;
   let logPath: string | null = null;
-  let degraded: StorageError['code'] | null = null;
+  let degraded: ErrorCode | null = null;
+  let services: EngineServices | null = null;
   let maintenance: ReturnType<typeof setInterval> | null = null;
   let stopped = false;
 
   const state = (): ServiceState => {
     if (phase === 'awaiting_hello' || phase === 'booting') return { kind: 'unavailable', error: protocolError('engine_starting') };
     if (phase === 'stopping') return { kind: 'unavailable', error: protocolError('engine_unavailable') };
-    if (degraded || !result?.db || !hmacKey || !bus) return { kind: 'unavailable', error: protocolError(degraded ?? 'internal') };
-    return { kind: 'ready', context: { db: result.db, clock: ports.clock, logger, events: bus, runGate, hmacKey } };
+    if (degraded || !result?.db || !result.catalog || !hmacKey || !bus || !services) return { kind: 'unavailable', error: protocolError(degraded ?? 'internal') };
+    return { kind: 'ready', context: { db: result.db, clock: ports.clock, logger, events: bus, runGate, hmacKey, catalog: result.catalog, ports, services } };
   };
   const dispatcher = new Dispatcher(o.handlers ?? HANDLERS, state, () => logger);
 
@@ -115,6 +120,7 @@ export function startEngine(o: StartEngineOptions): EngineHandle {
     }
     if (result.state === 'degraded') degraded = result.reason ?? 'internal';
     bus = new EventBus({ stream, clock: ports.clock, send: (m) => channel.send(m) });
+    if (!degraded && result.db && result.catalog && hmacKey) services = createServices({ catalog: result.catalog, db: result.db, ports, events: bus, logger, hmacKey, testLoginShell: o.testLoginShell ?? null });
     if (phase === 'stopping') return result;
     phase = 'serving';
     logger.log('info', 'engine serving', { state: degraded ? 'degraded' : 'ready', reason: degraded, keySource: hmacKey?.source ?? null });
@@ -192,6 +198,7 @@ export function startEngine(o: StartEngineOptions): EngineHandle {
         stopped = true;
         phase = 'stopping';
         if (maintenance) clearInterval(maintenance);
+        services?.projects.cancelAll();
         bus?.close();
         try {
           result?.db?.close();

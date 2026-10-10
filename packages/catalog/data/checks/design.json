@@ -1,0 +1,668 @@
+{
+  "section": "design",
+  "checks": [
+    {
+      "id": "design.tokens.static",
+      "version": "1.0.0",
+      "section": "design",
+      "criterion": "design-system",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.design.tokens.static.title",
+        "why": "catalog.check.design.tokens.static.why",
+        "limits": "catalog.check.design.tokens.static.limits"
+      },
+      "applies": {
+        "signal": "styles.any"
+      },
+      "default": {
+        "kind": "conditional",
+        "when": {
+          "ref": "tokens"
+        }
+      },
+      "requirements": [
+        {
+          "kind": "reference",
+          "ref": "tokens"
+        }
+      ],
+      "runner": {
+        "kind": "analyzer",
+        "ids": [
+          "tokens-static"
+        ]
+      },
+      "resourceClass": "light",
+      "sideEffects": {
+        "runsProjectCode": false,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "design.tokens.render",
+      "version": "1.0.0",
+      "section": "design",
+      "criterion": "design-system",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.design.tokens.render.title",
+        "why": "catalog.check.design.tokens.render.why",
+        "limits": "catalog.check.design.tokens.render.limits"
+      },
+      "applies": {
+        "signal": "ui.rendered"
+      },
+      "default": {
+        "kind": "conditional",
+        "when": {
+          "all": [
+            {
+              "ref": "tokens"
+            },
+            {
+              "ref": "renderTarget"
+            }
+          ]
+        }
+      },
+      "requirements": [
+        {
+          "kind": "reference",
+          "ref": "tokens"
+        },
+        {
+          "kind": "reference",
+          "ref": "renderTarget"
+        },
+        {
+          "kind": "dataAsset",
+          "asset": "browser"
+        }
+      ],
+      "runner": {
+        "kind": "probe",
+        "ids": [
+          "web-probe"
+        ]
+      },
+      "resourceClass": "medium",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [
+          {
+            "check": "code.build",
+            "when": {
+              "all": [
+                {
+                  "signal": "build.step"
+                },
+                {
+                  "signal": "type.browserExtension"
+                }
+              ]
+            }
+          }
+        ],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-21"
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "design.fonts.static",
+      "version": "1.0.0",
+      "section": "design",
+      "criterion": "fonts",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.design.fonts.static.title",
+        "why": "catalog.check.design.fonts.static.why",
+        "limits": "catalog.check.design.fonts.static.limits"
+      },
+      "applies": {
+        "signal": "styles.any"
+      },
+      "default": {
+        "kind": "conditional",
+        "when": {
+          "ref": "fonts"
+        }
+      },
+      "requirements": [
+        {
+          "kind": "reference",
+          "ref": "fonts"
+        }
+      ],
+      "runner": {
+        "kind": "analyzer",
+        "ids": [
+          "fonts-static"
+        ]
+      },
+      "resourceClass": "light",
+      "sideEffects": {
+        "runsProjectCode": false,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "design.fonts.render",
+      "version": "1.0.0",
+      "section": "design",
+      "criterion": "fonts",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.design.fonts.render.title",
+        "why": "catalog.check.design.fonts.render.why",
+        "limits": "catalog.check.design.fonts.render.limits"
+      },
+      "applies": {
+        "signal": "ui.rendered"
+      },
+      "default": {
+        "kind": "conditional",
+        "when": {
+          "all": [
+            {
+              "ref": "fonts"
+            },
+            {
+              "ref": "renderTarget"
+            }
+          ]
+        }
+      },
+      "requirements": [
+        {
+          "kind": "reference",
+          "ref": "fonts"
+        },
+        {
+          "kind": "reference",
+          "ref": "renderTarget"
+        },
+        {
+          "kind": "dataAsset",
+          "asset": "browser"
+        }
+      ],
+      "runner": {
+        "kind": "probe",
+        "ids": [
+          "web-probe"
+        ]
+      },
+      "resourceClass": "medium",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [
+          {
+            "check": "code.build",
+            "when": {
+              "all": [
+                {
+                  "signal": "build.step"
+                },
+                {
+                  "signal": "type.browserExtension"
+                }
+              ]
+            }
+          }
+        ],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "design.a11y",
+      "version": "1.0.0",
+      "section": "design",
+      "criterion": "accessibility",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.design.a11y.title",
+        "why": "catalog.check.design.a11y.why",
+        "limits": "catalog.check.design.a11y.limits"
+      },
+      "applies": {
+        "signal": "ui.rendered"
+      },
+      "default": {
+        "kind": "conditional",
+        "when": {
+          "audience": [
+            "small_group",
+            "public"
+          ]
+        }
+      },
+      "requirements": [
+        {
+          "kind": "reference",
+          "ref": "renderTarget"
+        },
+        {
+          "kind": "dataAsset",
+          "asset": "browser"
+        }
+      ],
+      "runner": {
+        "kind": "probe",
+        "ids": [
+          "web-probe"
+        ]
+      },
+      "resourceClass": "medium",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [
+          {
+            "check": "code.build",
+            "when": {
+              "all": [
+                {
+                  "signal": "build.step"
+                },
+                {
+                  "signal": "type.browserExtension"
+                }
+              ]
+            }
+          }
+        ],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-20",
+        "S-22",
+        "S-23"
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "design.a11y.review",
+      "version": "1.0.0",
+      "section": "design",
+      "criterion": "accessibility",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.design.a11y.review.title",
+        "why": "catalog.check.design.a11y.review.why",
+        "limits": "catalog.check.design.a11y.review.limits"
+      },
+      "applies": {
+        "signal": "ui.rendered"
+      },
+      "default": {
+        "kind": "conditional",
+        "when": {
+          "audience": [
+            "public"
+          ]
+        }
+      },
+      "requirements": [],
+      "runner": {
+        "kind": "internal",
+        "ids": [
+          "human-review"
+        ]
+      },
+      "resourceClass": "light",
+      "sideEffects": {
+        "runsProjectCode": false,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-23"
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "design.rtl.static",
+      "version": "1.0.0",
+      "section": "design",
+      "criterion": "direction",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.design.rtl.static.title",
+        "why": "catalog.check.design.rtl.static.why",
+        "limits": "catalog.check.design.rtl.static.limits"
+      },
+      "applies": {
+        "signal": "ui.rtl"
+      },
+      "default": {
+        "kind": "conditional",
+        "when": {
+          "signal": "ui.rtl"
+        }
+      },
+      "requirements": [],
+      "runner": {
+        "kind": "analyzer",
+        "ids": [
+          "rtl-static"
+        ]
+      },
+      "resourceClass": "light",
+      "sideEffects": {
+        "runsProjectCode": false,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {
+        "warning": "model"
+      },
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-48",
+        "S-52"
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "design.rtl.render",
+      "version": "1.0.0",
+      "section": "design",
+      "criterion": "direction",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.design.rtl.render.title",
+        "why": "catalog.check.design.rtl.render.why",
+        "limits": "catalog.check.design.rtl.render.limits"
+      },
+      "applies": {
+        "all": [
+          {
+            "signal": "ui.rtl"
+          },
+          {
+            "signal": "ui.rendered"
+          }
+        ]
+      },
+      "default": {
+        "kind": "conditional",
+        "when": {
+          "all": [
+            {
+              "signal": "ui.rtl"
+            },
+            {
+              "ref": "renderTarget"
+            }
+          ]
+        }
+      },
+      "requirements": [
+        {
+          "kind": "reference",
+          "ref": "renderTarget"
+        },
+        {
+          "kind": "dataAsset",
+          "asset": "browser"
+        }
+      ],
+      "runner": {
+        "kind": "probe",
+        "ids": [
+          "web-probe"
+        ]
+      },
+      "resourceClass": "medium",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [
+          {
+            "check": "code.build",
+            "when": {
+              "all": [
+                {
+                  "signal": "build.step"
+                },
+                {
+                  "signal": "type.browserExtension"
+                }
+              ]
+            }
+          }
+        ],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-21"
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "design.states",
+      "version": "1.0.0",
+      "section": "design",
+      "criterion": "ui-states",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.design.states.title",
+        "why": "catalog.check.design.states.why",
+        "limits": "catalog.check.design.states.limits"
+      },
+      "applies": {
+        "signal": "ui.rendered"
+      },
+      "default": {
+        "kind": "conditional",
+        "when": {
+          "ref": "states"
+        }
+      },
+      "requirements": [
+        {
+          "kind": "reference",
+          "ref": "states"
+        },
+        {
+          "kind": "reference",
+          "ref": "renderTarget"
+        },
+        {
+          "kind": "dataAsset",
+          "asset": "browser"
+        }
+      ],
+      "runner": {
+        "kind": "probe",
+        "ids": [
+          "web-probe"
+        ]
+      },
+      "resourceClass": "medium",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [
+          {
+            "check": "code.build",
+            "when": {
+              "all": [
+                {
+                  "signal": "build.step"
+                },
+                {
+                  "signal": "type.browserExtension"
+                }
+              ]
+            }
+          }
+        ],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "design.visual",
+      "version": "1.0.0",
+      "section": "design",
+      "criterion": "visual-stability",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.design.visual.title",
+        "why": "catalog.check.design.visual.why",
+        "limits": "catalog.check.design.visual.limits"
+      },
+      "applies": {
+        "signal": "ui.rendered"
+      },
+      "default": {
+        "kind": "optional",
+        "suggestWhen": {
+          "ref": "baselines"
+        }
+      },
+      "requirements": [
+        {
+          "kind": "baseline"
+        },
+        {
+          "kind": "reference",
+          "ref": "renderTarget"
+        },
+        {
+          "kind": "dataAsset",
+          "asset": "browser"
+        }
+      ],
+      "runner": {
+        "kind": "probe",
+        "ids": [
+          "web-probe"
+        ]
+      },
+      "resourceClass": "heavy",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [
+          {
+            "check": "code.build",
+            "when": {
+              "all": [
+                {
+                  "signal": "build.step"
+                },
+                {
+                  "signal": "type.browserExtension"
+                }
+              ]
+            }
+          }
+        ],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-17"
+      ],
+      "verifiedAt": "2026-10-09"
+    }
+  ]
+}

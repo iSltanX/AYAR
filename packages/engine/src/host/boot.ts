@@ -7,6 +7,7 @@
 // database, or one newer than this app, still gets the safety steps (ledger kills, tmp/ deletion) through
 // the read-only connection, but no write: the engine comes up "degraded". Each later step either degrades
 // the engine (tmp/, migration, catalog) or only logs (interrupted runs, weekly backup); none crashes it.
+import { CatalogError, loadCatalog, type Catalog, type LoadResult } from '@ayar/catalog';
 import type { ErrorCode } from '@ayar/protocol';
 import type { EnginePorts, Logger } from '../ports/index.ts';
 import { weeklyBackupIfDue } from '../storage/backup.ts';
@@ -38,10 +39,11 @@ export interface BootStep {
   detail: Record<string, string | number | boolean | null>;
 }
 
-export type CatalogLoader = () => Promise<{ loaded: boolean; detail: string }>;
+/** Loads and validates the catalog (C-08). Throws CatalogError when it is invalid: the engine then stays degraded. */
+export type CatalogLoader = (now: Date) => LoadResult | Promise<LoadResult>;
 
-/** DEV-4 replaces this with the real catalog (C-08) and its schema validation. */
-export const noCatalog: CatalogLoader = () => Promise.resolve({ loaded: false, detail: 'not_implemented: the catalog arrives in DEV-4' });
+/** The catalog shipped with this engine (packages/catalog), validated at load exactly as at build. */
+export const builtinCatalog: CatalogLoader = (now) => loadCatalog(undefined, { now });
 
 export interface BootOptions {
   dataDir: string;
@@ -58,6 +60,7 @@ export interface BootResult {
   layout: DataLayout | null;
   db: Db | null;
   schemaVersion: number | null;
+  catalog: Catalog | null;
   steps: BootStep[];
 }
 
@@ -81,12 +84,14 @@ export async function boot(o: BootOptions): Promise<BootResult> {
     steps.push({ step, ok, detail });
     o.logger.log(ok ? 'info' : 'warn', `boot ${step}`, detail);
   };
+  let catalog: Catalog | null = null;
   const result = (state: BootResult['state'], reason: ErrorCode | null, layout: DataLayout | null, db: Db | null, schemaVersion: number | null): BootResult => ({
     state,
     reason,
     layout,
     db,
     schemaVersion,
+    catalog,
     steps,
   });
 
@@ -184,13 +189,25 @@ export async function boot(o: BootOptions): Promise<BootResult> {
     return result('degraded', code, layout, null, readSchemaVersionSafe(layout));
   }
 
-  // 5. Catalog and knowledge base (C-08, DEV-4): without a valid catalog no check can run.
+  // 5. The catalog (C-08): validated at load; an invalid catalog keeps the engine from serving (degraded),
+  //    and an entry verified more than 180 days ago only warns (NFR-06). Its version and hash are recorded.
   try {
-    record('catalog.load', true, await (o.catalog ?? noCatalog)());
+    const loaded = await (o.catalog ?? builtinCatalog)(clock.now());
+    catalog = loaded.catalog;
+    for (const s of loaded.stale) o.logger.log('warn', 'catalog entry is stale', { kind: s.kind, id: s.id, verifiedAt: s.verifiedAt, ageDays: s.ageDays });
+    db.run(
+      'INSERT INTO catalog_meta (version, hash, loaded_at) VALUES (?, ?, ?) ON CONFLICT (version) DO UPDATE SET hash = excluded.hash, loaded_at = excluded.loaded_at',
+      catalog.version,
+      catalog.hash,
+      clock.now().toISOString(),
+    );
+    record('catalog.load', true, { version: catalog.version, hash: catalog.hash.slice(0, 16), checks: catalog.checks.length, stale: loaded.stale.length });
   } catch (e) {
-    record('catalog.load', false, { error: e instanceof Error ? e.message : String(e) });
+    const invalid = e instanceof CatalogError;
+    record('catalog.load', false, { error: invalid ? 'catalog_invalid' : 'internal', issues: invalid ? e.issues.length : null, message: (e instanceof Error ? e.message : String(e)).slice(0, 500) });
+    catalog = null;
     db.close();
-    return result('degraded', 'internal', layout, null, schemaVersion);
+    return result('degraded', invalid ? 'catalog_invalid' : 'internal', layout, null, schemaVersion);
   }
 
   // 5b. Runs that an unexpected stop left running. A failure only logs: the next boot tries again.

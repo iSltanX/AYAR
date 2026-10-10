@@ -10,11 +10,11 @@
 - **الرموز والمنح:** الواجهة لا ترسل مسارًا أبدًا. ترسل رمزًا (`sel_` و`dst_` و`src_` و`cfm_`) تصدره العملية الرئيسية بعد نافذة نظام، أو بعد معاينة (`setup.preview` و`tools.preview`)، أو بعد تأكيد الواجهة لإجراء مدمّر (`confirm.issue`). وعند تمرير الأمر إلى المحرك تستبدل العملية الرئيسية بالرمز «منحة» (`grants`) تحمل المسار أو ربط التأكيد بالأمر وهدفه. والمحرك يرفض الأمر دون منحه (`checkGrants`).
 - **الأحداث:** مرقمة في «مجرى» (`stream`) لكل جلسة محرك، وللمشرف مجراه. الفجوة في الترقيم أو تبدّل المجرى تطلق إعادة المزامنة في الجسر (`bridge.resync`).
 - **`report.copied`** سجل تدقيق في `audit_log`، لا حدث (G-21). والأحداث الناقصة (تقدم التجهيز، وحالات فحوص النموذج والبطاقات) تضيفها مراحلها بإصدار ثانوي.
-- **عقود المجال** (`DiscoverySnapshot` و`RunPlan` وغيرها) تضيفها مراحلها. ونتيجة `z.unknown()` في الجدول تعني أن عقد النتيجة لم يُعرَّف بعد.
+- **عقود المجال** في `src/domain/` ملفًا لكل مجال: `DiscoverySnapshot` و`ResolvedEnv` وملف المعايير (`ProfileView` و`ExportedProfile` بصيغة `ayar-profile/1`) وعقود المشاريع من DEV-4 (الإصدار 1.1)، و`RunPlan` وغيره تضيفها مراحلها. ونتيجة `z.unknown()` تعني أن عقد النتيجة لم يُعرَّف بعد.
 
 ## ملكية الأوامر (G-19)
 
-مولّد من السجل نفسه (`ownershipMarkdown()`)، واختبار `test/readme.test.ts` يمنع افتراقهما. «المنفّذ» `main` يعني أن العملية الرئيسية تنفذه بنفسها. و«من يستدعيه» `host` يعني أن الواجهة لا تستطيعه. والأوامر الثمانية خارج 6.5 قرار D-DEV3-03.
+مولّد من السجل نفسه (`ownershipMarkdown()`)، واختبار `test/readme.test.ts` يمنع افتراقهما. «المنفّذ» `main` يعني أن العملية الرئيسية تنفذه بنفسها. و«من يستدعيه» `host` يعني أن الواجهة لا تستطيعه. والأوامر الثمانية خارج 6.5 للعملية الرئيسية والمضيف قرار D-DEV3-03، والستة للمحرك (`project.confirm` و`project.cancelDiscovery` و`project.rename` و`profile.exportPreview` و`profile.importFromRepo` و`environment.resolve`) قرار D-DEV4-02 في الإصدار 1.1، ومعها حدثا `discovery.cancelled` و`discovery.failed`.
 
 | الأمر | المالك | المنفّذ | من يستدعيه | المنح المطلوبة | المرحلة |
 |---|---|---|---|---|---|
@@ -25,12 +25,18 @@
 | `project.relocate` | C-05 | engine | renderer | selection | DEV-4 |
 | `project.remove` | C-05 | engine | renderer | confirmation | DEV-4 |
 | `project.setTrust` | C-05 | engine | renderer | — | DEV-4 |
+| `project.confirm` | C-05 | engine | renderer | — | DEV-4 |
+| `project.cancelDiscovery` | C-05 | engine | renderer | — | DEV-4 |
+| `project.rename` | C-05 | engine | renderer | — | DEV-4 |
 | `profile.propose` | C-09 | engine | renderer | — | DEV-4 |
 | `profile.get` | C-09 | engine | renderer | — | DEV-4 |
 | `profile.update` | C-09 | engine | renderer | — | DEV-4 |
 | `profile.approve` | C-09 | engine | renderer | — | DEV-4 |
 | `profile.export` | C-09 | engine | renderer | destination | DEV-4 |
 | `profile.import` | C-09 | engine | renderer | source | DEV-4 |
+| `profile.exportPreview` | C-09 | engine | renderer | — | DEV-4 |
+| `profile.importFromRepo` | C-09 | engine | renderer | — | DEV-4 |
+| `environment.resolve` | C-07 | engine | renderer | — | DEV-4 |
 | `readiness.evaluate` | C-10 | engine | renderer | — | DEV-5 |
 | `setup.preview` | C-11 | engine | renderer | — | DEV-5 |
 | `setup.execute` | C-11 | engine | renderer | confirmation | DEV-5 |
@@ -85,6 +91,8 @@
 |---|---|---|
 | `discovery.progress` | C-06 | DEV-4 |
 | `discovery.done` | C-06 | DEV-4 |
+| `discovery.cancelled` | C-06 | DEV-4 |
+| `discovery.failed` | C-06 | DEV-4 |
 | `run.state` | C-12 | DEV-5 |
 | `check.state` | C-12 | DEV-5 |
 | `check.progress` | C-12 | DEV-5 |

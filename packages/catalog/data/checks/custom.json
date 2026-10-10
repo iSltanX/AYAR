@@ -1,0 +1,47 @@
+{
+  "section": "custom",
+  "checks": [
+    {
+      "id": "custom.*",
+      "version": "1.0.0",
+      "section": "custom",
+      "criterion": "custom",
+      "inIndex": true,
+      "scope": "project",
+      "text": {
+        "title": "catalog.check.custom.any.title",
+        "why": "catalog.check.custom.any.why",
+        "limits": "catalog.check.custom.any.limits"
+      },
+      "applies": {
+        "always": true
+      },
+      "default": {
+        "kind": "optional"
+      },
+      "requirements": [],
+      "runner": {
+        "kind": "custom",
+        "ids": [
+          "custom-command"
+        ]
+      },
+      "resourceClass": "medium",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "maybe"
+      },
+      "network": "optional",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [],
+      "verifiedAt": "2026-10-09"
+    }
+  ]
+}

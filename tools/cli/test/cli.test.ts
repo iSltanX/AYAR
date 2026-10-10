@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
-import { PROTOCOL_VERSION } from '@ayar/protocol';
+import { PROTOCOL_VERSION, settingDefaults } from '@ayar/protocol';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { connectEngine, spawnEngine } from '../src/index.ts';
 
@@ -25,7 +25,7 @@ describe('tools/cli (D-19)', () => {
     const health = await engine.waitForEvent('engine.health');
     expect(health).toMatchObject({ seq: 1, stream: engine.welcome.engine.stream, payload: { state: 'ready', hmacKeySource: 'test', schemaVersion: 1 } });
     expect(await engine.invoke('settings.set', { key: 'ui.theme', value: 'dark' })).toEqual({ ok: true, result: { key: 'ui.theme', value: 'dark' } });
-    expect(await engine.invoke('settings.get', {})).toEqual({ ok: true, result: { values: { 'ui.language': 'system', 'ui.theme': 'dark' } } });
+    expect(await engine.invoke('settings.get', {})).toEqual({ ok: true, result: { values: { ...settingDefaults(), 'ui.theme': 'dark' } } });
     expect(await engine.close()).toBe(0);
   });
 
@@ -47,7 +47,9 @@ describe('tools/cli (D-19)', () => {
     expect(JSON.parse(boot.stdout)).toMatchObject({ health: { state: 'ready', hmacKeySource: 'test' } });
     const set = await run(process.execPath, [MAIN, '--data-dir', dir, 'invoke', 'settings.set', '{"key":"ui.language","value":"en"}']);
     expect(JSON.parse(set.stdout)).toEqual({ ok: true, result: { key: 'ui.language', value: 'en' } });
-    await expect(run(process.execPath, [MAIN, '--data-dir', dir, 'invoke', 'project.list'])).rejects.toMatchObject({ code: 1 });
+    expect(JSON.parse((await run(process.execPath, [MAIN, '--data-dir', dir, 'invoke', 'project.list'])).stdout)).toEqual({ ok: true, result: { projects: [] } });
+    // A command a later phase implements still answers not_implemented, and the tool exits 1.
+    await expect(run(process.execPath, [MAIN, '--data-dir', dir, 'invoke', 'tools.list'])).rejects.toMatchObject({ code: 1 });
     await expect(run(process.execPath, [MAIN, '--data-dir', dir, 'invoke', 'shell.exec'])).rejects.toMatchObject({ code: 2 });
   });
 

@@ -1,0 +1,22 @@
+{
+  "projects.location.documents": "المستندات",
+  "projects.location.desktop": "سطح المكتب",
+  "projects.location.downloads": "التنزيلات",
+  "projects.location.icloud": "iCloud Drive",
+  "projects.location.removable": "الوحدات الخارجية",
+  "projects.location.network": "وحدات الشبكة",
+  "projects.permission.title": "يحتاج عِيَار إذنًا لقراءة هذا المجلد",
+  "projects.permission.explain": "رفض macOS قراءة المجلد الموجود في «{location}». عِيَار يقرأ الملفات فقط، ولا يكتب في مشروعك.",
+  "projects.permission.steps": "افتح إعدادات النظام ← الخصوصية والأمن ← الملفات والمجلدات، وفعّل عِيَار لـ «{location}»، ثم اضغط «حاول مجددًا».",
+  "projects.permission.retry": "حاول مجددًا",
+  "projects.preExplain": "سيطلب macOS إذنًا باسم عِيَار مرة واحدة لـ «{location}»، لأن المجلد وصل دون نافذة الاختيار. يقرأ عِيَار ملفات المشروع ليكتشف فحوصه، ولا يكتب فيه شيئًا.",
+  "projects.confirm.home_folder": "اخترت مجلدك المنزلي كله. سيقرأ عِيَار كل ما فيه ضمن حدود الاكتشاف، وقد يطول ذلك. أتتابع؟",
+  "projects.confirm.disk_root": "اخترت جذر القرص كله. هذا نطاق واسع جدًا لمشروع واحد. أتتابع؟",
+  "projects.confirm.identity_mismatch": "المجلد الجديد لا يبدو المشروع نفسه: كان «{expected}»، والموجود «{found}». أتربطه رغم ذلك؟",
+  "projects.pathStatus.missing": "المسار غير موجود",
+  "projects.pathStatus.permission_denied": "لا إذن بقراءة المسار",
+  "projects.action.relocate": "حدّد الموقع الجديد",
+  "projects.removed": "حُذفت بيانات عِيَار عن المشروع، ولم يُلمس المستودع.",
+  "projects.untrusted.label": "مشروع غير موثوق",
+  "projects.untrusted.explain": "في هذا الوضع لا تُشغَّل أوامر المشروع، وتعمل القراءة والأدوات القارئة فقط. وعِيَار ليس بيئة معزولة."
+}

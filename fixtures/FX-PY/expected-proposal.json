@@ -1,0 +1,633 @@
+{
+  "schema": "fixture-proposal/1",
+  "project": "FX-PY",
+  "variant": "good",
+  "context": "undeclared",
+  "catalog": "1.0.0",
+  "instances": [
+    {
+      "instance": "design.tokens.static@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.styles.any)"
+      ]
+    },
+    {
+      "instance": "design.tokens.render@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.ui.rendered)"
+      ]
+    },
+    {
+      "instance": "design.fonts.static@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.styles.any)"
+      ]
+    },
+    {
+      "instance": "design.fonts.render@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.ui.rendered)"
+      ]
+    },
+    {
+      "instance": "design.a11y@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.ui.rendered)"
+      ]
+    },
+    {
+      "instance": "design.a11y.review@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.ui.rendered)"
+      ]
+    },
+    {
+      "instance": "design.rtl.static@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.ui.rtl)"
+      ]
+    },
+    {
+      "instance": "design.rtl.render@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.ui.rtl,profile.signal.ui.rendered)"
+      ]
+    },
+    {
+      "instance": "design.states@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.ui.rendered)"
+      ]
+    },
+    {
+      "instance": "design.visual@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.ui.rendered)"
+      ]
+    },
+    {
+      "instance": "sec.secrets.files@.",
+      "applicable": true,
+      "required": true,
+      "blocking": true,
+      "included": true,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": "betterleaks:managed",
+      "reasons": [
+        "profile.reason.defaultRequiredBlocking",
+        "profile.reason.managedTool"
+      ]
+    },
+    {
+      "instance": "sec.secrets.history@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.git.repo)"
+      ]
+    },
+    {
+      "instance": "sec.deps@.",
+      "applicable": true,
+      "required": true,
+      "blocking": false,
+      "included": true,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": "osv-scanner:managed",
+      "reasons": [
+        "profile.reason.defaultRequired",
+        "profile.reason.managedTool"
+      ]
+    },
+    {
+      "instance": "sec.deps.audit@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": "pip-audit:system",
+      "reasons": [
+        "profile.reason.defaultOptional"
+      ]
+    },
+    {
+      "instance": "sec.sast@.",
+      "applicable": true,
+      "required": true,
+      "blocking": false,
+      "included": true,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": "semgrep:managed",
+      "reasons": [
+        "profile.reason.conditionMet",
+        "profile.reason.audienceUndeclared",
+        "profile.reason.managedTool"
+      ]
+    },
+    {
+      "instance": "sec.ext.manifest@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.type.browserExtension)"
+      ]
+    },
+    {
+      "instance": "sec.ext.permissions@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.type.browserExtension)"
+      ]
+    },
+    {
+      "instance": "code.build@.",
+      "applicable": true,
+      "required": true,
+      "blocking": true,
+      "included": true,
+      "missing": [],
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "--offline",
+        "--",
+        "python",
+        "-m",
+        "build"
+      ],
+      "script": null,
+      "tool": "build:uv",
+      "reasons": [
+        "profile.reason.defaultRequiredBlocking",
+        "profile.reason.commandFromTool"
+      ]
+    },
+    {
+      "instance": "code.types@.",
+      "applicable": true,
+      "required": true,
+      "blocking": true,
+      "included": true,
+      "missing": [],
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "--offline",
+        "--",
+        "python",
+        "-m",
+        "mypy"
+      ],
+      "script": null,
+      "tool": "mypy:uv",
+      "reasons": [
+        "profile.reason.defaultRequiredBlocking",
+        "profile.reason.commandFromTool"
+      ]
+    },
+    {
+      "instance": "code.lint@.",
+      "applicable": true,
+      "required": true,
+      "blocking": false,
+      "included": true,
+      "missing": [],
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "--offline",
+        "--",
+        "ruff",
+        "check",
+        "."
+      ],
+      "script": null,
+      "tool": "ruff:uv",
+      "reasons": [
+        "profile.reason.defaultRequired",
+        "profile.reason.commandFromTool"
+      ]
+    },
+    {
+      "instance": "code.unused@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.lang.js,profile.signal.lang.ts)"
+      ]
+    },
+    {
+      "instance": "code.refs.local@.",
+      "applicable": true,
+      "required": true,
+      "blocking": false,
+      "included": true,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.defaultRequired",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "code.refs.external@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": "lychee:managed",
+      "reasons": [
+        "profile.reason.defaultOptional",
+        "profile.reason.managedTool"
+      ]
+    },
+    {
+      "instance": "code.size@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [
+        {
+          "kind": "configuration",
+          "ref": "budgets"
+        }
+      ],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.conditionUnmet(profile.ref.budgets)",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "code.complexity@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.lang.js,profile.signal.lang.ts)"
+      ]
+    },
+    {
+      "instance": "beh.unit@.",
+      "applicable": true,
+      "required": true,
+      "blocking": true,
+      "included": true,
+      "missing": [],
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "--offline",
+        "--",
+        "python",
+        "-m",
+        "pytest"
+      ],
+      "script": null,
+      "tool": "pytest:uv",
+      "reasons": [
+        "profile.reason.defaultRequiredBlocking",
+        "profile.reason.commandFromTool"
+      ]
+    },
+    {
+      "instance": "beh.integration@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.tests.integration)"
+      ]
+    },
+    {
+      "instance": "beh.e2e@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.tests.playwright)"
+      ]
+    },
+    {
+      "instance": "beh.contract@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.tests.contract)"
+      ]
+    },
+    {
+      "instance": "beh.ext.host@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.type.chromiumExtension)"
+      ]
+    },
+    {
+      "instance": "beh.stability@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": [
+        "uv",
+        "run",
+        "--no-sync",
+        "--offline",
+        "--",
+        "python",
+        "-m",
+        "pytest"
+      ],
+      "script": null,
+      "tool": "pytest:uv",
+      "reasons": [
+        "profile.reason.defaultOptional",
+        "profile.reason.commandFromTool"
+      ]
+    },
+    {
+      "instance": "beh.mutation@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.lang.js,profile.signal.lang.ts)"
+      ]
+    },
+    {
+      "instance": "perf.web@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.ui.rendered)"
+      ]
+    },
+    {
+      "instance": "perf.load@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.perf.loadScenario)"
+      ]
+    },
+    {
+      "instance": "perf.recovery@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.ref.recoveryCommand)"
+      ]
+    },
+    {
+      "instance": "perf.compat@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.compat.matrix)"
+      ]
+    },
+    {
+      "instance": "integ.guard@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": true,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.alwaysOn",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "integ.state@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": true,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.alwaysOn",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "integ.model-claims@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.ayar.aiResults)"
+      ]
+    },
+    {
+      "instance": "integ.reviews@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.state.reviews)"
+      ]
+    }
+  ]
+}

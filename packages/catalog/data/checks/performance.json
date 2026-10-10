@@ -1,0 +1,231 @@
+{
+  "section": "performance",
+  "checks": [
+    {
+      "id": "perf.web",
+      "version": "1.0.0",
+      "section": "performance",
+      "criterion": "performance",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.perf.web.title",
+        "why": "catalog.check.perf.web.why",
+        "limits": "catalog.check.perf.web.limits"
+      },
+      "applies": {
+        "signal": "ui.rendered"
+      },
+      "default": {
+        "kind": "optional"
+      },
+      "requirements": [
+        {
+          "kind": "reference",
+          "ref": "renderTarget"
+        },
+        {
+          "kind": "reference",
+          "ref": "budgets"
+        },
+        {
+          "kind": "dataAsset",
+          "asset": "browser"
+        }
+      ],
+      "runner": {
+        "kind": "probe",
+        "ids": [
+          "web-probe"
+        ]
+      },
+      "resourceClass": "heavy",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "no"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [
+          {
+            "check": "code.build",
+            "when": {
+              "all": [
+                {
+                  "signal": "build.step"
+                },
+                {
+                  "signal": "type.browserExtension"
+                }
+              ]
+            }
+          }
+        ],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "perf.load",
+      "version": "1.0.0",
+      "section": "performance",
+      "criterion": "performance",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.perf.load.title",
+        "why": "catalog.check.perf.load.why",
+        "limits": "catalog.check.perf.load.limits"
+      },
+      "applies": {
+        "signal": "perf.loadScenario"
+      },
+      "default": {
+        "kind": "optional"
+      },
+      "requirements": [
+        {
+          "kind": "service"
+        },
+        {
+          "kind": "tool",
+          "tools": [
+            "k6"
+          ],
+          "from": "project_or_system"
+        }
+      ],
+      "runner": {
+        "kind": "adapter",
+        "ids": [
+          "k6"
+        ]
+      },
+      "resourceClass": "very_heavy",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "no"
+      },
+      "network": "optional",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [
+        "S-31"
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "perf.recovery",
+      "version": "1.0.0",
+      "section": "performance",
+      "criterion": "recovery",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.perf.recovery.title",
+        "why": "catalog.check.perf.recovery.why",
+        "limits": "catalog.check.perf.recovery.limits"
+      },
+      "applies": {
+        "ref": "recoveryCommand"
+      },
+      "default": {
+        "kind": "optional",
+        "suggestWhen": {
+          "context": "persistentData"
+        }
+      },
+      "requirements": [
+        {
+          "kind": "reference",
+          "ref": "recoveryCommand"
+        }
+      ],
+      "runner": {
+        "kind": "custom",
+        "ids": [
+          "recovery-command"
+        ]
+      },
+      "resourceClass": "medium",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "maybe"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [],
+        "alternativeTo": []
+      },
+      "sources": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "perf.compat",
+      "version": "1.0.0",
+      "section": "performance",
+      "criterion": "compatibility",
+      "inIndex": true,
+      "scope": "component",
+      "text": {
+        "title": "catalog.check.perf.compat.title",
+        "why": "catalog.check.perf.compat.why",
+        "limits": "catalog.check.perf.compat.limits"
+      },
+      "applies": {
+        "signal": "compat.matrix"
+      },
+      "default": {
+        "kind": "optional"
+      },
+      "requirements": [
+        {
+          "kind": "dataAsset",
+          "asset": "browser"
+        },
+        {
+          "kind": "dependencies"
+        }
+      ],
+      "runner": {
+        "kind": "adapter",
+        "ids": [
+          "playwright"
+        ]
+      },
+      "resourceClass": "heavy",
+      "sideEffects": {
+        "runsProjectCode": true,
+        "writesRepo": "maybe"
+      },
+      "network": "none",
+      "cost": "local",
+      "nextStep": {},
+      "relations": {
+        "includes": [],
+        "dependsOn": [],
+        "sharesExecutionWith": [
+          "beh.e2e"
+        ],
+        "alternativeTo": []
+      },
+      "sources": [],
+      "verifiedAt": "2026-10-09"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "projects.location.documents": "Documents",
+  "projects.location.desktop": "Desktop",
+  "projects.location.downloads": "Downloads",
+  "projects.location.icloud": "iCloud Drive",
+  "projects.location.removable": "removable volumes",
+  "projects.location.network": "network volumes",
+  "projects.permission.title": "AYAR needs permission to read this folder",
+  "projects.permission.explain": "macOS refused to read the folder in “{location}”. AYAR only reads files and never writes into your project.",
+  "projects.permission.steps": "Open System Settings → Privacy & Security → Files and Folders, allow AYAR for “{location}”, then press “Try again”.",
+  "projects.permission.retry": "Try again",
+  "projects.preExplain": "macOS will ask, once, to let AYAR access “{location}”, because the folder did not come through the open panel. AYAR reads the project’s files to discover its checks, and writes nothing into it.",
+  "projects.confirm.home_folder": "You selected your whole home folder. AYAR will read everything in it within the discovery limits, which may take a while. Continue?",
+  "projects.confirm.disk_root": "You selected the root of the disk. That is a very wide scope for one project. Continue?",
+  "projects.confirm.identity_mismatch": "The new folder does not look like the same project: it was “{expected}”, and this one is “{found}”. Link it anyway?",
+  "projects.pathStatus.missing": "Path not found",
+  "projects.pathStatus.permission_denied": "No permission to read the path",
+  "projects.action.relocate": "Locate the new folder",
+  "projects.removed": "AYAR’s data about the project was deleted; the repository was not touched.",
+  "projects.untrusted.label": "Untrusted project",
+  "projects.untrusted.explain": "In this mode the project’s commands do not run; only reading and read-only tools work. AYAR is not a sandbox."
+}

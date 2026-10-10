@@ -45,6 +45,7 @@ function tracedPorts(trace: string[], layout: () => DataLayout | null): EnginePo
         trace.push(`kill:${pgid}`);
         return nodeProcessControl.killGroup(pgid, signal);
       },
+      spawn: () => Promise.reject(new Error('boot spawns nothing')),
     },
     fs: {
       ...nodeFileSystem,
@@ -253,6 +254,7 @@ describe('operational faults degrade or log, never crash the boot (C-04)', () =>
           signalled.push(pgid);
           return Promise.reject(Object.assign(new Error('kill EPERM'), { code: 'EPERM' }));
         },
+        spawn: () => Promise.reject(new Error('boot spawns nothing')),
       },
     };
     const r = await boot({ dataDir: layout.root, ports: eperm, logger: quiet, appVersion: '0.1.0' });

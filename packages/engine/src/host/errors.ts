@@ -18,3 +18,24 @@ export const EXIT = {
   /** EX_PROTOCOL: the host speaks another major protocol version; restarting will not help. */
   protocolMismatch: 76,
 } as const;
+
+/**
+ * A file-system failure at a command's boundary, as a coded answer instead of an engine crash (review M5):
+ * a refusal (privacy, read-only volume) is permission_denied, a vanished path is path_missing, the rest internal.
+ */
+export function fsError(e: unknown, details: ErrorDetails = {}): CommandError {
+  const code = (e as { code?: string } | null)?.code ?? '';
+  if (['EACCES', 'EPERM', 'EROFS'].includes(code)) return new CommandError('permission_denied', { ...details, error: code });
+  if (['ENOENT', 'ENOTDIR', 'ELOOP', 'ENOTFILE'].includes(code)) return new CommandError('path_missing', { ...details, error: code });
+  return new CommandError('internal', { ...details, error: code || 'unknown' });
+}
+
+/** Runs a file-system step, mapping its failure to a coded answer. A CommandError passes through unchanged. */
+export async function withFs<T>(fn: () => Promise<T>, details: ErrorDetails = {}): Promise<T> {
+  try {
+    return await fn();
+  } catch (e) {
+    if (e instanceof CommandError) throw e;
+    throw fsError(e, details);
+  }
+}

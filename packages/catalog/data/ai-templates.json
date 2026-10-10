@@ -1,0 +1,68 @@
+[
+  {
+    "id": "ai.logic-review",
+    "version": "1.0.0",
+    "text": {
+      "title": "catalog.ai.logic-review.title",
+      "role": "catalog.ai.logic-review.role"
+    },
+    "cost": "model",
+    "sources": [],
+    "verifiedAt": "2026-10-09"
+  },
+  {
+    "id": "ai.threat-review",
+    "version": "1.0.0",
+    "text": {
+      "title": "catalog.ai.threat-review.title",
+      "role": "catalog.ai.threat-review.role"
+    },
+    "cost": "model",
+    "sources": [],
+    "verifiedAt": "2026-10-09"
+  },
+  {
+    "id": "ai.docs-consistency",
+    "version": "1.0.0",
+    "text": {
+      "title": "catalog.ai.docs-consistency.title",
+      "role": "catalog.ai.docs-consistency.role"
+    },
+    "cost": "model",
+    "sources": [],
+    "verifiedAt": "2026-10-09"
+  },
+  {
+    "id": "ai.ui-copy",
+    "version": "1.0.0",
+    "text": {
+      "title": "catalog.ai.ui-copy.title",
+      "role": "catalog.ai.ui-copy.role"
+    },
+    "cost": "model",
+    "sources": [],
+    "verifiedAt": "2026-10-09"
+  },
+  {
+    "id": "ai.test-gaps",
+    "version": "1.0.0",
+    "text": {
+      "title": "catalog.ai.test-gaps.title",
+      "role": "catalog.ai.test-gaps.role"
+    },
+    "cost": "model",
+    "sources": [],
+    "verifiedAt": "2026-10-09"
+  },
+  {
+    "id": "ai.structure-review",
+    "version": "1.0.0",
+    "text": {
+      "title": "catalog.ai.structure-review.title",
+      "role": "catalog.ai.structure-review.role"
+    },
+    "cost": "model",
+    "sources": [],
+    "verifiedAt": "2026-10-09"
+  }
+]

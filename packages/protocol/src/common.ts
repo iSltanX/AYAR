@@ -5,7 +5,8 @@ export const Id = z.string().regex(/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/, 'inval
 export type Id = z.infer<typeof Id>;
 
 /** Check instance key `checkId@component` (D-45). */
-export const CheckInstanceKey = z.string().min(3).max(512).regex(/^[^@\s]+@[^@\s]+$/, 'invalid check instance key');
+/** The check id has no `@`; the component is a relative path, which may contain `@` or spaces (`packages/@scope/x`). */
+export const CheckInstanceKey = z.string().min(3).max(4200).regex(/^[^@\s]+@.+$/, 'invalid check instance key');
 
 export const Lang = z.enum(['ar', 'en']);
 export type Lang = z.infer<typeof Lang>;

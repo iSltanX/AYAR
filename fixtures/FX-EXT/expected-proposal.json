@@ -1,0 +1,671 @@
+{
+  "schema": "fixture-proposal/1",
+  "project": "FX-EXT",
+  "variant": "good",
+  "context": "undeclared",
+  "catalog": "1.0.0",
+  "instances": [
+    {
+      "instance": "design.tokens.static@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [
+        {
+          "kind": "configuration",
+          "ref": "tokens"
+        }
+      ],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.conditionUnmet(profile.ref.tokens)",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "design.tokens.render@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [
+        {
+          "kind": "configuration",
+          "ref": "tokens"
+        }
+      ],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.conditionUnmet(profile.ref.tokens)",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "design.fonts.static@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [
+        {
+          "kind": "configuration",
+          "ref": "fonts"
+        }
+      ],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.conditionUnmet(profile.ref.fonts)",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "design.fonts.render@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [
+        {
+          "kind": "configuration",
+          "ref": "fonts"
+        }
+      ],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.conditionUnmet(profile.ref.fonts)",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "design.a11y@.",
+      "applicable": true,
+      "required": true,
+      "blocking": false,
+      "included": true,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.conditionMet",
+        "profile.reason.audienceUndeclared",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "design.a11y.review@.",
+      "applicable": true,
+      "required": true,
+      "blocking": false,
+      "included": true,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.conditionMet",
+        "profile.reason.audienceUndeclared",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "design.rtl.static@.",
+      "applicable": true,
+      "required": true,
+      "blocking": false,
+      "included": true,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.conditionMet",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "design.rtl.render@.",
+      "applicable": true,
+      "required": true,
+      "blocking": false,
+      "included": true,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.conditionMet",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "design.states@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [
+        {
+          "kind": "configuration",
+          "ref": "states"
+        }
+      ],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.conditionUnmet(profile.ref.states)",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "design.visual@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.defaultOptional",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "sec.secrets.files@.",
+      "applicable": true,
+      "required": true,
+      "blocking": true,
+      "included": true,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": "betterleaks:managed",
+      "reasons": [
+        "profile.reason.defaultRequiredBlocking",
+        "profile.reason.managedTool"
+      ]
+    },
+    {
+      "instance": "sec.secrets.history@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.git.repo)"
+      ]
+    },
+    {
+      "instance": "sec.deps@.",
+      "applicable": true,
+      "required": true,
+      "blocking": false,
+      "included": true,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": "osv-scanner:managed",
+      "reasons": [
+        "profile.reason.defaultRequired",
+        "profile.reason.managedTool"
+      ]
+    },
+    {
+      "instance": "sec.deps.audit@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": "npm:system",
+      "reasons": [
+        "profile.reason.defaultOptional"
+      ]
+    },
+    {
+      "instance": "sec.sast@.",
+      "applicable": true,
+      "required": true,
+      "blocking": false,
+      "included": true,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": "semgrep:managed",
+      "reasons": [
+        "profile.reason.conditionMet",
+        "profile.reason.audienceUndeclared",
+        "profile.reason.managedTool"
+      ]
+    },
+    {
+      "instance": "sec.ext.manifest@.",
+      "applicable": true,
+      "required": true,
+      "blocking": true,
+      "included": true,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.defaultRequiredBlocking",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "sec.ext.permissions@.",
+      "applicable": true,
+      "required": true,
+      "blocking": false,
+      "included": true,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.defaultRequired",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "code.build@.",
+      "applicable": true,
+      "required": true,
+      "blocking": true,
+      "included": true,
+      "missing": [],
+      "command": [
+        "pnpm",
+        "run",
+        "build"
+      ],
+      "script": "build",
+      "tool": "build-script:project",
+      "reasons": [
+        "profile.reason.defaultRequiredBlocking",
+        "profile.reason.commandFromScript"
+      ]
+    },
+    {
+      "instance": "code.types@.",
+      "applicable": true,
+      "required": true,
+      "blocking": true,
+      "included": true,
+      "missing": [],
+      "command": [
+        "pnpm",
+        "run",
+        "typecheck"
+      ],
+      "script": "typecheck",
+      "tool": "tsc:project",
+      "reasons": [
+        "profile.reason.defaultRequiredBlocking",
+        "profile.reason.commandFromScript"
+      ]
+    },
+    {
+      "instance": "code.lint@.",
+      "applicable": true,
+      "required": true,
+      "blocking": false,
+      "included": true,
+      "missing": [],
+      "command": [
+        "pnpm",
+        "run",
+        "lint"
+      ],
+      "script": "lint",
+      "tool": "eslint:project",
+      "reasons": [
+        "profile.reason.defaultRequired",
+        "profile.reason.commandFromScript"
+      ]
+    },
+    {
+      "instance": "code.unused@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": [
+        "pnpm",
+        "exec",
+        "knip"
+      ],
+      "script": null,
+      "tool": "knip:project",
+      "reasons": [
+        "profile.reason.defaultOptional",
+        "profile.reason.commandFromTool"
+      ]
+    },
+    {
+      "instance": "code.refs.local@.",
+      "applicable": true,
+      "required": true,
+      "blocking": false,
+      "included": true,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.defaultRequired",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "code.refs.external@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": "lychee:managed",
+      "reasons": [
+        "profile.reason.defaultOptional",
+        "profile.reason.managedTool"
+      ]
+    },
+    {
+      "instance": "code.size@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [
+        {
+          "kind": "configuration",
+          "ref": "budgets"
+        }
+      ],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.conditionUnmet(profile.ref.budgets)",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "code.complexity@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.defaultOptional",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "beh.unit@.",
+      "applicable": true,
+      "required": true,
+      "blocking": true,
+      "included": true,
+      "missing": [],
+      "command": [
+        "pnpm",
+        "run",
+        "test"
+      ],
+      "script": "test",
+      "tool": "vitest:project",
+      "reasons": [
+        "profile.reason.defaultRequiredBlocking",
+        "profile.reason.commandFromScript"
+      ]
+    },
+    {
+      "instance": "beh.integration@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.tests.integration)"
+      ]
+    },
+    {
+      "instance": "beh.e2e@.",
+      "applicable": true,
+      "required": true,
+      "blocking": false,
+      "included": true,
+      "missing": [],
+      "command": [
+        "pnpm",
+        "run",
+        "e2e"
+      ],
+      "script": "e2e",
+      "tool": "playwright:project",
+      "reasons": [
+        "profile.reason.conditionMet",
+        "profile.reason.commandFromScript"
+      ]
+    },
+    {
+      "instance": "beh.contract@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.tests.contract)"
+      ]
+    },
+    {
+      "instance": "beh.ext.host@.",
+      "applicable": true,
+      "required": true,
+      "blocking": false,
+      "included": true,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.defaultRequired",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "beh.stability@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": [
+        "pnpm",
+        "run",
+        "test"
+      ],
+      "script": "test",
+      "tool": "vitest:project",
+      "reasons": [
+        "profile.reason.defaultOptional",
+        "profile.reason.commandFromScript"
+      ]
+    },
+    {
+      "instance": "beh.mutation@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": [
+        "pnpm",
+        "exec",
+        "stryker",
+        "run"
+      ],
+      "script": null,
+      "tool": "stryker:project",
+      "reasons": [
+        "profile.reason.defaultOptional",
+        "profile.reason.commandFromTool"
+      ]
+    },
+    {
+      "instance": "perf.web@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [
+        {
+          "kind": "configuration",
+          "ref": "budgets"
+        }
+      ],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.defaultOptional",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "perf.load@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.perf.loadScenario)"
+      ]
+    },
+    {
+      "instance": "perf.recovery@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.ref.recoveryCommand)"
+      ]
+    },
+    {
+      "instance": "perf.compat@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.compat.matrix)"
+      ]
+    },
+    {
+      "instance": "integ.guard@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": true,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.alwaysOn",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "integ.state@.",
+      "applicable": true,
+      "required": false,
+      "blocking": false,
+      "included": true,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.alwaysOn",
+        "profile.reason.builtIn"
+      ]
+    },
+    {
+      "instance": "integ.model-claims@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.ayar.aiResults)"
+      ]
+    },
+    {
+      "instance": "integ.reviews@.",
+      "applicable": false,
+      "required": false,
+      "blocking": false,
+      "included": false,
+      "missing": [],
+      "command": null,
+      "script": null,
+      "tool": null,
+      "reasons": [
+        "profile.reason.notApplicable(profile.signal.state.reviews)"
+      ]
+    }
+  ]
+}

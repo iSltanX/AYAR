@@ -2,6 +2,7 @@
 // migration (NFR-02, G-11), refusal of a newer database, integrity_check, and 0700 folders (NFR-03).
 import { chmodSync, existsSync, mkdirSync, openSync, readdirSync, statSync, symlinkSync, writeFileSync, writeSync, closeSync } from 'node:fs';
 import { join } from 'node:path';
+import { settingDefaults } from '@ayar/protocol';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { nodeFileSystem as fs } from '../src/node/fs.ts';
 import { backupDatabase, listBackups, weeklyBackupIfDue, WEEK_MS } from '../src/storage/backup.ts';
@@ -271,7 +272,8 @@ describe('settings (14.1)', () => {
   it('returns defaults, stores values, and falls back when a stored value is no longer valid', async () => {
     const { db, layout } = await freshStore();
     await migrate(db, { fs, clock: fakeClock(), backupsDir: layout.backups, appVersion: '0.1.0' });
-    expect(readSettings(db)).toEqual({ 'ui.language': 'system', 'ui.theme': 'system' });
+    expect(readSettings(db)).toEqual(settingDefaults());
+    expect(readSettings(db)).toMatchObject({ 'ui.language': 'system', 'ui.theme': 'system', 'environment.timeoutSeconds': 10, 'discovery.maxDepth': 12 });
     writeSetting(db, { key: 'ui.theme', value: 'dark' });
     expect(readSettings(db, ['ui.theme'])).toEqual({ 'ui.theme': 'dark' });
     db.run("UPDATE settings SET value_json = '\"sepia\"' WHERE key = 'ui.theme'");
