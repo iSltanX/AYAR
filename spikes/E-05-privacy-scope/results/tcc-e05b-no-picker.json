@@ -1,0 +1,139 @@
+{
+  "start": "2026-10-10 07:47:02",
+  "prefix": "com.bysltan.ayar.spike.e05b",
+  "requests": 11,
+  "prompted": 4,
+  "byService": {
+    "kTCCServiceListenEvent": {
+      "requests": 1,
+      "prompted": 0,
+      "denied": 0
+    },
+    "kTCCServiceSystemPolicyAllFiles": {
+      "requests": 5,
+      "prompted": 0,
+      "denied": 5
+    },
+    "kTCCServiceSystemPolicyDocumentsFolder": {
+      "requests": 1,
+      "prompted": 1,
+      "denied": 0
+    },
+    "kTCCServiceSystemPolicyDesktopFolder": {
+      "requests": 1,
+      "prompted": 1,
+      "denied": 0
+    },
+    "kTCCServiceSystemPolicyDownloadsFolder": {
+      "requests": 1,
+      "prompted": 1,
+      "denied": 0
+    },
+    "kTCCServiceSystemPolicyRemovableVolumes": {
+      "requests": 2,
+      "prompted": 1,
+      "denied": 0
+    }
+  },
+  "requestsDetail": [
+    {
+      "time": "2026-10-10 07:47:04.383",
+      "service": "kTCCServiceListenEvent",
+      "responsible": "com.bysltan.ayar.spike.e05b",
+      "accessing": "com.bysltan.ayar.spike.e05b.helper spikes/E-01-electron-forge/out/AYAR Spike E05B-darwin-arm64/AYAR Spike E05B.app/Contents/Frameworks/AYAR Spike E05B Helper.app/Contents/MacOS/AYAR Spike E05B Helper",
+      "authValue": 1,
+      "authReason": 5,
+      "prompted": false
+    },
+    {
+      "time": "2026-10-10 07:47:04.537",
+      "service": "kTCCServiceSystemPolicyAllFiles",
+      "responsible": "com.bysltan.ayar.spike.e05b",
+      "accessing": "com.bysltan.ayar.spike.e05b.helper spikes/E-01-electron-forge/out/AYAR Spike E05B-darwin-arm64/AYAR Spike E05B.app/Contents/Frameworks/AYAR Spike E05B Helper.app/Contents/MacOS/AYAR Spike E05B Helper",
+      "authValue": 0,
+      "authReason": 5,
+      "prompted": false
+    },
+    {
+      "time": "2026-10-10 07:47:04.557",
+      "service": "kTCCServiceSystemPolicyDocumentsFolder",
+      "responsible": "com.bysltan.ayar.spike.e05b",
+      "accessing": "com.bysltan.ayar.spike.e05b.helper spikes/E-01-electron-forge/out/AYAR Spike E05B-darwin-arm64/AYAR Spike E05B.app/Contents/Frameworks/AYAR Spike E05B Helper.app/Contents/MacOS/AYAR Spike E05B Helper",
+      "authValue": 2,
+      "authReason": 2,
+      "prompted": true
+    },
+    {
+      "time": "2026-10-10 07:56:41.585",
+      "service": "kTCCServiceSystemPolicyAllFiles",
+      "responsible": "com.bysltan.ayar.spike.e05b",
+      "accessing": "com.bysltan.ayar.spike.e05b.helper spikes/E-01-electron-forge/out/AYAR Spike E05B-darwin-arm64/AYAR Spike E05B.app/Contents/Frameworks/AYAR Spike E05B Helper.app/Contents/MacOS/AYAR Spike E05B Helper",
+      "authValue": 0,
+      "authReason": 5,
+      "prompted": false
+    },
+    {
+      "time": "2026-10-10 07:56:41.592",
+      "service": "kTCCServiceSystemPolicyDesktopFolder",
+      "responsible": "com.bysltan.ayar.spike.e05b",
+      "accessing": "com.bysltan.ayar.spike.e05b.helper spikes/E-01-electron-forge/out/AYAR Spike E05B-darwin-arm64/AYAR Spike E05B.app/Contents/Frameworks/AYAR Spike E05B Helper.app/Contents/MacOS/AYAR Spike E05B Helper",
+      "authValue": 2,
+      "authReason": 2,
+      "prompted": true
+    },
+    {
+      "time": "2026-10-10 07:56:42.727",
+      "service": "kTCCServiceSystemPolicyDownloadsFolder",
+      "responsible": "com.bysltan.ayar.spike.e05b",
+      "accessing": "com.bysltan.ayar.spike.e05b.helper spikes/E-01-electron-forge/out/AYAR Spike E05B-darwin-arm64/AYAR Spike E05B.app/Contents/Frameworks/AYAR Spike E05B Helper.app/Contents/MacOS/AYAR Spike E05B Helper",
+      "authValue": 2,
+      "authReason": 2,
+      "prompted": true
+    },
+    {
+      "time": "2026-10-10 07:56:43.498",
+      "service": "kTCCServiceSystemPolicyAllFiles",
+      "responsible": "com.bysltan.ayar.spike.e05b",
+      "accessing": "com.bysltan.ayar.spike.e05b.helper spikes/E-01-electron-forge/out/AYAR Spike E05B-darwin-arm64/AYAR Spike E05B.app/Contents/Frameworks/AYAR Spike E05B Helper.app/Contents/MacOS/AYAR Spike E05B Helper",
+      "authValue": 0,
+      "authReason": 5,
+      "prompted": false
+    },
+    {
+      "time": "2026-10-10 07:56:46.560",
+      "service": "kTCCServiceSystemPolicyAllFiles",
+      "responsible": "com.bysltan.ayar.spike.e05b",
+      "accessing": "com.bysltan.ayar.spike.e05b.helper spikes/E-01-electron-forge/out/AYAR Spike E05B-darwin-arm64/AYAR Spike E05B.app/Contents/Frameworks/AYAR Spike E05B Helper.app/Contents/MacOS/AYAR Spike E05B Helper",
+      "authValue": 0,
+      "authReason": 5,
+      "prompted": false
+    },
+    {
+      "time": "2026-10-10 07:56:46.571",
+      "service": "kTCCServiceSystemPolicyRemovableVolumes",
+      "responsible": "com.bysltan.ayar.spike.e05b",
+      "accessing": "com.bysltan.ayar.spike.e05b.helper spikes/E-01-electron-forge/out/AYAR Spike E05B-darwin-arm64/AYAR Spike E05B.app/Contents/Frameworks/AYAR Spike E05B Helper.app/Contents/MacOS/AYAR Spike E05B Helper",
+      "authValue": 2,
+      "authReason": 2,
+      "prompted": true
+    },
+    {
+      "time": "2026-10-10 07:56:47.997",
+      "service": "kTCCServiceSystemPolicyAllFiles",
+      "responsible": "com.bysltan.ayar.spike.e05b",
+      "accessing": "com.bysltan.ayar.spike.e05b.helper spikes/E-01-electron-forge/out/AYAR Spike E05B-darwin-arm64/AYAR Spike E05B.app/Contents/Frameworks/AYAR Spike E05B Helper.app/Contents/MacOS/AYAR Spike E05B Helper",
+      "authValue": 0,
+      "authReason": 5,
+      "prompted": false
+    },
+    {
+      "time": "2026-10-10 07:56:48.008",
+      "service": "kTCCServiceSystemPolicyRemovableVolumes",
+      "responsible": "com.bysltan.ayar.spike.e05b",
+      "accessing": "com.bysltan.ayar.spike.e05b.helper spikes/E-01-electron-forge/out/AYAR Spike E05B-darwin-arm64/AYAR Spike E05B.app/Contents/Frameworks/AYAR Spike E05B Helper.app/Contents/MacOS/AYAR Spike E05B Helper",
+      "authValue": 2,
+      "authReason": 2,
+      "prompted": false
+    }
+  ]
+}

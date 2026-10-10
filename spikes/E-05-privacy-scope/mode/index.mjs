@@ -18,6 +18,8 @@ const LOCATIONS = [
 
 export async function run({ app, createWindow, Engine, info, readBundleId }) {
   const replay = process.argv.includes('--replay');
+  const onlyIdx = process.argv.indexOf('--only');
+  const only = onlyIdx > 0 ? process.argv[onlyIdx + 1] : null; // run a single location (re-pick)
   const win = createWindow({ width: 760, height: 520, title: `AYAR Spike — E-05 ${replay ? 'replay' : 'pick'}` });
   await win.loadURL('app://spike/index.html');
   const engine = new Engine();
@@ -28,7 +30,7 @@ export async function run({ app, createWindow, Engine, info, readBundleId }) {
   const report = { spike: 'E-05', mode: replay ? 'replay' : 'pick', at: new Date().toISOString(), bundleId: readBundleId(), buildInfo: info, locations: [] };
   const show = () => win.webContents.send('spike:report', report);
 
-  for (const [key, dir, label] of LOCATIONS) {
+  for (const [key, dir, label] of LOCATIONS.filter(([k]) => !only || k === only)) {
     const entry = { key, label, t0: new Date().toISOString() };
     let root = stored[key];
     if (!replay) {
@@ -53,7 +55,7 @@ export async function run({ app, createWindow, Engine, info, readBundleId }) {
   }
   fs.writeFileSync(stateFile, JSON.stringify(stored, null, 2));
   report.finishedAt = new Date().toISOString();
-  fs.writeFileSync(path.join(app.getPath('userData'), `e05-${report.mode}.json`), JSON.stringify(report, null, 2));
+  fs.writeFileSync(path.join(app.getPath('userData'), `e05-${report.mode}${only ? `-${only}` : ''}.json`), JSON.stringify(report, null, 2));
   show();
   if (process.argv.includes('--auto-quit')) setTimeout(() => app.quit(), 1500);
 }

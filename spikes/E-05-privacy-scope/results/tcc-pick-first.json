@@ -1,0 +1,100 @@
+{
+  "start": "2026-10-10 07:33:12",
+  "prefix": "com.bysltan.ayar.spike.e05",
+  "requests": 8,
+  "prompted": 0,
+  "byService": {
+    "kTCCServiceListenEvent": {
+      "requests": 5,
+      "prompted": 0,
+      "denied": 0
+    },
+    "kTCCServiceAddressBook": {
+      "requests": 1,
+      "prompted": 0,
+      "denied": 0
+    },
+    "kTCCServiceCalendar": {
+      "requests": 1,
+      "prompted": 0,
+      "denied": 0
+    },
+    "kTCCServiceReminders": {
+      "requests": 1,
+      "prompted": 0,
+      "denied": 0
+    }
+  },
+  "requestsDetail": [
+    {
+      "time": "2026-10-10 07:33:22.566",
+      "service": "kTCCServiceListenEvent",
+      "responsible": "com.bysltan.ayar.spike.e05",
+      "accessing": "com.bysltan.ayar.spike.e05.helper spikes/E-01-electron-forge/out/AYAR Spike E05-darwin-arm64/AYAR Spike E05.app/Contents/Frameworks/AYAR Spike E05 Helper.app/Contents/MacOS/AYAR Spike E05 Helper",
+      "authValue": 1,
+      "authReason": 5,
+      "prompted": false
+    },
+    {
+      "time": "2026-10-10 07:33:22.941",
+      "service": "kTCCServiceListenEvent",
+      "responsible": "com.bysltan.ayar.spike.e05",
+      "authValue": 1,
+      "authReason": 5,
+      "prompted": false
+    },
+    {
+      "time": "2026-10-10 07:33:22.944",
+      "service": "kTCCServiceListenEvent",
+      "responsible": "com.bysltan.ayar.spike.e05",
+      "accessing": "com.apple.quicklook.QuickLookUIService /System/Library/Frameworks/QuickLookUI.framework/Versions/A/XPCServices/QuickLookUIService.xpc/Contents/MacOS/QuickLookUIService",
+      "authValue": 1,
+      "authReason": 5,
+      "prompted": false
+    },
+    {
+      "time": "2026-10-10 07:33:23.088",
+      "service": "kTCCServiceAddressBook",
+      "responsible": "com.bysltan.ayar.spike.e05",
+      "accessing": "com.apple.appkit.xpc.openAndSavePanelService /System/Library/Frameworks/AppKit.framework/Versions/C/XPCServices/com.apple.appkit.xpc.openAndSavePanelService.xpc/Contents/MacOS/com.apple.appkit.xpc.openAndSavePanelService",
+      "authValue": 2,
+      "authReason": 11,
+      "prompted": false
+    },
+    {
+      "time": "2026-10-10 07:33:23.089",
+      "service": "kTCCServiceCalendar",
+      "responsible": "com.bysltan.ayar.spike.e05",
+      "accessing": "com.apple.appkit.xpc.openAndSavePanelService /System/Library/Frameworks/AppKit.framework/Versions/C/XPCServices/com.apple.appkit.xpc.openAndSavePanelService.xpc/Contents/MacOS/com.apple.appkit.xpc.openAndSavePanelService",
+      "authValue": 1,
+      "authReason": 0,
+      "prompted": false
+    },
+    {
+      "time": "2026-10-10 07:33:23.118",
+      "service": "kTCCServiceReminders",
+      "responsible": "com.bysltan.ayar.spike.e05",
+      "accessing": "com.apple.appkit.xpc.openAndSavePanelService /System/Library/Frameworks/AppKit.framework/Versions/C/XPCServices/com.apple.appkit.xpc.openAndSavePanelService.xpc/Contents/MacOS/com.apple.appkit.xpc.openAndSavePanelService",
+      "authValue": 1,
+      "authReason": 0,
+      "prompted": false
+    },
+    {
+      "time": "2026-10-10 07:34:20.464",
+      "service": "kTCCServiceListenEvent",
+      "responsible": "com.bysltan.ayar.spike.e05",
+      "authValue": 1,
+      "authReason": 5,
+      "prompted": false
+    },
+    {
+      "time": "2026-10-10 07:34:20.471",
+      "service": "kTCCServiceListenEvent",
+      "responsible": "com.bysltan.ayar.spike.e05",
+      "accessing": "com.apple.appkit.xpc.ThemeWidgetControlViewService /System/Library/Frameworks/AppKit.framework/Versions/C/XPCServices/ThemeWidgetControlViewService.xpc/Contents/MacOS/ThemeWidgetControlViewService",
+      "authValue": 1,
+      "authReason": 5,
+      "prompted": false
+    }
+  ]
+}
