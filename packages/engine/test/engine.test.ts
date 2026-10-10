@@ -5,6 +5,7 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { startEngine } from '../src/host/engine.ts';
+import { latestVersion } from '../src/storage/migrations.ts';
 import { nodePorts } from '../src/node/ports.ts';
 import type { HostChannel } from '../src/ports/index.ts';
 import { tempRoot } from './support/tmp.ts';
@@ -44,7 +45,7 @@ describe('engine host (C-04)', () => {
     h.hello();
     expect(h.sent[0]).toMatchObject({ kind: 'welcome', protocol: PROTOCOL_VERSION, engine: { version: '0.1.0', pid: process.pid, stream: h.engine.stream } });
     const event = await h.waitFor((m) => m.kind === 'event');
-    expect(event).toMatchObject({ seq: 1, stream: h.engine.stream, topic: 'engine.health', payload: { source: 'engine', state: 'ready', reason: null, schemaVersion: 1, hmacKeySource: 'test' } });
+    expect(event).toMatchObject({ seq: 1, stream: h.engine.stream, topic: 'engine.health', payload: { source: 'engine', state: 'ready', reason: null, schemaVersion: latestVersion(), hmacKeySource: 'test' } });
     expect((event.payload as { logPath: string }).logPath).toBe(join(root, 'AYAR', 'logs', 'engine.log'));
     expect(existsSync(join(root, 'AYAR', 'ayar.db'))).toBe(true);
     h.engine.stop();

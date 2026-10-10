@@ -121,11 +121,14 @@ describe('database (E-03 settings)', () => {
   });
 });
 
+/** The 14.1 schema alone (migration 1); the later migrations are tested on their own below. */
+const V1: readonly Migration[] = MIGRATIONS.slice(0, 1);
+
 describe('migrations (14.1, 14.3, NFR-02, G-11)', () => {
   it('creates the whole 14.1 schema in the first migration, after a backup', async () => {
     const { db, layout } = await freshStore();
     const clock = fakeClock();
-    const r = await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.1.0' });
+    const r = await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.1.0', migrations: V1 });
     expect(r).toMatchObject({ from: 0, to: 1, applied: ['1-initial-schema'] });
     expect(r.backup).not.toBeNull();
     expect(existsSync(r.backup!)).toBe(true);
@@ -168,10 +171,10 @@ describe('migrations (14.1, 14.3, NFR-02, G-11)', () => {
   it('backs up the current data before a later migration, and only then migrates', async () => {
     const { db, layout } = await freshStore();
     const clock = fakeClock();
-    await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.1.0' });
+    await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.1.0', migrations: V1 });
     writeSetting(db, { key: 'ui.language', value: 'ar' });
     clock.advance(60_000);
-    const v2: Migration[] = [...MIGRATIONS, { version: 2, name: 'test-table', sql: 'CREATE TABLE v2_marker (x INTEGER) STRICT;' }];
+    const v2: Migration[] = [...V1, { version: 2, name: 'test-table', sql: 'CREATE TABLE v2_marker (x INTEGER) STRICT;' }];
     const r = await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.2.0', migrations: v2 });
     expect(r).toMatchObject({ from: 1, to: 2, applied: ['2-test-table'] });
     expect(r.backup).toMatch(/pre-v1-to-v2\.db$/);
@@ -187,16 +190,38 @@ describe('migrations (14.1, 14.3, NFR-02, G-11)', () => {
   it('does not migrate when the backup cannot be written', async () => {
     const { db, layout } = await freshStore();
     const clock = fakeClock();
-    await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.1.0' });
+    await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.1.0', migrations: V1 });
     chmodSync(layout.backups, 0o500);
     try {
-      const v2: Migration[] = [...MIGRATIONS, { version: 2, name: 'test-table', sql: 'CREATE TABLE v2_marker (x INTEGER) STRICT;' }];
+      const v2: Migration[] = [...V1, { version: 2, name: 'test-table', sql: 'CREATE TABLE v2_marker (x INTEGER) STRICT;' }];
       await expect(migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.2.0', migrations: v2 })).rejects.toThrow();
       expect(readSchemaVersion(db)).toBe(1);
       expect(db.get<{ n: number }>("SELECT count(*) AS n FROM sqlite_master WHERE name = 'v2_marker'")?.n).toBe(0);
     } finally {
       chmodSync(layout.backups, 0o700);
     }
+  });
+
+  it('migration 2 (DEV-5) adds plans (G-24) and accepted tool versions (G-25), and only nullable columns elsewhere', async () => {
+    const { db, layout } = await freshStore();
+    const clock = fakeClock();
+    await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.1.0', migrations: V1 });
+    db.run("INSERT INTO projects (id, display_name, root_path, root_realpath, created_at) VALUES ('p', 'P', '/p', '/p', 'x')");
+    db.run("INSERT INTO runs (id, display_id, project_id, kind, selection_json, plan_json, state) VALUES ('r', 'RUN-1', 'p', 'full', '{}', '{}', 'finished')");
+    const r = await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.2.0' });
+    expect(r).toMatchObject({ from: 1, to: 2, applied: ['2-runs-and-evidence'] });
+    expect(r.backup).toMatch(/pre-v1-to-v2\.db$/);
+    const columns = (t: string) => db.all<{ name: string; notnull: number }>(`PRAGMA table_info(${t})`);
+    expect(columns('plans').map((c) => c.name)).toEqual(['id', 'project_id', 'kind', 'selection_json', 'plan_json', 'profile_version', 'profile_hash', 'snapshot_id', 'spec_inputs_json', 'created_at', 'frozen_at', 'run_id']);
+    expect(columns('tool_version_acceptances').map((c) => c.name)).toContain('required_spec');
+    // Every 14.1 column is still there, and every column added to a 14.1 table is nullable.
+    for (const [table, cols] of Object.entries(PLAN_TABLES)) {
+      const now = columns(table);
+      for (const c of cols) expect(now.map((x) => x.name), table).toContain(c);
+      for (const extra of now.filter((x) => !cols.includes(x.name))) expect(extra.notnull, `${table}.${extra.name}`).toBe(0);
+    }
+    // The data survived (the run row), and the new columns read as null for it.
+    expect(db.get('SELECT plan_id, cancel_reason, prevent_sleep FROM runs WHERE id = ?', 'r')).toEqual({ plan_id: null, cancel_reason: null, prevent_sleep: null });
   });
 
   it('refuses a database written by a newer AYAR, without a backup or any change', async () => {

@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { boot, BOOT_STEPS } from '../src/host/boot.ts';
 import { LEDGER_FROZEN_COLUMNS, reapLedger } from '../src/host/ledger.ts';
 import { nodeFileSystem } from '../src/node/fs.ts';
+import { nodePorts } from '../src/node/ports.ts';
 import { nodeProcessControl } from '../src/node/processes.ts';
 import { nodeRandom } from '../src/node/random.ts';
 import type { EnginePorts, Logger } from '../src/ports/index.ts';
@@ -18,7 +19,9 @@ import { alive, killQuietly, sleeper, waitUntil } from './support/processes.ts';
 import { fakeClock, tempRoot } from './support/tmp.ts';
 
 const quiet: Logger = { log: () => {}, flush: () => {} };
-const V2: Migration[] = [...MIGRATIONS, { version: 2, name: 'test-table', sql: 'CREATE TABLE v2_marker (x INTEGER) STRICT;' }];
+// The boot is tested from a version-1 store migrating to a test version 2 (the real later migrations aside).
+const V1: readonly Migration[] = MIGRATIONS.slice(0, 1);
+const V2: Migration[] = [...V1, { version: 2, name: 'test-table', sql: 'CREATE TABLE v2_marker (x INTEGER) STRICT;' }];
 const children: ReturnType<typeof sleeper>[] = [];
 let root: string;
 let cleanup: () => void;
@@ -38,9 +41,9 @@ function tracedPorts(trace: string[], layout: () => DataLayout | null): EnginePo
     exit: () => {
       throw new Error('exit');
     },
+    network: nodePorts.network,
     processes: {
-      currentUid: () => nodeProcessControl.currentUid(),
-      startTime: (pid) => nodeProcessControl.startTime(pid),
+      ...nodeProcessControl,
       killGroup: async (pgid, signal) => {
         trace.push(`kill:${pgid}`);
         return nodeProcessControl.killGroup(pgid, signal);
@@ -64,7 +67,7 @@ function tracedPorts(trace: string[], layout: () => DataLayout | null): EnginePo
 async function v1Store(): Promise<{ layout: DataLayout; db: Db }> {
   const { layout } = await ensureDataDir(nodeFileSystem, join(root, 'AYAR'), process.getuid!());
   const db = openDatabase(layout.db);
-  await migrate(db, { fs: nodeFileSystem, clock: fakeClock('2026-10-01T00:00:00.000Z'), backupsDir: layout.backups, appVersion: '0.1.0' });
+  await migrate(db, { fs: nodeFileSystem, clock: fakeClock('2026-10-01T00:00:00.000Z'), backupsDir: layout.backups, appVersion: '0.1.0', migrations: V1 });
   return { layout, db };
 }
 
@@ -143,7 +146,7 @@ describe('boot order (C-04, G-27)', () => {
     expect(r.state).toBe('ready');
     expect(r.schemaVersion).toBe(latestVersion());
     expect(r.steps.find((s) => s.step === 'ledger.reap')?.detail).toMatchObject({ running: 0 });
-    expect(r.steps.find((s) => s.step === 'db.migrate')?.detail).toMatchObject({ from: 0, to: 1, backup: true });
+    expect(r.steps.find((s) => s.step === 'db.migrate')?.detail).toMatchObject({ from: 0, to: latestVersion(), backup: true });
     r.db!.close();
   });
 
@@ -232,7 +235,8 @@ describe('operational faults degrade or log, never crash the boot (C-04)', () =>
       clock,
       fs: { ...ports.fs, chmod: (p, m) => (p.startsWith(layout.backups + '/') ? Promise.reject(new Error('ENOSPC')) : ports.fs.chmod(p, m)) },
     };
-    const r = await boot({ dataDir: layout.root, ports: failing, logger: quiet, appVersion: '0.1.0' });
+    // No migration is pending (V1), so the only backup the boot attempts is the weekly one.
+    const r = await boot({ dataDir: layout.root, ports: failing, logger: quiet, appVersion: '0.1.0', migrations: V1 });
     expect(r.state).toBe('ready');
     expect(r.steps.find((s) => s.step === 'db.weekly_backup')).toMatchObject({ ok: false });
     r.db!.close();
@@ -248,6 +252,7 @@ describe('operational faults degrade or log, never crash the boot (C-04)', () =>
     const eperm: EnginePorts = {
       ...ports,
       processes: {
+        ...nodeProcessControl,
         currentUid: () => process.getuid!(),
         startTime: (pid) => Promise.resolve(pid === 4242 ? 'Mon Oct  5 10:00:00 2026' : 'whatever'),
         killGroup: (pgid) => {
