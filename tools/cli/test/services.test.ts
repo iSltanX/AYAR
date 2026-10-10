@@ -30,6 +30,11 @@ describe('FR-21: companion services', () => {
       await engine.waitForEvent('engine.health');
       const { projectId } = await addProject(engine, materialize('FX-PROC', 'good', join(root, 'fx')));
       const http = `require('http').createServer((q, s) => s.end('ok')).listen(${port}, '127.0.0.1', () => console.log('listening'));`;
+      // A readiness pattern that is not a regular expression is refused when the profile is saved.
+      expect(await engine.invoke('profile.update', { projectId, patch: { services: { bad: { argv: ['node', '-e', '1'], cwd: '.', readyUrl: null, readyPattern: '(unclosed', readyTimeoutSec: 5, ports: [] } } } })).toMatchObject({
+        ok: false,
+        error: { code: 'profile_invalid', details: { rule: 'service_pattern', name: 'bad' } },
+      });
       ok(await engine.invoke('profile.update', {
         projectId,
         patch: {

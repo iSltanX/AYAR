@@ -12,7 +12,6 @@
 import ignore from 'ignore';
 import { createHash, createHmac } from 'node:crypto';
 import { posix } from 'node:path';
-import { gunzipSync, gzipSync } from 'node:zlib';
 import type { SideEffects } from '@ayar/protocol';
 import { sensitiveKind } from '../discovery/walker.ts';
 import type { DirEntry, FileStat, FileSystem } from '../ports/index.ts';
@@ -302,14 +301,6 @@ export class SnapshotService {
     if (!entry[7] || !entry[5].startsWith('sha256:')) return null;
     return new TextDecoder().decode(await this.#d.blobs.get(entry[5].slice('sha256:'.length)));
   }
-}
-
-/** Compressed JSON for an in-memory manifest kept between two per-check snapshots. */
-export function packManifest(m: Manifest): Uint8Array {
-  return gzipSync(JSON.stringify(m));
-}
-export function unpackManifest(data: Uint8Array): Manifest {
-  return JSON.parse(gunzipSync(data).toString('utf8')) as Manifest;
 }
 
 export interface DiffOptions {

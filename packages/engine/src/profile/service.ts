@@ -177,6 +177,15 @@ export class ProfileService {
     }
     for (const [name, sv] of Object.entries(settings.services)) {
       if (judgeCommand(policy, [argvText(sv.argv), ...sv.argv]).refused.length) throw invalid('sudo', { instance: `service:${name}` });
+      // FR-21: the readiness pattern is a regular expression the engine runs on the service's log: one that does
+      // not compile is refused here, not discovered at the first run.
+      if (sv.readyPattern !== null) {
+        try {
+          new RegExp(sv.readyPattern);
+        } catch {
+          throw invalid('service_pattern', { name });
+        }
+      }
     }
     // Nothing is saved before C-18: a profile that holds a secret (in a command, a variable, a reference) is
     // refused rather than stored; a secret reaches a check only as an allowed variable, by name (D-47).

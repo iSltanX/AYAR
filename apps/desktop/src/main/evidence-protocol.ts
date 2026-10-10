@@ -4,6 +4,7 @@
 // behind it: the engine checks the token, that the file is a regular file inside the evidence store with no link
 // on the way, and that its hash still matches its index; anything else answers 404 without saying why.
 import type { InvokeResult } from '@ayar/protocol';
+import { createHash } from 'node:crypto';
 import { securityHeaders } from './app-protocol.ts';
 
 export const EVIDENCE_SCHEME = 'ayar-evidence';
@@ -35,10 +36,11 @@ export async function serveEvidence(url: string, deps: EvidenceDeps): Promise<Re
   if (!token) return notFound();
   const r = await deps.resolve(token).catch(() => null);
   if (!r?.ok) return notFound();
-  const { path, kind, size } = r.result as { path: string; kind: string; size: number };
+  const { path, kind, size, sha256 } = r.result as { path: string; kind: string; size: number; sha256: string };
   try {
     const body = await deps.readFile(path);
-    if (body.length !== size) return notFound(); // changed since the engine checked it
+    // What is served is what the engine checked: the same size and the same hash (a file changed since is not).
+    if (body.length !== size || createHash('sha256').update(body).digest('hex') !== sha256) return notFound();
     return new Response(new Uint8Array(body), { status: 200, headers: headers(contentTypeOf(kind)) });
   } catch {
     return notFound();

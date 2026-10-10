@@ -26,6 +26,9 @@ import { EventBus } from './event-bus.ts';
 import { RunGate } from './run-gate.ts';
 import { createServices, type EngineServices } from './services.ts';
 
+/** How long a stop waits for an active run's short ending: the 2 s step to SIGKILL, the sweep, and a margin. */
+export const QUIT_WAIT_MS = 4500;
+
 export interface StartEngineOptions {
   ports: EnginePorts;
   channel: HostChannel;
@@ -215,11 +218,11 @@ export function startEngine(o: StartEngineOptions): EngineHandle {
         logger.flush();
         ports.exit(code);
       };
-      // 9.7: a run still active when the engine is told to stop ends the short way (SIGTERM, then SIGKILL and
-      // the sweep) within the supervisor's 2 s; what it cannot finish, the next boot marks «انقطع».
+      // 9.7: a run still active when the engine is told to stop ends the short way (SIGTERM, 2 s, SIGKILL and
+      // the sweep); the wait leaves room for the SIGKILL. What it cannot finish, the next boot marks «انقطع».
       if (services?.runs.hasActive()) {
         const quick = services.runs.prepareQuit().catch(() => null);
-        void Promise.race([quick, new Promise((r) => setTimeout(r, 1800))]).finally(finish);
+        void Promise.race([quick, new Promise((r) => setTimeout(r, QUIT_WAIT_MS))]).finally(finish);
       } else finish();
     },
     crash(error: unknown): never {

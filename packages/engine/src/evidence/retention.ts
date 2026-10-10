@@ -57,8 +57,22 @@ export async function deleteRuns(d: RetentionDeps, projectId: string, runIds: re
       if (!used) d.db.run('DELETE FROM snapshots WHERE id = ?', s);
     }
   });
+  purgeLedger(d.db);
   const gc = await d.blobs.collect(d.db);
   return { deleted: runIds.length, freedBytes: evidenceBytes + gc.freedBytes };
+}
+
+/**
+ * The process ledger keeps a row per launch (C-12 point 4); a settled row is needed only while its run exists. Rows
+ * of runs that are gone, and settled rows of setup commands older than 30 days, are deleted (never a running row:
+ * the boot's reap needs it).
+ */
+export function purgeLedger(db: Db, now: Date = new Date()): number {
+  const old = new Date(now.getTime() - 30 * 86_400_000).toISOString();
+  return db.run(
+    "DELETE FROM process_ledger WHERE state <> 'running' AND ((run_id IS NOT NULL AND run_id NOT IN (SELECT id FROM runs)) OR (run_id IS NULL AND created_at < ?))",
+    old,
+  ).changes;
 }
 
 export async function applyRetention(d: RetentionDeps, projectId: string, keep: number): Promise<{ deleted: number; freedBytes: number }> {

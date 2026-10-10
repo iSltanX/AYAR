@@ -2,6 +2,7 @@
 // a valid token the engine resolves, never by a path; and the sleep guard (FR-26) holds one power-save blocker
 // while any run that asks for it is running, and releases it when none is.
 import { protocolError } from '@ayar/protocol';
+import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import { contentTypeOf, evidenceToken, serveEvidence } from '../src/main/evidence-protocol.ts';
 import { SleepGuard } from '../src/main/sleep-guard.ts';
@@ -28,7 +29,7 @@ describe('ayar-evidence://', () => {
     const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47]);
     const asked: string[] = [];
     const res = await serveEvidence(`ayar-evidence://e/${TOKEN}`, {
-      resolve: (t) => (asked.push(t), Promise.resolve({ ok: true, result: { path: '/data/evidence/a.png', kind: 'screenshot', size: 4, sha256: 'x' } })),
+      resolve: (t) => (asked.push(t), Promise.resolve({ ok: true, result: { path: '/data/evidence/a.png', kind: 'screenshot', size: 4, sha256: createHash('sha256').update(png).digest('hex') } })),
       readFile: () => Promise.resolve(png),
     });
     expect(asked).toEqual([TOKEN]);
@@ -42,13 +43,16 @@ describe('ayar-evidence://', () => {
   });
 
   it('answers 404, saying nothing, for a refused token, a vanished file, or one changed since it was checked', async () => {
+    // (The served file must have the size and the hash the engine checked.)
     const url = `ayar-evidence://e/${TOKEN}`;
-    const found = { ok: true as const, result: { path: '/p', kind: 'log', size: 3, sha256: 'x' } };
+    const found = { ok: true as const, result: { path: '/p', kind: 'log', size: 3, sha256: createHash('sha256').update(new Uint8Array(3)).digest('hex') } };
     const cases = [
       { resolve: () => Promise.resolve({ ok: false as const, error: protocolError('token_invalid') }), readFile: () => Promise.resolve(new Uint8Array(3)) },
       { resolve: () => Promise.reject(new Error('engine gone')), readFile: () => Promise.resolve(new Uint8Array(3)) },
       { resolve: () => Promise.resolve(found), readFile: () => Promise.reject(new Error('ENOENT /p')) },
       { resolve: () => Promise.resolve(found), readFile: () => Promise.resolve(new Uint8Array(4)) },
+      // Same size, other bytes: changed after the engine hashed it.
+      { resolve: () => Promise.resolve(found), readFile: () => Promise.resolve(new Uint8Array([1, 2, 3])) },
     ];
     for (const deps of cases) {
       const res = await serveEvidence(url, deps);

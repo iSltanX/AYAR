@@ -90,5 +90,6 @@
   "profile.invalid.outside_project": "ملف المعايير في المستودع يشير إلى خارج المشروع، فلم يُقرأ.",
   "profile.invalid.too_deep": "ملف المعايير متداخل بعمق يتجاوز الحد، فرُفض.",
   "profile.ref.outputs": "لا مخرجات معلنة يكتبها الفحص",
-  "profile.invalid.unknown_service": "الفحص ({instance}) يطلب خدمة مرافقة غير معلنة في الملف: «{name}»."
+  "profile.invalid.unknown_service": "الفحص ({instance}) يطلب خدمة مرافقة غير معلنة في الملف: «{name}».",
+  "profile.invalid.service_pattern": "نمط جاهزية الخدمة «{name}» ليس تعبيرًا نمطيًا صالحًا"
 }

@@ -90,5 +90,6 @@
   "profile.invalid.outside_project": "The repository’s standards profile points outside the project, so it was not read.",
   "profile.invalid.too_deep": "The standards profile is nested deeper than the limit, so it was refused.",
   "profile.ref.outputs": "no declared outputs the checks write",
-  "profile.invalid.unknown_service": "The check ({instance}) asks for a companion service the profile does not declare: “{name}”."
+  "profile.invalid.unknown_service": "The check ({instance}) asks for a companion service the profile does not declare: “{name}”.",
+  "profile.invalid.service_pattern": "The readiness pattern of the service «{name}» is not a valid regular expression"
 }

@@ -2,7 +2,9 @@
 // a tool whose bytes do not match the pinned hash is refused — the download is deleted, a security alert is raised
 // and the audit log records what came and what was expected — and the register shows the pinned version, the
 // licence, where it comes from, and a stale alert for an entry verified more than 180 days ago. With honest bytes
-// the same tool installs, verifies, and a file changed after install shows as damaged.
+// the same tool installs, verifies, and a file changed after install shows as damaged. With AYAR_AT35_NETWORK=1,
+// the real uv 0.13.0 installs only once its Developer ID requirement names the pinned team, and the same bytes
+// pinned to another team are refused (E-20; the network for this test only).
 import type { ToolInstallResult, ToolView } from '@ayar/protocol';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { chmodSync, existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
@@ -135,4 +137,26 @@ describe('AT-35: a tampered tool is refused; the register shows version, licence
     expect(audit(dataDir, 'tool.installed')).toEqual([expect.objectContaining({ tool: 'ayar-fake-tool', verification: 'sha256' })]);
     expect(audit(dataDir, 'tool.removed')).toHaveLength(1);
   }, 60_000);
+
+  it.runIf(process.env.AYAR_AT35_NETWORK === '1')('with the network: uv is installed only when its Developer ID names the pinned team', async () => {
+    const install = async (env: Record<string, string>): Promise<ToolInstallResult> => {
+      const engine = await connectEngine({ dataDir: join(root, `AYAR-${Object.keys(env).length}`), env });
+      try {
+        await engine.waitForEvent('engine.health');
+        const preview = ok<{ digest: string }>(await engine.invoke('tools.preview', { toolId: 'uv' }));
+        const g = confirmationGrant('tools.install', 'uv', preview.digest);
+        return ok<ToolInstallResult>(await engine.invoke('tools.install', { toolId: 'uv', confirmationToken: g.token }, g.grants));
+      } finally {
+        await engine.close();
+      }
+    };
+    // The shipped entry: Astral's team.
+    expect(await install({})).toMatchObject({ status: 'installed', tool: { installedVersion: '0.13.0', signatureChecked: true, verification: { kind: 'developer_id', teamId: '2DC432GLL2' } } });
+    // The very same bytes and hash, pinned to another team: the signature does not satisfy the requirement.
+    const reg = join(root, 'registry-uv.json');
+    const { BUILTIN_TOOLS } = await import('../../../packages/engine/src/tools/registry.ts');
+    const uv = BUILTIN_TOOLS.find((t) => t.key === 'uv')!;
+    writeFileSync(reg, JSON.stringify([{ ...uv, verification: { kind: 'developer_id', teamId: '4993Y37DX6' }, test: true }]));
+    expect(await install({ AYAR_TEST_TOOL_REGISTRY: reg })).toMatchObject({ status: 'rejected', reason: 'signature_invalid' });
+  }, 180_000);
 });

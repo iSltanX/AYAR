@@ -8,7 +8,7 @@ import type { RedactionService } from '../redaction/service.ts';
 import { readSettings } from '../storage/settings.ts';
 import type { HmacKey } from '../storage/hmac-key.ts';
 import { BlobStore } from './blobs.ts';
-import { applyRetention, deleteRuns, projectSpace, removeProjectData, type RetentionDeps } from './retention.ts';
+import { applyRetention, deleteRuns, projectSpace, purgeLedger, removeProjectData, type RetentionDeps } from './retention.ts';
 import { SnapshotService } from './snapshot.ts';
 import { EvidenceStore } from './store.ts';
 
@@ -71,6 +71,7 @@ export class EvidenceService {
    */
   async afterProjectRemoved(projectId: string): Promise<void> {
     await removeProjectData(this.#deps(), projectId);
+    purgeLedger(this.#db);
     await this.blobs.collect(this.#db);
   }
 }

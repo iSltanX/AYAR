@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { BlobStore } from '../src/evidence/blobs.ts';
 import { parseGitIndex, trackedPaths } from '../src/evidence/git-index.ts';
-import { expiredRuns } from '../src/evidence/retention.ts';
+import { expiredRuns, purgeLedger } from '../src/evidence/retention.ts';
 import { EvidenceService } from '../src/evidence/service.ts';
 import { diffManifests, underAny, type Manifest } from '../src/evidence/snapshot.ts';
 import { nodeFileSystem } from '../src/node/fs.ts';
@@ -271,6 +271,19 @@ describe('evidence files and tokens (C-17, T7)', () => {
 });
 
 describe('retention (C-17, 14.3, AT-26 engine part)', () => {
+  it('the process ledger keeps a settled row only while its run exists, and never drops a running one', () => {
+    seedRun('kept', '2026-10-01T08:00:00.000Z');
+    const row = (id: string, runId: string | null, state: string, at: string) =>
+      db.run("INSERT INTO process_ledger (id, check_run_id, pid, pgid, os_start_time, command_digest, check_token, temp_dir, state, created_at, kind, run_id) VALUES (?, NULL, 1, 1, 'x', 'sha256:x', ?, NULL, ?, ?, 'check', ?)", id, `tok-${id}`, state, at, runId);
+    row('of-kept', 'kept', 'ended', '2026-10-01T08:00:00.000Z');
+    row('of-gone', 'gone', 'ended', '2026-10-01T08:00:00.000Z');
+    row('running', 'gone', 'running', '2026-10-01T08:00:00.000Z');
+    row('setup-old', null, 'ended', '2026-08-01T08:00:00.000Z');
+    row('setup-new', null, 'ended', '2026-10-09T08:00:00.000Z');
+    expect(purgeLedger(db, new Date('2026-10-10T00:00:00Z'))).toBe(2);
+    expect(db.all<{ id: string }>('SELECT id FROM process_ledger ORDER BY id').map((r) => r.id)).toEqual(['of-kept', 'running', 'setup-new']);
+  });
+
   it('keeps the last 20, every pinned run and what rounds need; frees the rest and the space shown drops by as much', async () => {
     write('src/a.js', 'a\n');
     for (let i = 1; i <= 23; i++) {

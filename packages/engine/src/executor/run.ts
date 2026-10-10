@@ -382,6 +382,13 @@ export class RunService {
         if (heavy) break;
       }
       if (!pending.length && !running.size) break;
+      if (!progressed && !running.size) {
+        // Nothing runs and nothing can start (a cycle the plan did not see): the rest ends «تعذّر», never a hang
+        // that would hold the one run slot (D-33) until a restart.
+        this.#o.logger.log('error', 'scheduler stalled: the remaining checks cannot start', { runId, pending: pending.length });
+        for (const x of pending.splice(0)) this.#finishCheck(execs.get(x)!, 'unavailable', { key: 'run.reason.internal' }, null, []);
+        break;
+      }
       if (!progressed) await new Promise<void>((r) => (wake = r));
     }
     await active.services.stopAll(active.cancel === 'app_quit' ? 'quit' : 'cancel');
@@ -397,7 +404,8 @@ export class RunService {
       if (active.cancel) recordAudit(db, { id: newId(ports.random, 'aud'), at: ports.clock.now(), action: 'run.cancelled', projectId, details: { runId, reason: active.cancel } });
     });
     this.#emitRun(runId);
-    await evidence.retain(projectId).catch((e: unknown) => this.#o.logger.log('error', 'retention failed', { error: e instanceof Error ? e.message : String(e) }));
+    // Retention waits for the next run (or the weekly pass) when the app is quitting: the quit stays short.
+    if (active.cancel !== 'app_quit') await evidence.retain(projectId).catch((e: unknown) => this.#o.logger.log('error', 'retention failed', { error: e instanceof Error ? e.message : String(e) }));
   }
 
   /** The specs as the project's files say now, or null when they cannot be read (the caller fails closed). */
@@ -549,12 +557,11 @@ export class RunService {
       sideEffects = diffManifests(before, after, { declared: ctx.declared, tracked: await trackedPaths(ports.fs, ctx.root) });
       await add('side-effects.json', 'side_effects', new TextEncoder().encode(JSON.stringify(sideEffects, null, 2)));
     }
-    const reports = await this.#collectReports(reportsDir, async (name, data) => {
+    await this.#collectReports(reportsDir, async (name, data, truncated) => {
       const text = new TextDecoder().decode(data);
       const red = redactor.redactText(text);
-      await add(`reports/${name}`, 'report', new TextEncoder().encode(red.text), { counts: red.counts });
+      await add(`reports/${name}`, 'report', new TextEncoder().encode(red.text), { counts: red.counts, truncated });
     });
-    void reports;
     await ports.fs.remove(tmpRoot);
 
     // The outcome the process itself gives (7.3 rule 1; 7.5), and the notes of 9.7 and 17.
@@ -660,7 +667,7 @@ export class RunService {
     this.#emitRun(this.#checkRow(e.checkRunId).run_id);
   }
 
-  async #collectReports(dir: string, each: (name: string, data: Uint8Array) => Promise<void>): Promise<number> {
+  async #collectReports(dir: string, each: (name: string, data: Uint8Array, truncated: boolean) => Promise<void>): Promise<number> {
     const { fs } = this.#o.ports;
     let n = 0;
     const walk = async (rel: string) => {
@@ -670,8 +677,8 @@ export class RunService {
         if (x.kind === 'directory') await walk(r);
         else if (x.kind === 'file') {
           // A raw report is read with a limit (10.3 «حماية القراءة»): beyond it, the part read is kept.
-          const { data } = await fs.readFilePrefix(posix.join(dir, r), 50 * 1024 * 1024);
-          await each(r.replace(/[^A-Za-z0-9._/-]/g, '_'), data);
+          const { data, size } = await fs.readFilePrefix(posix.join(dir, r), 50 * 1024 * 1024);
+          await each(r.replace(/[^A-Za-z0-9._/-]/g, '_'), data, size > data.length);
           n++;
         }
       }
@@ -694,6 +701,7 @@ export class RunService {
         this.#o.runGate.release(target.runId);
         db.run("UPDATE check_runs SET state = 'finished', outcome = 'cancelled', outcome_reason = ?, finished_at = ? WHERE run_id = ? AND state <> 'finished'", JSON.stringify({ key: 'run.reason.cancelledByUser' }), this.#now(), target.runId);
         db.run("UPDATE runs SET state = 'finished', finished_at = ?, cancel_reason = 'user', counts_json = ? WHERE id = ?", this.#now(), JSON.stringify(this.#counts(target.runId)), target.runId);
+        recordAudit(db, { id: newId(this.#o.ports.random, 'aud'), at: this.#o.ports.clock.now(), action: 'run.cancelled', projectId: run.project_id, details: { runId: target.runId, reason: 'user', queued: true } });
         this.#emitRun(target.runId);
         return { accepted: true, state: 'finished' };
       }

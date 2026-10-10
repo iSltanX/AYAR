@@ -254,16 +254,21 @@ export function buildPlan(i: PlanInput): RunPlan {
     } else if (!first) keys.set(key, it);
   }
 
-  // 7. An order with no cycle (Kahn), ties broken by catalog order.
+  // 7. An order with no cycle (Kahn), ties broken by catalog order. What an item waits for is its dependencies,
+  //    and the execution it takes its verdict from (the covering one, or the shared one): a cycle through those is
+  //    refused here, never left for the scheduler to wait on.
   const inPlan = [...items.values()].filter((x) => ['run', 'shared', 'covered', 'missing', 'untrusted'].includes(x.status));
   const set = new Set(inPlan.map((x) => x.instance));
-  const indeg = new Map(inPlan.map((x) => [x.instance, x.dependsOn.filter((d) => set.has(d)).length]));
+  const sourceOf = (x: PlanItem): string | null =>
+    x.status === 'covered' ? x.coveredBy : x.status === 'shared' ? (inPlan.find((p) => p.status === 'run' && p.sharedInvocationKey === x.sharedInvocationKey)?.instance ?? null) : null;
+  const after = new Map(inPlan.map((x) => [x.instance, [...new Set([...x.dependsOn, ...(sourceOf(x) ? [sourceOf(x)!] : [])])].filter((d) => set.has(d) && d !== x.instance)]));
+  const indeg = new Map(inPlan.map((x) => [x.instance, after.get(x.instance)!.length]));
   const ready = inPlan.filter((x) => indeg.get(x.instance) === 0).map((x) => x.instance).sort(cmp);
   const ordered: string[] = [];
   while (ready.length) {
     const x = ready.shift()!;
     ordered.push(x);
-    for (const y of inPlan.filter((p) => p.dependsOn.includes(x))) {
+    for (const y of inPlan.filter((p) => after.get(p.instance)!.includes(x))) {
       indeg.set(y.instance, indeg.get(y.instance)! - 1);
       if (indeg.get(y.instance) === 0) {
         ready.push(y.instance);

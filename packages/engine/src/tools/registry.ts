@@ -17,7 +17,7 @@ export const ToolFile = z.strictObject({
   size: z.int().positive(),
   archive: z.enum(['tar.gz', 'zip', 'binary']),
   /** The executable inside the archive (or the file name for a binary). */
-  bin: z.string().regex(/^[A-Za-z0-9._-]+(\/[A-Za-z0-9._-]+)*$/),
+  bin: z.string().regex(/^(?!\.{1,2}(?:\/|$))[A-Za-z0-9._-]+(?:\/(?!\.{1,2}(?:\/|$))[A-Za-z0-9._-]+)*$/),
 });
 
 export const ManagedToolDef = z.strictObject({

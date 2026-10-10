@@ -131,6 +131,7 @@ export class ToolsService {
     }
     if (!def.system) return null;
     for (const dir of await this.#o.path()) {
+      if (!dir.startsWith('/')) continue; // a relative PATH entry would resolve inside whatever folder is current
       for (const name of def.system.names) {
         const p = posix.join(dir, name);
         const st = await this.#o.ports.fs.stat(p).catch(() => null);
@@ -334,7 +335,11 @@ export class ToolsService {
     const v = def.verification;
     const run = (cmd: string, args: string[]) => this.#o.ports.processes.spawn(cmd, args, { cwd: work, env: { PATH: '/usr/bin:/bin' }, timeoutMs: 60_000, maxOutputBytes: 256 * 1024 });
     if (v.kind === 'developer_id') {
-      const check = await run('/usr/bin/codesign', ['--verify', '--strict', bin]);
+      // The requirement itself, not only the signature's own claim: an Apple-anchored Developer ID chain (the
+      // Developer ID CA and an application leaf) whose leaf names the pinned team. A self-signed certificate that
+      // merely writes the team in its subject does not satisfy it. (teamId is [A-Z0-9]{10} by its schema.)
+      const requirement = `anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] exists and certificate leaf[field.1.2.840.113635.100.6.1.13] exists and certificate leaf[subject.OU] = "${v.teamId}"`;
+      const check = await run('/usr/bin/codesign', ['--verify', '--strict', `-R=${requirement}`, bin]);
       const info = await run('/usr/bin/codesign', ['-dv', bin]);
       const team = /TeamIdentifier=(\S+)/.exec(new TextDecoder().decode(info.stderr))?.[1] ?? null;
       if (check.code !== 0 || team !== v.teamId) throw new ToolRejected('signature_invalid', { expectedTeam: v.teamId, team: team ?? 'none' });

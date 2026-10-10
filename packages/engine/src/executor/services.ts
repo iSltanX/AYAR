@@ -10,6 +10,8 @@ import type { RedactionService } from '../redaction/service.ts';
 import type { ProcessSupervisor, RunningProcess } from './process.ts';
 
 const POLL_MS = 250;
+/** The readiness pattern sees at most this much of a log line: a long line never stalls the engine on it. */
+const PATTERN_LINE_CHARS = 4096;
 
 interface Running {
   proc: RunningProcess;
@@ -98,11 +100,16 @@ export class CompanionServices {
     const redactor = { out: this.#o.redaction.redactor().lineStream(), err: this.#o.redaction.redactor().lineStream() };
     const decoder = { out: new TextDecoder(), err: new TextDecoder() };
     let matched = false;
-    const pattern = s.readyPattern ? new RegExp(s.readyPattern) : null;
+    let pattern: RegExp | null = null;
+    try {
+      pattern = s.readyPattern ? new RegExp(s.readyPattern) : null;
+    } catch {
+      pattern = null; // refused at save (profile.invalid.service_pattern); an older profile simply waits for its URL
+    }
     const sink = (k: 'out' | 'err') => (c: Uint8Array) => {
       for (const line of redactor[k].push(decoder[k].decode(c, { stream: true }))) {
         if (log.length < 20_000) log.push(line);
-        if (pattern?.test(line)) matched = true;
+        if (!matched && pattern?.test(line.slice(0, PATTERN_LINE_CHARS))) matched = true;
       }
     };
     const proc = this.#o.supervisor.start({

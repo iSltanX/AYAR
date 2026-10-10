@@ -9,7 +9,7 @@
 // token (setsid, double fork) is ended (E-22), and a new launchd child outside the system folders or a new
 // launchd job is recorded as a possible escape: «تعذّر التحقق من إنهاء كل العمليات» — never claimed clean (17).
 import { createHash } from 'node:crypto';
-import type { Clock, EnginePorts, Logger, ProcessInfo, StopSignal } from '../ports/index.ts';
+import type { Clock, EnginePorts, Logger, ProcessInfo, StartedProcess, StopSignal } from '../ports/index.ts';
 import type { Db } from '../storage/db.ts';
 import { newId } from '../host/ids.ts';
 import { sweepTokens } from './sweep.ts';
@@ -147,12 +147,17 @@ export class ProcessSupervisor {
       spec.ledger.runId,
     );
     let lastOutput = startMono;
-    let lastBusy = startMono;
     const wrapOut = (fn: (c: Uint8Array) => void) => (c: Uint8Array) => {
       lastOutput = this.#clock.monotonicMs();
       fn(c);
     };
-    const started = await processes.start(spec.argv[0]!, spec.argv.slice(1), { cwd: spec.cwd, env: { ...spec.env, AYAR_CHECK_TOKEN: spec.token }, onStdout: wrapOut((c) => spec.onStdout(c)), onStderr: wrapOut((c) => spec.onStderr(c)) });
+    let started: StartedProcess;
+    try {
+      started = await processes.start(spec.argv[0]!, spec.argv.slice(1), { cwd: spec.cwd, env: { ...spec.env, AYAR_CHECK_TOKEN: spec.token }, onStdout: wrapOut((c) => spec.onStdout(c)), onStderr: wrapOut((c) => spec.onStderr(c)) });
+    } catch (e) {
+      // A launch that throws instead of reporting its failure is a failed launch: the ledger row is closed below.
+      started = { pid: null, error: e instanceof Error ? e.message.slice(0, 200) : String(e), exited: Promise.resolve({ code: null, signal: null }) };
+    }
     const result: ProcessResult = {
       ended: 'exited',
       exitCode: null,
@@ -177,6 +182,32 @@ export class ProcessSupervisor {
     }
     const pgid = started.pid;
     setPid(pgid);
+    try {
+      return await this.#supervise(spec, started, pgid, ledgerId, result, base, startMono, () => lastOutput, stopMode, setWake);
+    } catch (e) {
+      // Supervision itself failed (the database went away…): the group must not run on unsupervised.
+      this.#logger.log('error', 'supervision failed: the group is killed', { error: e instanceof Error ? e.message.slice(0, 300) : String(e) });
+      await processes.killGroup(pgid, 'SIGKILL').catch(() => false);
+      await this.sweepToken(spec.token).catch(() => null);
+      this.#endLedger(ledgerId);
+      throw e;
+    }
+  }
+
+  async #supervise(
+    spec: ProcessSpec,
+    started: StartedProcess,
+    pgid: number,
+    ledgerId: string,
+    result: ProcessResult,
+    base: Baseline,
+    startMono: number,
+    lastOutputOf: () => number,
+    stopMode: () => 'cancel' | 'quit' | null,
+    setWake: (w: () => void) => void,
+  ): Promise<ProcessResult> {
+    const { processes } = this.#ports;
+    let lastBusy = startMono;
     const osStart = (await processes.startTime(pgid)) ?? '';
     this.#db.run('UPDATE process_ledger SET pid = ?, pgid = ?, os_start_time = ? WHERE id = ?', pgid, pgid, osStart, ledgerId);
 
@@ -216,13 +247,18 @@ export class ProcessSupervisor {
         result.resources.maxCpuPercent = Math.max(result.resources.maxCpuPercent, sample.cpuPercent);
         result.resources.lastCpuPercent = sample.cpuPercent;
         if (sample.cpuPercent >= BUSY_CPU_PERCENT) lastBusy = nowMono;
-        spec.onSample?.({ ...sample, silentMs: Math.round(nowMono - lastOutput) });
+        try {
+          spec.onSample?.({ ...sample, silentMs: Math.round(nowMono - lastOutputOf()) });
+        } catch (e) {
+          // A sample that could not be recorded never stops the watch: timeouts and cancel go on.
+          this.#logger.log('warn', 'sample not recorded', { error: e instanceof Error ? e.message.slice(0, 200) : String(e) });
+        }
       }
       const mode = stopMode();
       if (mode) ending = 'cancelled';
       else if (spec.timeoutMs !== null && nowMono - startMono >= spec.timeoutMs) ending = 'timed_out';
       // Idle: neither output nor processor activity for the idle limit (a busy silent check is never idle).
-      else if (spec.idleTimeoutMs !== null && nowMono - Math.max(lastOutput, lastBusy) >= spec.idleTimeoutMs) ending = 'idle_timed_out';
+      else if (spec.idleTimeoutMs !== null && nowMono - Math.max(lastOutputOf(), lastBusy) >= spec.idleTimeoutMs) ending = 'idle_timed_out';
       if (ending) {
         await this.#escalate(pgid, stopMode() === 'quit' ? 'quit' : 'cancel', () => exited, result, startMono, stopMode);
         break;
@@ -243,7 +279,7 @@ export class ProcessSupervisor {
     const endMono = this.#clock.monotonicMs();
     result.durationMs = Math.round(endMono - startMono);
     result.finishedAt = this.#clock.now();
-    result.lastActivityAt = new Date(result.startedAt.getTime() + Math.round(lastOutput - startMono));
+    result.lastActivityAt = new Date(result.startedAt.getTime() + Math.round(lastOutputOf() - startMono));
     return result;
   }
 
