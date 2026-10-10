@@ -1,0 +1,17 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": [
+      "ES2024",
+      "ES2025.Intl",
+      "DOM"
+    ],
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "./**/*.ts",
+    "../e2e/**/*.ts"
+  ]
+}

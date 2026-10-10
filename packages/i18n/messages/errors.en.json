@@ -1,0 +1,22 @@
+{
+  "errors.unknown_command": "Unknown command; nothing was done.",
+  "errors.invalid_message": "A message did not match the protocol and was rejected.",
+  "errors.invalid_payload": "The command's data does not match its schema; nothing was done.",
+  "errors.invalid_result": "The engine's reply does not match its contract and was discarded.",
+  "errors.untrusted_sender": "The message was rejected because it did not come from the AYAR window.",
+  "errors.not_implemented": "This function is not built yet.",
+  "errors.grant_missing": "The command lacks a permission it was not granted; nothing was done.",
+  "errors.token_invalid": "The token is invalid, expired, or already used.",
+  "errors.confirmation_mismatch": "The confirmation was issued for another action; this one was not done.",
+  "errors.engine_starting": "The engine is starting; try again in a moment.",
+  "errors.engine_unavailable": "The engine is paused and is being restarted.",
+  "errors.engine_failed": "The engine could not be restarted after three attempts. Log: {logPath}",
+  "errors.protocol_mismatch": "The engine's version ({received}) does not match the app's ({expected}); the connection was stopped.",
+  "errors.db_corrupt": "AYAR's database is damaged. The last good backup can be restored.",
+  "errors.db_newer_than_app": "The database was created by a newer AYAR; this version will not open it. Update the app.",
+  "errors.data_dir_unsafe": "AYAR's data folder is unsafe (permissions, owner, or a symbolic link) and was not used.",
+  "errors.busy": "Another run is active; this one waits its turn in the queue.",
+  "errors.not_found": "Not found.",
+  "errors.cancelled": "Cancelled.",
+  "errors.internal": "Internal AYAR error. Details are in the log."
+}

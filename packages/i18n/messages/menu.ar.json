@@ -1,0 +1,19 @@
+{
+  "menu.app.about": "حول عِيَار",
+  "menu.app.hide": "إخفاء عِيَار",
+  "menu.app.hideOthers": "إخفاء الآخرين",
+  "menu.app.showAll": "إظهار الكل",
+  "menu.app.quit": "إنهاء عِيَار",
+  "menu.edit.title": "تحرير",
+  "menu.edit.undo": "تراجع",
+  "menu.edit.redo": "إعادة",
+  "menu.edit.cut": "قص",
+  "menu.edit.copy": "نسخ",
+  "menu.edit.paste": "لصق",
+  "menu.edit.selectAll": "تحديد الكل",
+  "menu.window.title": "نافذة",
+  "menu.window.minimize": "تصغير",
+  "menu.window.zoom": "تكبير",
+  "menu.window.close": "إغلاق النافذة",
+  "menu.window.front": "إحضار الكل للأمام"
+}

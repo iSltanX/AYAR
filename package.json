@@ -1,0 +1,35 @@
+{
+  "name": "ayar",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AYAR: a local macOS app that measures a software project against declared standards and proves every violation with evidence.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=24.12.0"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "tools/cli"
+  ],
+  "scripts": {
+    "postinstall": "node node_modules/electron/install.js",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "eslint --max-warnings 0 .",
+    "test": "vitest run",
+    "test:e2e": "npm run test:e2e -w @ayar/desktop",
+    "verify": "npm run typecheck && npm run lint && npm run build && npm test && npm run test:e2e"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "@typescript/native": "npm:typescript@7.0.2",
+    "eslint": "10.12.0",
+    "eslint-plugin-svelte": "3.23.1",
+    "fast-check": "4.10.2",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.1",
+    "vitest": "5.0.3"
+  }
+}

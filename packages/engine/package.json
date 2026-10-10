@@ -1,0 +1,20 @@
+{
+  "name": "@ayar/engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The AYAR engine (C-04 host, C-17 storage, ...). Never imports electron (D-19, NFR-07).",
+  "type": "module",
+  "license": "UNLICENSED",
+  "exports": {
+    ".": "./src/index.ts",
+    "./host-support": "./src/host-support.ts",
+    "./bin/node": "./src/bin/node.ts",
+    "./bin/utility": "./src/bin/utility.ts"
+  },
+  "scripts": {
+    "typecheck": "node ../../node_modules/@typescript/native/bin/tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ayar/protocol": "0.1.0"
+  }
+}

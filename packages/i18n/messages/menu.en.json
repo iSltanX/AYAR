@@ -1,0 +1,19 @@
+{
+  "menu.app.about": "About AYAR",
+  "menu.app.hide": "Hide AYAR",
+  "menu.app.hideOthers": "Hide Others",
+  "menu.app.showAll": "Show All",
+  "menu.app.quit": "Quit AYAR",
+  "menu.edit.title": "Edit",
+  "menu.edit.undo": "Undo",
+  "menu.edit.redo": "Redo",
+  "menu.edit.cut": "Cut",
+  "menu.edit.copy": "Copy",
+  "menu.edit.paste": "Paste",
+  "menu.edit.selectAll": "Select All",
+  "menu.window.title": "Window",
+  "menu.window.minimize": "Minimize",
+  "menu.window.zoom": "Zoom",
+  "menu.window.close": "Close Window",
+  "menu.window.front": "Bring All to Front"
+}
