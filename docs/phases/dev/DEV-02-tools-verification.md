@@ -4,7 +4,7 @@ track: dev
 number: 2
 stage: verification
 title: التحقق السابق للبناء — الأدوات والعمليات والمستودعات
-status: delivered
+status: closed
 status_date: 2026-10-10
 depends_on: [DEV-0, DEV-1]
 design_gates: []
@@ -23,7 +23,7 @@ outputs:
   - قيود E-07 وE-08 وE-09 وE-10 وE-11 وE-12 وE-15 وE-16 وE-17 وE-20 وE-21 وE-22 وE-24 محسومة بالدليل
   - قاعدة OSV المصغرة وإكمال عيوب الثغرات في المشاريع
   - spikes/ للأدوات والعمليات
-closing_commit:
+closing_commit: e8ad6b3
 ---
 
 # DEV-2 — التحقق السابق للبناء: الأدوات والعمليات والمستودعات
