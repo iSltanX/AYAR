@@ -111,6 +111,38 @@ describe('modal sheet (C-19)', () => {
   }
 });
 
+describe('modal sheet reopened at once (C-19, BLK-WAVE4-01)', () => {
+  // The close event of a <dialog> is a separate task after close(): a sheet opened again before that task ran
+  // used to take the late event for a native close and shut itself. Reproduced deterministically: cancel, let
+  // the close happen, reopen within the same task, then let the queued close event arrive.
+  for (const lang of ['ar', 'en'] as const) {
+    it(`stays open when reopened before the close event of the previous closing arrives (${lang})`, async () => {
+      await showGallery(run.page, { lang, theme: 'light', section: 'C-19' });
+      const demo = `${panel('C-19', lang)} [data-demo="Sheet/Cancel confirmation/modal"]`;
+      await run.page.click(`${demo} > .specimen > button`);
+      await run.page.waitForSelector(`${demo} dialog[open]`);
+      const result = await run.page.evaluate(async (sel) => {
+        const root = document.querySelector(sel)!;
+        const dialog = root.querySelector('dialog')!;
+        const opener = root.querySelector<HTMLButtonElement>(':scope > .specimen > button')!;
+        const closes: number[] = [];
+        dialog.addEventListener('close', () => closes.push(performance.now()));
+        dialog.dispatchEvent(new Event('cancel', { cancelable: true })); // Escape: the sheet asks to close
+        for (let i = 0; i < 5 && dialog.open; i++) await Promise.resolve(); // the effect closes it (microtasks)
+        const closedBeforeReopen = !dialog.open;
+        opener.click(); // reopen before the queued close event task runs
+        for (let i = 0; i < 5 && !dialog.open; i++) await Promise.resolve();
+        await new Promise((r) => setTimeout(r, 50)); // the late close event and anything it triggers
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        return { closedBeforeReopen, openAfter: dialog.open, closeEvents: closes.length };
+      }, demo);
+      expect(result).toEqual({ closedBeforeReopen: true, openAfter: true, closeEvents: 1 });
+      await run.page.keyboard.press('Escape');
+      await run.page.waitForSelector(`${demo} dialog:not([open])`, { state: 'attached' });
+    });
+  }
+});
+
 describe('sheet state is reset on every opening (C-19)', () => {
   it('reopens the human review with the first decision and an empty note', async () => {
     await showGallery(run.page, { lang: 'en', theme: 'light', section: 'C-19' });
@@ -193,6 +225,53 @@ describe('argument editor focus (C-18)', () => {
       return { inEditor: !!document.querySelector(sel)?.contains(a), tag: a.tagName, remove: !!a.closest('.remove') };
     }, editor);
     expect(focused).toEqual({ inEditor: true, tag: 'BUTTON', remove: true });
+  });
+});
+
+describe('the «مبدئي» chip explains itself to sighted users (owner condition on D-DEV10-11)', () => {
+  const tipOf = (chip: string) =>
+    run.page.$eval(chip, (c) => {
+      const tip = document.getElementById(c.getAttribute('aria-describedby') ?? '');
+      const pop = tip?.closest('[popover]');
+      return { role: tip?.getAttribute('role'), open: !!pop && pop.matches(':popover-open'), text: tip?.textContent?.trim() ?? '' };
+    });
+
+  for (const lang of ['ar', 'en'] as const) {
+    it(`shows its tooltip on hover and on keyboard focus, and Escape hides it (standalone row, ${lang})`, async () => {
+      await showGallery(run.page, { lang, theme: 'light', section: 'C-07' });
+      const chip = `${panel('C-07', lang)} [data-demo="Finding row/provisional"] .prov-chip`;
+      expect(await run.page.$eval(chip, (c) => c.getClientRects().length > 0)).toBe(true);
+      expect((await tipOf(chip)).open).toBe(false);
+      await run.page.hover(chip);
+      const hovered = await tipOf(chip);
+      expect(hovered.role).toBe('tooltip');
+      expect(hovered.open).toBe(true);
+      expect(hovered.text.length).toBeGreaterThan(10);
+      await run.page.mouse.move(0, 0);
+      expect((await tipOf(chip)).open).toBe(false);
+      // Keyboard: Tab from the row's checkbox reaches the chip, the ring shows and so does the tooltip.
+      await run.page.focus(`${panel('C-07', lang)} [data-demo="Finding row/provisional"] input[type="checkbox"]`);
+      await run.page.keyboard.press('Tab');
+      expect(await run.page.$eval(chip, (c) => c === document.activeElement && c.matches(':focus-visible'))).toBe(true);
+      expect((await tipOf(chip)).open).toBe(true);
+      await run.page.keyboard.press('Escape');
+      expect((await tipOf(chip)).open).toBe(false);
+    });
+  }
+
+  it('is reached by the arrow keys inside the findings table, with its tooltip', async () => {
+    await showGallery(run.page, { lang: 'ar', theme: 'light', section: 'C-17' });
+    const table = `${panel('C-17', 'ar')} [data-demo="Table/provisional"] [role="grid"]`;
+    const chip = `${table} .prov-chip`;
+    await run.page.focus(`${table} [role="row"][data-nav="P-2"]`);
+    await run.page.keyboard.press('ArrowLeft'); // forward in Arabic: the checkbox
+    await run.page.keyboard.press('ArrowLeft'); // then the chip
+    expect(await run.page.$eval(chip, (c) => c === document.activeElement)).toBe(true);
+    expect((await tipOf(chip)).open).toBe(true);
+    await run.page.keyboard.press('ArrowRight'); // back: the checkbox
+    expect((await tipOf(chip)).open).toBe(false);
+    // The chip is not a tab stop of its own inside the grid.
+    expect(await run.page.$eval(chip, (c) => (c as HTMLElement).tabIndex)).toBe(-1);
   });
 });
 

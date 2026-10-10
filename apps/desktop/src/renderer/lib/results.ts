@@ -51,7 +51,7 @@ export interface Finding {
 
 /**
  * The columns of Table Kind=findings (112:8213), from the start side after the select column. Their widths
- * (28 · 64 · 112 · title · 196 · 80 · 64) are ONE CSS definition, --finding-columns on .findings-grid in
+ * (28 · 64 · 112 · title · 196 · 84 · 100; 76 last in Arabic) are ONE CSS definition, --finding-columns on .findings-grid in
  * FindingRow.svelte, shared by the header row and every finding row.
  */
 export const FINDING_COLUMNS = [

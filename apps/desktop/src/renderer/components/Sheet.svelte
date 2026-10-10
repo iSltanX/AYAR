@@ -15,7 +15,8 @@
   // - Escape fires `cancel`, which is prevented and reported through `oncancel`. Chromium makes a second Escape
   //   without user activation non-cancelable, so the dialog may also close natively: that `close` is reported
   //   through `oncancel` too. If `open` is still true after the caller had its turn, the dialog is shown again,
-  //   so it is never closed while `open` is true.
+  //   so it is never closed while `open` is true. A close the sheet asked for itself is never taken for a native
+  //   one, even when its event arrives after the sheet was opened again (BLK-WAVE4-01).
   // - The body and footer are mounted only while `open` is true, so their own DOM state is fresh on every
   //   opening. The working state a sheet keeps in its own props (a selection, a decision, a note, a name…) is
   //   reset by that sheet to its defaults each time `open` goes from false to true, and whenever the data it was
@@ -45,11 +46,19 @@
     d.querySelector<HTMLElement>('[data-initial-focus]')?.focus();
   }
 
+  // The `close` event of a <dialog> is dispatched as a separate task after close() returns. A close we asked for
+  // (open went false) is counted here, so its late event is never taken for a native close: without this, a
+  // sheet reopened before that event arrived (close, then open again at once) was closed again by it.
+  let requestedCloses = 0;
+
   $effect(() => {
     const d = dialog;
     if (!d) return;
     if (open && !d.open) show(d);
-    else if (!open && d.open) d.close();
+    else if (!open && d.open) {
+      requestedCloses++;
+      d.close();
+    }
   });
 
   function cancel(e: Event) {
@@ -59,7 +68,12 @@
 
   /** A close we did not ask for (a non-cancelable Escape): report it, then keep the dialog in step with `open`. */
   async function closed() {
-    if (!open) return;
+    if (requestedCloses > 0) {
+      requestedCloses--;
+      return;
+    }
+    // Already shown again (or never meant to be open): nothing closed that the caller does not know about.
+    if (!open || dialog?.open) return;
     oncancel?.();
     await tick();
     if (open && dialog && !dialog.open) show(dialog);

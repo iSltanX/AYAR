@@ -53,7 +53,7 @@
       {#if localCheck}
         <span class="local-check"><span class="mono" dir="ltr" title={localCheck}>{localCheck}</span></span>
       {:else}
-        <span class="local-check"><span>{t('results.claim.noLocalCheck')}</span></span>
+        <span class="local-check none"><span>{t('results.claim.noLocalCheck')}</span></span>
       {/if}
     </span>
   </div>
@@ -120,6 +120,10 @@
     flex: 1 1 0;
     min-width: 0;
     color: var(--text-secondary);
+  }
+  /* The short fixed label is never cut: the location gives way first. */
+  .local-check.none {
+    flex: none;
   }
   .local-check > span {
     min-width: 0;

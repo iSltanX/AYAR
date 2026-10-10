@@ -93,6 +93,10 @@
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
+    /* Cairo's glyphs reach about 2 px past the 20 px line: the clip box is grown by that much without moving
+       the layout, so marks above and below Arabic letters are never cut. */
+    padding-block: 2px;
+    margin-block: -2px;
   }
   button.sort:hover {
     background: var(--bg-sunken);

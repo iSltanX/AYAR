@@ -86,5 +86,6 @@
   "results.inspector.firstSeen": "First seen",
   "results.inspector.logTitle": "Log line {line} · {check}",
   "results.inspector.actions": "Finding actions",
-  "results.inspector.tabs": "Check details and log"
+  "results.inspector.tabs": "Check details and log",
+  "results.findingRow.provisionalMeaning": "A finding that appeared during the run and has not yet been confirmed by reading the report"
 }

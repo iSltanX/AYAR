@@ -26,6 +26,9 @@
     { id: 'security', title: t('ui.section.security'), findings: [finding('F-1'), finding('F-2'), finding('F-3')] },
     { id: 'code', title: t('ui.section.code'), findings: [], count: 5 },
   ];
+  const provisionalGroups: FindingGroup[] = [
+    { id: 'security', title: t('ui.section.security'), findings: [finding('P-1'), { ...finding('P-2'), provisional: true }] },
+  ];
   const label = t('glossary.severity');
   const cellWidth = { rtl: { plain: 50, sorted: 70 }, ltr: { plain: 61, sorted: 81 } }[dir];
   const sorts = [
@@ -62,6 +65,16 @@
     <Demo name="Table/findings" figma="112:8213" h={193} w={720}>
       <div class="frame">
         <Table label={t('ui.tab.findings')} {groups} selected={['F-2']} collapsed={['code']} sort={{ column: 'severity', direction: 'desc' }} />
+      </div>
+    </Demo>
+  </div>
+</Row>
+
+<Row title="Table · a provisional finding (not a Figma variant): the striped «مبدئي» chip in the narrow title cell, reached by the arrow keys, with its tooltip on hover and focus">
+  <div class="scroll">
+    <Demo name="Table/provisional" figma="112:8213">
+      <div class="frame">
+        <Table label={t('ui.tab.findings')} groups={provisionalGroups} />
       </div>
     </Demo>
   </div>

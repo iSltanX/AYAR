@@ -8,7 +8,8 @@
   // Keyboard (WAI-ARIA grid, row focus): the header's select-all and sort buttons are ordinary tab stops; the rows
   // (group toggles and finding rows) are ONE tab stop with a roving tabindex. ArrowUp/ArrowDown move between them,
   // Home/End go to the first and last; on a finding row Space selects and Enter opens; the forward arrow (Left in
-  // Arabic, Right in English) moves into the row's checkbox and the back arrow returns to the row; on a group row
+  // Arabic, Right in English) moves into the row's checkbox, then to its «مبدئي» chip when shown, and the back
+  // arrow walks back to the row; on a group row
   // the forward arrow expands and the back arrow collapses. Rows carry aria-selected (aria-multiselectable grid).
   // The last column's header label runs back over its start rather than past the table's edge.
   import { useLocale } from '../lib/locale.ts';
@@ -102,16 +103,15 @@
       if ((e.key === forward) === collapsed.includes(id)) toggleGroup(id, e.key === forward);
       e.preventDefault();
       return;
-    } else if (e.key === forward && target === row) {
-      const box = row.querySelector<HTMLElement>('input');
-      if (box) {
-        e.preventDefault();
-        box.focus();
-      }
-      return;
-    } else if (e.key === back && target !== row) {
+    } else if ((e.key === forward || e.key === back) && !key.startsWith('group:')) {
+      // Inside a finding row the arrows walk its focusable cells (the checkbox, then the «مبدئي» chip when it
+      // is shown), from the row and back to it.
+      const cells = [...row.querySelectorAll<HTMLElement>('input, [data-cell-focus]')].filter((c) => c.getClientRects().length > 0);
+      const at = target === row ? -1 : cells.indexOf(target);
+      const next = e.key === forward ? at + 1 : at - 1;
+      if (next >= cells.length || (target === row && e.key === back)) return;
       e.preventDefault();
-      row.focus();
+      (next < 0 ? row : cells[next]!).focus();
       return;
     }
     if (to === undefined) return;
@@ -178,7 +178,7 @@
   }
   .header-row {
     display: grid;
-    grid-template-columns: var(--finding-columns, 28px 64px 112px minmax(0, 1fr) 196px 80px 64px);
+    grid-template-columns: var(--finding-columns, 28px 64px 112px minmax(0, 1fr) 196px 84px 100px);
     column-gap: var(--space-8);
     align-items: center;
     height: 33px;

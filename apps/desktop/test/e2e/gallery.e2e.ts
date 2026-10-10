@@ -97,6 +97,45 @@ describe('geometry against Figma (task 6, measurable part)', () => {
   });
 });
 
+describe('no cut content in the components with approved size deviations (owner condition, D-DEV10-10 to 12)', () => {
+  // Every element that clips (overflow other than visible, or an ellipsis) must hold its whole text, in both
+  // languages and both themes. Excluded by design: screen-reader-only text, the finding title (Figma truncates it
+  // at the end), and the folders of a path, which give way in the middle while the file name and line stay
+  // (D-DES3-04, PathPill and PathText `.head`), including the path pill specimen that demonstrates it.
+  const DEMOS = /^(Search field|Context menu|Menu item|Inspector|Capture tile|Path pill|Copy for model button|Table header cell|Table\/|Image diff viewer|Log viewer|Section card|Finding row|Model claim row)/;
+  it('cuts no text in those components, in Arabic and English, light and dark', async () => {
+    const cut: string[] = [];
+    let checked = 0;
+    for (const c of COMBOS) {
+      await showGallery(run.page, { lang: c.lang, theme: c.theme });
+      const r = await run.page.$$eval(
+        '[data-demo]',
+        (els, source) => {
+          const pattern = new RegExp(source);
+          const demos = els.filter((e) => pattern.test(e.getAttribute('data-demo') ?? '') && e.getAttribute('data-demo') !== 'Path pill/truncated');
+          const out: string[] = [];
+          for (const demo of demos) {
+            for (const x of demo.querySelectorAll<HTMLElement>('.specimen *')) {
+              if (x.closest('.visually-hidden') || x.classList.contains('title-text') || x.closest('.head') || !x.textContent?.trim()) continue;
+              const st = getComputedStyle(x);
+              const clips = st.overflowX !== 'visible' || st.textOverflow === 'ellipsis';
+              if (clips && (x.scrollWidth > x.clientWidth + 1 || x.scrollHeight > x.clientHeight + 1) && st.overflowX !== 'auto' && st.overflowY !== 'auto') {
+                out.push(`${demo.getAttribute('data-demo')}: "${x.textContent.trim().slice(0, 30)}" ${x.scrollWidth}/${x.clientWidth}`);
+              }
+            }
+          }
+          return { out, demos: demos.length };
+        },
+        DEMOS.source,
+      );
+      checked += r.demos;
+      cut.push(...r.out.map((o) => `${c.lang}/${c.theme} ${o}`));
+    }
+    expect(cut).toEqual([]);
+    expect(checked).toBeGreaterThan(100);
+  });
+});
+
 describe('accessibility (AT-40 part, NFR-04)', () => {
   const axeSource = readFileSync(createRequire(import.meta.url).resolve('axe-core/axe.min.js'), 'utf8');
 

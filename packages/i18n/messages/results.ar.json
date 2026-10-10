@@ -86,5 +86,6 @@
   "results.inspector.firstSeen": "أول ظهور",
   "results.inspector.logTitle": "سطر السجل {line} · {check}",
   "results.inspector.actions": "إجراءات الاكتشاف",
-  "results.inspector.tabs": "تفاصيل الفحص وسجله"
+  "results.inspector.tabs": "تفاصيل الفحص وسجله",
+  "results.findingRow.provisionalMeaning": "اكتشاف ظهر أثناء التشغيل ولم تؤكده قراءة التقرير بعد"
 }
