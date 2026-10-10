@@ -108,6 +108,7 @@ node fixtures/tools/validate.mjs FX-EXT
 | `osv-mini-db/build.mjs` + `records/` | **قاعدة OSV المصغرة** (E-09، DEV-2): سجلان مصطنعان `AYAR-2026-0001` (npm) و`AYAR-2026-0002` (PyPI) للحزمة `ayar-vuln-fake@1.0.0`، يُبنيان وقت الاختبار إلى `<cache>/osv-scalibr/<Ecosystem>/all.zip` (التخطيط الذي يقرؤه osv-scanner 2.6.0 مع `OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY`) بكاتب ZIP حتمي بلا تبعيات؛ ملفات zip لا تُلتزم |
 | `malicious/generate.mjs` + `test.mjs` | مولّد FX-MALICIOUS واختباره (**لا يشغّل `git` في المستودع المولَّد**، D-38) |
 | `tool-server/server.mjs` + `test.mjs` | **AT-35**: خادم محلي يقدّم أداة بصمتها لا تطابق الكتالوج + مدخل كتالوج تاريخ تحققه أقدم من 180 يومًا (`--honest` ضابط سلبي) |
+| `at26-state.ts` | **AT-26** (DEV-5): مولّد حالة بيانات عِيَار بمخطط القاعدة وخدمات المحرك نفسها: مشروع بـ 21 تشغيلًا (الأول «محفوظ دائمًا»، وجولة قائمة على الثالث)، ولكل تشغيل لقطة حالة بمحتواها ودليل ببصمته، ومراجعتان وبطاقتان وصورتان مرجعيتان. `node fixtures/tools/at26-state.ts <مجلد-البيانات> <جذر-المشروع> [--runs 21]`، ويطبع المعرّفات سطر JSON. يستعمل مفتاح HMAC الاختباري المعلن (G-47) |
 | `synth-repo/generate.mjs` + `test.mjs` | **AT-36**: مستودعات اصطناعية حتمية بـ 1000 و10000 و50000 ملف (`--preset small/medium/large`) |
 | `axe-check.mjs` `chrome-load.mjs` `ext-policy-check.mjs` `web-design-check.mjs` `reports-check.mjs` | فاحصات مستقلة تثبت أن العيب المزروع حقيقي (ليست جزءًا من عِيَار) |
 
@@ -126,7 +127,7 @@ Node 24.16.0 مع pnpm 12.8.1 (`packageManager` في كل مشروع pnpm)، وu
 
 | المطلب | المرحلة | التفصيل |
 |---|---|---|
-| **AT-26** مولّد حالة بيانات عِيَار: مشروع بـ 21 تشغيلًا أحدها «محفوظ دائمًا» ومراجعات وبطاقات وصور مرجعية | **DEV-5** (حين يوجد مخطط القاعدة) | يُكتب في `fixtures/tools/` بالنمط نفسه، ويُحمَّل بمخطط القاعدة لا بنسخة منه |
+| **AT-26** مولّد حالة بيانات عِيَار: مشروع بـ 21 تشغيلًا أحدها «محفوظ دائمًا» ومراجعات وبطاقات وصور مرجعية | **أُنجز في DEV-5** | `tools/at26-state.ts` بمخطط القاعدة (ترحيلات المحرك) وخدماته، لا بنسخة منهما؛ ويستعمله `tools/cli/test/at26.test.ts` |
 | قاعدة OSV المصغرة (حزمة وثغرة مزيفتان) و`sec.deps` لنسخ `vuln-dep` (FX-EXT وFX-PY) و`osv--bad` | **أُنجز في DEV-2** (E-09) | `tools/osv-mini-db/`؛ وثبت أن osv-scanner يقرأ تبعية `file:` من `pnpm-lock.yaml` (بإصدار نصي `file:vendor/ayar-vuln-fake`) وتبعية `directory` من `uv.lock` (بإصدارها 1.0.0) ويطابقهما؛ فلا حاجة لمدخل قفل بسجل وهمي |
 | معرّفات القواعد (`rule`) في كل ملفات التوقع | **DEV-6** | كلها `null` بوسم `rule_pending: true` |
 | محولا Stryker وk6 | DEV-6 أو DEV-8 | اختياريان |
