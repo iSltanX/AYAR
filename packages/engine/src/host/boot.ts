@@ -1,9 +1,12 @@
 // The boot order of C-04, with G-27 settled:
-//   data folder → open ayar.db → integrity_check → schema version check → settle the process ledger →
-//   delete tmp/ → back up and migrate → load the catalog → mark interrupted runs → weekly backup if due.
-// integrity_check runs right after opening, before anything writes. The ledger is read before migrating
-// (its frozen columns make that safe on any schema). A damaged database, or one newer than this app, still
-// gets the safety steps (ledger kills, tmp/ deletion) but no writes: the engine comes up "degraded".
+//   data folder → open ayar.db READ-ONLY → integrity_check → schema version check → reopen for writing →
+//   settle the process ledger → delete tmp/ → back up and migrate → load the catalog → mark interrupted
+//   runs → weekly backup if due.
+// Nothing touches the database file (not even the WAL pragma) before integrity_check and the version check
+// pass. The ledger is read before migrating (its frozen columns make that safe on any schema). A damaged
+// database, or one newer than this app, still gets the safety steps (ledger kills, tmp/ deletion) through
+// the read-only connection, but no write: the engine comes up "degraded". Each later step either degrades
+// the engine (tmp/, migration, catalog) or only logs (interrupted runs, weekly backup); none crashes it.
 import type { ErrorCode } from '@ayar/protocol';
 import type { EnginePorts, Logger } from '../ports/index.ts';
 import { weeklyBackupIfDue } from '../storage/backup.ts';
@@ -19,6 +22,7 @@ export const BOOT_STEPS = [
   'db.open',
   'db.integrity',
   'db.version',
+  'db.writable',
   'ledger.reap',
   'tmp.clean',
   'db.migrate',
@@ -98,46 +102,72 @@ export async function boot(o: BootOptions): Promise<BootResult> {
     return result('degraded', code, null, null, null);
   }
 
-  // 1. Open the database.
-  let db: Db | null = null;
+  // 1. Probe the database READ-ONLY: no pragma, no journal change, no write until integrity and version pass.
+  let probe: Db | null = null;
   let reason: ErrorCode | null = null;
-  try {
-    db = openDatabase(layout.db);
-    await fs.chmod(layout.db, 0o600);
-    record('db.open', true);
-  } catch (e) {
-    reason = 'db_corrupt';
-    record('db.open', false, { error: e instanceof Error ? e.message : String(e) });
-  }
-
-  // 1b. Integrity, before any write.
-  if (db) {
-    const integrity = integrityCheck(db);
-    record('db.integrity', integrity.ok, { problems: integrity.problems.length });
-    if (!integrity.ok) reason = 'db_corrupt';
-  }
-
-  // 1c. A database from a newer AYAR is left untouched.
   let schemaVersion: number | null = null;
-  if (db && !reason) {
+  const exists = (await fs.lstat(layout.db)) !== null;
+  if (!exists) {
+    record('db.open', true, { exists: false });
+    record('db.integrity', true, { skipped: 'new database' });
+    record('db.version', true, { schemaVersion: 0 });
+    schemaVersion = 0;
+  } else {
     try {
-      schemaVersion = assertNotNewer(db, o.migrations ?? MIGRATIONS);
-      record('db.version', true, { schemaVersion });
+      probe = openDatabase(layout.db, { readOnly: true });
+      record('db.open', true, { exists: true, readOnly: true });
     } catch (e) {
-      reason = e instanceof StorageError ? e.code : 'db_corrupt';
-      record('db.version', false, { error: reason });
+      reason = 'db_corrupt';
+      record('db.open', false, { error: e instanceof Error ? e.message : String(e) });
+    }
+    // 1b. Integrity, before any write.
+    if (probe) {
+      const integrity = integrityCheck(probe);
+      record('db.integrity', integrity.ok, { problems: integrity.problems.length });
+      if (!integrity.ok) reason = 'db_corrupt';
+    }
+    // 1c. A database from a newer AYAR is left untouched.
+    if (probe && !reason) {
+      try {
+        schemaVersion = assertNotNewer(probe, o.migrations ?? MIGRATIONS);
+        record('db.version', true, { schemaVersion });
+      } catch (e) {
+        reason = e instanceof StorageError ? e.code : 'db_corrupt';
+        record('db.version', false, { error: reason });
+      }
+    }
+  }
+
+  // 1d. Only a healthy, compatible (or new) database is opened for writing, with the E-03 settings.
+  let db: Db | null = null;
+  if (!reason) {
+    try {
+      probe?.close();
+      probe = null;
+      db = openDatabase(layout.db);
+      await fs.chmod(layout.db, 0o600);
+      record('db.writable', true);
+    } catch (e) {
+      reason = 'db_corrupt';
+      record('db.writable', false, { error: e instanceof Error ? e.message : String(e) });
     }
   }
 
   // 2. Settle the ledger: kill orphaned groups (always), mark entries (only on a healthy database).
-  const ledger = await reapLedger(db, processes, { writable: !reason, tmpRoot: layout.tmp, now: () => clock.now() });
-  record('ledger.reap', ledger.error === null, { ...ledger });
+  const ledger = await reapLedger(db ?? probe, processes, { writable: db !== null, tmpRoot: layout.tmp, now: () => clock.now() });
+  record('ledger.reap', ledger.error === null && ledger.failed === 0, { ...ledger });
 
-  // 3. Delete tmp/ now that no ledger process can still write into it.
-  const tmp = await cleanTmp(fs, layout);
-  record('tmp.clean', true, tmp);
+  // 3. Delete tmp/ now that no ledger process can still write into it. If that fails, raw reports may remain:
+  //    the engine does not go on to serve (degraded), and the next boot tries again.
+  try {
+    record('tmp.clean', true, await cleanTmp(fs, layout));
+  } catch (e) {
+    record('tmp.clean', false, { error: e instanceof Error ? e.message : String(e) });
+    reason ??= 'internal';
+  }
 
   if (reason || !db) {
+    probe?.close();
     db?.close();
     return result('degraded', reason ?? 'db_corrupt', layout, null, schemaVersion);
   }
@@ -154,16 +184,29 @@ export async function boot(o: BootOptions): Promise<BootResult> {
     return result('degraded', code, layout, null, readSchemaVersionSafe(layout));
   }
 
-  // 5. Catalog and knowledge base (C-08, DEV-4).
-  const catalog = await (o.catalog ?? noCatalog)();
-  record('catalog.load', true, catalog);
+  // 5. Catalog and knowledge base (C-08, DEV-4): without a valid catalog no check can run.
+  try {
+    record('catalog.load', true, await (o.catalog ?? noCatalog)());
+  } catch (e) {
+    record('catalog.load', false, { error: e instanceof Error ? e.message : String(e) });
+    db.close();
+    return result('degraded', 'internal', layout, null, schemaVersion);
+  }
 
-  // 5b. Runs that an unexpected stop left running.
-  record('runs.interrupted', true, markInterrupted(db, clock.now()));
+  // 5b. Runs that an unexpected stop left running. A failure only logs: the next boot tries again.
+  try {
+    record('runs.interrupted', true, markInterrupted(db, clock.now()));
+  } catch (e) {
+    record('runs.interrupted', false, { error: e instanceof Error ? e.message : String(e) });
+  }
 
-  // 6. The weekly backup (14.3), when the newest backup is a week old.
-  const weekly = await weeklyBackupIfDue(db, fs, layout.backups, clock);
-  record('db.weekly_backup', true, { made: weekly !== null });
+  // 6. The weekly backup (14.3), when the newest backup is a week old. Optional: a failure only logs.
+  try {
+    const weekly = await weeklyBackupIfDue(db, fs, layout.backups, clock);
+    record('db.weekly_backup', true, { made: weekly !== null });
+  } catch (e) {
+    record('db.weekly_backup', false, { error: e instanceof Error ? e.message : String(e) });
+  }
 
   return result('ready', null, layout, db, schemaVersion);
 }

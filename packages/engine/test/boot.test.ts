@@ -1,5 +1,7 @@
 // C-04 boot order with a trial ledger (AT-48 part, G-27): ledger, then tmp/, then backup and migration.
-import { mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { closeSync, existsSync, mkdirSync, openSync, readdirSync, readFileSync, statSync, writeFileSync, writeSync } from 'node:fs';
+import { DatabaseSync } from 'node:sqlite';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { boot, BOOT_STEPS } from '../src/host/boot.ts';
@@ -183,6 +185,84 @@ describe('boot order (C-04, G-27)', () => {
   });
 });
 
+const sha = (p: string) => createHash('sha256').update(readFileSync(p)).digest('hex');
+
+describe('no write before the checks pass (C-04, NFR-02)', () => {
+  it('leaves a newer database byte for byte untouched, even in rollback-journal mode', async () => {
+    const { layout } = await ensureDataDir(nodeFileSystem, join(root, 'AYAR'), process.getuid!());
+    const raw = new DatabaseSync(layout.db);
+    raw.exec("PRAGMA journal_mode = DELETE; CREATE TABLE schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL); INSERT INTO schema_meta VALUES ('schema_version', '99');");
+    raw.close();
+    const before = sha(layout.db);
+    const r = await boot({ dataDir: layout.root, ports: tracedPorts([], () => layout), logger: quiet, appVersion: '0.1.0' });
+    expect(r).toMatchObject({ state: 'degraded', reason: 'db_newer_than_app' });
+    expect(sha(layout.db)).toBe(before);
+    expect(existsSync(`${layout.db}-wal`)).toBe(false);
+  });
+
+  it('leaves a database that opens but fails integrity_check untouched, and says db_corrupt', async () => {
+    const { layout, db } = await v1Store();
+    db.transaction(() => {
+      for (let i = 0; i < 400; i++) db.run('INSERT INTO audit_log (id, at, actor, action) VALUES (?, ?, ?, ?)', `a${i}`, 'now', 'test', 'x'.repeat(200));
+    });
+    db.exec('PRAGMA wal_checkpoint(TRUNCATE)');
+    db.close();
+    const size = statSync(layout.db).size;
+    const fd = openSync(layout.db, 'r+');
+    writeSync(fd, Buffer.alloc(4096, 0xa5), 0, 4096, Math.floor(size / 2 / 4096) * 4096);
+    closeSync(fd);
+    const before = sha(layout.db);
+    const r = await boot({ dataDir: layout.root, ports: tracedPorts([], () => layout), logger: quiet, appVersion: '0.1.0' });
+    expect(r).toMatchObject({ state: 'degraded', reason: 'db_corrupt' });
+    expect(r.steps.find((s) => s.step === 'db.open')?.ok).toBe(true);
+    expect(r.steps.find((s) => s.step === 'db.integrity')?.ok).toBe(false);
+    expect(sha(layout.db)).toBe(before);
+  });
+});
+
+describe('operational faults degrade or log, never crash the boot (C-04)', () => {
+  it('a failing weekly backup only logs', async () => {
+    const { layout, db } = await v1Store();
+    db.close();
+    const ports = tracedPorts([], () => layout);
+    const clock = fakeClock('2026-12-31T00:00:00.000Z'); // the v1 backup is months old: the weekly one is due
+    const failing: EnginePorts = {
+      ...ports,
+      clock,
+      fs: { ...ports.fs, chmod: (p, m) => (p.startsWith(layout.backups + '/') ? Promise.reject(new Error('ENOSPC')) : ports.fs.chmod(p, m)) },
+    };
+    const r = await boot({ dataDir: layout.root, ports: failing, logger: quiet, appVersion: '0.1.0' });
+    expect(r.state).toBe('ready');
+    expect(r.steps.find((s) => s.step === 'db.weekly_backup')).toMatchObject({ ok: false });
+    r.db!.close();
+  });
+
+  it('a ledger kill that fails (EPERM) is counted, the row settled, and the boot goes on', async () => {
+    const { layout, db } = await v1Store();
+    ledgerRow(db, 'l-eperm', 4242, 'Mon Oct  5 10:00:00 2026');
+    ledgerRow(db, 'l-self', process.pid, 'whatever');
+    db.close();
+    const ports = tracedPorts([], () => layout);
+    const signalled: number[] = [];
+    const eperm: EnginePorts = {
+      ...ports,
+      processes: {
+        currentUid: () => process.getuid!(),
+        startTime: (pid) => Promise.resolve(pid === 4242 ? 'Mon Oct  5 10:00:00 2026' : 'whatever'),
+        killGroup: (pgid) => {
+          signalled.push(pgid);
+          return Promise.reject(Object.assign(new Error('kill EPERM'), { code: 'EPERM' }));
+        },
+      },
+    };
+    const r = await boot({ dataDir: layout.root, ports: eperm, logger: quiet, appVersion: '0.1.0' });
+    expect(r.state).toBe('ready');
+    expect(r.steps.find((s) => s.step === 'ledger.reap')?.detail).toMatchObject({ running: 2, failed: 1, notOurs: 1, marked: 2 });
+    expect(signalled).toEqual([4242]); // never the engine's own pid, even when a row names it
+    r.db!.close();
+  });
+});
+
 describe('ledger stability (G-27)', () => {
   it('the frozen ledger columns exist in the latest schema', async () => {
     const { db } = await v1Store();
@@ -196,7 +276,7 @@ describe('ledger stability (G-27)', () => {
     db.exec('ALTER TABLE process_ledger ADD COLUMN future_note TEXT');
     ledgerRow(db, 'l', 999_997, 'x');
     const r = await reapLedger(db, nodeProcessControl, { writable: false, tmpRoot: layout.tmp, now: () => new Date() });
-    expect(r).toMatchObject({ running: 1, killed: 0, notOurs: 1, marked: 0, error: null });
+    expect(r).toMatchObject({ running: 1, killed: 0, notOurs: 1, marked: 0, failed: 0, error: null });
     db.close();
   });
 });

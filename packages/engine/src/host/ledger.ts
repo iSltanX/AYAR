@@ -15,6 +15,8 @@ export interface LedgerReport {
   /** Leader gone, or alive with another start time: the pid was reused, so nothing was signalled. */
   notOurs: number;
   marked: number;
+  /** Rows whose kill or update failed (for example EPERM: the pid now belongs to another user). */
+  failed: number;
   /** Temp folders recorded outside tmp/ (never deleted from a path read in the database). */
   outsideTmp: number;
   error: string | null;
@@ -33,7 +35,9 @@ export async function reapLedger(
   processes: ProcessControl,
   o: { writable: boolean; tmpRoot: string; now: () => Date },
 ): Promise<LedgerReport> {
-  const report: LedgerReport = { running: 0, killed: 0, notOurs: 0, marked: 0, outsideTmp: 0, error: null };
+  const report: LedgerReport = { running: 0, killed: 0, notOurs: 0, marked: 0, failed: 0, outsideTmp: 0, error: null };
+  // A ledger row never makes the engine signal itself or the app (a damaged or forged row).
+  const self = new Set([process.pid, process.ppid, 0, 1]);
   if (!db) return report;
   let rows: Row[];
   try {
@@ -45,13 +49,23 @@ export async function reapLedger(
   }
   report.running = rows.length;
   for (const row of rows) {
-    const leaderStart = await processes.startTime(row.pgid);
-    if (leaderStart !== null && leaderStart === row.os_start_time && (await processes.killGroup(row.pgid, 'SIGKILL'))) report.killed++;
-    else report.notOurs++;
-    if (row.temp_dir && !row.temp_dir.startsWith(o.tmpRoot + '/')) report.outsideTmp++;
+    // Each row on its own: one failure must not stop the others, nor the boot.
+    try {
+      if (row.temp_dir && !row.temp_dir.startsWith(o.tmpRoot + '/')) report.outsideTmp++;
+      const leaderStart = self.has(row.pgid) ? null : await processes.startTime(row.pgid);
+      if (leaderStart !== null && leaderStart === row.os_start_time && (await processes.killGroup(row.pgid, 'SIGKILL'))) report.killed++;
+      else report.notOurs++;
+    } catch {
+      report.failed++;
+    }
+    // Marked even when the kill failed: a group we may not signal is not ours, and the row would repeat forever.
     if (o.writable) {
-      db.run("UPDATE process_ledger SET state = 'reaped', ended_at = ? WHERE id = ?", o.now().toISOString(), row.id);
-      report.marked++;
+      try {
+        db.run("UPDATE process_ledger SET state = 'reaped', ended_at = ? WHERE id = ?", o.now().toISOString(), row.id);
+        report.marked++;
+      } catch {
+        report.failed++;
+      }
     }
   }
   return report;
