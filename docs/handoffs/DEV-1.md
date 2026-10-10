@@ -31,7 +31,7 @@ approval: —
 | المساعدات | `node fixtures/tools/sanity-helpers.mjs` | نجح: validate، وtool-server، وsynth-repo (بما فيه 50000)، وmalicious | 2026-10-10 |
 | مولّد FX-MALICIOUS | `node fixtures/tools/malicious/test.mjs` | نجح: 33 فحصًا (لا git في التوليد، ولا علامات، والفخاخ صحيحة، و`git fsck --full --strict` نظيف على نسخة بلا فخاخ، وgitleaks يكشف السر القديم) | 2026-10-10 |
 | إعادة بناء صندوق الأدوات | `AYAR_FX_HOME=<مؤقت> sh fixtures/tools/bootstrap-toolchain.sh` | نجح (uv 0.13.0، وsemgrep 1.180.0، وosv-scanner 2.6.0 ببصمة SHA-256 مطابقة، وlychee 0.24.2 ببصمته) | 2026-10-10 |
-| سلامة المستودع | `git status` و`find fixtures -name .git -o -name "*.marker"` و`gitleaks dir fixtures` | لا ملف علامة ولا `.git` متداخل؛ ثمانية مواضع فقط تطابق الفاحص وكلها أسرار مصطنعة مقصودة (خمسة في ملفات المشاريع وثلاثة في نتائج السلامة التي تعرضها) | 2026-10-10 |
+| سلامة المستودع | `git status` و`find fixtures -name .git -o -name "*.marker"` و`gitleaks dir fixtures` | نجح: لا ملف علامة ولا `.git` متداخل؛ ثمانية مواضع فقط تطابق الفاحص وكلها أسرار مصطنعة مقصودة (خمسة في ملفات المشاريع وثلاثة في نتائج السلامة التي تعرضها) | 2026-10-10 |
 | بصمات الخطة | `cd docs/plan && shasum -a 256 -c CHECKSUMS.sha256` | نجح (قبل البدء) | 2026-10-10 |
 
 **لم يُشغَّل:** `sec.deps` لنسخ `vuln-dep` (FX-EXT وFX-PY) و`osv--bad` و`good:osv` ينتظر قاعدة OSV المصغرة (E-09، DEV-2). و«لم يُثبت بعد أن OSV-Scanner يقرأ تبعية `file:`/`directory` من `pnpm-lock.yaml` و`uv.lock`»؛ إن لم يقرأها يُستبدل بمدخل قفل بسجل وهمي في DEV-2 (مدون في `pending` لكل ملف توقع).
