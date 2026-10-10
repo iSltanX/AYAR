@@ -73,14 +73,76 @@ function qualityTools(cf: ComponentFacts): Record<string, string | null> {
   return out;
 }
 
-/** The script and its pre/post texts when the manager runs them (npm and Yarn 1 do; pnpm, Yarn 2+ and bun do not). */
-function scriptCommand(cf: ComponentFacts, s: ScriptInfo): CommandSpec {
-  const pm = packageManager(cf);
-  const all = scriptsOf(cf);
+const MANAGERS = ['npm', 'pnpm', 'yarn', 'bun'];
+/** Flags of the managers that take a value (`--filter x`, `-C dir`…): their value is not a script name. */
+const VALUE_FLAGS = new Set(['--filter', '-F', '--prefix', '-C', '--dir', '--workspace', '-w', '--cwd', '--registry']);
+/** Commands of the managers themselves: a positional argument equal to one of them is not a script (pnpm, yarn). */
+const BUILTINS = new Set(['install', 'i', 'add', 'remove', 'rm', 'uninstall', 'update', 'up', 'exec', 'dlx', 'x', 'create', 'init', 'link', 'unlink', 'publish', 'pack', 'audit', 'outdated', 'list', 'ls', 'why', 'config', 'set', 'get', 'store', 'cache', 'import', 'rebuild', 'prune', 'patch', 'env', 'setup', 'self-update', 'help', 'bin', 'root', 'deploy', 'fetch', 'install-test', 'it', 'licenses', 'node', 'workspace', 'workspaces', 'dedupe', 'upgrade', 'info', 'version', 'login', 'logout', 'whoami']);
+const NPM_SHORTCUTS: Record<string, string> = { test: 'test', t: 'test', tst: 'test', start: 'start', stop: 'stop', restart: 'restart' };
+
+/**
+ * The project script an argument vector runs, whatever the form (review M8): `npm run x`, `npm run-script x`,
+ * `npm test`, `npm start`, `pnpm x`, `pnpm --filter a run x`, `yarn x`, `bun run x`. Null for anything else.
+ */
+export function scriptNameOf(argv: readonly string[], scripts: readonly { name: string }[]): string | null {
+  const pm = argv[0]?.split('/').pop();
+  if (!pm || !MANAGERS.includes(pm)) return null;
+  const positional: string[] = [];
+  for (let i = 1; i < argv.length; i++) {
+    const a = argv[i]!;
+    if (a === '--') break;
+    if (VALUE_FLAGS.has(a)) {
+      i++;
+      continue;
+    }
+    if (a.startsWith('-')) continue;
+    positional.push(a);
+  }
+  const [first, second] = positional;
+  if (!first) return null;
+  let name: string | null = null;
+  if (first === 'run' || first === 'run-script' || first === 'rs') name = second ?? null;
+  else if (pm === 'npm') name = NPM_SHORTCUTS[first] ?? null;
+  else if ((pm === 'pnpm' || pm === 'yarn') && !BUILTINS.has(first)) name = first;
+  return name && scripts.some((s) => s.name === name) ? name : null;
+}
+
+/** Scripts a script runs in turn, by name (`npm run a && pnpm b`), followed to a fixed depth. */
+function referencedScripts(text: string, all: readonly ScriptInfo[], self: string): { name: string; text: string }[] {
+  const out = new Map<string, string>();
+  const visit = (t: string, depth: number) => {
+    if (depth > 5) return;
+    for (const part of t.split(/&&|\|\||;|\|/)) {
+      const argv = part.trim().split(/\s+/);
+      const at = argv.findIndex((a) => MANAGERS.includes(a));
+      if (at < 0) continue;
+      const name = scriptNameOf(argv.slice(at), all);
+      if (!name || name === self || out.has(name)) continue;
+      const s = all.find((x) => x.name === name)!;
+      out.set(name, s.text);
+      visit(s.text, depth + 1);
+    }
+  };
+  visit(text, 0);
+  return [...out].map(([name, t]) => ({ name, text: t })).sort((a, b) => (a.name < b.name ? -1 : 1));
+}
+
+/** The literal script and what the manager runs with it: pre/post (npm, Yarn 1) and the scripts it calls. */
+export function scriptSpec(pm: string, s: ScriptInfo, all: readonly ScriptInfo[]): NonNullable<CommandSpec['script']> {
   const prePost = pm === 'npm' || pm === 'yarn';
   const pre = prePost ? (all.find((x) => x.name === `pre${s.name}`)?.text ?? null) : null;
   const post = prePost ? (all.find((x) => x.name === `post${s.name}`)?.text ?? null) : null;
-  return { argv: [pm, 'run', s.name], cwd: cf.component, script: { name: s.name, text: s.text, pre, post, composite: s.composite }, from: 'script' };
+  return { name: s.name, text: s.text, pre, post, composite: s.composite, referenced: referencedScripts(s.text, all, s.name) };
+}
+
+/** The script and its pre/post texts when the manager runs them (npm and Yarn 1 do; pnpm, Yarn 2+ and bun do not). */
+function scriptCommand(cf: ComponentFacts, s: ScriptInfo): CommandSpec {
+  const pm = packageManager(cf);
+  return { argv: [pm, 'run', s.name], cwd: cf.component, script: scriptSpec(pm, s, scriptsOf(cf)), from: 'script' };
+}
+
+export function scriptsOfFacts(facts: readonly Fact[]): ScriptInfo[] {
+  return facts.filter((f) => f.key === 'node.script').map((f) => f.value as unknown as ScriptInfo);
 }
 
 function nodeTool(cf: ComponentFacts, args: string[], key: string): CommandChoice {

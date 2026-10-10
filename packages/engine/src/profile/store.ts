@@ -106,6 +106,7 @@ const DIFF_FIELDS: [string, (s: CheckSpec) => unknown][] = [
   ['command.script.text', (s) => s.command?.script?.text ?? null],
   ['command.script.pre', (s) => s.command?.script?.pre ?? null],
   ['command.script.post', (s) => s.command?.script?.post ?? null],
+  ['command.script.referenced', (s) => s.command?.script?.referenced ?? null],
   ['tool', (s) => s.tool],
   ['env.explicit', (s) => s.env.explicit],
   ['env.allowSensitive', (s) => s.env.allowSensitive],

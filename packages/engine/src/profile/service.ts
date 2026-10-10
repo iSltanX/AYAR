@@ -153,14 +153,14 @@ export class ProfileService {
     for (const [instance, o] of Object.entries(settings.overrides)) {
       const checkId = instance.slice(0, instance.indexOf('@'));
       if (!known.has(checkId) && !(checkId.startsWith('custom.') && settings.custom[checkId.slice('custom.'.length)])) throw invalid('unknown_check', { instance });
-      if (o.argv && judgeCommand(policy, [argvText(o.argv)]).refused.length) throw invalid('sudo', { instance });
+      if (o.argv && judgeCommand(policy, [argvText(o.argv), ...o.argv]).refused.length) throw invalid('sudo', { instance });
       for (const name of Object.keys(o.explicitEnv ?? {})) if (classifyEnvName(name, names) === 'sensitive') throw invalid('explicit_sensitive', { instance, name });
       if (o.enabled === false && o.required === true) throw invalid('consistency', { instance });
       const spec = specs.find((s) => s.instance === instance);
       if (o.included === false && (o.required === true || (o.required === undefined && spec?.required === true && o.enabled !== false))) throw invalid('consistency', { instance });
     }
     for (const [name, c] of Object.entries(settings.custom)) {
-      if (judgeCommand(policy, [argvText(c.argv)]).refused.length) throw invalid('sudo', { instance: `custom.${name}@.` });
+      if (judgeCommand(policy, [argvText(c.argv), ...c.argv]).refused.length) throw invalid('sudo', { instance: `custom.${name}@.` });
     }
     // Nothing is saved before C-18: a profile that holds a secret (in a command, a variable, a reference) is
     // refused rather than stored; a secret reaches a check only as an allowed variable, by name (D-47).

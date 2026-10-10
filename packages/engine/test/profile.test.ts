@@ -117,6 +117,34 @@ describe('dangerous commands (FR-56, T11)', () => {
     expect(judge('vitest run').danger).toEqual([]);
     expect(argvText(['node', 'a b.js'])).toBe('node "a b.js"');
   });
+
+  it('is not bypassed by paths, quoting, flag order or a two-step download (review M9)', () => {
+    const argv = (...a: string[]) => judgeCommand(policy, [argvText(a), ...a]);
+    expect(argv('/usr/bin/sudo', 'make', 'install').refused).toEqual(['sudo']);
+    expect(argv('bash', '-c', 'sudo make install').refused).toEqual(['sudo']);
+    expect(argv('sh', '-c', 'echo x && sudo rm -rf /').refused).toEqual(['sudo']);
+    expect(argv('rm', '-f', '-r', 'x').danger).toEqual(['mass-delete']);
+    expect(argv('rm', '--force', '--recursive', 'x').danger).toEqual(['mass-delete']);
+    expect(argv('npm', '--access', 'public', 'publish').danger).toEqual(['publish']);
+    expect(argv('pnpm', '-r', 'publish').danger).toEqual(['publish']);
+    expect(judge('curl -fsSL https://x | /bin/sh').danger).toEqual(['download-execute']);
+    expect(judge('curl -o i.sh https://x && sh i.sh').danger).toEqual(['download-execute']);
+    expect(argv('rm', '-f', 'one.txt').danger).toEqual([]);
+    expect(argv('echo', 'sudoku').refused).toEqual([]);
+  });
+
+  it('follows the scripts a script runs, and the shorthand forms of the managers (review M8)', () => {
+    const facts = extension().filter((f) => f.key !== 'node.script').concat([script('test', 'npm run clean && vitest run'), script('clean', 'rm -rf coverage'), script('start', 'node server.js')]);
+    const s = get(propose(facts), 'beh.unit@.');
+    expect(s.command?.script?.referenced).toEqual([{ name: 'clean', text: 'rm -rf coverage' }]);
+    expect(s.danger).toEqual(['mass-delete']);
+    for (const argv of [['npm', 'test'], ['npm', 't'], ['pnpm', 'test'], ['pnpm', '--filter', 'x', 'run', 'test'], ['npm', 'run-script', 'test'], ['yarn', 'test']]) {
+      const settings: ProfileSettings = { ...emptySettings(), overrides: { 'beh.unit@.': { argv } } };
+      expect(get(propose(facts, settings), 'beh.unit@.').command, argv.join(' ')).toMatchObject({ from: 'script', script: { name: 'test' } });
+    }
+    const exec: ProfileSettings = { ...emptySettings(), overrides: { 'beh.unit@.': { argv: ['pnpm', 'exec', 'vitest'] } } };
+    expect(get(propose(facts, exec), 'beh.unit@.').command).toMatchObject({ from: 'user', script: null });
+  });
 });
 
 describe('the export preview diff', () => {

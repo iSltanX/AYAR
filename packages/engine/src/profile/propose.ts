@@ -7,7 +7,7 @@
 import type { Catalog, CheckDefinition, ReferenceKind } from '@ayar/catalog';
 import type { CheckOverride, CheckSpec, CustomCheck, DiscoveryComponent, Fact, JsonValue, MissingRequirement, ProfileContext, ProfileReferences, Reason } from '@ayar/protocol';
 import { canonicalJson } from '@ayar/catalog';
-import { proposeCommand } from './commands.ts';
+import { proposeCommand, scriptNameOf, scriptsOfFacts, scriptSpec } from './commands.ts';
 import { argvText, compilePolicy, judgeCommand, type CompiledPolicy } from './policy.ts';
 import { computeRefs, computeSignals, effectiveAudience, evaluate, factsOf, unmet, type EvalEnv } from './signals.ts';
 
@@ -93,21 +93,6 @@ export function specMaterial(spec: Omit<CheckSpec, 'specHash' | 'reasons'>): unk
 
 function sameArgv(a: readonly string[], b: readonly string[]): boolean {
   return a.length === b.length && a.every((x, i) => x === b[i]);
-}
-
-/** `npm|pnpm|yarn|bun run <script>` (or `yarn <script>`): the script it runs, with its text. */
-function scriptRun(argv: readonly string[], facts: readonly Fact[]): { name: string; text: string; pre: string | null; post: string | null; composite: boolean } | null {
-  const pm = argv[0];
-  const name = argv[1] === 'run' ? argv[2] : pm === 'yarn' ? argv[1] : undefined;
-  if (!pm || !['npm', 'pnpm', 'yarn', 'bun'].includes(pm) || !name) return null;
-  const s = facts.find((f) => f.key === 'node.script' && rec(f.value).name === name);
-  if (!s) return null;
-  const v = rec(s.value);
-  const all = facts.filter((f) => f.key === 'node.script').map((f) => rec(f.value));
-  const prePost = pm === 'npm' || pm === 'yarn';
-  const pre = prePost ? (all.find((x) => x.name === `pre${name}`)?.text as string | undefined) ?? null : null;
-  const post = prePost ? (all.find((x) => x.name === `post${name}`)?.text as string | undefined) ?? null : null;
-  return { name, text: String(v.text), pre, post, composite: v.composite === true };
 }
 
 function overriddenFields(o: CheckOverride | undefined): string[] {
@@ -216,7 +201,9 @@ function specFor(
   if (override?.argv && !(command && sameArgv(command.argv, override.argv))) {
     // A user command that runs a project script still carries the script's text, so editing the script
     // still asks for approval (D-08).
-    const script = scriptRun(override.argv, facts);
+    const scripts = scriptsOfFacts(facts);
+    const name = scriptNameOf(override.argv, scripts);
+    const script = name ? scriptSpec(override.argv[0]!.split('/').pop()!, scripts.find((x) => x.name === name)!, scripts) : null;
     command = { argv: override.argv, cwd: override.cwd ?? command?.cwd ?? component, script, from: script ? 'script' : 'user' };
   }
   else if (override?.cwd && command) command = { ...command, cwd: override.cwd };
@@ -246,7 +233,9 @@ function specFor(
   }
 
   // FR-56: judged on the command line and, for a script, its literal text with its pre/post scripts.
-  const verdict = command ? judgeCommand(policy, [argvText(command.argv), command.script?.text, command.script?.pre, command.script?.post]) : { refused: [], danger: [] };
+  const verdict = command
+    ? judgeCommand(policy, [argvText(command.argv), ...command.argv, command.script?.text, command.script?.pre, command.script?.post, ...(command.script?.referenced.map((r) => r.text) ?? [])])
+    : { refused: [], danger: [] };
 
   const custom = customEntry?.custom ?? null;
   const base: Omit<CheckSpec, 'specHash' | 'reasons'> = {

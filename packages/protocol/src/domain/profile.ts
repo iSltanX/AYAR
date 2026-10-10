@@ -98,7 +98,15 @@ export const CommandSpec = z.strictObject({
   cwd: RelPath,
   /** For a project script: its literal text, with the pre/post scripts the manager runs automatically (C-09). */
   script: z
-    .strictObject({ name: z.string(), text: z.string(), pre: z.string().nullable(), post: z.string().nullable(), composite: z.boolean() })
+    .strictObject({
+      name: z.string(),
+      text: z.string(),
+      pre: z.string().nullable(),
+      post: z.string().nullable(),
+      composite: z.boolean(),
+      /** The project scripts this one runs in turn (`npm run clean && …`): their texts are part of the spec too. */
+      referenced: z.array(z.strictObject({ name: z.string(), text: z.string() })),
+    })
     .nullable(),
   from: z.enum(['script', 'tool', 'user', 'custom']),
 });
