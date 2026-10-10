@@ -1,0 +1,4288 @@
+{
+ "pairs": 121,
+ "rows": 242,
+ "required": 198,
+ "failed": 0,
+ "rowsDetail": [
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/inverse",
+   "bg": "text/primary",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#141B20",
+   "ratio": 15.82,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 68,
+   "sets": [
+    "Button",
+    "Title bar"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/inverse",
+   "bg": "text/primary",
+   "fgHex": "#141B20",
+   "bgHex": "#F7F4EC",
+   "ratio": 15.82,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 68,
+   "sets": [
+    "Button",
+    "Title bar"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/inverse",
+   "bg": "text/secondary",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#434F54",
+   "ratio": 7.69,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Button",
+    "Copy for model button"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/inverse",
+   "bg": "text/secondary",
+   "fgHex": "#141B20",
+   "bgHex": "#BABFBD",
+   "ratio": 9.34,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Button",
+    "Copy for model button"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/inverse",
+   "bg": "text/tertiary",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#59676C",
+   "ratio": 5.33,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Button",
+    "Copy for model button"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/inverse",
+   "bg": "text/tertiary",
+   "fgHex": "#141B20",
+   "bgHex": "#97A0A2",
+   "ratio": 6.51,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Button",
+    "Copy for model button"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "focus-ring",
+   "fg": "focus/ring",
+   "bg": "bg/canvas",
+   "fgHex": "#141B20",
+   "bgHex": "#F7F4EC",
+   "ratio": 15.82,
+   "min": 3,
+   "required": true,
+   "why": "حلقة تركيز",
+   "pass": true,
+   "count": 71,
+   "sets": [
+    "Button",
+    "Icon button"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "focus-ring",
+   "fg": "focus/ring",
+   "bg": "bg/canvas",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#141B20",
+   "ratio": 15.82,
+   "min": 3,
+   "required": true,
+   "why": "حلقة تركيز",
+   "pass": true,
+   "count": 71,
+   "sets": [
+    "Button",
+    "Icon button"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "focus-ring",
+   "fg": "focus/ring",
+   "bg": "bg/surface",
+   "fgHex": "#141B20",
+   "bgHex": "#FFFCF4",
+   "ratio": 16.96,
+   "min": 3,
+   "required": true,
+   "why": "حلقة تركيز",
+   "pass": true,
+   "count": 73,
+   "sets": [
+    "Button",
+    "Icon button"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "focus-ring",
+   "fg": "focus/ring",
+   "bg": "bg/surface",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#1C2429",
+   "ratio": 14.33,
+   "min": 3,
+   "required": true,
+   "why": "حلقة تركيز",
+   "pass": true,
+   "count": 73,
+   "sets": [
+    "Button",
+    "Icon button"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text-disabled",
+   "fg": "text/tertiary",
+   "bg": "bg/sunken",
+   "fgHex": "#59676C",
+   "bgHex": "#EBEAE3",
+   "ratio": 4.86,
+   "min": 4.5,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 16,
+   "sets": [
+    "Button",
+    "Search field"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text-disabled",
+   "fg": "text/tertiary",
+   "bg": "bg/sunken",
+   "fgHex": "#97A0A2",
+   "bgHex": "#0B1116",
+   "ratio": 7.11,
+   "min": 4.5,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 16,
+   "sets": [
+    "Button",
+    "Search field"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/primary",
+   "bg": "bg/surface",
+   "fgHex": "#141B20",
+   "bgHex": "#FFFCF4",
+   "ratio": 16.96,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 536,
+   "sets": [
+    "Button",
+    "Search field"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/primary",
+   "bg": "bg/surface",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#1C2429",
+   "ratio": 14.33,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 536,
+   "sets": [
+    "Button",
+    "Search field"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/primary",
+   "bg": "bg/sunken",
+   "fgHex": "#141B20",
+   "bgHex": "#EBEAE3",
+   "ratio": 14.42,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 112,
+   "sets": [
+    "Button",
+    "Select"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/primary",
+   "bg": "bg/sunken",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#0B1116",
+   "ratio": 17.28,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 112,
+   "sets": [
+    "Button",
+    "Select"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/primary",
+   "bg": "border/subtle",
+   "fgHex": "#141B20",
+   "bgHex": "#D9D9D4",
+   "ratio": 12.28,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 22,
+   "sets": [
+    "Button",
+    "Select"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/primary",
+   "bg": "border/subtle",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#3B454B",
+   "ratio": 8.93,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 22,
+   "sets": [
+    "Button",
+    "Select"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/primary",
+   "bg": "bg/canvas",
+   "fgHex": "#141B20",
+   "bgHex": "#F7F4EC",
+   "ratio": 15.82,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 262,
+   "sets": [
+    "Button",
+    "Switch"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/primary",
+   "bg": "bg/canvas",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#141B20",
+   "ratio": 15.82,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 262,
+   "sets": [
+    "Button",
+    "Switch"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text-disabled",
+   "fg": "text/tertiary",
+   "bg": "bg/canvas",
+   "fgHex": "#59676C",
+   "bgHex": "#F7F4EC",
+   "ratio": 5.33,
+   "min": 4.5,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 26,
+   "sets": [
+    "Button",
+    "Switch"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text-disabled",
+   "fg": "text/tertiary",
+   "bg": "bg/canvas",
+   "fgHex": "#97A0A2",
+   "bgHex": "#141B20",
+   "ratio": 6.51,
+   "min": 4.5,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 26,
+   "sets": [
+    "Button",
+    "Switch"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text-disabled",
+   "fg": "text/tertiary",
+   "bg": "bg/surface",
+   "fgHex": "#59676C",
+   "bgHex": "#FFFCF4",
+   "ratio": 5.72,
+   "min": 4.5,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 26,
+   "sets": [
+    "Button",
+    "Switch"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text-disabled",
+   "fg": "text/tertiary",
+   "bg": "bg/surface",
+   "fgHex": "#97A0A2",
+   "bgHex": "#1C2429",
+   "ratio": 5.9,
+   "min": 4.5,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 26,
+   "sets": [
+    "Button",
+    "Switch"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "text/primary",
+   "bg": "bg/surface",
+   "fgHex": "#141B20",
+   "bgHex": "#FFFCF4",
+   "ratio": 16.96,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 218,
+   "sets": [
+    "Button",
+    "Icon button"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "text/primary",
+   "bg": "bg/surface",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#1C2429",
+   "ratio": 14.33,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 218,
+   "sets": [
+    "Button",
+    "Icon button"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "text/primary",
+   "bg": "bg/sunken",
+   "fgHex": "#141B20",
+   "bgHex": "#EBEAE3",
+   "ratio": 14.42,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 64,
+   "sets": [
+    "Button",
+    "Icon button"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "text/primary",
+   "bg": "bg/sunken",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#0B1116",
+   "ratio": 17.28,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 64,
+   "sets": [
+    "Button",
+    "Icon button"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "text/primary",
+   "bg": "border/subtle",
+   "fgHex": "#141B20",
+   "bgHex": "#D9D9D4",
+   "ratio": 12.28,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 20,
+   "sets": [
+    "Button",
+    "Icon button"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "text/primary",
+   "bg": "border/subtle",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#3B454B",
+   "ratio": 8.93,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 20,
+   "sets": [
+    "Button",
+    "Icon button"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon-disabled",
+   "fg": "text/tertiary",
+   "bg": "bg/sunken",
+   "fgHex": "#59676C",
+   "bgHex": "#EBEAE3",
+   "ratio": 4.86,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 18,
+   "sets": [
+    "Button",
+    "Search field"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon-disabled",
+   "fg": "text/tertiary",
+   "bg": "bg/sunken",
+   "fgHex": "#97A0A2",
+   "bgHex": "#0B1116",
+   "ratio": 7.11,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 18,
+   "sets": [
+    "Button",
+    "Search field"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "text/primary",
+   "bg": "bg/canvas",
+   "fgHex": "#141B20",
+   "bgHex": "#F7F4EC",
+   "ratio": 15.82,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 344,
+   "sets": [
+    "Icon button",
+    "Nav item"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "text/primary",
+   "bg": "bg/canvas",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#141B20",
+   "ratio": 15.82,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 344,
+   "sets": [
+    "Icon button",
+    "Nav item"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon-disabled",
+   "fg": "text/tertiary",
+   "bg": "bg/canvas",
+   "fgHex": "#59676C",
+   "bgHex": "#F7F4EC",
+   "ratio": 5.33,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Icon button",
+    "Nav item"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon-disabled",
+   "fg": "text/tertiary",
+   "bg": "bg/canvas",
+   "fgHex": "#97A0A2",
+   "bgHex": "#141B20",
+   "ratio": 6.51,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Icon button",
+    "Nav item"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon-disabled",
+   "fg": "text/tertiary",
+   "bg": "bg/surface",
+   "fgHex": "#59676C",
+   "bgHex": "#FFFCF4",
+   "ratio": 5.72,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Icon button",
+    "Nav item"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon-disabled",
+   "fg": "text/tertiary",
+   "bg": "bg/surface",
+   "fgHex": "#97A0A2",
+   "bgHex": "#1C2429",
+   "ratio": 5.9,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Icon button",
+    "Nav item"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/tertiary",
+   "bg": "bg/surface",
+   "fgHex": "#59676C",
+   "bgHex": "#FFFCF4",
+   "ratio": 5.72,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 178,
+   "sets": [
+    "Search field",
+    "Text field"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/tertiary",
+   "bg": "bg/surface",
+   "fgHex": "#97A0A2",
+   "bgHex": "#1C2429",
+   "ratio": 5.9,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 178,
+   "sets": [
+    "Search field",
+    "Text field"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "text/secondary",
+   "bg": "bg/surface",
+   "fgHex": "#434F54",
+   "bgHex": "#FFFCF4",
+   "ratio": 8.24,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 134,
+   "sets": [
+    "Search field",
+    "Select"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "text/secondary",
+   "bg": "bg/surface",
+   "fgHex": "#BABFBD",
+   "bgHex": "#1C2429",
+   "ratio": 8.45,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 134,
+   "sets": [
+    "Search field",
+    "Select"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/tertiary",
+   "bg": "bg/sunken",
+   "fgHex": "#59676C",
+   "bgHex": "#EBEAE3",
+   "ratio": 4.86,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 30,
+   "sets": [
+    "Search field",
+    "Text field"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/tertiary",
+   "bg": "bg/sunken",
+   "fgHex": "#97A0A2",
+   "bgHex": "#0B1116",
+   "ratio": 7.11,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 30,
+   "sets": [
+    "Search field",
+    "Text field"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "text/secondary",
+   "bg": "bg/sunken",
+   "fgHex": "#434F54",
+   "bgHex": "#EBEAE3",
+   "ratio": 7.01,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 364,
+   "sets": [
+    "Search field",
+    "Select"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "text/secondary",
+   "bg": "bg/sunken",
+   "fgHex": "#BABFBD",
+   "bgHex": "#0B1116",
+   "ratio": 10.19,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 364,
+   "sets": [
+    "Search field",
+    "Select"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "text/secondary",
+   "bg": "border/subtle",
+   "fgHex": "#434F54",
+   "bgHex": "#D9D9D4",
+   "ratio": 5.97,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Select",
+    "Project switcher"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "text/secondary",
+   "bg": "border/subtle",
+   "fgHex": "#BABFBD",
+   "bgHex": "#3B454B",
+   "ratio": 5.27,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Select",
+    "Project switcher"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "border",
+   "fg": "border/strong",
+   "bg": "bg/canvas",
+   "fgHex": "#7B8588",
+   "bgHex": "#F7F4EC",
+   "ratio": 3.44,
+   "min": 3,
+   "required": true,
+   "why": "حد",
+   "pass": true,
+   "count": 88,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "border",
+   "fg": "border/strong",
+   "bg": "bg/canvas",
+   "fgHex": "#728085",
+   "bgHex": "#141B20",
+   "ratio": 4.26,
+   "min": 3,
+   "required": true,
+   "why": "حد",
+   "pass": true,
+   "count": 88,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "border",
+   "fg": "border/strong",
+   "bg": "bg/surface",
+   "fgHex": "#7B8588",
+   "bgHex": "#FFFCF4",
+   "ratio": 3.69,
+   "min": 3,
+   "required": true,
+   "why": "حد",
+   "pass": true,
+   "count": 140,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "border",
+   "fg": "border/strong",
+   "bg": "bg/surface",
+   "fgHex": "#728085",
+   "bgHex": "#1C2429",
+   "ratio": 3.86,
+   "min": 3,
+   "required": true,
+   "why": "حد",
+   "pass": true,
+   "count": 140,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary",
+   "fg": "bg/sunken",
+   "bg": "bg/canvas",
+   "fgHex": "#EBEAE3",
+   "bgHex": "#F7F4EC",
+   "ratio": 1.1,
+   "min": 3,
+   "required": false,
+   "why": "تعبئة تحكم بإطار border/strong (الإطار يحمل الحد)",
+   "pass": false,
+   "count": 10,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary",
+   "fg": "bg/sunken",
+   "bg": "bg/canvas",
+   "fgHex": "#0B1116",
+   "bgHex": "#141B20",
+   "ratio": 1.09,
+   "min": 3,
+   "required": false,
+   "why": "تعبئة تحكم بإطار border/strong (الإطار يحمل الحد)",
+   "pass": false,
+   "count": 10,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary",
+   "fg": "bg/sunken",
+   "bg": "bg/surface",
+   "fgHex": "#EBEAE3",
+   "bgHex": "#FFFCF4",
+   "ratio": 1.18,
+   "min": 3,
+   "required": false,
+   "why": "تعبئة تحكم بإطار border/strong (الإطار يحمل الحد)",
+   "pass": false,
+   "count": 10,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary",
+   "fg": "bg/sunken",
+   "bg": "bg/surface",
+   "fgHex": "#0B1116",
+   "bgHex": "#1C2429",
+   "ratio": 1.21,
+   "min": 3,
+   "required": false,
+   "why": "تعبئة تحكم بإطار border/strong (الإطار يحمل الحد)",
+   "pass": false,
+   "count": 10,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "border/strong",
+   "bg": "bg/sunken",
+   "fgHex": "#7B8588",
+   "bgHex": "#EBEAE3",
+   "ratio": 3.14,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Switch"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "border/strong",
+   "bg": "bg/sunken",
+   "fgHex": "#728085",
+   "bgHex": "#0B1116",
+   "ratio": 4.65,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Switch"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "border",
+   "fg": "text/secondary",
+   "bg": "bg/canvas",
+   "fgHex": "#434F54",
+   "bgHex": "#F7F4EC",
+   "ratio": 7.69,
+   "min": 3,
+   "required": true,
+   "why": "حد",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Switch"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "border",
+   "fg": "text/secondary",
+   "bg": "bg/canvas",
+   "fgHex": "#BABFBD",
+   "bgHex": "#141B20",
+   "ratio": 9.34,
+   "min": 3,
+   "required": true,
+   "why": "حد",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Switch"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "border",
+   "fg": "text/secondary",
+   "bg": "bg/surface",
+   "fgHex": "#434F54",
+   "bgHex": "#FFFCF4",
+   "ratio": 8.24,
+   "min": 3,
+   "required": true,
+   "why": "حد",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Switch"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "border",
+   "fg": "text/secondary",
+   "bg": "bg/surface",
+   "fgHex": "#BABFBD",
+   "bgHex": "#1C2429",
+   "ratio": 8.45,
+   "min": 3,
+   "required": true,
+   "why": "حد",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Switch"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary-disabled",
+   "fg": "bg/sunken",
+   "bg": "bg/canvas",
+   "fgHex": "#EBEAE3",
+   "bgHex": "#F7F4EC",
+   "ratio": 1.1,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": false,
+   "count": 6,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary-disabled",
+   "fg": "bg/sunken",
+   "bg": "bg/canvas",
+   "fgHex": "#0B1116",
+   "bgHex": "#141B20",
+   "ratio": 1.09,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": false,
+   "count": 6,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary-disabled",
+   "fg": "bg/sunken",
+   "bg": "bg/surface",
+   "fgHex": "#EBEAE3",
+   "bgHex": "#FFFCF4",
+   "ratio": 1.18,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": false,
+   "count": 6,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary-disabled",
+   "fg": "bg/sunken",
+   "bg": "bg/surface",
+   "fgHex": "#0B1116",
+   "bgHex": "#1C2429",
+   "ratio": 1.21,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": false,
+   "count": 6,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon-disabled",
+   "fg": "border/subtle",
+   "bg": "bg/sunken",
+   "fgHex": "#D9D9D4",
+   "bgHex": "#EBEAE3",
+   "ratio": 1.17,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": false,
+   "count": 2,
+   "sets": [
+    "Switch"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon-disabled",
+   "fg": "border/subtle",
+   "bg": "bg/sunken",
+   "fgHex": "#3B454B",
+   "bgHex": "#0B1116",
+   "ratio": 1.93,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": false,
+   "count": 2,
+   "sets": [
+    "Switch"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary",
+   "fg": "text/primary",
+   "bg": "bg/canvas",
+   "fgHex": "#141B20",
+   "bgHex": "#F7F4EC",
+   "ratio": 15.82,
+   "min": 3,
+   "required": true,
+   "why": "تعبئة تحكم بلا إطار",
+   "pass": true,
+   "count": 24,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary",
+   "fg": "text/primary",
+   "bg": "bg/canvas",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#141B20",
+   "ratio": 15.82,
+   "min": 3,
+   "required": true,
+   "why": "تعبئة تحكم بلا إطار",
+   "pass": true,
+   "count": 24,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary",
+   "fg": "text/primary",
+   "bg": "bg/surface",
+   "fgHex": "#141B20",
+   "bgHex": "#FFFCF4",
+   "ratio": 16.96,
+   "min": 3,
+   "required": true,
+   "why": "تعبئة تحكم بلا إطار",
+   "pass": true,
+   "count": 34,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary",
+   "fg": "text/primary",
+   "bg": "bg/surface",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#1C2429",
+   "ratio": 14.33,
+   "min": 3,
+   "required": true,
+   "why": "تعبئة تحكم بلا إطار",
+   "pass": true,
+   "count": 34,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "bg/surface",
+   "bg": "text/primary",
+   "fgHex": "#FFFCF4",
+   "bgHex": "#141B20",
+   "ratio": 16.96,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Switch"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "bg/surface",
+   "bg": "text/primary",
+   "fgHex": "#1C2429",
+   "bgHex": "#F7F4EC",
+   "ratio": 14.33,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Switch"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary",
+   "fg": "text/secondary",
+   "bg": "bg/canvas",
+   "fgHex": "#434F54",
+   "bgHex": "#F7F4EC",
+   "ratio": 7.69,
+   "min": 3,
+   "required": true,
+   "why": "تعبئة تحكم بلا إطار",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary",
+   "fg": "text/secondary",
+   "bg": "bg/canvas",
+   "fgHex": "#BABFBD",
+   "bgHex": "#141B20",
+   "ratio": 9.34,
+   "min": 3,
+   "required": true,
+   "why": "تعبئة تحكم بلا إطار",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary",
+   "fg": "text/secondary",
+   "bg": "bg/surface",
+   "fgHex": "#434F54",
+   "bgHex": "#FFFCF4",
+   "ratio": 8.24,
+   "min": 3,
+   "required": true,
+   "why": "تعبئة تحكم بلا إطار",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary",
+   "fg": "text/secondary",
+   "bg": "bg/surface",
+   "fgHex": "#BABFBD",
+   "bgHex": "#1C2429",
+   "ratio": 8.45,
+   "min": 3,
+   "required": true,
+   "why": "تعبئة تحكم بلا إطار",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "bg/surface",
+   "bg": "text/secondary",
+   "fgHex": "#FFFCF4",
+   "bgHex": "#434F54",
+   "ratio": 8.24,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Switch"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "bg/surface",
+   "bg": "text/secondary",
+   "fgHex": "#1C2429",
+   "bgHex": "#BABFBD",
+   "ratio": 8.45,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Switch"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary-disabled",
+   "fg": "border/strong",
+   "bg": "bg/canvas",
+   "fgHex": "#7B8588",
+   "bgHex": "#F7F4EC",
+   "ratio": 3.44,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary-disabled",
+   "fg": "border/strong",
+   "bg": "bg/canvas",
+   "fgHex": "#728085",
+   "bgHex": "#141B20",
+   "ratio": 4.26,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary-disabled",
+   "fg": "border/strong",
+   "bg": "bg/surface",
+   "fgHex": "#7B8588",
+   "bgHex": "#FFFCF4",
+   "ratio": 3.69,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary-disabled",
+   "fg": "border/strong",
+   "bg": "bg/surface",
+   "fgHex": "#728085",
+   "bgHex": "#1C2429",
+   "ratio": 3.86,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Switch",
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon-disabled",
+   "fg": "bg/sunken",
+   "bg": "border/strong",
+   "fgHex": "#EBEAE3",
+   "bgHex": "#7B8588",
+   "ratio": 3.14,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Switch"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon-disabled",
+   "fg": "bg/sunken",
+   "bg": "border/strong",
+   "fgHex": "#0B1116",
+   "bgHex": "#728085",
+   "ratio": 4.65,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Switch"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary",
+   "fg": "bg/surface",
+   "bg": "bg/canvas",
+   "fgHex": "#FFFCF4",
+   "bgHex": "#F7F4EC",
+   "ratio": 1.07,
+   "min": 3,
+   "required": false,
+   "why": "تعبئة تحكم بإطار border/strong (الإطار يحمل الحد)",
+   "pass": false,
+   "count": 30,
+   "sets": [
+    "Checkbox",
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary",
+   "fg": "bg/surface",
+   "bg": "bg/canvas",
+   "fgHex": "#1C2429",
+   "bgHex": "#141B20",
+   "ratio": 1.1,
+   "min": 3,
+   "required": false,
+   "why": "تعبئة تحكم بإطار border/strong (الإطار يحمل الحد)",
+   "pass": false,
+   "count": 30,
+   "sets": [
+    "Checkbox",
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary",
+   "fg": "bg/surface",
+   "bg": "bg/surface",
+   "fgHex": "#FFFCF4",
+   "bgHex": "#FFFCF4",
+   "ratio": 1,
+   "min": 3,
+   "required": false,
+   "why": "تعبئة تحكم بإطار border/strong (الإطار يحمل الحد)",
+   "pass": false,
+   "count": 30,
+   "sets": [
+    "Checkbox",
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary",
+   "fg": "bg/surface",
+   "bg": "bg/surface",
+   "fgHex": "#1C2429",
+   "bgHex": "#1C2429",
+   "ratio": 1,
+   "min": 3,
+   "required": false,
+   "why": "تعبئة تحكم بإطار border/strong (الإطار يحمل الحد)",
+   "pass": false,
+   "count": 30,
+   "sets": [
+    "Checkbox",
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary",
+   "fg": "border/subtle",
+   "bg": "bg/canvas",
+   "fgHex": "#D9D9D4",
+   "bgHex": "#F7F4EC",
+   "ratio": 1.29,
+   "min": 3,
+   "required": false,
+   "why": "زخرفي (D-DES1-03، D-DES2-13)",
+   "pass": false,
+   "count": 6,
+   "sets": [
+    "Checkbox",
+    "Progress"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary",
+   "fg": "border/subtle",
+   "bg": "bg/canvas",
+   "fgHex": "#3B454B",
+   "bgHex": "#141B20",
+   "ratio": 1.77,
+   "min": 3,
+   "required": false,
+   "why": "زخرفي (D-DES1-03، D-DES2-13)",
+   "pass": false,
+   "count": 6,
+   "sets": [
+    "Checkbox",
+    "Progress"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary",
+   "fg": "border/subtle",
+   "bg": "bg/surface",
+   "fgHex": "#D9D9D4",
+   "bgHex": "#FFFCF4",
+   "ratio": 1.38,
+   "min": 3,
+   "required": false,
+   "why": "زخرفي (D-DES1-03، D-DES2-13)",
+   "pass": false,
+   "count": 6,
+   "sets": [
+    "Checkbox",
+    "Progress"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary",
+   "fg": "border/subtle",
+   "bg": "bg/surface",
+   "fgHex": "#3B454B",
+   "bgHex": "#1C2429",
+   "ratio": 1.6,
+   "min": 3,
+   "required": false,
+   "why": "زخرفي (D-DES1-03، D-DES2-13)",
+   "pass": false,
+   "count": 6,
+   "sets": [
+    "Checkbox",
+    "Progress"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "text/inverse",
+   "bg": "text/primary",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#141B20",
+   "ratio": 15.82,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 88,
+   "sets": [
+    "Checkbox",
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "text/inverse",
+   "bg": "text/primary",
+   "fgHex": "#141B20",
+   "bgHex": "#F7F4EC",
+   "ratio": 15.82,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 88,
+   "sets": [
+    "Checkbox",
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "text/inverse",
+   "bg": "text/secondary",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#434F54",
+   "ratio": 7.69,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 10,
+   "sets": [
+    "Checkbox",
+    "Copy for model button"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "text/inverse",
+   "bg": "text/secondary",
+   "fgHex": "#141B20",
+   "bgHex": "#BABFBD",
+   "ratio": 9.34,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 10,
+   "sets": [
+    "Checkbox",
+    "Copy for model button"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary",
+   "fg": "text/tertiary",
+   "bg": "bg/canvas",
+   "fgHex": "#59676C",
+   "bgHex": "#F7F4EC",
+   "ratio": 5.33,
+   "min": 3,
+   "required": true,
+   "why": "تعبئة تحكم بلا إطار",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary",
+   "fg": "text/tertiary",
+   "bg": "bg/canvas",
+   "fgHex": "#97A0A2",
+   "bgHex": "#141B20",
+   "ratio": 6.51,
+   "min": 3,
+   "required": true,
+   "why": "تعبئة تحكم بلا إطار",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary",
+   "fg": "text/tertiary",
+   "bg": "bg/surface",
+   "fgHex": "#59676C",
+   "bgHex": "#FFFCF4",
+   "ratio": 5.72,
+   "min": 3,
+   "required": true,
+   "why": "تعبئة تحكم بلا إطار",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary",
+   "fg": "text/tertiary",
+   "bg": "bg/surface",
+   "fgHex": "#97A0A2",
+   "bgHex": "#1C2429",
+   "ratio": 5.9,
+   "min": 3,
+   "required": true,
+   "why": "تعبئة تحكم بلا إطار",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Checkbox"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "text/inverse",
+   "bg": "text/tertiary",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#59676C",
+   "ratio": 5.33,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Checkbox",
+    "Copy for model button"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "text/inverse",
+   "bg": "text/tertiary",
+   "fgHex": "#141B20",
+   "bgHex": "#97A0A2",
+   "ratio": 6.51,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Checkbox",
+    "Copy for model button"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon-disabled",
+   "fg": "text/inverse",
+   "bg": "border/strong",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#7B8588",
+   "ratio": 3.44,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Checkbox",
+    "Radio"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon-disabled",
+   "fg": "text/inverse",
+   "bg": "border/strong",
+   "fgHex": "#141B20",
+   "bgHex": "#728085",
+   "ratio": 4.26,
+   "min": 3,
+   "required": false,
+   "why": "معطل (مستثنى، WCAG 1.4.3/1.4.11)",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Checkbox",
+    "Radio"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/secondary",
+   "bg": "bg/canvas",
+   "fgHex": "#434F54",
+   "bgHex": "#F7F4EC",
+   "ratio": 7.69,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 130,
+   "sets": [
+    "Segment",
+    "Tab"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/secondary",
+   "bg": "bg/canvas",
+   "fgHex": "#BABFBD",
+   "bgHex": "#141B20",
+   "ratio": 9.34,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 130,
+   "sets": [
+    "Segment",
+    "Tab"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/secondary",
+   "bg": "bg/surface",
+   "fgHex": "#434F54",
+   "bgHex": "#FFFCF4",
+   "ratio": 8.24,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 300,
+   "sets": [
+    "Segment",
+    "Tab"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/secondary",
+   "bg": "bg/surface",
+   "fgHex": "#BABFBD",
+   "bgHex": "#1C2429",
+   "ratio": 8.45,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 300,
+   "sets": [
+    "Segment",
+    "Tab"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/secondary",
+   "bg": "bg/sunken",
+   "fgHex": "#434F54",
+   "bgHex": "#EBEAE3",
+   "ratio": 7.01,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 332,
+   "sets": [
+    "Segmented control",
+    "Project switcher"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/secondary",
+   "bg": "bg/sunken",
+   "fgHex": "#BABFBD",
+   "bgHex": "#0B1116",
+   "ratio": 10.19,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 332,
+   "sets": [
+    "Segmented control",
+    "Project switcher"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "border",
+   "fg": "border/strong",
+   "bg": "bg/sunken",
+   "fgHex": "#7B8588",
+   "bgHex": "#EBEAE3",
+   "ratio": 3.14,
+   "min": 3,
+   "required": true,
+   "why": "حد",
+   "pass": true,
+   "count": 34,
+   "sets": [
+    "Segmented control",
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "border",
+   "fg": "border/strong",
+   "bg": "bg/sunken",
+   "fgHex": "#728085",
+   "bgHex": "#0B1116",
+   "ratio": 4.65,
+   "min": 3,
+   "required": true,
+   "why": "حد",
+   "pass": true,
+   "count": 34,
+   "sets": [
+    "Segmented control",
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "text/tertiary",
+   "bg": "bg/surface",
+   "fgHex": "#59676C",
+   "bgHex": "#FFFCF4",
+   "ratio": 5.72,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 72,
+   "sets": [
+    "Argument editor"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "text/tertiary",
+   "bg": "bg/surface",
+   "fgHex": "#97A0A2",
+   "bgHex": "#1C2429",
+   "ratio": 5.9,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 72,
+   "sets": [
+    "Argument editor"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "result/failed/fg",
+   "bg": "result/failed/bg",
+   "fgHex": "#92002C",
+   "bgHex": "#FFEFEF",
+   "ratio": 8.34,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 19,
+   "sets": [
+    "Nav badge",
+    "Sidebar"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "result/failed/fg",
+   "bg": "result/failed/bg",
+   "fgHex": "#FFC2C5",
+   "bgHex": "#3C1D1F",
+   "ratio": 9.93,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 19,
+   "sets": [
+    "Nav badge",
+    "Sidebar"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "result/missing/icon",
+   "bg": "bg/canvas",
+   "fgHex": "#59676C",
+   "bgHex": "#F7F4EC",
+   "ratio": 5.33,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 7,
+   "sets": [
+    "Nav badge",
+    "Sidebar"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "result/missing/icon",
+   "bg": "bg/canvas",
+   "fgHex": "#BABFBD",
+   "bgHex": "#141B20",
+   "ratio": 9.34,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 7,
+   "sets": [
+    "Nav badge",
+    "Sidebar"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "result/missing/icon",
+   "bg": "bg/surface",
+   "fgHex": "#59676C",
+   "bgHex": "#FFFCF4",
+   "ratio": 5.72,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 3,
+   "sets": [
+    "Nav badge",
+    "Section card"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "result/missing/icon",
+   "bg": "bg/surface",
+   "fgHex": "#BABFBD",
+   "bgHex": "#1C2429",
+   "ratio": 8.45,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 3,
+   "sets": [
+    "Nav badge",
+    "Section card"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/primary",
+   "bg": "selection",
+   "fgHex": "#141B20",
+   "bgHex": "#EBEAE3",
+   "ratio": 14.42,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 36,
+   "sets": [
+    "Nav item",
+    "Sidebar"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/primary",
+   "bg": "selection",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#272F34",
+   "ratio": 12.39,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 36,
+   "sets": [
+    "Nav item",
+    "Sidebar"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "text/primary",
+   "bg": "selection",
+   "fgHex": "#141B20",
+   "bgHex": "#EBEAE3",
+   "ratio": 14.42,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 26,
+   "sets": [
+    "Nav item",
+    "Sidebar"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "text/primary",
+   "bg": "selection",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#272F34",
+   "ratio": 12.39,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 26,
+   "sets": [
+    "Nav item",
+    "Sidebar"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "indicator",
+   "fg": "border/strong",
+   "bg": "selection",
+   "fgHex": "#7B8588",
+   "bgHex": "#EBEAE3",
+   "ratio": 3.14,
+   "min": 3,
+   "required": true,
+   "why": "مؤشر تحديد",
+   "pass": true,
+   "count": 18,
+   "sets": [
+    "Nav item",
+    "Sidebar"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "indicator",
+   "fg": "border/strong",
+   "bg": "selection",
+   "fgHex": "#728085",
+   "bgHex": "#272F34",
+   "ratio": 3.33,
+   "min": 3,
+   "required": true,
+   "why": "مؤشر تحديد",
+   "pass": true,
+   "count": 18,
+   "sets": [
+    "Nav item",
+    "Sidebar"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/tertiary",
+   "bg": "bg/canvas",
+   "fgHex": "#59676C",
+   "bgHex": "#F7F4EC",
+   "ratio": 5.33,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 52,
+   "sets": [
+    "Nav group header",
+    "Sidebar"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/tertiary",
+   "bg": "bg/canvas",
+   "fgHex": "#97A0A2",
+   "bgHex": "#141B20",
+   "ratio": 6.51,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 52,
+   "sets": [
+    "Nav group header",
+    "Sidebar"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "text/secondary",
+   "bg": "bg/canvas",
+   "fgHex": "#434F54",
+   "bgHex": "#F7F4EC",
+   "ratio": 7.69,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 66,
+   "sets": [
+    "Project switcher",
+    "Sidebar"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "text/secondary",
+   "bg": "bg/canvas",
+   "fgHex": "#BABFBD",
+   "bgHex": "#141B20",
+   "ratio": 9.34,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 66,
+   "sets": [
+    "Project switcher",
+    "Sidebar"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "border",
+   "fg": "result/failed/border",
+   "bg": "bg/canvas",
+   "fgHex": "#D53954",
+   "bgHex": "#F7F4EC",
+   "ratio": 4.21,
+   "min": 3,
+   "required": true,
+   "why": "حد",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Sidebar",
+    "Window frame"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "border",
+   "fg": "result/failed/border",
+   "bg": "bg/canvas",
+   "fgHex": "#F66A79",
+   "bgHex": "#141B20",
+   "ratio": 6.01,
+   "min": 3,
+   "required": true,
+   "why": "حد",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Sidebar",
+    "Window frame"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "result/warning/icon",
+   "bg": "bg/surface",
+   "fgHex": "#AD6A13",
+   "bgHex": "#FFFCF4",
+   "ratio": 4.23,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Run bar",
+    "Section card"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "result/warning/icon",
+   "bg": "bg/surface",
+   "fgHex": "#D48E1F",
+   "bgHex": "#1C2429",
+   "ratio": 5.76,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Run bar",
+    "Section card"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "result/failed/icon",
+   "bg": "bg/surface",
+   "fgHex": "#D53954",
+   "bgHex": "#FFFCF4",
+   "ratio": 4.51,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Run bar",
+    "Section card"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "result/failed/icon",
+   "bg": "bg/surface",
+   "fgHex": "#F66A79",
+   "bgHex": "#1C2429",
+   "ratio": 5.44,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Run bar",
+    "Section card"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "result/passed/icon",
+   "bg": "bg/surface",
+   "fgHex": "#388F60",
+   "bgHex": "#FFFCF4",
+   "ratio": 3.89,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Run bar",
+    "Section card"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "result/passed/icon",
+   "bg": "bg/surface",
+   "fgHex": "#3FB87F",
+   "bgHex": "#1C2429",
+   "ratio": 6.28,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Run bar",
+    "Section card"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "cycle/running/fg",
+   "bg": "bg/surface",
+   "fgHex": "#083EB4",
+   "bgHex": "#FFFCF4",
+   "ratio": 8.68,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Run bar",
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "cycle/running/fg",
+   "bg": "bg/surface",
+   "fgHex": "#BDD5FF",
+   "bgHex": "#1C2429",
+   "ratio": 10.59,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Run bar",
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "cycle/running/icon",
+   "bg": "bg/surface",
+   "fgHex": "#3170F9",
+   "bgHex": "#FFFCF4",
+   "ratio": 4.25,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Run bar",
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "cycle/running/icon",
+   "bg": "bg/surface",
+   "fgHex": "#699DF9",
+   "bgHex": "#1C2429",
+   "ratio": 5.84,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Run bar",
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "cycle/cancelling/fg",
+   "bg": "bg/surface",
+   "fgHex": "#21292E",
+   "bgHex": "#FFFCF4",
+   "ratio": 14.41,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Run bar"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "cycle/cancelling/fg",
+   "bg": "bg/surface",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#1C2429",
+   "ratio": 14.33,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Run bar"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "cycle/cancelling/icon",
+   "bg": "bg/surface",
+   "fgHex": "#434F54",
+   "bgHex": "#FFFCF4",
+   "ratio": 8.24,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Run bar"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "cycle/cancelling/icon",
+   "bg": "bg/surface",
+   "fgHex": "#BABFBD",
+   "bgHex": "#1C2429",
+   "ratio": 8.45,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Run bar"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "text/tertiary",
+   "bg": "bg/canvas",
+   "fgHex": "#59676C",
+   "bgHex": "#F7F4EC",
+   "ratio": 5.33,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 16,
+   "sets": [
+    "Title bar",
+    "Window frame"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "text/tertiary",
+   "bg": "bg/canvas",
+   "fgHex": "#97A0A2",
+   "bgHex": "#141B20",
+   "ratio": 6.51,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 16,
+   "sets": [
+    "Title bar",
+    "Window frame"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "cycle/queued/fg",
+   "bg": "bg/canvas",
+   "fgHex": "#313B40",
+   "bgHex": "#F7F4EC",
+   "ratio": 10.44,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "cycle/queued/fg",
+   "bg": "bg/canvas",
+   "fgHex": "#BABFBD",
+   "bgHex": "#141B20",
+   "ratio": 9.34,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "cycle/queued/fg",
+   "bg": "bg/surface",
+   "fgHex": "#313B40",
+   "bgHex": "#FFFCF4",
+   "ratio": 11.19,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "cycle/queued/fg",
+   "bg": "bg/surface",
+   "fgHex": "#BABFBD",
+   "bgHex": "#1C2429",
+   "ratio": 8.45,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "cycle/queued/icon",
+   "bg": "bg/canvas",
+   "fgHex": "#59676C",
+   "bgHex": "#F7F4EC",
+   "ratio": 5.33,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "cycle/queued/icon",
+   "bg": "bg/canvas",
+   "fgHex": "#97A0A2",
+   "bgHex": "#141B20",
+   "ratio": 6.51,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "cycle/queued/icon",
+   "bg": "bg/surface",
+   "fgHex": "#59676C",
+   "bgHex": "#FFFCF4",
+   "ratio": 5.72,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "cycle/queued/icon",
+   "bg": "bg/surface",
+   "fgHex": "#97A0A2",
+   "bgHex": "#1C2429",
+   "ratio": 5.9,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "cycle/queued/fg",
+   "bg": "bg/sunken",
+   "fgHex": "#313B40",
+   "bgHex": "#EBEAE3",
+   "ratio": 9.51,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "cycle/queued/fg",
+   "bg": "bg/sunken",
+   "fgHex": "#BABFBD",
+   "bgHex": "#0B1116",
+   "ratio": 10.19,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "cycle/queued/icon",
+   "bg": "bg/sunken",
+   "fgHex": "#59676C",
+   "bgHex": "#EBEAE3",
+   "ratio": 4.86,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "cycle/queued/icon",
+   "bg": "bg/sunken",
+   "fgHex": "#97A0A2",
+   "bgHex": "#0B1116",
+   "ratio": 7.11,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary",
+   "fg": "bg/surface",
+   "bg": "bg/sunken",
+   "fgHex": "#FFFCF4",
+   "bgHex": "#EBEAE3",
+   "ratio": 1.18,
+   "min": 3,
+   "required": false,
+   "why": "تعبئة تحكم بإطار border/strong (الإطار يحمل الحد)",
+   "pass": false,
+   "count": 8,
+   "sets": [
+    "Check row",
+    "Finding row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary",
+   "fg": "bg/surface",
+   "bg": "bg/sunken",
+   "fgHex": "#1C2429",
+   "bgHex": "#0B1116",
+   "ratio": 1.21,
+   "min": 3,
+   "required": false,
+   "why": "تعبئة تحكم بإطار border/strong (الإطار يحمل الحد)",
+   "pass": false,
+   "count": 8,
+   "sets": [
+    "Check row",
+    "Finding row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/tertiary",
+   "bg": "selection",
+   "fgHex": "#59676C",
+   "bgHex": "#EBEAE3",
+   "ratio": 4.86,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 14,
+   "sets": [
+    "Check row",
+    "Finding row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/tertiary",
+   "bg": "selection",
+   "fgHex": "#97A0A2",
+   "bgHex": "#272F34",
+   "ratio": 5.1,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 14,
+   "sets": [
+    "Check row",
+    "Finding row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "cycle/queued/fg",
+   "bg": "selection",
+   "fgHex": "#313B40",
+   "bgHex": "#EBEAE3",
+   "ratio": 9.51,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "cycle/queued/fg",
+   "bg": "selection",
+   "fgHex": "#BABFBD",
+   "bgHex": "#272F34",
+   "ratio": 7.31,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "cycle/queued/icon",
+   "bg": "selection",
+   "fgHex": "#59676C",
+   "bgHex": "#EBEAE3",
+   "ratio": 4.86,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "cycle/queued/icon",
+   "bg": "selection",
+   "fgHex": "#97A0A2",
+   "bgHex": "#272F34",
+   "ratio": 5.1,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary",
+   "fg": "text/primary",
+   "bg": "selection",
+   "fgHex": "#141B20",
+   "bgHex": "#EBEAE3",
+   "ratio": 14.42,
+   "min": 3,
+   "required": true,
+   "why": "تعبئة تحكم بلا إطار",
+   "pass": true,
+   "count": 10,
+   "sets": [
+    "Check row",
+    "Finding row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary",
+   "fg": "text/primary",
+   "bg": "selection",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#272F34",
+   "ratio": 12.39,
+   "min": 3,
+   "required": true,
+   "why": "تعبئة تحكم بلا إطار",
+   "pass": true,
+   "count": 10,
+   "sets": [
+    "Check row",
+    "Finding row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "border/subtle",
+   "bg": "bg/surface",
+   "fgHex": "#D9D9D4",
+   "bgHex": "#FFFCF4",
+   "ratio": 1.38,
+   "min": 3,
+   "required": false,
+   "why": "زخرفي (D-DES1-03، D-DES2-13)",
+   "pass": false,
+   "count": 14,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "border/subtle",
+   "bg": "bg/surface",
+   "fgHex": "#3B454B",
+   "bgHex": "#1C2429",
+   "ratio": 1.6,
+   "min": 3,
+   "required": false,
+   "why": "زخرفي (D-DES1-03، D-DES2-13)",
+   "pass": false,
+   "count": 14,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "cycle/running/fg",
+   "bg": "bg/canvas",
+   "fgHex": "#083EB4",
+   "bgHex": "#F7F4EC",
+   "ratio": 8.1,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "cycle/running/fg",
+   "bg": "bg/canvas",
+   "fgHex": "#BDD5FF",
+   "bgHex": "#141B20",
+   "ratio": 11.7,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "cycle/running/icon",
+   "bg": "bg/canvas",
+   "fgHex": "#3170F9",
+   "bgHex": "#F7F4EC",
+   "ratio": 3.97,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "cycle/running/icon",
+   "bg": "bg/canvas",
+   "fgHex": "#699DF9",
+   "bgHex": "#141B20",
+   "ratio": 6.45,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "cycle/running/fg",
+   "bg": "bg/sunken",
+   "fgHex": "#083EB4",
+   "bgHex": "#EBEAE3",
+   "ratio": 7.38,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "cycle/running/fg",
+   "bg": "bg/sunken",
+   "fgHex": "#BDD5FF",
+   "bgHex": "#0B1116",
+   "ratio": 12.77,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "cycle/running/icon",
+   "bg": "bg/sunken",
+   "fgHex": "#3170F9",
+   "bgHex": "#EBEAE3",
+   "ratio": 3.62,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Check row",
+    "Sheet/Setup panel"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "cycle/running/icon",
+   "bg": "bg/sunken",
+   "fgHex": "#699DF9",
+   "bgHex": "#0B1116",
+   "ratio": 7.04,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Check row",
+    "Sheet/Setup panel"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/secondary",
+   "bg": "selection",
+   "fgHex": "#434F54",
+   "bgHex": "#EBEAE3",
+   "ratio": 7.01,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 12,
+   "sets": [
+    "Check row",
+    "Finding row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/secondary",
+   "bg": "selection",
+   "fgHex": "#BABFBD",
+   "bgHex": "#272F34",
+   "ratio": 7.31,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 12,
+   "sets": [
+    "Check row",
+    "Finding row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "text/secondary",
+   "bg": "selection",
+   "fgHex": "#434F54",
+   "bgHex": "#EBEAE3",
+   "ratio": 7.01,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "text/secondary",
+   "bg": "selection",
+   "fgHex": "#BABFBD",
+   "bgHex": "#272F34",
+   "ratio": 7.31,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "cycle/running/fg",
+   "bg": "selection",
+   "fgHex": "#083EB4",
+   "bgHex": "#EBEAE3",
+   "ratio": 7.38,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "cycle/running/fg",
+   "bg": "selection",
+   "fgHex": "#BDD5FF",
+   "bgHex": "#272F34",
+   "ratio": 9.16,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "cycle/running/icon",
+   "bg": "selection",
+   "fgHex": "#3170F9",
+   "bgHex": "#EBEAE3",
+   "ratio": 3.62,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "cycle/running/icon",
+   "bg": "selection",
+   "fgHex": "#699DF9",
+   "bgHex": "#272F34",
+   "ratio": 5.05,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Check row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "result/failed/icon",
+   "bg": "result/failed/bg",
+   "fgHex": "#D53954",
+   "bgHex": "#FFEFEF",
+   "ratio": 4.15,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 12,
+   "sets": [
+    "Check row",
+    "Inspector"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "result/failed/icon",
+   "bg": "result/failed/bg",
+   "fgHex": "#F66A79",
+   "bgHex": "#3C1D1F",
+   "ratio": 5.23,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 12,
+   "sets": [
+    "Check row",
+    "Inspector"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "border/strong",
+   "bg": "bg/surface",
+   "fgHex": "#7B8588",
+   "bgHex": "#FFFCF4",
+   "ratio": 3.69,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 10,
+   "sets": [
+    "Section card"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "border/strong",
+   "bg": "bg/surface",
+   "fgHex": "#728085",
+   "bgHex": "#1C2429",
+   "ratio": 3.86,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 10,
+   "sets": [
+    "Section card"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "result/needs-review/icon",
+   "bg": "bg/surface",
+   "fgHex": "#855BE5",
+   "bgHex": "#FFFCF4",
+   "ratio": 4.43,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Section card"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "result/needs-review/icon",
+   "bg": "bg/surface",
+   "fgHex": "#A68CE6",
+   "bgHex": "#1C2429",
+   "ratio": 5.63,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Section card"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "focus-ring",
+   "fg": "focus/ring",
+   "bg": "bg/sunken",
+   "fgHex": "#141B20",
+   "bgHex": "#EBEAE3",
+   "ratio": 14.42,
+   "min": 3,
+   "required": true,
+   "why": "حلقة تركيز",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Command block"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "focus-ring",
+   "fg": "focus/ring",
+   "bg": "bg/sunken",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#0B1116",
+   "ratio": 17.28,
+   "min": 3,
+   "required": true,
+   "why": "حلقة تركيز",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Command block"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "result/needs-review/fg",
+   "bg": "result/needs-review/bg",
+   "fgHex": "#562BA3",
+   "bgHex": "#F4F1FF",
+   "ratio": 8.31,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Image diff viewer",
+    "Inspector"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "result/needs-review/fg",
+   "bg": "result/needs-review/bg",
+   "fgHex": "#D8CBFF",
+   "bgHex": "#292438",
+   "ratio": 9.91,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Image diff viewer",
+    "Inspector"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "result/needs-review/icon",
+   "bg": "result/needs-review/bg",
+   "fgHex": "#855BE5",
+   "bgHex": "#F4F1FF",
+   "ratio": 4.08,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Image diff viewer",
+    "Inspector"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "result/needs-review/icon",
+   "bg": "result/needs-review/bg",
+   "fgHex": "#A68CE6",
+   "bgHex": "#292438",
+   "ratio": 5.35,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Image diff viewer",
+    "Inspector"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "border",
+   "fg": "text/primary",
+   "bg": "bg/surface",
+   "fgHex": "#141B20",
+   "bgHex": "#FFFCF4",
+   "ratio": 16.96,
+   "min": 3,
+   "required": true,
+   "why": "حد",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Image diff viewer"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "border",
+   "fg": "text/primary",
+   "bg": "bg/surface",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#1C2429",
+   "ratio": 14.33,
+   "min": 3,
+   "required": true,
+   "why": "حد",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Image diff viewer"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "result/passed/fg",
+   "bg": "result/passed/bg",
+   "fgHex": "#025D35",
+   "bgHex": "#EDF6F0",
+   "ratio": 7.27,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 10,
+   "sets": [
+    "Capture tile",
+    "Inspector"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "result/passed/fg",
+   "bg": "result/passed/bg",
+   "fgHex": "#A6E5C1",
+   "bgHex": "#162D21",
+   "ratio": 10.2,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 10,
+   "sets": [
+    "Capture tile",
+    "Inspector"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "result/passed/icon",
+   "bg": "result/passed/bg",
+   "fgHex": "#388F60",
+   "bgHex": "#EDF6F0",
+   "ratio": 3.62,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 18,
+   "sets": [
+    "Capture tile",
+    "Inspector"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "result/passed/icon",
+   "bg": "result/passed/bg",
+   "fgHex": "#3FB87F",
+   "bgHex": "#162D21",
+   "ratio": 5.85,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 18,
+   "sets": [
+    "Capture tile",
+    "Inspector"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "result/skipped/fg",
+   "bg": "result/skipped/bg",
+   "fgHex": "#313B40",
+   "bgHex": "#EBEAE3",
+   "ratio": 9.51,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Capture tile"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "result/skipped/fg",
+   "bg": "result/skipped/bg",
+   "fgHex": "#DADBD6",
+   "bgHex": "#272F34",
+   "ratio": 9.78,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Capture tile"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "result/skipped/icon",
+   "bg": "result/skipped/bg",
+   "fgHex": "#59676C",
+   "bgHex": "#EBEAE3",
+   "ratio": 4.86,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Capture tile"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "result/skipped/icon",
+   "bg": "result/skipped/bg",
+   "fgHex": "#97A0A2",
+   "bgHex": "#272F34",
+   "ratio": 5.1,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 6,
+   "sets": [
+    "Capture tile"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "text/tertiary",
+   "bg": "bg/sunken",
+   "fgHex": "#59676C",
+   "bgHex": "#EBEAE3",
+   "ratio": 4.86,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Table header cell"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "text/tertiary",
+   "bg": "bg/sunken",
+   "fgHex": "#97A0A2",
+   "bgHex": "#0B1116",
+   "ratio": 7.11,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Table header cell"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/primary",
+   "bg": "bg/elevated",
+   "fgHex": "#141B20",
+   "bgHex": "#FFFCF4",
+   "ratio": 16.96,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 168,
+   "sets": [
+    "Selection bar",
+    "Context menu"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/primary",
+   "bg": "bg/elevated",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#272F34",
+   "ratio": 12.39,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 168,
+   "sets": [
+    "Selection bar",
+    "Context menu"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "border",
+   "fg": "border/strong",
+   "bg": "bg/elevated",
+   "fgHex": "#7B8588",
+   "bgHex": "#FFFCF4",
+   "ratio": 3.69,
+   "min": 3,
+   "required": true,
+   "why": "حد",
+   "pass": true,
+   "count": 82,
+   "sets": [
+    "Selection bar",
+    "Sheet/Setup preview"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "border",
+   "fg": "border/strong",
+   "bg": "bg/elevated",
+   "fgHex": "#728085",
+   "bgHex": "#272F34",
+   "ratio": 3.33,
+   "min": 3,
+   "required": true,
+   "why": "حد",
+   "pass": true,
+   "count": 82,
+   "sets": [
+    "Selection bar",
+    "Sheet/Setup preview"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/secondary",
+   "bg": "bg/elevated",
+   "fgHex": "#434F54",
+   "bgHex": "#FFFCF4",
+   "ratio": 8.24,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 120,
+   "sets": [
+    "Selection bar",
+    "Term tooltip"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/secondary",
+   "bg": "bg/elevated",
+   "fgHex": "#BABFBD",
+   "bgHex": "#272F34",
+   "ratio": 7.31,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 120,
+   "sets": [
+    "Selection bar",
+    "Term tooltip"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/tertiary",
+   "bg": "bg/elevated",
+   "fgHex": "#59676C",
+   "bgHex": "#FFFCF4",
+   "ratio": 5.72,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 14,
+   "sets": [
+    "Run menu",
+    "Sheet/Approval diff"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/tertiary",
+   "bg": "bg/elevated",
+   "fgHex": "#97A0A2",
+   "bgHex": "#272F34",
+   "ratio": 5.1,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 14,
+   "sets": [
+    "Run menu",
+    "Sheet/Approval diff"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "text/secondary",
+   "bg": "bg/elevated",
+   "fgHex": "#434F54",
+   "bgHex": "#FFFCF4",
+   "ratio": 8.24,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 12,
+   "sets": [
+    "Sheet/Setup preview",
+    "Sheet/Export report"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "text/secondary",
+   "bg": "bg/elevated",
+   "fgHex": "#BABFBD",
+   "bgHex": "#272F34",
+   "ratio": 7.31,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 12,
+   "sets": [
+    "Sheet/Setup preview",
+    "Sheet/Export report"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary",
+   "fg": "bg/surface",
+   "bg": "bg/elevated",
+   "fgHex": "#FFFCF4",
+   "bgHex": "#FFFCF4",
+   "ratio": 1,
+   "min": 3,
+   "required": false,
+   "why": "تعبئة تحكم بإطار border/strong (الإطار يحمل الحد)",
+   "pass": false,
+   "count": 14,
+   "sets": [
+    "Sheet/Setup preview",
+    "Sheet/Re-run"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary",
+   "fg": "bg/surface",
+   "bg": "bg/elevated",
+   "fgHex": "#1C2429",
+   "bgHex": "#272F34",
+   "ratio": 1.16,
+   "min": 3,
+   "required": false,
+   "why": "تعبئة تحكم بإطار border/strong (الإطار يحمل الحد)",
+   "pass": false,
+   "count": 14,
+   "sets": [
+    "Sheet/Setup preview",
+    "Sheet/Re-run"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "fill-boundary",
+   "fg": "text/primary",
+   "bg": "bg/elevated",
+   "fgHex": "#141B20",
+   "bgHex": "#FFFCF4",
+   "ratio": 16.96,
+   "min": 3,
+   "required": true,
+   "why": "تعبئة تحكم بلا إطار",
+   "pass": true,
+   "count": 24,
+   "sets": [
+    "Sheet/Approval diff",
+    "Sheet/Export report"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "fill-boundary",
+   "fg": "text/primary",
+   "bg": "bg/elevated",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#272F34",
+   "ratio": 12.39,
+   "min": 3,
+   "required": true,
+   "why": "تعبئة تحكم بلا إطار",
+   "pass": true,
+   "count": 24,
+   "sets": [
+    "Sheet/Approval diff",
+    "Sheet/Export report"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "text/secondary",
+   "bg": "border/subtle",
+   "fgHex": "#434F54",
+   "bgHex": "#D9D9D4",
+   "ratio": 5.97,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Sheet/Approval diff"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "text/secondary",
+   "bg": "border/subtle",
+   "fgHex": "#BABFBD",
+   "bgHex": "#3B454B",
+   "ratio": 5.27,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 4,
+   "sets": [
+    "Sheet/Approval diff"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "text/primary",
+   "bg": "bg/elevated",
+   "fgHex": "#141B20",
+   "bgHex": "#FFFCF4",
+   "ratio": 16.96,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 16,
+   "sets": [
+    "Sheet/Permission explanation",
+    "Toast"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "text/primary",
+   "bg": "bg/elevated",
+   "fgHex": "#F7F4EC",
+   "bgHex": "#272F34",
+   "ratio": 12.39,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 16,
+   "sets": [
+    "Sheet/Permission explanation",
+    "Toast"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "result/failed/icon",
+   "bg": "bg/elevated",
+   "fgHex": "#D53954",
+   "bgHex": "#FFFCF4",
+   "ratio": 4.51,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Sheet/Scoring details"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "result/failed/icon",
+   "bg": "bg/elevated",
+   "fgHex": "#F66A79",
+   "bgHex": "#272F34",
+   "ratio": 4.7,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Sheet/Scoring details"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "result/passed/icon",
+   "bg": "bg/elevated",
+   "fgHex": "#388F60",
+   "bgHex": "#FFFCF4",
+   "ratio": 3.89,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Sheet/Scoring details"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "result/passed/icon",
+   "bg": "bg/elevated",
+   "fgHex": "#3FB87F",
+   "bgHex": "#272F34",
+   "ratio": 5.43,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 8,
+   "sets": [
+    "Sheet/Scoring details"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "result/needs-review/icon",
+   "bg": "bg/elevated",
+   "fgHex": "#855BE5",
+   "bgHex": "#FFFCF4",
+   "ratio": 4.43,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Sheet/Scoring details"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "result/needs-review/icon",
+   "bg": "bg/elevated",
+   "fgHex": "#A68CE6",
+   "bgHex": "#272F34",
+   "ratio": 4.87,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 2,
+   "sets": [
+    "Sheet/Scoring details"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "text",
+   "fg": "tag/model-claim/fg",
+   "bg": "tag/model-claim/bg",
+   "fgHex": "#562BA3",
+   "bgHex": "#F4F1FF",
+   "ratio": 8.31,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 18,
+   "sets": [
+    "Sheet/Human review",
+    "Model claim row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "text",
+   "fg": "tag/model-claim/fg",
+   "bg": "tag/model-claim/bg",
+   "fgHex": "#D8CBFF",
+   "bgHex": "#292438",
+   "ratio": 9.91,
+   "min": 4.5,
+   "required": true,
+   "why": "نص",
+   "pass": true,
+   "count": 18,
+   "sets": [
+    "Sheet/Human review",
+    "Model claim row"
+   ]
+  },
+  {
+   "mode": "light",
+   "kind": "icon",
+   "fg": "tag/model-claim/icon",
+   "bg": "tag/model-claim/bg",
+   "fgHex": "#855BE5",
+   "bgHex": "#F4F1FF",
+   "ratio": 4.08,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 18,
+   "sets": [
+    "Sheet/Human review",
+    "Model claim row"
+   ]
+  },
+  {
+   "mode": "dark",
+   "kind": "icon",
+   "fg": "tag/model-claim/icon",
+   "bg": "tag/model-claim/bg",
+   "fgHex": "#A68CE6",
+   "bgHex": "#292438",
+   "ratio": 5.35,
+   "min": 3,
+   "required": true,
+   "why": "رمز",
+   "pass": true,
+   "count": 18,
+   "sets": [
+    "Sheet/Human review",
+    "Model claim row"
+   ]
+  }
+ ]
+}

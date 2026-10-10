@@ -1,0 +1,1177 @@
+{
+ "source": "use_figma audit on page Components (49:1056), 2026-10-10 (re-exported after the Switch off-hover fix): every visible text, icon vector, stroke, focus ring, selected bar and control fill inside the 62 component sets, paired with the variable of the nearest filled ancestor (or bg/canvas and bg/surface when the component has no own background). Format: [kind, fg variable, bg variable, occurrences, example sets].",
+ "pairs": [
+  [
+   "text",
+   "text/inverse",
+   "text/primary",
+   68,
+   [
+    "Button",
+    "Title bar"
+   ]
+  ],
+  [
+   "text",
+   "text/inverse",
+   "text/secondary",
+   4,
+   [
+    "Button",
+    "Copy for model button"
+   ]
+  ],
+  [
+   "text",
+   "text/inverse",
+   "text/tertiary",
+   4,
+   [
+    "Button",
+    "Copy for model button"
+   ]
+  ],
+  [
+   "focus-ring",
+   "focus/ring",
+   "bg/canvas",
+   71,
+   [
+    "Button",
+    "Icon button"
+   ]
+  ],
+  [
+   "focus-ring",
+   "focus/ring",
+   "bg/surface",
+   73,
+   [
+    "Button",
+    "Icon button"
+   ]
+  ],
+  [
+   "text-disabled",
+   "text/tertiary",
+   "bg/sunken",
+   16,
+   [
+    "Button",
+    "Search field"
+   ]
+  ],
+  [
+   "text",
+   "text/primary",
+   "bg/surface",
+   536,
+   [
+    "Button",
+    "Search field"
+   ]
+  ],
+  [
+   "text",
+   "text/primary",
+   "bg/sunken",
+   112,
+   [
+    "Button",
+    "Select"
+   ]
+  ],
+  [
+   "text",
+   "text/primary",
+   "border/subtle",
+   22,
+   [
+    "Button",
+    "Select"
+   ]
+  ],
+  [
+   "text",
+   "text/primary",
+   "bg/canvas",
+   262,
+   [
+    "Button",
+    "Switch"
+   ]
+  ],
+  [
+   "text-disabled",
+   "text/tertiary",
+   "bg/canvas",
+   26,
+   [
+    "Button",
+    "Switch"
+   ]
+  ],
+  [
+   "text-disabled",
+   "text/tertiary",
+   "bg/surface",
+   26,
+   [
+    "Button",
+    "Switch"
+   ]
+  ],
+  [
+   "icon",
+   "text/primary",
+   "bg/surface",
+   218,
+   [
+    "Button",
+    "Icon button"
+   ]
+  ],
+  [
+   "icon",
+   "text/primary",
+   "bg/sunken",
+   64,
+   [
+    "Button",
+    "Icon button"
+   ]
+  ],
+  [
+   "icon",
+   "text/primary",
+   "border/subtle",
+   20,
+   [
+    "Button",
+    "Icon button"
+   ]
+  ],
+  [
+   "icon-disabled",
+   "text/tertiary",
+   "bg/sunken",
+   18,
+   [
+    "Button",
+    "Search field"
+   ]
+  ],
+  [
+   "icon",
+   "text/primary",
+   "bg/canvas",
+   344,
+   [
+    "Icon button",
+    "Nav item"
+   ]
+  ],
+  [
+   "icon-disabled",
+   "text/tertiary",
+   "bg/canvas",
+   4,
+   [
+    "Icon button",
+    "Nav item"
+   ]
+  ],
+  [
+   "icon-disabled",
+   "text/tertiary",
+   "bg/surface",
+   4,
+   [
+    "Icon button",
+    "Nav item"
+   ]
+  ],
+  [
+   "text",
+   "text/tertiary",
+   "bg/surface",
+   178,
+   [
+    "Search field",
+    "Text field"
+   ]
+  ],
+  [
+   "icon",
+   "text/secondary",
+   "bg/surface",
+   134,
+   [
+    "Search field",
+    "Select"
+   ]
+  ],
+  [
+   "text",
+   "text/tertiary",
+   "bg/sunken",
+   30,
+   [
+    "Search field",
+    "Text field"
+   ]
+  ],
+  [
+   "icon",
+   "text/secondary",
+   "bg/sunken",
+   364,
+   [
+    "Search field",
+    "Select"
+   ]
+  ],
+  [
+   "icon",
+   "text/secondary",
+   "border/subtle",
+   8,
+   [
+    "Select",
+    "Project switcher"
+   ]
+  ],
+  [
+   "border",
+   "border/strong",
+   "bg/canvas",
+   88,
+   [
+    "Switch",
+    "Checkbox"
+   ]
+  ],
+  [
+   "border",
+   "border/strong",
+   "bg/surface",
+   140,
+   [
+    "Switch",
+    "Checkbox"
+   ]
+  ],
+  [
+   "fill-boundary",
+   "bg/sunken",
+   "bg/canvas",
+   10,
+   [
+    "Switch",
+    "Checkbox"
+   ]
+  ],
+  [
+   "fill-boundary",
+   "bg/sunken",
+   "bg/surface",
+   10,
+   [
+    "Switch",
+    "Checkbox"
+   ]
+  ],
+  [
+   "icon",
+   "border/strong",
+   "bg/sunken",
+   6,
+   [
+    "Switch"
+   ]
+  ],
+  [
+   "border",
+   "text/secondary",
+   "bg/canvas",
+   2,
+   [
+    "Switch"
+   ]
+  ],
+  [
+   "border",
+   "text/secondary",
+   "bg/surface",
+   2,
+   [
+    "Switch"
+   ]
+  ],
+  [
+   "fill-boundary-disabled",
+   "bg/sunken",
+   "bg/canvas",
+   6,
+   [
+    "Switch",
+    "Checkbox"
+   ]
+  ],
+  [
+   "fill-boundary-disabled",
+   "bg/sunken",
+   "bg/surface",
+   6,
+   [
+    "Switch",
+    "Checkbox"
+   ]
+  ],
+  [
+   "icon-disabled",
+   "border/subtle",
+   "bg/sunken",
+   2,
+   [
+    "Switch"
+   ]
+  ],
+  [
+   "fill-boundary",
+   "text/primary",
+   "bg/canvas",
+   24,
+   [
+    "Switch",
+    "Checkbox"
+   ]
+  ],
+  [
+   "fill-boundary",
+   "text/primary",
+   "bg/surface",
+   34,
+   [
+    "Switch",
+    "Checkbox"
+   ]
+  ],
+  [
+   "icon",
+   "bg/surface",
+   "text/primary",
+   4,
+   [
+    "Switch"
+   ]
+  ],
+  [
+   "fill-boundary",
+   "text/secondary",
+   "bg/canvas",
+   8,
+   [
+    "Switch",
+    "Checkbox"
+   ]
+  ],
+  [
+   "fill-boundary",
+   "text/secondary",
+   "bg/surface",
+   8,
+   [
+    "Switch",
+    "Checkbox"
+   ]
+  ],
+  [
+   "icon",
+   "bg/surface",
+   "text/secondary",
+   2,
+   [
+    "Switch"
+   ]
+  ],
+  [
+   "fill-boundary-disabled",
+   "border/strong",
+   "bg/canvas",
+   8,
+   [
+    "Switch",
+    "Checkbox"
+   ]
+  ],
+  [
+   "fill-boundary-disabled",
+   "border/strong",
+   "bg/surface",
+   8,
+   [
+    "Switch",
+    "Checkbox"
+   ]
+  ],
+  [
+   "icon-disabled",
+   "bg/sunken",
+   "border/strong",
+   2,
+   [
+    "Switch"
+   ]
+  ],
+  [
+   "fill-boundary",
+   "bg/surface",
+   "bg/canvas",
+   30,
+   [
+    "Checkbox",
+    "Check row"
+   ]
+  ],
+  [
+   "fill-boundary",
+   "bg/surface",
+   "bg/surface",
+   30,
+   [
+    "Checkbox",
+    "Check row"
+   ]
+  ],
+  [
+   "fill-boundary",
+   "border/subtle",
+   "bg/canvas",
+   6,
+   [
+    "Checkbox",
+    "Progress"
+   ]
+  ],
+  [
+   "fill-boundary",
+   "border/subtle",
+   "bg/surface",
+   6,
+   [
+    "Checkbox",
+    "Progress"
+   ]
+  ],
+  [
+   "icon",
+   "text/inverse",
+   "text/primary",
+   88,
+   [
+    "Checkbox",
+    "Check row"
+   ]
+  ],
+  [
+   "icon",
+   "text/inverse",
+   "text/secondary",
+   10,
+   [
+    "Checkbox",
+    "Copy for model button"
+   ]
+  ],
+  [
+   "fill-boundary",
+   "text/tertiary",
+   "bg/canvas",
+   4,
+   [
+    "Checkbox"
+   ]
+  ],
+  [
+   "fill-boundary",
+   "text/tertiary",
+   "bg/surface",
+   4,
+   [
+    "Checkbox"
+   ]
+  ],
+  [
+   "icon",
+   "text/inverse",
+   "text/tertiary",
+   8,
+   [
+    "Checkbox",
+    "Copy for model button"
+   ]
+  ],
+  [
+   "icon-disabled",
+   "text/inverse",
+   "border/strong",
+   6,
+   [
+    "Checkbox",
+    "Radio"
+   ]
+  ],
+  [
+   "text",
+   "text/secondary",
+   "bg/canvas",
+   130,
+   [
+    "Segment",
+    "Tab"
+   ]
+  ],
+  [
+   "text",
+   "text/secondary",
+   "bg/surface",
+   300,
+   [
+    "Segment",
+    "Tab"
+   ]
+  ],
+  [
+   "text",
+   "text/secondary",
+   "bg/sunken",
+   332,
+   [
+    "Segmented control",
+    "Project switcher"
+   ]
+  ],
+  [
+   "border",
+   "border/strong",
+   "bg/sunken",
+   34,
+   [
+    "Segmented control",
+    "Check row"
+   ]
+  ],
+  [
+   "icon",
+   "text/tertiary",
+   "bg/surface",
+   72,
+   [
+    "Argument editor"
+   ]
+  ],
+  [
+   "text",
+   "result/failed/fg",
+   "result/failed/bg",
+   19,
+   [
+    "Nav badge",
+    "Sidebar"
+   ]
+  ],
+  [
+   "icon",
+   "result/missing/icon",
+   "bg/canvas",
+   7,
+   [
+    "Nav badge",
+    "Sidebar"
+   ]
+  ],
+  [
+   "icon",
+   "result/missing/icon",
+   "bg/surface",
+   3,
+   [
+    "Nav badge",
+    "Section card"
+   ]
+  ],
+  [
+   "text",
+   "text/primary",
+   "selection",
+   36,
+   [
+    "Nav item",
+    "Sidebar"
+   ]
+  ],
+  [
+   "icon",
+   "text/primary",
+   "selection",
+   26,
+   [
+    "Nav item",
+    "Sidebar"
+   ]
+  ],
+  [
+   "indicator",
+   "border/strong",
+   "selection",
+   18,
+   [
+    "Nav item",
+    "Sidebar"
+   ]
+  ],
+  [
+   "text",
+   "text/tertiary",
+   "bg/canvas",
+   52,
+   [
+    "Nav group header",
+    "Sidebar"
+   ]
+  ],
+  [
+   "icon",
+   "text/secondary",
+   "bg/canvas",
+   66,
+   [
+    "Project switcher",
+    "Sidebar"
+   ]
+  ],
+  [
+   "border",
+   "result/failed/border",
+   "bg/canvas",
+   6,
+   [
+    "Sidebar",
+    "Window frame"
+   ]
+  ],
+  [
+   "icon",
+   "result/warning/icon",
+   "bg/surface",
+   6,
+   [
+    "Run bar",
+    "Section card"
+   ]
+  ],
+  [
+   "icon",
+   "result/failed/icon",
+   "bg/surface",
+   6,
+   [
+    "Run bar",
+    "Section card"
+   ]
+  ],
+  [
+   "icon",
+   "result/passed/icon",
+   "bg/surface",
+   6,
+   [
+    "Run bar",
+    "Section card"
+   ]
+  ],
+  [
+   "text",
+   "cycle/running/fg",
+   "bg/surface",
+   8,
+   [
+    "Run bar",
+    "Check row"
+   ]
+  ],
+  [
+   "icon",
+   "cycle/running/icon",
+   "bg/surface",
+   8,
+   [
+    "Run bar",
+    "Check row"
+   ]
+  ],
+  [
+   "text",
+   "cycle/cancelling/fg",
+   "bg/surface",
+   2,
+   [
+    "Run bar"
+   ]
+  ],
+  [
+   "icon",
+   "cycle/cancelling/icon",
+   "bg/surface",
+   4,
+   [
+    "Run bar"
+   ]
+  ],
+  [
+   "icon",
+   "text/tertiary",
+   "bg/canvas",
+   16,
+   [
+    "Title bar",
+    "Window frame"
+   ]
+  ],
+  [
+   "text",
+   "cycle/queued/fg",
+   "bg/canvas",
+   4,
+   [
+    "Check row"
+   ]
+  ],
+  [
+   "text",
+   "cycle/queued/fg",
+   "bg/surface",
+   4,
+   [
+    "Check row"
+   ]
+  ],
+  [
+   "icon",
+   "cycle/queued/icon",
+   "bg/canvas",
+   4,
+   [
+    "Check row"
+   ]
+  ],
+  [
+   "icon",
+   "cycle/queued/icon",
+   "bg/surface",
+   4,
+   [
+    "Check row"
+   ]
+  ],
+  [
+   "text",
+   "cycle/queued/fg",
+   "bg/sunken",
+   2,
+   [
+    "Check row"
+   ]
+  ],
+  [
+   "icon",
+   "cycle/queued/icon",
+   "bg/sunken",
+   2,
+   [
+    "Check row"
+   ]
+  ],
+  [
+   "fill-boundary",
+   "bg/surface",
+   "bg/sunken",
+   8,
+   [
+    "Check row",
+    "Finding row"
+   ]
+  ],
+  [
+   "text",
+   "text/tertiary",
+   "selection",
+   14,
+   [
+    "Check row",
+    "Finding row"
+   ]
+  ],
+  [
+   "text",
+   "cycle/queued/fg",
+   "selection",
+   2,
+   [
+    "Check row"
+   ]
+  ],
+  [
+   "icon",
+   "cycle/queued/icon",
+   "selection",
+   2,
+   [
+    "Check row"
+   ]
+  ],
+  [
+   "fill-boundary",
+   "text/primary",
+   "selection",
+   10,
+   [
+    "Check row",
+    "Finding row"
+   ]
+  ],
+  [
+   "icon",
+   "border/subtle",
+   "bg/surface",
+   14,
+   [
+    "Check row"
+   ]
+  ],
+  [
+   "text",
+   "cycle/running/fg",
+   "bg/canvas",
+   6,
+   [
+    "Check row"
+   ]
+  ],
+  [
+   "icon",
+   "cycle/running/icon",
+   "bg/canvas",
+   6,
+   [
+    "Check row"
+   ]
+  ],
+  [
+   "text",
+   "cycle/running/fg",
+   "bg/sunken",
+   2,
+   [
+    "Check row"
+   ]
+  ],
+  [
+   "icon",
+   "cycle/running/icon",
+   "bg/sunken",
+   4,
+   [
+    "Check row",
+    "Sheet/Setup panel"
+   ]
+  ],
+  [
+   "text",
+   "text/secondary",
+   "selection",
+   12,
+   [
+    "Check row",
+    "Finding row"
+   ]
+  ],
+  [
+   "icon",
+   "text/secondary",
+   "selection",
+   2,
+   [
+    "Check row"
+   ]
+  ],
+  [
+   "text",
+   "cycle/running/fg",
+   "selection",
+   2,
+   [
+    "Check row"
+   ]
+  ],
+  [
+   "icon",
+   "cycle/running/icon",
+   "selection",
+   2,
+   [
+    "Check row"
+   ]
+  ],
+  [
+   "icon",
+   "result/failed/icon",
+   "result/failed/bg",
+   12,
+   [
+    "Check row",
+    "Inspector"
+   ]
+  ],
+  [
+   "icon",
+   "border/strong",
+   "bg/surface",
+   10,
+   [
+    "Section card"
+   ]
+  ],
+  [
+   "icon",
+   "result/needs-review/icon",
+   "bg/surface",
+   2,
+   [
+    "Section card"
+   ]
+  ],
+  [
+   "focus-ring",
+   "focus/ring",
+   "bg/sunken",
+   2,
+   [
+    "Command block"
+   ]
+  ],
+  [
+   "text",
+   "result/needs-review/fg",
+   "result/needs-review/bg",
+   8,
+   [
+    "Image diff viewer",
+    "Inspector"
+   ]
+  ],
+  [
+   "icon",
+   "result/needs-review/icon",
+   "result/needs-review/bg",
+   8,
+   [
+    "Image diff viewer",
+    "Inspector"
+   ]
+  ],
+  [
+   "border",
+   "text/primary",
+   "bg/surface",
+   6,
+   [
+    "Image diff viewer"
+   ]
+  ],
+  [
+   "text",
+   "result/passed/fg",
+   "result/passed/bg",
+   10,
+   [
+    "Capture tile",
+    "Inspector"
+   ]
+  ],
+  [
+   "icon",
+   "result/passed/icon",
+   "result/passed/bg",
+   18,
+   [
+    "Capture tile",
+    "Inspector"
+   ]
+  ],
+  [
+   "text",
+   "result/skipped/fg",
+   "result/skipped/bg",
+   6,
+   [
+    "Capture tile"
+   ]
+  ],
+  [
+   "icon",
+   "result/skipped/icon",
+   "result/skipped/bg",
+   6,
+   [
+    "Capture tile"
+   ]
+  ],
+  [
+   "icon",
+   "text/tertiary",
+   "bg/sunken",
+   8,
+   [
+    "Table header cell"
+   ]
+  ],
+  [
+   "text",
+   "text/primary",
+   "bg/elevated",
+   168,
+   [
+    "Selection bar",
+    "Context menu"
+   ]
+  ],
+  [
+   "border",
+   "border/strong",
+   "bg/elevated",
+   82,
+   [
+    "Selection bar",
+    "Sheet/Setup preview"
+   ]
+  ],
+  [
+   "text",
+   "text/secondary",
+   "bg/elevated",
+   120,
+   [
+    "Selection bar",
+    "Term tooltip"
+   ]
+  ],
+  [
+   "text",
+   "text/tertiary",
+   "bg/elevated",
+   14,
+   [
+    "Run menu",
+    "Sheet/Approval diff"
+   ]
+  ],
+  [
+   "icon",
+   "text/secondary",
+   "bg/elevated",
+   12,
+   [
+    "Sheet/Setup preview",
+    "Sheet/Export report"
+   ]
+  ],
+  [
+   "fill-boundary",
+   "bg/surface",
+   "bg/elevated",
+   14,
+   [
+    "Sheet/Setup preview",
+    "Sheet/Re-run"
+   ]
+  ],
+  [
+   "fill-boundary",
+   "text/primary",
+   "bg/elevated",
+   24,
+   [
+    "Sheet/Approval diff",
+    "Sheet/Export report"
+   ]
+  ],
+  [
+   "text",
+   "text/secondary",
+   "border/subtle",
+   4,
+   [
+    "Sheet/Approval diff"
+   ]
+  ],
+  [
+   "icon",
+   "text/primary",
+   "bg/elevated",
+   16,
+   [
+    "Sheet/Permission explanation",
+    "Toast"
+   ]
+  ],
+  [
+   "icon",
+   "result/failed/icon",
+   "bg/elevated",
+   2,
+   [
+    "Sheet/Scoring details"
+   ]
+  ],
+  [
+   "icon",
+   "result/passed/icon",
+   "bg/elevated",
+   8,
+   [
+    "Sheet/Scoring details"
+   ]
+  ],
+  [
+   "icon",
+   "result/needs-review/icon",
+   "bg/elevated",
+   2,
+   [
+    "Sheet/Scoring details"
+   ]
+  ],
+  [
+   "text",
+   "tag/model-claim/fg",
+   "tag/model-claim/bg",
+   18,
+   [
+    "Sheet/Human review",
+    "Model claim row"
+   ]
+  ],
+  [
+   "icon",
+   "tag/model-claim/icon",
+   "tag/model-claim/bg",
+   18,
+   [
+    "Sheet/Human review",
+    "Model claim row"
+   ]
+  ]
+ ]
+}
