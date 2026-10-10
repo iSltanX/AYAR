@@ -51,7 +51,7 @@ cat ~/Library/Application\ Support/AYAR\ Spike/selftest.json
 | التوقيع، المسار 1 | **غير صالح للحزمة**: إضافة الصمامات تعيد توقيع الملف التنفيذي وحده، فيبقى ختم الحزمة القديم (`invalid Info.plist`). والتطبيق يعمل، لكن `tccd` يعجز عن نسبته إلى هوية (`IDENTITY_ATTRIBUTION: Failed to copy signing info`) | `results/tcc-attribution-fuses-only-adhoc.txt` |
 | التوقيع، المسار 2 | **صالح**: `valid on disk` و`satisfies its Designated Requirement`، والمعرّف `com.bysltan.ayar.spike` | `results/codesign-final.txt` |
 | التشغيل المحصّن دون Team ID | يرفض النظام تحميل `Electron Framework` (`Library Validation failed ... different Team IDs`). والحل استثناء `com.apple.security.cs.disable-library-validation` في التطبيق ومساعديه | `results/hardened-runtime-no-dlv.txt` |
-| الفتح عبر LaunchServices | نجح، وأب العملية `launchd` (ppid = 1) كما في الفتح من Finder. والنقر المزدوج في Finder نفسه يُعاد في جلسة المالك مع E-04 | `results/selftest-final.json` |
+| الفتح عبر LaunchServices وFinder | نجح، وأب العملية `launchd` (ppid = 1). وفي 2026-10-10 فُتحت حزم التطبيق نفسه بالنقر المزدوج في Finder (E-04 بناءان، وE-05) بالتحكم بالشاشة وعملت. ملاحظة: `open` ينقل بيئة مستدعيه إلى التطبيق، وFinder لا ينقلها (E-06) | `results/selftest-final.json` |
 | `utilityProcess` | أُنشئ وفتح القاعدة، وعاش بعد قتل الواجهة بالـ pid نفسه، وقرأ القاعدة بعده | `steps.renderer.kill` |
 | `node:sqlite` | SQLite 3.53.4، وسجل `wal`، ولا تحذيرات تجريبية | `steps.engine.sqlite` |
 | الخط ثابت العرض | **Menlo-Regular** للاتينية. والعربية داخل المسار بالبديل التلقائي **Courier New** (15 حرفًا). وSF Mono لم يُستخدم | `steps.renderer.fonts` |
