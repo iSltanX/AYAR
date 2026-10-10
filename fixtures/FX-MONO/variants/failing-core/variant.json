@@ -1,0 +1,7 @@
+{
+  "name": "failing-core",
+  "description": "اختبار فاشل في الحزمة الأساسية وحدها: يتوقع متوسط [2, 4] يساوي 4.",
+  "defects": [
+    "beh.unit@packages/core: اختبار فاشل"
+  ]
+}

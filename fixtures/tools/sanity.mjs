@@ -5,7 +5,7 @@
 //   node fixtures/tools/sanity.mjs report                  # يبني fixtures/SANITY.md من النتائج المحفوظة
 //
 // كل مشروع يعلن تشغيلاته في FX-X/sanity.mjs (default export):
-//   { setup: 'أمر', versions: { اسم: 'أمر' }, variants: { نسخة: [ { id, cmd, exit, match?, nomatch?, proves, timeout_s?, env?, soft? } ] } }
+//   { setup: 'أمر', prepare: 'أمر بعد التجهيز وقبل التشغيلات', versions: { اسم: 'أمر' }, variants: { نسخة: [ { id, cmd, exit, match?, nomatch?, proves, timeout_s?, env?, soft? } ] } }
 //   - exit: رمز الخروج المتوقع (رقم أو مصفوفة). وmatch: تعابير نمطية يجب أن تظهر في الخرج، وnomatch: يجب ألا تظهر.
 //   - pending: { id, proves, reason } يسجَّل «لم يُشغَّل» بسببه.
 // تُركَّب كل نسخة في مجلد مؤقت خارج المستودع (G-09)، ويُحذف بعد التشغيل.
@@ -68,6 +68,10 @@ async function runProject(id, only) {
       if (needSetup && spec.setup) {
         const s = sh(spec.setup, dir, { timeout: 600 });
         if (s.code !== 0) { rec.push({ id: 'setup', cmd: spec.setup, ok: false, code: s.code, proves: 'تجهيز التبعيات', excerpt: excerpt(s.out) }); bad++; }
+      }
+      if (!rec.length && spec.prepare && runs.some((r) => !r.pending)) {
+        const p = sh(spec.prepare, dir, { timeout: 120 });
+        if (p.code !== 0) { rec.push({ id: 'prepare', cmd: spec.prepare, ok: false, code: p.code, proves: 'تهيئة النسخة المؤقتة', excerpt: excerpt(p.out) }); bad++; }
       }
       if (!rec.length) {
         for (const r of runs) {

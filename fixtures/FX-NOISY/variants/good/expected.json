@@ -1,0 +1,60 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-NOISY",
+  "variant": "good",
+  "summary": "الاختبارات تنجح؛ المطلوب رصد: ملفان جديدان وملف متتبع معدّل، ومطابقة .nvmrc.",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "reason": "node --test: اختباران ينجحان؛ وتُشغَّل بسكربت مركب فيُقترح استدعاء الأداة المحلية مباشرة"
+    },
+    {
+      "check": "integ.state",
+      "result": "يحتاج مراجعة",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "data/runs.json",
+        "anchor": "\"runs\""
+      },
+      "confidence": "اشتباه",
+      "reason": "ملف متتبع (data/runs.json) تعدّل أثناء التشغيل وهو خارج المخرجات المعلنة؛ أما .cache/ وreports/ فآثار جانبية معلنة في الإعداد"
+    },
+    {
+      "check": "code.refs.local",
+      "result": "غير منطبق",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "reason": "لا HTML ولا CSS ولا Markdown"
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "side-effects-new-files",
+      "statement": "يرصد عِيَار ملفين جديدين غير متتبعين بعد التشغيل: .cache/last-run.json وreports/summary.txt",
+      "acceptance": "C-17"
+    },
+    {
+      "id": "side-effects-tracked",
+      "statement": "يرصد عِيَار تعديل data/runs.json المتتبع (runs: 0 ← 1) ويعرضه فرقًا بين لقطتي الحالة",
+      "acceptance": "C-17"
+    },
+    {
+      "id": "readiness-nvmrc",
+      "statement": "جاهزية beh.unit «يحتاج تجهيزًا: إصدار غير مطابق»: .nvmrc يطلب 22.11.0 وهو غير مثبت، ولا تثبيت تلقائي من مدير إصدارات (AT-31)",
+      "acceptance": "AT-31"
+    },
+    {
+      "id": "composite-script",
+      "statement": "سكربت test مركب (&&): لا تُضاف الوسائط بعد --؛ يُقترح استدعاء node --test مباشرة مع حفظ خيارات السكربت، والأمر النهائي حرفيًّا في الاعتماد",
+      "acceptance": "C-15"
+    }
+  ]
+}

@@ -130,7 +130,7 @@ function validateProject(id) {
         for (const k of ['name', 'description']) if (!vm[k]) fail(`${id}/${v}/variant.json: «${k}» غائب`);
         if (vm.name !== v) fail(`${id}/${v}/variant.json: name=${vm.name}`);
         const role = vm.role ?? (v === 'good' ? 'clean' : 'defect');
-        if (!['defect', 'fix', 'clean'].includes(role)) fail(`${id}/${v}/variant.json: role غير معروف`);
+        if (!['defect', 'fix', 'clean', 'neutral'].includes(role)) fail(`${id}/${v}/variant.json: role غير معروف`);
         if (role === 'defect' && v !== 'good' && !(vm.defects?.length)) fail(`${id}/${v}/variant.json: النسخة المعيبة تعلن defects`);
         if (vm.derived_from && vm.derived_from !== 'good' && !declared.includes(vm.derived_from)) fail(`${id}/${v}/variant.json: derived_from=${vm.derived_from} غير معلنة`);
         roles[v] = role;
