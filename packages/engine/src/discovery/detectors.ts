@@ -527,5 +527,24 @@ export const otherEcosystems: Detector = {
   },
 };
 
+/**
+ * C-20 rule 5 (DEV-8): migration folders, so a migration counts as «مكتشف» for the advisor. Known layouts only
+ * (review: `docs/migration` is a guide, `src/migrate` a module): a `migrations` folder (Laravel, Django, Knex,
+ * TypeORM, Prisma, Supabase), Rails' `db/migrate`, Flyway's `db/migration` and Alembic's `alembic/versions`, never
+ * under a documentation folder. Inferred from the folder name only; nothing is read.
+ */
+const MIGRATION_DIR = /(^|\/)(migrations|db\/migrate|db\/migration|alembic\/versions)$/;
+const DOCS_DIR = /(^|\/)(docs?|documentation)(\/|$)/i;
+
+export const migrations: Detector = {
+  id: 'migrations',
+  version: 1,
+  run(ctx, add) {
+    const dirs = [...ctx.dirs].filter((d) => MIGRATION_DIR.test(d) && !DOCS_DIR.test(d)).sort();
+    if (dirs.length) add('data.migrations', { dirs: dirs.slice(0, 20), count: dirs.length }, fileSource(dirs[0]!), 'inferred');
+    return Promise.resolve();
+  },
+};
+
 /** Detectors run for every component, in this order. */
-export const COMPONENT_DETECTORS: readonly Detector[] = [nodePackage, nodeWorkspaces, pnpmWorkspace, python, runtimeFiles, extension, web, testing, qualityConfig, references, languages, otherEcosystems];
+export const COMPONENT_DETECTORS: readonly Detector[] = [nodePackage, nodeWorkspaces, pnpmWorkspace, python, runtimeFiles, extension, web, testing, qualityConfig, references, languages, otherEcosystems, migrations];

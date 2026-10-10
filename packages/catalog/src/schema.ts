@@ -4,6 +4,7 @@
 // side effects, network need, cost tag, next-step class per outcome, relations, and dated sources. The engine
 // evaluates the conditions (C-09); the catalog only names them.
 import { AUDIENCE_VALUES, REFERENCE_KINDS as PROFILE_REFERENCE_KINDS, z } from '@ayar/protocol';
+import { CardsData, KbData } from './kb.ts';
 
 export const SECTION_IDS = ['design', 'security', 'code', 'behavior', 'performance', 'custom', 'integrity', 'model'] as const;
 export const SectionId = z.enum(SECTION_IDS);
@@ -258,5 +259,8 @@ export const CatalogData = z.strictObject({
   sources: z.array(Source),
   redaction: RedactionData,
   commandPolicy: CommandPolicy,
+  /** kb/1 (C-08 point 4) and the card types of 12.8 (C-08 point 6). */
+  kb: KbData,
+  cards: CardsData,
 });
 export type CatalogData = z.infer<typeof CatalogData>;

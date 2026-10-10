@@ -1,0 +1,741 @@
+{
+  "verifiedAt": "2026-10-09",
+  "basisKinds": [
+    {
+      "id": "est",
+      "name": "مبدأ راسخ",
+      "meaning": "معيار أو مبدأ متفق عليه على نطاق واسع"
+    },
+    {
+      "id": "res",
+      "name": "دراسة تجريبية",
+      "meaning": "نتيجة بحث منشور، تصدق في حدود عيّنته"
+    },
+    {
+      "id": "ctx",
+      "name": "حسب السياق",
+      "meaning": "توصية جيدة في سياقات محددة لا في كل مشروع"
+    },
+    {
+      "id": "opn",
+      "name": "ممارسة جهة",
+      "meaning": "ممارسة مؤلف أو مؤسسة بعينها، مفيدة لكنها ليست قاعدة عامة"
+    },
+    {
+      "id": "doc",
+      "name": "توثيق رسمي",
+      "meaning": "ما يقوله التوثيق الرسمي للأداة أو المنصة"
+    },
+    {
+      "id": "syn",
+      "name": "تركيب الأداة",
+      "meaning": "قاعدة صاغتها هذه الأداة من المصادر؛ عدّلها إن خالفت سياقك"
+    }
+  ],
+  "sources": [
+    {
+      "id": "istqb",
+      "title": "ISTQB CTFL Syllabus v4.0.1 (2024)",
+      "url": "https://www.istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf",
+      "basis": "est",
+      "claim": "المبادئ السبعة، مستويات الاختبار وأنواعه، التأكيد والانحدار، الاختبار الساكن، الاستكشاف",
+      "origin": "kb",
+      "merged": [
+        {
+          "id": "istqb_codex",
+          "title": "منهج ISTQB التأسيسي، الإصدار 4.0.1",
+          "url": "https://istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf",
+          "claim": "الأقسام 1.3 و2.2.3 و5.2: الاختيار بحسب المخاطر، وتأكيد الإصلاح يختلف عن فحص الانحدار، وتحليل الأثر يحدد نطاق الإعادة."
+        }
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "astqb_risk",
+      "title": "ISTQB §5.2 Risk Management (ASTQB)",
+      "url": "https://astqb.org/5-2-risk-management/",
+      "basis": "est",
+      "claim": "الخطر = احتمال × أثر، والأعلى يحصل على معالجة أعمق",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "swe11",
+      "title": "Software Engineering at Google — ch.11 Testing Overview",
+      "url": "https://abseil.io/resources/swe-book/html/ch11.html",
+      "basis": "opn",
+      "claim": "حجم الاختبار ونطاقه، التقلب، قاعدة بيونسيه، موقفهم من التغطية",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "swe12",
+      "title": "Software Engineering at Google — ch.12 Unit Testing",
+      "url": "https://abseil.io/resources/swe-book/html/ch12.html",
+      "basis": "opn",
+      "claim": "اختبار السلوك عبر الواجهة العامة",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "swe13",
+      "title": "Software Engineering at Google — ch.13 Test Doubles",
+      "url": "https://abseil.io/resources/swe-book/html/ch13.html",
+      "basis": "opn",
+      "claim": "تفضيل التنفيذ الحقيقي ثم المزيف على المحاكاة الدقيقة",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "swe14",
+      "title": "Software Engineering at Google — ch.14 Larger Testing",
+      "url": "https://abseil.io/resources/swe-book/html/ch14.html",
+      "basis": "opn",
+      "claim": "ما تكشفه الاختبارات الكبيرة: الإعداد، انحراف البدائل، الحمل",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "fowler_cov",
+      "title": "Martin Fowler — TestCoverage",
+      "url": "https://martinfowler.com/bliki/TestCoverage.html",
+      "basis": "opn",
+      "claim": "التغطية لإيجاد غير المختبر لا هدفًا للجودة",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "vocke",
+      "title": "Ham Vocke — The Practical Test Pyramid (2018)",
+      "url": "https://martinfowler.com/articles/practical-test-pyramid.html",
+      "basis": "ctx",
+      "claim": "تجنب تكرار التغطية عبر المستويات، وإنزال الاختبار مستوى عند كشف خلل",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "fowler_shapes",
+      "title": "Martin Fowler — On the Diverse Shapes of Testing (2021)",
+      "url": "https://martinfowler.com/articles/2021-test-shapes.html",
+      "basis": "opn",
+      "claim": "خلاف الهرم والكأس سببه غالبًا تعريف «الوحدة»",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "fowler_nondet",
+      "title": "Martin Fowler — Eradicating Non-Determinism in Tests",
+      "url": "https://martinfowler.com/articles/nonDeterminism.html",
+      "basis": "opn",
+      "claim": "عزل المتقلب بحد أقصى وعلاج أسبابه",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "fowler_contract",
+      "title": "Martin Fowler — ContractTest",
+      "url": "https://martinfowler.com/bliki/ContractTest.html",
+      "basis": "ctx",
+      "claim": "اختبارات منفصلة تتحقق من تطابق البدائل مع الخدمة الحقيقية",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "fowler_unit",
+      "title": "Martin Fowler — UnitTest",
+      "url": "https://martinfowler.com/bliki/UnitTest.html",
+      "basis": "opn",
+      "claim": "الاختبار الاجتماعي والمنعزل",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "inozemtseva",
+      "title": "Inozemtseva & Holmes — Coverage is not strongly correlated with test suite effectiveness (ICSE 2014)",
+      "url": "https://cs.ubc.ca/~rtholmes/papers/icse_2014_inozemtseva.pdf",
+      "basis": "res",
+      "claim": "ارتباط منخفض إلى متوسط بين التغطية واكتشاف العيوب بعد ضبط حجم الحزمة",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "ivankovic",
+      "title": "Ivanković et al. — Code Coverage at Google (ESEC/FSE 2019)",
+      "url": "https://homes.cs.washington.edu/~rjust/publ/google_coverage_fse_2019.pdf",
+      "basis": "res",
+      "claim": "التغطية أنفع على الفرق أثناء المراجعة",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "petrovic",
+      "title": "Petrović et al. — Does mutation testing improve testing practices? (ICSE 2021)",
+      "url": "https://homes.cs.washington.edu/~rjust/publ/mutation_testing_practices_icse_2021.pdf",
+      "basis": "res",
+      "claim": "نحو 70% من الأعطال عالية الأولوية المدروسة ارتبطت بطفرة كانت ستُعرض عند التغيير",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "yuan",
+      "title": "Yuan et al. — Simple Testing Can Prevent Most Critical Failures (OSDI 2014)",
+      "url": "https://www.usenix.org/system/files/conference/osdi14/osdi14-paper-yuan.pdf",
+      "basis": "res",
+      "claim": "92% من الأعطال الكارثية في عينتهم من معالجة خاطئة لأخطاء أُبلغ عنها صراحة",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "micco",
+      "title": "Google Testing Blog — Flaky Tests at Google (2016)",
+      "url": "https://testing.googleblog.com/2016/05/flaky-tests-at-google-and-how-we.html",
+      "basis": "ctx",
+      "claim": "حجم التقلب وكلفته",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "memon",
+      "title": "Memon et al. — Taming Google-Scale Continuous Testing (ICSE-SEIP 2017)",
+      "url": "https://huang.isis.vanderbilt.edu/cs8395-f23/paper/google-testing-icse-seip-17.pdf",
+      "basis": "res",
+      "claim": "الكسور البعيدة جدًا عن التغيير في شجرة التبعيات نادرة",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "machalica",
+      "title": "Machalica et al. — Predictive Test Selection (ICSE-SEIP 2019)",
+      "url": "https://arxiv.org/abs/1810.05286",
+      "basis": "res",
+      "claim": "اختيار الاختبارات حسب التغيير يخفض الكلفة مع الإبقاء على معظم الكشف",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "dora",
+      "title": "DORA — Test automation capability",
+      "url": "https://dora.dev/capabilities/test-automation/",
+      "basis": "est",
+      "claim": "المطورون يملكون الاختبارات، تغذية راجعة سريعة، حزمة صغيرة موثوقة",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "quadrants",
+      "title": "Crispin & Gregory — Agile Testing, ch.8 (Testing Quadrants)",
+      "url": "https://agiletester.ca/wp-content/uploads/2014/09/Gregory_Chapter_8_Final.pdf",
+      "basis": "est",
+      "claim": "أرباع الاختبار: ما يوجّه التطوير وما ينقد المنتج",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "feathers",
+      "title": "Michael Feathers — Characterization Testing",
+      "url": "https://michaelfeathers.silvrback.com/characterization-testing",
+      "basis": "est",
+      "claim": "تسجيل ما تفعله الشيفرة فعلًا قبل تعديلها",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "kaner",
+      "title": "Cem Kaner — Defining Exploratory Testing",
+      "url": "https://kaner.com/?p=46",
+      "basis": "est",
+      "claim": "التعلم والتصميم والتنفيذ والتفسير معًا",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "fmea",
+      "title": "ASQ — Failure Mode and Effects Analysis",
+      "url": "https://asq.org/quality-resources/fmea",
+      "basis": "ctx",
+      "claim": "الشدة والتكرار وقابلية الاكتشاف لترتيب المخاطر",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "perry",
+      "title": "Perry et al. — Do Users Write More Insecure Code with AI Assistants? (CCS 2023)",
+      "url": "https://arxiv.org/abs/2211.03622",
+      "basis": "res",
+      "claim": "عينة صغيرة: شيفرة أقل أمانًا وثقة أعلى بها",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "pearce",
+      "title": "Pearce et al. — Asleep at the Keyboard?",
+      "url": "https://arxiv.org/abs/2108.09293",
+      "basis": "res",
+      "claim": "نحو 40% من البرامج المولدة في سيناريوهاتهم كانت معرضة لثغرات",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "asvs",
+      "title": "OWASP ASVS 5.0.0 (May 2025)",
+      "url": "https://github.com/OWASP/ASVS/releases/tag/v5.0.0_release",
+      "basis": "est",
+      "claim": "مستويات التحقق الأمني L1–L3",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "wstg",
+      "title": "OWASP Web Security Testing Guide",
+      "url": "https://owasp.org/www-project-web-security-testing-guide/",
+      "basis": "est",
+      "claim": "دليل اختبار أمن الويب (v4.2 المستقر)",
+      "origin": "kb",
+      "merged": [
+        {
+          "id": "wstg_codex",
+          "title": "OWASP WSTG 4.2: دليل اختبار أمن تطبيقات الويب",
+          "url": "https://wstg.owasp.org/v4.2/4-Web_Application_Security_Testing/",
+          "claim": "مرجع لفحص الهوية والصلاحيات والجلسات والمدخلات ومنطق الأعمال؛ تُختار منه الحالات المناسبة للتهديدات الفعلية."
+        }
+      ],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "wstg_idor",
+      "title": "WSTG-ATHZ-04 — Insecure Direct Object References",
+      "url": "https://wstg.owasp.org/v4.2/4-Web_Application_Security_Testing/05-Authorization_Testing/04-Testing_for_Insecure_Direct_Object_References/",
+      "basis": "opn",
+      "claim": "اختبار بحسابين وتبديل المعرّفات",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "authz_cheat",
+      "title": "OWASP — Authorization Testing Automation Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Testing_Automation_Cheat_Sheet.html",
+      "basis": "opn",
+      "claim": "مصفوفة دور × عملية كبيانات واختبار آلي لها",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "top10",
+      "title": "OWASP Top 10:2025",
+      "url": "https://top10.owasp.org/2025/",
+      "basis": "est",
+      "claim": "A01 التحكم المكسور في الوصول، A03 سلسلة التوريد، A05 الحقن، A10 الحالات الاستثنائية",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "masvs",
+      "title": "OWASP MAS (MASVS / MASTG)",
+      "url": "https://mas.owasp.org/",
+      "basis": "est",
+      "claim": "معيار أمن تطبيقات الجوال ودليل اختبارها",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "ssdf",
+      "title": "NIST SP 800-218 SSDF v1.1",
+      "url": "https://csrc.nist.gov/pubs/sp/800/218/final",
+      "basis": "est",
+      "claim": "PW.7 مراجعة الشيفرة، PW.8 اختبار الشيفرة التنفيذية",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "wcag22",
+      "title": "W3C — WCAG 2.2",
+      "url": "https://www.w3.org/TR/WCAG22/",
+      "basis": "est",
+      "claim": "المرجع الحالي للإتاحة (توصية 2023، تحديث ديسمبر 2024)",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "wai_eval",
+      "title": "W3C WAI — Evaluating Web Accessibility",
+      "url": "https://www.w3.org/WAI/test-evaluate/",
+      "basis": "est",
+      "claim": "لا أداة وحدها تحدد المطابقة؛ يلزم تقييم بشري",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "deque57",
+      "title": "Deque — Automated Testing Coverage Study (2021)",
+      "url": "https://www.deque.com/automated-accessibility-testing-coverage/",
+      "basis": "ctx",
+      "claim": "ادعاء مورّد: 57% من المشكلات عددًا في عينتهم، لا من المعايير",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "apple_a11y",
+      "title": "Apple — Performing accessibility testing for your app",
+      "url": "https://developer.apple.com/documentation/accessibility/performing-accessibility-testing-for-your-app",
+      "basis": "doc",
+      "claim": "اختبار يدوي على جهاز حقيقي مع VoiceOver وتدقيقات آلية",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "android_a11y",
+      "title": "Android — Test your app's accessibility",
+      "url": "https://developer.android.com/guide/topics/ui/accessibility/testing",
+      "basis": "doc",
+      "claim": "TalkBack وAccessibility Scanner والفحوص الآلية",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "cwv",
+      "title": "web.dev — Web Vitals",
+      "url": "https://web.dev/articles/vitals",
+      "basis": "est",
+      "claim": "LCP ≤ 2.5s، INP ≤ 200ms، CLS ≤ 0.1 عند المئين 75",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "labfield",
+      "title": "web.dev — Lab and field data differences",
+      "url": "https://web.dev/articles/lab-and-field-data-differences",
+      "basis": "est",
+      "claim": "القياس المختبري قابل للتكرار، والميداني هو تجربة المستخدمين",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "k6types",
+      "title": "Grafana k6 — Load test types",
+      "url": "https://grafana.com/docs/k6/latest/testing-guides/test-types/",
+      "basis": "doc",
+      "claim": "smoke, average-load, stress, soak, spike, breakpoint",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "w3c_dir",
+      "title": "W3C i18n — Structural markup and right-to-left text in HTML",
+      "url": "https://www.w3.org/International/questions/qa-html-dir",
+      "basis": "est",
+      "claim": "dir على العنصر الجذر، الخصائص المنطقية، dir=\"auto\" للنص المجهول",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "w3c_bidi",
+      "title": "W3C i18n — Inline markup and bidirectional text in HTML",
+      "url": "https://www.w3.org/International/articles/inline-bidi-markup/",
+      "basis": "est",
+      "claim": "عزل المقاطع بـ bdi، وظاهرة امتداد الاتجاه إلى الأرقام والترقيم",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "uax9",
+      "title": "Unicode UAX #9 — Bidirectional Algorithm",
+      "url": "https://www.unicode.org/reports/tr9/",
+      "basis": "est",
+      "claim": "مع ملف الاختبار BidiCharacterTest.txt",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "uax15",
+      "title": "Unicode UAX #15 — Normalization Forms",
+      "url": "https://www.unicode.org/reports/tr15/",
+      "basis": "est",
+      "claim": "NFC وNFD وNFKC وNFKD، وملف NormalizationTest.txt",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "alreq",
+      "title": "W3C — Arabic & Persian Layout Requirements",
+      "url": "https://www.w3.org/TR/alreq/",
+      "basis": "est",
+      "claim": "الأرقام، الكشيدة والتطويل، الالتفاف",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "apple_rtl",
+      "title": "Apple HIG — Right to left",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/right-to-left",
+      "basis": "doc",
+      "claim": "ما يُعكس وما لا يُعكس",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "android_pseudo",
+      "title": "Android — Test your app with pseudolocales",
+      "url": "https://developer.android.com/guide/topics/resources/pseudolocales",
+      "basis": "doc",
+      "claim": "اللغة الزائفة ar-XB لاختبار الاتجاه",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "qt_reverse",
+      "title": "Qt 6 — QGuiApplication (-reverse)",
+      "url": "https://doc.qt.io/qt-6/qguiapplication.html",
+      "basis": "doc",
+      "claim": "خيار -reverse يفرض الاتجاه من اليمين للتصحيح فقط",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "pact_fit",
+      "title": "Pact — What is Pact good for?",
+      "url": "https://docs.pact.io/getting_started/what_is_pact_good_for",
+      "basis": "ctx",
+      "claim": "يناسب حين تملك الطرفين، ولا يناسب الواجهات العامة",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "hypothesis",
+      "title": "Hypothesis documentation",
+      "url": "https://hypothesis.readthedocs.io/en/latest/",
+      "basis": "doc",
+      "claim": "اختبار الخصائص في Python",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "fastcheck",
+      "title": "fast-check — What is property-based testing",
+      "url": "https://fast-check.dev/docs/introduction/what-is-property-based-testing/",
+      "basis": "doc",
+      "claim": "اختبار الخصائص في JavaScript",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "pw_snap",
+      "title": "Playwright — Visual comparisons",
+      "url": "https://playwright.dev/docs/test-snapshots",
+      "basis": "doc",
+      "claim": "اللقطات تختلف حسب النظام والمتصفح؛ ولّدها وقارنها في البيئة نفسها",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "stryker",
+      "title": "Stryker Mutator",
+      "url": "https://stryker-mutator.io/",
+      "basis": "doc",
+      "claim": "اختبار الطفرات لـ JS/TS وC# وScala",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "go_fuzz",
+      "title": "Go — Fuzzing",
+      "url": "https://go.dev/doc/security/fuzz/",
+      "basis": "doc",
+      "claim": "go test -fuzz منذ Go 1.18",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "schemathesis",
+      "title": "Schemathesis",
+      "url": "https://schemathesis.readthedocs.io/en/stable/",
+      "basis": "doc",
+      "claim": "اختبارات خصائص مولدة من مخطط OpenAPI أو GraphQL",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "android_fund",
+      "title": "Android — Fundamentals of testing",
+      "url": "https://developer.android.com/training/testing/fundamentals",
+      "basis": "doc",
+      "claim": "اختبارات صغيرة كثيرة وكبيرة قليلة، دون نسبة مفروضة",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "obsidian_guide",
+      "title": "Obsidian — Plugin guidelines",
+      "url": "https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines",
+      "basis": "doc",
+      "claim": "إرشادات قابلة للفحص قبل الإرسال",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "wp_a11y_ready",
+      "title": "WordPress Themes — Accessibility-ready requirements",
+      "url": "https://make.wordpress.org/themes/handbook/review/accessibility/required/",
+      "basis": "doc",
+      "claim": "متطلبات وسم الإتاحة للقوالب",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "kde_widget_test",
+      "title": "KDE Developer — Testing Plasma widgets",
+      "url": "https://develop.kde.org/docs/plasma/widget/testing/",
+      "basis": "doc",
+      "claim": "plasmoidviewer وتغيير المقياس والحافة",
+      "origin": "kb",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "google-behavior",
+      "title": "Google: اختبر السلوك بدلاً من ربط الاختبارات بالدوال",
+      "url": "https://testing.googleblog.com/2014/04/testing-on-toilet-test-behaviors-not.html",
+      "basis": null,
+      "claim": "قد تضم الدالة أكثر من سلوك، وقد يمتد السلوك عبر أكثر من دالة؛ اجعل النتيجة المطلوبة محور الحالة.",
+      "origin": "codex",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "google-coverage",
+      "title": "Google: الاستخدام العملي لتغطية الشيفرة",
+      "url": "https://testing.googleblog.com/2020/08/code-coverage-best-practices.html",
+      "basis": null,
+      "claim": "التغطية تكشف مناطق لم تُنفّذ. ارتفاعها لا يضمن صحة التحقق، ولا توجد نسبة مثالية تصلح لكل المنتجات.",
+      "origin": "codex",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "playwright",
+      "title": "Playwright: المتصفحات المدعومة وحدودها",
+      "url": "https://playwright.dev/docs/browsers",
+      "basis": null,
+      "claim": "يدعم Chromium وFirefox وWebKit وتكوينات محاكاة الجوال. WebKit المُرفق ليس متصفح Safari الرسمي.",
+      "origin": "codex",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "k6",
+      "title": "Grafana k6: عتبات تقييم الأداء",
+      "url": "https://grafana.com/docs/k6/latest/using-k6/thresholds/",
+      "basis": null,
+      "claim": "العتبات تُحوّل مقاييس الأداء إلى قرار نجاح أو فشل يحدده صاحب الاختبار؛ أرقام الأمثلة في الوثائق ليست أهدافاً عامة.",
+      "origin": "codex",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "pact",
+      "title": "Pact: العقود تختلف عن فحص الوظيفة",
+      "url": "https://docs.pact.io/consumer/contract_tests_not_functional_tests",
+      "basis": null,
+      "claim": "العقد يفحص اتفاق المستهلك والمزوّد على الرسائل؛ لا يثبت وحده الآثار الجانبية مثل حفظ الطلب.",
+      "origin": "codex",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "appium",
+      "title": "Appium: برامج القيادة والمنصات",
+      "url": "https://appium.io/docs/en/latest/ecosystem/drivers/",
+      "basis": null,
+      "claim": "UiAutomator2 يستهدف Android، وXCUITest يستهدف منصات Apple المذكورة في الدليل؛ الدعم والمتطلبات يتبعان برنامج القيادة.",
+      "origin": "codex",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "recovery",
+      "title": "Google SRE: سلامة البيانات والتحقق من الاستعادة",
+      "url": "https://sre.google/sre-book/data-integrity/",
+      "basis": null,
+      "claim": "وجود نسخة احتياطية لا يثبت قابلية الاستعادة. اختبر الاستعادة كاملة، وصحة البيانات، والزمن والتبعيات.",
+      "origin": "codex",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "cucumber",
+      "title": "Cucumber: توضيح قواعد القبول بالأمثلة",
+      "url": "https://cucumber.io/docs/bdd/example-mapping/",
+      "basis": null,
+      "claim": "ناقش القواعد والأمثلة والأسئلة المفتوحة قبل التطوير؛ الأمثلة الملموسة أساس مفيد لاختبارات القبول.",
+      "origin": "codex",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    },
+    {
+      "id": "exploratory",
+      "title": "Jonathan Bach: إدارة جلسات الاختبار الاستكشافي",
+      "url": "https://www.satisfice.us/articles/sbtm.pdf",
+      "basis": null,
+      "claim": "الاستكشاف قابل للإدارة بجلسة ذات مهمة وتوثيق ومراجعة؛ ليس تصفحاً عشوائياً بلا هدف.",
+      "origin": "codex",
+      "merged": [],
+      "verifiedAt": "2026-10-09"
+    }
+  ]
+}

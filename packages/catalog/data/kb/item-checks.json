@@ -1,0 +1,33 @@
+{
+  "verifiedAt": "2026-10-09",
+  "mappings": [
+    { "item": "static_gate", "checks": ["code.types", "code.lint", "sec.secrets.files"], "card": null },
+    { "item": "unit_logic", "checks": ["beh.unit"], "card": "unit_test" },
+    { "item": "property_logic", "checks": ["beh.unit"], "card": "property_test" },
+    { "item": "confirm_bug", "checks": ["beh.unit"], "card": "bug_repro_test" },
+    { "item": "regression_neighbors", "checks": ["beh.unit"], "card": null },
+    { "item": "regression_full", "checks": ["beh.unit"], "card": null },
+    { "item": "characterization", "checks": [], "card": "characterization_test" },
+    { "item": "acceptance_examples", "checks": [], "card": "unit_test" },
+    { "item": "integration_boundary", "checks": ["beh.integration"], "card": "integration_test" },
+    { "item": "contract_api", "checks": ["beh.contract"], "card": "integration_test" },
+    { "item": "migration_rehearsal", "checks": ["perf.recovery"], "card": "check_setup" },
+    { "item": "error_paths", "checks": ["design.states"], "card": "integration_test" },
+    { "item": "component_ui", "checks": ["design.states"], "card": "ui_states_definition" },
+    { "item": "e2e_critical", "checks": ["beh.e2e"], "card": "journey_test" },
+    { "item": "visual_check", "checks": ["design.visual"], "card": null },
+    { "item": "exploratory_session", "checks": [], "card": "exploratory_session" },
+    { "item": "security_authz", "checks": ["sec.sast"], "card": "integration_test" },
+    { "item": "security_input", "checks": ["sec.sast"], "card": "unit_test" },
+    { "item": "security_deps", "checks": ["sec.deps", "sec.secrets.files"], "card": null },
+    { "item": "perf_budget", "checks": ["code.size", "perf.web"], "card": null },
+    { "item": "load_test", "checks": ["perf.load"], "card": null },
+    { "item": "a11y_check", "checks": ["design.a11y", "design.a11y.review"], "card": "human_a11y_review" },
+    { "item": "arabic_rtl", "checks": ["design.rtl.static", "design.rtl.render"], "card": "check_setup" },
+    { "item": "compat_matrix", "checks": ["perf.compat"], "card": "check_setup" },
+    { "item": "smoke_release", "checks": ["code.build", "beh.ext.host", "custom.*"], "card": "check_setup" },
+    { "item": "build_config", "checks": ["code.build"], "card": null },
+    { "item": "test_health", "checks": ["beh.stability"], "card": "check_setup" },
+    { "item": "risk_inventory", "checks": [], "card": "generic" }
+  ]
+}

@@ -1,0 +1,218 @@
+{
+  "verifiedAt": "2026-10-09",
+  "presets": [
+    {
+      "id": "p_typo",
+      "name": "تصحيح نص ظاهر في صفحة الإعدادات",
+      "inputs": {
+        "situation": "cosmetic",
+        "areas": [
+          "ui"
+        ],
+        "impact": 1,
+        "audience": "small",
+        "reversibility": "easy",
+        "scope": "local",
+        "factors": [],
+        "evidence": "weak",
+        "automation": "manual",
+        "frequency": "rare",
+        "platform": [
+          "web"
+        ],
+        "stack": "Next.js",
+        "stage": "released",
+        "time": "minutes",
+        "expected": "clear"
+      }
+    },
+    {
+      "id": "p_hamza",
+      "name": "إصلاح خلل في توحيد الهمزات عند البحث",
+      "inputs": {
+        "situation": "bugfix",
+        "areas": [
+          "logic",
+          "arabic"
+        ],
+        "impact": 2,
+        "audience": "small",
+        "reversibility": "easy",
+        "scope": "local",
+        "factors": [
+          "complex"
+        ],
+        "evidence": "weak",
+        "automation": "manual",
+        "frequency": "frequent",
+        "platform": [
+          "plugin"
+        ],
+        "stack": "Obsidian plugin, TypeScript",
+        "stage": "released",
+        "time": "hours"
+      }
+    },
+    {
+      "id": "p_sync",
+      "name": "إضافة مزامنة مع خدمة سحابية في تطبيق جوال",
+      "inputs": {
+        "situation": "new_feature",
+        "areas": [
+          "external",
+          "data",
+          "auth"
+        ],
+        "impact": 4,
+        "audience": "public",
+        "reversibility": "hard",
+        "scope": "module",
+        "factors": [
+          "unfamiliar",
+          "async"
+        ],
+        "evidence": "none",
+        "automation": "none",
+        "frequency": "frequent",
+        "platform": [
+          "mobile"
+        ],
+        "stack": "SwiftUI",
+        "stage": "released",
+        "time": "days",
+        "expected": "vague"
+      }
+    },
+    {
+      "id": "p_upgrade",
+      "name": "ترقية إطار الواجهة إلى إصدار رئيسي",
+      "inputs": {
+        "situation": "deps_upgrade",
+        "areas": [
+          "ui",
+          "config",
+          "compat"
+        ],
+        "impact": 3,
+        "audience": "public",
+        "reversibility": "easy",
+        "scope": "wide",
+        "factors": [],
+        "evidence": "weak",
+        "automation": "auto",
+        "frequency": "frequent",
+        "platform": [
+          "web"
+        ],
+        "stack": "Next.js, TypeScript",
+        "stage": "released",
+        "time": "hours"
+      }
+    },
+    {
+      "id": "p_theme",
+      "name": "تعديل مكوّن التخطيط المشترك في قالب",
+      "inputs": {
+        "situation": "shared_change",
+        "areas": [
+          "ui",
+          "arabic",
+          "compat"
+        ],
+        "impact": 2,
+        "audience": "public",
+        "reversibility": "easy",
+        "scope": "wide",
+        "factors": [],
+        "evidence": "none",
+        "automation": "none",
+        "frequency": "frequent",
+        "platform": [
+          "theme"
+        ],
+        "stack": "WordPress theme, PHP",
+        "stage": "released",
+        "time": "hours"
+      }
+    },
+    {
+      "id": "p_release",
+      "name": "تجهيز الإصدار الأول لمتجر التطبيقات",
+      "inputs": {
+        "situation": "release",
+        "areas": [
+          "ui",
+          "data",
+          "arabic"
+        ],
+        "impact": 3,
+        "audience": "public",
+        "reversibility": "hard",
+        "scope": "wide",
+        "factors": [
+          "unfamiliar"
+        ],
+        "evidence": "weak",
+        "automation": "manual",
+        "frequency": "frequent",
+        "platform": [
+          "mobile"
+        ],
+        "stack": "SwiftUI",
+        "stage": "active",
+        "time": "days"
+      }
+    },
+    {
+      "id": "p_refactor",
+      "name": "إعادة هيكلة وحدة التصدير دون تغيير السلوك",
+      "inputs": {
+        "situation": "refactor",
+        "areas": [
+          "logic"
+        ],
+        "impact": 3,
+        "audience": "me",
+        "reversibility": "easy",
+        "scope": "module",
+        "factors": [
+          "ai_generated"
+        ],
+        "evidence": "none",
+        "automation": "none",
+        "frequency": "rare",
+        "platform": [
+          "desktop"
+        ],
+        "stack": "",
+        "stage": "active",
+        "time": "hours"
+      }
+    },
+    {
+      "id": "p_legacy",
+      "name": "تقييم مشروع قائم بلا اختبارات",
+      "inputs": {
+        "situation": "legacy_assess",
+        "areas": [],
+        "audience": "public",
+        "platform": [
+          "web",
+          "api"
+        ],
+        "stack": "Python, FastAPI",
+        "stage": "maintenance",
+        "evidence": "none",
+        "automation": "none",
+        "time": "days"
+      }
+    },
+    {
+      "id": "p_sparse",
+      "name": "معلومات ناقصة: أعرف فقط أنني أضفت ميزة",
+      "inputs": {
+        "situation": "new_feature"
+      }
+    }
+  ]
+}

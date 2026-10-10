@@ -1,5 +1,7 @@
 // Reports, copying, tasks and the advisor (C-21, C-01, C-20, C-23). Implemented in DEV-8 and DEV-9.
 import { Id, JsonObject, Lang } from '../common.ts';
+import { AdvisorContext, AdvisorResult } from '../domain/advisor.ts';
+import { TaskRecord, TaskSource } from '../domain/tasks.ts';
 import { DestinationToken } from '../tokens.ts';
 import { z } from '../zod.ts';
 import { defineCommand } from './define.ts';
@@ -33,10 +35,31 @@ export const reportCommands = {
     payload: z.strictObject({ kind: CopyKind, id: Id }),
     result: z.unknown(),
   }),
-  'tasks.list': defineCommand({ ...renderer, owner: 'C-20', implementedIn: 'DEV-8', payload: z.strictObject({ projectId: Id }), result: z.unknown() }),
-  'task.create': defineCommand({ ...renderer, owner: 'C-20', implementedIn: 'DEV-8', payload: z.strictObject({ source: JsonObject }), result: z.unknown() }),
-  'task.update': defineCommand({ ...renderer, owner: 'C-20', implementedIn: 'DEV-8', payload: z.strictObject({ taskId: Id, patch: JsonObject }), result: z.unknown() }),
-  'advisor.suggest': defineCommand({ ...renderer, owner: 'C-20', implementedIn: 'DEV-8', payload: z.strictObject({ projectId: Id, context: JsonObject }), result: z.unknown() }),
+  'tasks.list': defineCommand({
+    ...renderer,
+    owner: 'C-20',
+    implementedIn: 'DEV-8',
+    payload: z.strictObject({ projectId: Id }),
+    result: z.strictObject({ tasks: z.array(TaskRecord) }),
+  }),
+  // C-20 «مصادر البطاقات» and 12.8: generates the card from its source and keeps it (status «مفتوحة»).
+  'task.create': defineCommand({
+    ...renderer,
+    owner: 'C-20',
+    implementedIn: 'DEV-8',
+    payload: z.strictObject({ projectId: Id, source: TaskSource }),
+    result: z.strictObject({ task: TaskRecord }),
+  }),
+  // The card's lifecycle and its verification (12.8, C-20) are DEV-9's (D-DEV8-11).
+  'task.update': defineCommand({ ...renderer, owner: 'C-20', implementedIn: 'DEV-9', payload: z.strictObject({ taskId: Id, patch: JsonObject }), result: z.unknown() }),
+  // FR-46 and FR-18: recommendations for a change context, from the knowledge base (kb/1) and the project's facts.
+  'advisor.suggest': defineCommand({
+    ...renderer,
+    owner: 'C-20',
+    implementedIn: 'DEV-8',
+    payload: z.strictObject({ projectId: Id, context: AdvisorContext }),
+    result: AdvisorResult,
+  }),
   'report.export': defineCommand({
     ...renderer,
     owner: 'C-23',

@@ -4,6 +4,7 @@
 // An entry verified more than staleAfterDays ago (180) loads, with a staleness warning (NFR-06).
 import { createHash } from 'node:crypto';
 import { builtinCatalogData } from './data.ts';
+import { buildKb, kbIssues, type Kb } from './kb.ts';
 import {
   CatalogData,
   SECTION_IDS,
@@ -26,7 +27,7 @@ export class CatalogError extends Error {
 }
 
 export interface StaleEntry {
-  kind: 'check' | 'aiTemplate' | 'source' | 'redaction' | 'commandPolicy';
+  kind: 'check' | 'aiTemplate' | 'source' | 'redaction' | 'commandPolicy' | 'kb' | 'kbSource' | 'kbTool' | 'cards';
   id: string;
   verifiedAt: string;
   ageDays: number;
@@ -44,6 +45,8 @@ export interface Catalog {
   readonly sources: CatalogData['sources'];
   readonly redaction: RedactionData;
   readonly commandPolicy: CommandPolicy;
+  /** kb/1: the knowledge base of the advisor and the cards (C-20), with the card types of 12.8. */
+  readonly kb: Kb;
   check(id: string): CheckDefinition | undefined;
   criterion(id: string): Criterion | undefined;
   /** 12.7: the check's own next step for this outcome, else the catalog default. */
@@ -188,6 +191,9 @@ export function loadCatalog(raw: unknown = builtinCatalogData(), opts: { now: Da
   for (const r of data.commandPolicy.refused) regexOk(`command ${r.id}`, r.regex.pattern, r.regex.flags);
   for (const d of data.commandPolicy.dangerous) d.regexes.forEach((r, i) => regexOk(`command ${d.id}[${i}]`, r.pattern, r.flags));
 
+  // kb/1: every reference resolves, and C-20's map points at checks of this catalog.
+  issues.push(...kbIssues(data.kb, data.cards, new Set(byId.keys())));
+
   if (issues.length) throw new CatalogError(issues);
 
   // Staleness (NFR-06): entries verified more than staleAfterDays ago.
@@ -203,6 +209,11 @@ export function loadCatalog(raw: unknown = builtinCatalogData(), opts: { now: Da
   for (const s of data.sources) consider('source', s.id, s.verifiedAt);
   consider('redaction', `redaction@${data.redaction.version}`, data.redaction.verifiedAt);
   consider('commandPolicy', `command-policy@${data.commandPolicy.version}`, data.commandPolicy.verifiedAt);
+  consider('kb', `kb@${data.kb.manifest.version}`, data.kb.manifest.verifiedAt);
+  for (const [name, part] of Object.entries(data.kb)) if ('verifiedAt' in part && name !== 'manifest') consider('kb', `kb/${name}`, part.verifiedAt);
+  for (const s of data.kb.sources.sources) consider('kbSource', s.id, s.verifiedAt);
+  data.kb.tools.tools.forEach((t, i) => consider('kbTool', `${t.ecosystem}/${t.category}/${t.name}#${i}`, t.verifiedAt));
+  consider('cards', `cards@${data.cards.version}`, data.cards.verifiedAt);
 
   const hash = createHash('sha256').update(canonicalJson(data)).digest('hex');
   const catalog: Catalog = {
@@ -216,6 +227,7 @@ export function loadCatalog(raw: unknown = builtinCatalogData(), opts: { now: Da
     sources: data.sources,
     redaction: data.redaction,
     commandPolicy: data.commandPolicy,
+    kb: buildKb(data.kb, data.cards),
     check: (id) => byId.get(id),
     criterion: (id) => criteria.get(id),
     nextStep: (checkId, outcome) => byId.get(checkId)?.nextStep[outcome] ?? data.manifest.nextSteps[outcome],

@@ -10,6 +10,7 @@ import { RedactionService } from '../redaction/service.ts';
 import type { Db } from '../storage/db.ts';
 import type { HmacKey } from '../storage/hmac-key.ts';
 import { readSettings } from '../storage/settings.ts';
+import { TasksService } from '../tasks/service.ts';
 import type { EventBus } from './event-bus.ts';
 
 export interface EngineServices {
@@ -21,6 +22,8 @@ export interface EngineServices {
   projects: ProjectsService;
   /** C-07: the login environment and the toolchains. */
   environment: EnvironmentService;
+  /** C-20: kept task cards. */
+  tasks: TasksService;
   /**
    * C-18 after the fact [D-DEV4-07]: redacts the stored rows again with the current rules (new sensitive values,
    * new user patterns). A failure is logged, never fatal: the rows stay as they were (re-review R4).
@@ -66,5 +69,6 @@ export function createServices(o: ServicesInput): EngineServices {
       return { shell: s['environment.shell'] ?? null, timeoutSeconds: s['environment.timeoutSeconds'] ?? 10 };
     },
   });
-  return { redaction, profiles, projects, environment, rescrubStored };
+  const tasks = new TasksService({ db: o.db, catalog: o.catalog, ports: o.ports, logger: o.logger });
+  return { redaction, profiles, projects, environment, tasks, rescrubStored };
 }

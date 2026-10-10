@@ -1,0 +1,427 @@
+{
+  "verifiedAt": "2026-10-09",
+  "archive": [
+    {
+      "name": "تعديل شكلي منخفض الخطر لا يستدعي اختبارًا إضافيًا",
+      "inputs": {
+        "situation": "cosmetic",
+        "areas": [
+          "ui"
+        ],
+        "impact": 1,
+        "audience": "small",
+        "reversibility": "easy",
+        "scope": "local",
+        "evidence": "weak"
+      },
+      "archiveExpectation": "r => r.depth === 'none' && r.items.every(i => i.priority === 3)"
+    },
+    {
+      "name": "إصلاح الخلل يضع اختبار إعادة الإنتاج في الأولوية العليا",
+      "inputs": {
+        "situation": "bugfix",
+        "areas": [
+          "logic"
+        ],
+        "impact": 2,
+        "audience": "me",
+        "scope": "local",
+        "evidence": "good",
+        "reversibility": "easy"
+      },
+      "archiveExpectation": "r => r.items.some(i => i.id === 'confirm_bug' && i.priority === 1)"
+    },
+    {
+      "name": "إعادة الهيكلة دون أدلة تبدأ بالاختبار التوصيفي",
+      "inputs": {
+        "situation": "refactor",
+        "areas": [
+          "logic"
+        ],
+        "impact": 2,
+        "audience": "me",
+        "scope": "module",
+        "evidence": "none",
+        "reversibility": "easy"
+      },
+      "archiveExpectation": "r => r.items.some(i => i.id === 'characterization' && i.priority === 1)"
+    },
+    {
+      "name": "بيانات بعاقبة فقدان وتراجع صعب ونطاق واسع: حرج وشامل مع بروفة ترحيل",
+      "inputs": {
+        "situation": "change_behavior",
+        "areas": [
+          "data"
+        ],
+        "impact": 4,
+        "audience": "public",
+        "scope": "wide",
+        "evidence": "none",
+        "reversibility": "hard",
+        "expected": "clear"
+      },
+      "archiveExpectation": "r => r.risk.level === 'critical' && r.depth === 'comprehensive' && r.items.some(i => i.id === 'migration_rehearsal' && i.priority === 1) && r.items.some(i => i.id === 'risk_inventory')"
+    },
+    {
+      "name": "المعلومات الناقصة تظهر افتراضات وتحليل حساسية",
+      "inputs": {
+        "situation": "new_feature"
+      },
+      "archiveExpectation": "r => r.assumptions.length >= 4 && ['impact', 'scope', 'evidence'].every(k => r.n.missing.includes(k)) && MI.sensitivity({ situation: 'new_feature' }, r).length >= 4"
+    },
+    {
+      "name": "رفع العاقبة من 2 إلى 4 يرفع المستوى ويضيف بنودًا مع شرح يذكر العاقبة",
+      "inputs": {
+        "situation": "new_feature",
+        "areas": [
+          "ui",
+          "data"
+        ],
+        "impact": 2,
+        "audience": "small",
+        "scope": "module",
+        "evidence": "weak",
+        "reversibility": "easy",
+        "expected": "clear"
+      },
+      "archiveExpectation": "r => { const raw2 = { situation: 'new_feature', areas: ['ui', 'data'], impact: 4, audience: 'small', scope: 'module', evidence: 'weak', reversibility: 'easy', expected: 'clear' }; const r2 = MI.compute(raw2); const x = MI.explainChange(r.n.c, r, raw2, r2); return r2.risk.levelIdx > r.risk.levelIdx && x && x.keys.includes('impact') && x.added.length > 0 && x.added.some(a => a.why.length > 0); }"
+    },
+    {
+      "name": "الإصدار لجمهور عام يضع الدخان في الأولوية العليا ويضيف الإتاحة",
+      "inputs": {
+        "situation": "release",
+        "areas": [
+          "ui"
+        ],
+        "impact": 3,
+        "audience": "public",
+        "scope": "wide",
+        "evidence": "good",
+        "reversibility": "easy"
+      },
+      "archiveExpectation": "r => r.items.some(i => i.id === 'smoke_release' && i.priority === 1) && r.items.some(i => i.id === 'a11y_check')"
+    },
+    {
+      "name": "الصلاحيات مع جمهور عام: اختبار بحسابين أولوية عليا",
+      "inputs": {
+        "situation": "new_feature",
+        "areas": [
+          "auth"
+        ],
+        "impact": 3,
+        "audience": "public",
+        "scope": "module",
+        "evidence": "weak",
+        "reversibility": "easy",
+        "expected": "clear"
+      },
+      "archiveExpectation": "r => r.items.some(i => i.id === 'security_authz' && i.priority === 1)"
+    },
+    {
+      "name": "لمس النص العربي يضيف اختبار العربية والاتجاه",
+      "inputs": {
+        "situation": "change_behavior",
+        "areas": [
+          "arabic"
+        ],
+        "impact": 2,
+        "audience": "small",
+        "scope": "local",
+        "evidence": "good",
+        "reversibility": "easy",
+        "expected": "clear"
+      },
+      "archiveExpectation": "r => r.items.some(i => i.id === 'arabic_rtl')"
+    },
+    {
+      "name": "كل بند فيه توقيت وتكرار ومعيار قبول وحدود",
+      "inputs": {
+        "situation": "release",
+        "areas": [
+          "ui",
+          "data",
+          "auth",
+          "input",
+          "arabic",
+          "perf",
+          "config",
+          "compat",
+          "external",
+          "logic"
+        ],
+        "impact": 4,
+        "audience": "public",
+        "scope": "wide",
+        "evidence": "none",
+        "reversibility": "hard",
+        "platform": [
+          "api",
+          "web"
+        ]
+      },
+      "archiveExpectation": "r => r.items.length >= 15 && r.items.every(i => { const t = MI.ITEMS[i.id]; return t.timing && t.repeat && t.evaluate && t.limits && t.expand && t.steps.length; })"
+    },
+    {
+      "name": "لا عبارة في الخطة المصدّرة تزعم أن اختبارًا نُفّذ أو نجح",
+      "inputs": {
+        "situation": "release",
+        "areas": [
+          "ui",
+          "data"
+        ],
+        "impact": 3,
+        "audience": "public",
+        "scope": "wide",
+        "evidence": "weak",
+        "reversibility": "hard"
+      },
+      "archiveExpectation": "r => { const md = MI.toMarkdown(r).replace('لم يُنفَّذ أي اختبار على مشروعك بعد', ''); return !/(تم تنفيذ|نُفِّذ الاختبار|نفذنا|اجتاز المشروع|نجحت اختبارات مشروعك|تم اختبار)/.test(md); }"
+    },
+    {
+      "name": "وقت أقل من ساعة لا يتسع لبنود عليا كثيرة فيظهر تنبيه",
+      "inputs": {
+        "situation": "shared_change",
+        "areas": [
+          "ui",
+          "data",
+          "arabic"
+        ],
+        "impact": 4,
+        "audience": "public",
+        "scope": "wide",
+        "evidence": "none",
+        "reversibility": "hard",
+        "time": "minutes"
+      },
+      "archiveExpectation": "r => !!r.budgetWarn"
+    },
+    {
+      "name": "تحديد التقنية يُظهر أدوات وأوامر، وغيابها لا يُظهر أوامر",
+      "inputs": {
+        "situation": "new_feature",
+        "areas": [
+          "ui"
+        ],
+        "impact": 3,
+        "audience": "public",
+        "scope": "module",
+        "evidence": "weak",
+        "reversibility": "easy",
+        "stack": "Next.js TypeScript",
+        "expected": "clear"
+      },
+      "archiveExpectation": "r => { const withS = r.items.some(i => MI.toolsForItem(i.id, r.tools.ecos).some(t => t.c && t.eco === 'js')); const r2 = MI.compute({ situation: 'new_feature', areas: ['ui'], impact: 3, audience: 'public', scope: 'module', evidence: 'weak', reversibility: 'easy', expected: 'clear' }); const without = r2.items.every(i => MI.toolsForItem(i.id, r2.tools.ecos).every(t => t.eco === 'any')); return withS && without; }"
+    },
+    {
+      "name": "تطبيق جوال دون تحديد التراجع يُفترض فيه التراجع صعبًا",
+      "inputs": {
+        "situation": "new_feature",
+        "platform": [
+          "mobile"
+        ],
+        "areas": [
+          "ui"
+        ],
+        "impact": 3,
+        "audience": "public",
+        "scope": "module",
+        "evidence": "good",
+        "expected": "clear"
+      },
+      "archiveExpectation": "r => r.e.reversibility === 'hard' && r.assumptions.some(a => a.key === 'reversibility')"
+    },
+    {
+      "name": "النموذج الأولي لا يتجاوز «مركّز مع انحدار» إلا مع عاقبة فقدان",
+      "inputs": {
+        "situation": "new_feature",
+        "stage": "proto",
+        "areas": [
+          "ui",
+          "logic"
+        ],
+        "impact": 3,
+        "audience": "small",
+        "scope": "wide",
+        "evidence": "none",
+        "reversibility": "easy",
+        "expected": "vague"
+      },
+      "archiveExpectation": "r => r.depth === 'focused_reg'"
+    }
+  ],
+  "codexCases": [
+    {
+      "number": 1,
+      "name": "قاعدة محلية منخفضة الأثر لا تفرض مسارًا شاملًا"
+    },
+    {
+      "number": 2,
+      "name": "المكوّن المشترك عالي الأثر يوسّع القرار ويشرح انتشار الفشل"
+    },
+    {
+      "number": 3,
+      "name": "علاقة محددة بدليل ضعيف تستدعي توسعة محدودة دون كل الأنواع"
+    },
+    {
+      "number": 4,
+      "name": "التحضير لتسليم عالي الأثر مع نقص دليل يستدعي تقييمًا شاملاً"
+    },
+    {
+      "number": 5,
+      "name": "الأثر الحرج يحافظ على عمق القرار رغم ضيق الوقت"
+    },
+    {
+      "number": 6,
+      "name": "الحالة الأصلية للعيب والتراجع هدفان متميزان"
+    },
+    {
+      "number": 7,
+      "name": "تغيير واجهة واضح يقترح تحققًا مرئيًا حتى دون تحديد مجال خطر"
+    },
+    {
+      "number": 8,
+      "name": "عدم التغيير والدليل المناسب الموثق قد يبرران عدم التكرار"
+    },
+    {
+      "number": 9,
+      "name": "تسمية الدليل مناسبًا دون توثيق لا تكفي للاكتفاء"
+    },
+    {
+      "number": 10,
+      "name": "دليل قديم رغم عدم وجود تغيير جديد يكشف الحاجة لإعادة تقييمه"
+    },
+    {
+      "number": 11,
+      "name": "يمكن البدء دون معلومات مع بقاء عدم اليقين ظاهرًا"
+    },
+    {
+      "number": 12,
+      "name": "غياب معيار القبول لا ينتج معايير نجاح مزعومة"
+    },
+    {
+      "number": 13,
+      "name": "النص الحر يحدد الموضوع ولا يغيّر المخاطر أو يحلل كودًا"
+    },
+    {
+      "number": 14,
+      "name": "منصة معالجة البيانات لا تفترض واجهة رسومية للمسار الكامل"
+    },
+    {
+      "number": 15,
+      "name": "الأمن والأداء والوصول تظهر عند وجود مبرر معلن وبمصادر مستقلة"
+    },
+    {
+      "number": 16,
+      "name": "تعريفات ناقصة وغير صالحة لا تسبب انهيارًا أو مصادر عشوائية"
+    },
+    {
+      "number": 17,
+      "name": "المحرك يعمل في المتصفح دون require ولا يتطلب شبكة"
+    },
+    {
+      "number": 18,
+      "name": "جميع التركيبات الأساسية تنتج خططًا ذات توقيت وتقييم وحدود دون ادعاء تنفيذ"
+    },
+    {
+      "number": 19,
+      "name": "أسماء الأجزاء توجّه التنفيذ دون استنتاج مخاطر أو فرض اختبارات جديدة"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "isolated-stable",
+      "situation": "تغيير نص أو تنسيق عرض محلي معزول لا يغيّر سلوكًا، بعاقبة منخفضة، ومعيار قبول معروف، ودليل حديث مفصّل منطبق، ولا التزام إصدار",
+      "expected": "توصية مركّزة بشروط صريحة وعدم يقين باقٍ ظاهر، دون قائمة شاملة مفروضة. **(معدّل)** وإن خرج العمق `none` («لا يلزم اختبار إضافي»، 28.7) فالبنود تبقى ظاهرة بأولوية «اختياري» مع السبب ولا تُخفى (التصحيح «التخطي» في رأس القسم 28)",
+      "amended": true
+    },
+    {
+      "id": "same-high-impact",
+      "situation": "التغيير الظاهري نفسه، لكن فشله قد يمس مجاميع مالية أو تفسيرًا حرجًا للسلامة",
+      "expected": "أدلة وصرامة تقييم أكثر من `isolated-stable` ولو وُسم الدليل قويًا؛ ولا يمحو اختيارٌ واحد أثرَ العاقبة",
+      "amended": false
+    },
+    {
+      "id": "unknown-everything",
+      "situation": "مشروع جديد بلا اسم ولا منصة ولا سلوك ولا معيار قبول ولا أثر ولا دليل",
+      "expected": "فجوات ظاهرة، وخطة مشروطة تبدأ بالاستكشاف، والمستوى نطاق مع أسئلة تضيّقه؛ ولا تُصنف العاقبة المجهولة منخفضة بصمت",
+      "amended": false
+    },
+    {
+      "id": "shared-payment-release",
+      "situation": "تغيير سلوك واجهة برمجية أو قاعدة بيانات أو دفع مشترك قبل إصدار، مع عملاء تابعين متعددين وعواقب مالية أو بيانات جسيمة",
+      "expected": "تقييم أوسع للمسارات التابعة والتعافي والانحدار، وبوابة اكتمال صريحة، ومخاطر نشر باقية مذكورة؛ لا اختبارات وحدة وحدها",
+      "amended": false
+    },
+    {
+      "id": "limited-resource",
+      "situation": "تغيير الدفع المشترك نفسه بساعة واحدة وموارد يدوية",
+      "expected": "فحوص مرتبة بالأعلى عاقبة، ومخاطر مؤجلة صريحة أو قيد على الإصدار؛ ولا تنتج الميزانية «لا اختبار» ولا خطرًا منخفضًا",
+      "amended": false
+    },
+    {
+      "id": "bug-fix",
+      "situation": "خلل قابل للإعادة أُصلح في منطق معزول، بحالة فشل معروفة وحدود مرتبطة",
+      "expected": "تأكيد الفشل الأصلي، ونهج انحدار يمنع عودته، والحدود المرتبطة؛ ونجاح الحالة العادية السابقة وحده لا يكفي",
+      "amended": false
+    },
+    {
+      "id": "native-mobile",
+      "situation": "تغيير سلوك الكاميرا أو العمل دون اتصال أو في الخلفية في تطبيق جوال أصلي، بقيود جهاز ومنصة",
+      "expected": "اختبار الجهاز ونظامه ودورة حياة التطبيق والأذونات والعمل دون اتصال حيث يلزم؛ وأدوات المتصفح وحدها تُقيَّد أو تُستبعد",
+      "amended": false
+    },
+    {
+      "id": "web-ui",
+      "situation": "تغيير تنقل نموذج ويب، ولوحة المفاتيح وقارئ الشاشة أساسيان، والمتصفحات المدعومة معروفة",
+      "expected": "رحلة متصفح وتحقق إتاحة يدوي، وأمثلة أتمتة مبررة فقط حين يكفي السياق التقني",
+      "amended": false
+    },
+    {
+      "id": "performance",
+      "situation": "تغيير متطلب زمن استجابة أو حمل، بخط أساس وحمل معروفين، وخادم مشترك",
+      "expected": "حمل ممثل ومعايير قابلة للقياس مقابل خط الأساس؛ ولا تكفي سرعة خام ولا طلب واحد على المسار السعيد",
+      "amended": false
+    },
+    {
+      "id": "evidence-vague",
+      "situation": "دليل موسوم «قوي» بلا نطاق اختبار ولا تاريخ ولا بيئة ولا صلة بالتغيير ولا نتيجة فعلية",
+      "expected": "طلب تفاصيل الدليل المنطبق، وعدم الإبلاغ بنجاح؛ وتبقى الثقة مشروطة",
+      "amended": false
+    },
+    {
+      "id": "acceptance-missing",
+      "situation": "وظيفة محددة بأثر فشل مرتفع، دون سلوك متوقع أو معيار قبول",
+      "expected": "تذكر الخطة صراحة غياب المتوقع، ولا تخترع نتيجة قبول قاطعة",
+      "amended": false
+    },
+    {
+      "id": "malicious-text",
+      "situation": "وصف مشروع أو سلوك يحتوي `<img src=x onerror=window.__xss=1>` مع معرّفات عربية وإنجليزية واقتباسات",
+      "expected": "نص حرفي آمن، ولا عنصر قابل للتنفيذ يُدرج، والنسخ والحفظ يحافظان على المحتوى بدقة",
+      "amended": false
+    }
+  ],
+  "example": {
+    "inputs": {
+      "situation": "change_behavior",
+      "areas": [
+        "logic"
+      ],
+      "expected": "clear",
+      "impact": 3,
+      "audience": "public",
+      "reversibility": "easy",
+      "scope": "local",
+      "factors": [],
+      "evidence": "weak",
+      "automation": "manual",
+      "platform": [
+        "web"
+      ],
+      "stage": "active",
+      "time": "hours"
+    },
+    "description": "عند وصول مجموع السلة إلى 200 ريال يُطبّق خصم 10٪ مرة واحدة قبل رسوم الشحن؛ ومعيار القبول أن سلة 200 ريال تصير 180 ريالًا، وسلة 199 ريالًا بلا خصم، ورسوم الشحن لا تتغير؛ واختبارات الحساب القديم موجودة، ولم تُختبر القاعدة الجديدة ولا الحد الفاصل.",
+    "expectedStructure": "بند `unit_logic` بين الموصى به بسبب القاعدة R04؛ وكل بند موصى به يحمل حقول البنود كاملة (28.4)؛ والأدلة `weak` تظهر سببًا في التفسير؛ والمخرج موسوم «توصية لم تُنفَّذ» بلا عبارة نجاح ولا ادعاء تنفيذ؛ وبطاقة «اختبار وحدة» المولّدة تترك القيم المتوقعة (مثل حالتي 199 و200 في الوصف) عنصرًا يملؤه المالك ولا تخترعها. والقائمة الكاملة للبنود تُثبَّت عند التنفيذ من الخوارزمية المصححة كما في 28.8. ولا يُطابق نص مخرج الأرشيف حرفيًا، لأن ذلك المخرج من محرك Codex الذي لا تعتمده الخطة (4.1)."
+  }
+}

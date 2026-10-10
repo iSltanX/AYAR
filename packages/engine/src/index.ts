@@ -20,4 +20,6 @@ export * from './storage/backup.ts';
 export * from './storage/integrity.ts';
 export * from './storage/hmac-key.ts';
 export * from './storage/settings.ts';
+export * from './advisor/index.ts';
+export * from './tasks/index.ts';
 export { nodePorts } from './node/ports.ts';
