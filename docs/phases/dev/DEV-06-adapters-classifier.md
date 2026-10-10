@@ -13,7 +13,7 @@ owner_inputs: [Q-05]
 model: Claude Fable 5.1
 effort: xhigh
 model_reason: قواعد الحكم والنقاء قلب صدق المنتج، وعشرون محولًا بحالات حدية
-scope: [packages/adapters/, packages/analyzers/, packages/engine/, packages/catalog/, packages/protocol/, packages/i18n/, fixtures/, pnpm-lock.yaml, package-lock.json]
+scope: [packages/adapters/, packages/analyzers/, packages/engine/, packages/catalog/, packages/protocol/, packages/i18n/, fixtures/, package-lock.json]
 goal: تحويل النتائج الخام إلى أحكام صادقة — محولات الأدوات العشرون، والمحللات الداخلية، وقواعد اشتقاق النتيجة، والبصمات عبر التشغيلات، ومؤشر النقاء purity/1 — مع إثبات كشف كل عيب مزروع خارج المسبار.
 start:
   - DEV-5 مغلقة

@@ -13,7 +13,7 @@ owner_inputs: [Q-07]
 model: Claude Fable 5.1
 effort: xhigh
 model_reason: قبول شامل ومعايرة وتشخيص إخفاقات عبر النظام كله
-scope: [apps/, packages/, tools/, fixtures/, docs/acceptance/, package.json, pnpm-lock.yaml, package-lock.json]
+scope: [apps/, packages/, tools/, fixtures/, docs/acceptance/, package.json, package-lock.json]
 goal: تحقيق تعريف اكتمال الإصدار الأول (الخطة 25) — حزمة .app موقعة محليًا قابلة لإعادة البناء، ومعايرة الأداء والتوازي والتخزين، ونجاح اختبارات القبول الثمانية والأربعين كلها ومنها اختبارات جهاز المالك والقارئ البشري، وفحص عِيَار لمستودعه نفسه.
 start:
   - DEV-12 مغلقة (التطبيق كامل وظيفيًا)

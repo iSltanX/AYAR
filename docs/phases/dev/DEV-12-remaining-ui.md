@@ -13,7 +13,7 @@ owner_inputs: []
 model: Claude Opus 5.5
 effort: high
 model_reason: شاشات كثيرة على الأنماط التي ثبتت في DEV-11
-scope: [apps/desktop/renderer/, apps/desktop/main/, apps/desktop/preload/, packages/i18n/, packages/protocol/, pnpm-lock.yaml, package-lock.json]
+scope: [apps/desktop/src/renderer/, apps/desktop/src/main/, apps/desktop/src/preload/, apps/desktop/test/, apps/desktop/package.json, packages/i18n/, packages/protocol/, package-lock.json]
 goal: إكمال الواجهة من التصميم المعتمد — صفحات الأقسام السبعة وفحوصها الخاصة، والنزاهة، وفحوص النموذج، والمهام والمستشار، والتشغيلات والمقارنة، وإعداد المشروع، والأدوات، والإعدادات، وحالات الخطأ والنقص — حتى تعمل الرحلات العشر كلها.
 start:
   - DEV-11 مغلقة

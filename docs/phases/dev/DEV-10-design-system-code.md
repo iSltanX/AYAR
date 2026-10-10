@@ -13,7 +13,7 @@ owner_inputs: []
 model: Claude Opus 5.5
 effort: high
 model_reason: تنفيذ دقيق من Figma لمكونات كثيرة بنسختين وحالات
-scope: [apps/desktop/renderer/, packages/i18n/, pnpm-lock.yaml, package-lock.json]
+scope: [apps/desktop/src/renderer/, apps/desktop/test/, apps/desktop/package.json, packages/i18n/, package-lock.json]
 goal: تحويل نظام التصميم المعتمد في Figma إلى شيفرة واجهة — المتغيرات بوضعيها، والخطان المضمنان، وأنماط النص، ورموز الحالات الخمسة عشر، والمكونات التسعة والعشرون بالعربية والإنجليزية وحالاتها — في معرض مكونات يُطابَق بالتصميم قبل بناء أي شاشة.
 start:
   - DEV-3 مغلقة (نقطة التركيب والجسر والتعريب)

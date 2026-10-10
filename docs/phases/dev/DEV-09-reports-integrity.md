@@ -13,7 +13,7 @@ owner_inputs: [Q-06]
 model: Claude Fable 5.1
 effort: xhigh
 model_reason: التقارير والنزاهة والادعاءات: خطأ واحد يحوّل ادعاءً إلى اجتياز
-scope: [packages/engine/, packages/catalog/, packages/protocol/, packages/i18n/, apps/desktop/main/, tools/cli/, pnpm-lock.yaml, package-lock.json]
+scope: [packages/engine/, packages/catalog/, packages/protocol/, packages/i18n/, apps/desktop/src/main/, apps/desktop/test/, tools/cli/, package-lock.json]
 goal: إكمال الدورة في المحرك — تقرير report/1 بصيغتي «لك» و«للنموذج» مع تحقق التطابق، وتوجيه الإصلاح، وحارس النزاهة وإعادة الفحص واستكمال الجولة والمقارنة، وتحقق البطاقات، وفحوص النموذج بملفات تعليماتها وادعاءاتها، والتصدير دون أسرار.
 start:
   - DEV-6 وDEV-7 وDEV-8 مغلقة

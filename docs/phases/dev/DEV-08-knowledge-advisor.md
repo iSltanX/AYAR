@@ -13,7 +13,7 @@ owner_inputs: []
 model: Claude Opus 5.5
 effort: high
 model_reason: تحويل بيانات كبير بمواصفة واضحة، مع عشرة قرارات خوارزمية (G-37) تحتاج حكمًا
-scope: [packages/catalog/, packages/engine/, packages/protocol/, packages/i18n/, pnpm-lock.yaml, package-lock.json]
+scope: [packages/catalog/, packages/engine/, packages/protocol/, packages/i18n/, package-lock.json]
 goal: تحويل المعرفة العربية المنقولة في الخطة 28 إلى ملفات بيانات بمخطط وإصدار، وبناء المستشار المصحح الذي يوصي ولا يحكم، وقوالب بطاقات المهام، مع اختبارات التحقق المنقولة كاملة.
 start:
   - DEV-4 مغلقة (حزمة الكتالوج ومخططاتها)
