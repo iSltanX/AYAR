@@ -83,8 +83,8 @@ function validateExpected(id, variant, expectedPath, tree, role) {
     if (e.rule !== null && e.rule_pending === true) fail(`${w}: rule_pending مع قاعدة معرّفة`);
     if (['أخفق', 'تعذّر'].includes(e.result) && !e.origin) fail(`${w}: النتيجة ${e.result} تستلزم origin (المشروع أو الأداة)`);
     if (['أخفق', 'تحذير', 'متذبذب'].includes(e.result) && e.confidence === null && !e.reason) fail(`${w}: ${e.result} بلا درجة ثبوت ولا سبب مكتوب`);
-    if (['اجتاز', 'غير منطبق', 'غير مضمّن'].includes(e.result) && e.confidence !== null) fail(`${w}: ${e.result} لا تحمل درجة ثبوت`);
-    if (isClean && !['اجتاز', 'غير منطبق', 'غير مضمّن', 'ناقص إعداد'].includes(e.result)) fail(`${w}: النسخة السليمة لا يجوز أن تتوقع ${e.result}`);
+    if (['اجتاز', 'غير منطبق', 'غير مضمّن', 'ناقص', 'ناقص إعداد'].includes(e.result) && e.confidence !== null && !(e.result === 'اجتاز' && e.confidence === 'اقتراح تحسين')) fail(`${w}: ${e.result} لا تحمل درجة ثبوت (عدا ملاحظة «اقتراح تحسين» على اجتاز)`);
+    if (isClean && !['اجتاز', 'غير منطبق', 'غير مضمّن', 'ناقص إعداد', 'ناقص'].includes(e.result)) fail(`${w}: النسخة السليمة لا يجوز أن تتوقع ${e.result}`);
     if (e.location && tree) {
       const src = tree.get(e.location.path);
       if (!src) { fail(`${w}: الموضع ${e.location.path} غير موجود في النسخة المركّبة`); return; }

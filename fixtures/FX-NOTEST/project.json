@@ -1,0 +1,34 @@
+{
+  "id": "FX-NOTEST",
+  "title": "FX-NOTEST — مكتبة JS بلا اختبارات",
+  "description": "مكتبة JavaScript صغيرة (14 وحدة منطق) بلا أي اختبارات ولا مرجع تصميم، ومعها README وصفحة توثيق HTML بأنماطها. الخطة 20 وAT-37 وAT-44.",
+  "kind": "overlay",
+  "variants": {
+    "good": {
+      "description": "النسخة السليمة: لا اختبارات (ناقص بطبيعتها)، ومراجعها المحلية سليمة."
+    },
+    "broken-md-link": {
+      "description": "رابط محلي مكسور في README: يشير إلى docs/usage.md وهو غير موجود."
+    },
+    "missing-image": {
+      "description": "صورة مفقودة في HTML: src يشير إلى img/logo-large.png."
+    },
+    "broken-anchor": {
+      "description": "مرسى مكسور: الرابط يشير إلى docs/guide.md#setup والعنوان الموجود هو install."
+    },
+    "complex-function": {
+      "description": "دالة validatePayload بتعقيد 19 بقياس ESLint تتجاوز العتبة المعلنة 10 (AT-37)."
+    }
+  },
+  "facts": {
+    "logic_files": 14,
+    "test_files": 0,
+    "dependencies": 0,
+    "note": "العدد 14 مثال AT-44؛ المعتبر في الاختبار أن يُبنى سبب ai.logic-review من الجرد الفعلي (G-08، FR-66)"
+  },
+  "toolchain": {
+    "node": "24.16.0",
+    "eslint (للتعقيد)": "10.12.0 مع القاعدة complexity بعتبة 10",
+    "lychee (للمراجع المحلية)": "0.24.2 --offline --include-fragments"
+  }
+}

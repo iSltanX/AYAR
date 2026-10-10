@@ -1,0 +1,29 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-NOTEST",
+  "variant": "broken-md-link",
+  "expectations": [
+    {
+      "check": "code.refs.local",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "README.md",
+        "line": 5,
+        "anchor": "docs/usage.md"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "reason": "مرجع إلى ملف غير موجود"
+    },
+    {
+      "check": "beh.unit",
+      "result": "ناقص",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    }
+  ]
+}

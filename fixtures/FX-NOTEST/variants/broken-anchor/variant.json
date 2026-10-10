@@ -1,0 +1,7 @@
+{
+  "name": "broken-anchor",
+  "description": "مرسى مكسور: الرابط يشير إلى docs/guide.md#setup والعنوان الموجود هو install.",
+  "defects": [
+    "code.refs.local: المرسى #setup غير موجود في docs/guide.md"
+  ]
+}

@@ -1,0 +1,16 @@
+body {
+  margin: 0;
+  padding: 24px;
+  color: #222222;
+  background: #ffffff;
+  font-family: Tahoma, sans-serif;
+  line-height: 1.7;
+}
+h1 {
+  margin-block-end: 16px;
+  color: #0b3d91;
+}
+img.logo {
+  width: 64px;
+  height: 64px;
+}

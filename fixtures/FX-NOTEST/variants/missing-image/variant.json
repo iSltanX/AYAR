@@ -1,0 +1,7 @@
+{
+  "name": "missing-image",
+  "description": "صورة مفقودة في HTML: src يشير إلى img/logo-large.png.",
+  "defects": [
+    "code.refs.local: docs/img/logo-large.png غير موجود"
+  ]
+}
