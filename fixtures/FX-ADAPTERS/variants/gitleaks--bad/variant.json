@@ -1,0 +1,9 @@
+{
+  "name": "gitleaks--bad",
+  "description": "سر مصطنع بصيغة مفتاح API: يخرج الفاحص برمز 42 (--exit-code 42).",
+  "defects": [
+    "sec.secrets.files: generic-api-key"
+  ],
+  "component": "gitleaks",
+  "kind": "bad"
+}

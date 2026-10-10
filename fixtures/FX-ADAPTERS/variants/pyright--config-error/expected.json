@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "pyright--config-error",
+  "expectations": [
+    {
+      "check": "code.types",
+      "component": "pyright",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "pyright/pyrightconfig.json",
+        "line": 1,
+        "anchor": "\"include\""
+      },
+      "confidence": null,
+      "origin": "الأداة",
+      "exit_code": 3,
+      "reason": "pyright برمز 3 (الخطة: 2 و3 و4 تعذّر)"
+    }
+  ]
+}

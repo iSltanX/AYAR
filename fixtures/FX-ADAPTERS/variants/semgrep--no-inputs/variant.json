@@ -1,0 +1,13 @@
+{
+  "name": "semgrep--no-inputs",
+  "description": "لا ملفات مصدر في الهدف src.",
+  "role": "neutral",
+  "defects": [
+    "sec.sast: لا مدخلات"
+  ],
+  "delete": [
+    "semgrep/src/a.js"
+  ],
+  "component": "semgrep",
+  "kind": "no-inputs"
+}

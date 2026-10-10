@@ -1,0 +1,12 @@
+{
+  "name": "vitest--no-inputs",
+  "description": "لا ملفات اختبار: Vitest يخرج برمز 1 مع «No test files found» (AT-14: ناقص).",
+  "defects": [
+    "beh.unit: لا ملفات اختبار"
+  ],
+  "delete": [
+    "vitest/test/add.test.js"
+  ],
+  "component": "vitest",
+  "kind": "no-inputs"
+}

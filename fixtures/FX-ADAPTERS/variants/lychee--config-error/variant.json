@@ -1,0 +1,9 @@
+{
+  "name": "lychee--config-error",
+  "description": "lychee.toml غير صالح.",
+  "defects": [
+    "code.refs.external: إعداد غير صالح"
+  ],
+  "component": "lychee",
+  "kind": "config-error"
+}

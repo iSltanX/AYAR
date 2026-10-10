@@ -1,0 +1,12 @@
+{
+  "name": "ruff--no-inputs",
+  "description": "لا ملفات Python في الهدف src.",
+  "defects": [
+    "code.lint: لا مدخلات"
+  ],
+  "delete": [
+    "ruff/src/a.py"
+  ],
+  "component": "ruff",
+  "kind": "no-inputs"
+}

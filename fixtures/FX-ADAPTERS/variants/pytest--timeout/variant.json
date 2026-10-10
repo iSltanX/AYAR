@@ -1,0 +1,9 @@
+{
+  "name": "pytest--timeout",
+  "description": "اختبار لا ينتهي (حلقة نوم): تقتله مهلة عِيَار.",
+  "defects": [
+    "beh.unit: يتجاوز المهلة"
+  ],
+  "component": "pytest",
+  "kind": "timeout"
+}

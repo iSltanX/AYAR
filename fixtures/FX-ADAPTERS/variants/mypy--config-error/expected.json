@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "mypy--config-error",
+  "expectations": [
+    {
+      "check": "code.types",
+      "component": "mypy",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "mypy/mypy.ini",
+        "line": 1,
+        "anchor": "[mypy"
+      },
+      "confidence": null,
+      "origin": "الأداة",
+      "exit_code": 2,
+      "reason": "رمز 2 بلا تشخيصات بموضع ملف مصدر ← تعذّر"
+    }
+  ]
+}

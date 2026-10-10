@@ -1,0 +1,9 @@
+{
+  "name": "ruff--bad",
+  "description": "import غير مستخدم (F401) فيخرج Ruff برمز 1.",
+  "defects": [
+    "code.lint: F401"
+  ],
+  "component": "ruff",
+  "kind": "bad"
+}

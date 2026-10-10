@@ -1,0 +1,9 @@
+{
+  "name": "playwright--config-error",
+  "description": "ملف إعداد Playwright فيه خطأ صياغة فتفشل الأداة قبل التشغيل.",
+  "defects": [
+    "beh.e2e: فشل تحميل الإعداد"
+  ],
+  "component": "playwright",
+  "kind": "config-error"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "lychee--timeout",
+  "description": "رابط لا يستجيب أبدًا: مهلة lychee (AT-14: ليس رابطًا مكسورًا).",
+  "defects": [
+    "code.refs.external: مهلة رابط"
+  ],
+  "component": "lychee",
+  "kind": "timeout"
+}

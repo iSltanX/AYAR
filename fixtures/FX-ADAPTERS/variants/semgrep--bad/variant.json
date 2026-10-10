@@ -1,0 +1,9 @@
+{
+  "name": "semgrep--bad",
+  "description": "استدعاء eval بقيمة غير ثابتة: يخرج Semgrep برمز 0 مع نتائج (AT-14: حسب السياسة، وليس اجتيازًا).",
+  "defects": [
+    "sec.sast: ayar-test.no-eval"
+  ],
+  "component": "semgrep",
+  "kind": "bad"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "vitest--conflict",
+  "description": "مراسل مخصص يفرض رمز الخروج 0 رغم اختبار فاشل: تعارض بين الرمز والتقرير (AT-14).",
+  "defects": [
+    "beh.unit: خروج 0 مع إخفاقات في التقرير"
+  ],
+  "component": "vitest",
+  "kind": "conflict"
+}

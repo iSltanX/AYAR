@@ -67,6 +67,7 @@ const axeSource = fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8'
 // منفذ حرّ يختاره الفاحص ثم يُمرَّر إلى server.mjs
 const port = await new Promise((resolve) => { const s = http.createServer().listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => resolve(p)); }); });
 const srv = spawn(process.execPath, ['server.mjs', String(port)], { cwd: root, stdio: ['ignore', 'pipe', 'inherit'] });
+process.on('exit', () => srv.kill());
 await new Promise((resolve) => srv.stdout.once('data', resolve));
 const base = `http://127.0.0.1:${port}`;
 

@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "pytest--collection-error",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "component": "pytest",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "pytest/tests/test_add.py",
+        "line": 4,
+        "anchor": "def test_add"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "exit_code": 2,
+      "reason": "رمز 2 وفي التقرير خطأ جمع اختبارات (صياغة في ملف اختبار)"
+    }
+  ]
+}

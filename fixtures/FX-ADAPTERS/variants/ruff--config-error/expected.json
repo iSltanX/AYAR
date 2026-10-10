@@ -1,0 +1,22 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "ruff--config-error",
+  "expectations": [
+    {
+      "check": "code.lint",
+      "component": "ruff",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "ruff/ruff.toml",
+        "line": 1,
+        "anchor": "line-length"
+      },
+      "confidence": null,
+      "origin": "الأداة",
+      "exit_code": 2
+    }
+  ]
+}

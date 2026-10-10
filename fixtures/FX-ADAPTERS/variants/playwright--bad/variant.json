@@ -1,0 +1,9 @@
+{
+  "name": "playwright--bad",
+  "description": "اختبار فاشل: expect(2 + 3).toBe(6).",
+  "defects": [
+    "beh.e2e: اختبار فاشل"
+  ],
+  "component": "playwright",
+  "kind": "bad"
+}

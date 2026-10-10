@@ -1,0 +1,169 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "good",
+  "summary": "كل مكوّن اجتاز.",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "component": "vitest",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "beh.unit",
+      "component": "jest",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "beh.unit",
+      "component": "node-test",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "beh.e2e",
+      "component": "playwright",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "code.lint",
+      "component": "eslint",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "code.lint",
+      "component": "biome",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "code.types",
+      "component": "tsc",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "code.unused",
+      "component": "knip",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "code.types",
+      "component": "pyright",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "beh.unit",
+      "component": "pytest",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "code.lint",
+      "component": "ruff",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "code.types",
+      "component": "mypy",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "sec.sast",
+      "component": "semgrep",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "sec.secrets.files",
+      "component": "gitleaks",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "code.refs.external",
+      "component": "lychee",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null
+    },
+    {
+      "check": "sec.deps",
+      "component": "osv",
+      "result": "اجتاز",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "requires": [
+        "osv-mini-db"
+      ]
+    }
+  ],
+  "pending": [
+    {
+      "waits_for": "E-09",
+      "check": "sec.deps",
+      "reason": "good لـ OSV يحتاج قاعدة OSV المصغرة (DEV-2)"
+    }
+  ],
+  "engine_expectations": [
+    {
+      "id": "AT-14-matrix",
+      "statement": "تقرير مطابقة المحولات: لكل متغير في variants/<أداة>--<نوع> يطابق التصنيف الناتج expected.json، ويفشل الاختبار بأي اختلاف",
+      "acceptance": "AT-14"
+    }
+  ]
+}

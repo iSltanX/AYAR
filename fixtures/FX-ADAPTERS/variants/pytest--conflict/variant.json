@@ -1,0 +1,9 @@
+{
+  "name": "pytest--conflict",
+  "description": "خطاف في conftest.py يفرض رمز الخروج 0 رغم اختبار فاشل: تعارض بين الرمز وتقرير JUnit (AT-14).",
+  "defects": [
+    "beh.unit: خروج 0 مع إخفاقات في التقرير"
+  ],
+  "component": "pytest",
+  "kind": "conflict"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "pytest--collection-error",
+  "description": "خطأ صياغة في ملف اختبار فيخرج pytest برمز 2 مع خطأ جمع (AT-14: أخفق، والمنشأ المشروع).",
+  "defects": [
+    "beh.unit: خطأ جمع في ملف اختبار"
+  ],
+  "component": "pytest",
+  "kind": "collection-error"
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "eslint--no-inputs",
+  "expectations": [
+    {
+      "check": "code.lint",
+      "component": "eslint",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "origin": "الأداة",
+      "exit_code": 2,
+      "reason": "No files matching the pattern \"src\" (رمز 2 ← تعذّر)"
+    }
+  ]
+}

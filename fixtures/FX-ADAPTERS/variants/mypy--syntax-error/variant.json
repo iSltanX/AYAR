@@ -1,0 +1,9 @@
+{
+  "name": "mypy--syntax-error",
+  "description": "خطأ صياغة في ملف مصدر فيخرج mypy برمز 2 مع تشخيص بموضع ملف [syntax] (AT-14: أخفق، والمنشأ المشروع).",
+  "defects": [
+    "code.types: syntax"
+  ],
+  "component": "mypy",
+  "kind": "syntax-error"
+}

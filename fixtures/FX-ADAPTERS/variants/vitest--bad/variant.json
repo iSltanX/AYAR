@@ -1,0 +1,9 @@
+{
+  "name": "vitest--bad",
+  "description": "اختبار فاشل: يتوقع add(2, 3) = 6.",
+  "defects": [
+    "beh.unit: اختبار فاشل"
+  ],
+  "component": "vitest",
+  "kind": "bad"
+}

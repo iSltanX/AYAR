@@ -1,0 +1,4 @@
+title = "ayar-adapter-gitleaks"
+
+[extend
+useDefault = true

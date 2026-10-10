@@ -1,0 +1,9 @@
+{
+  "name": "mypy--config-error",
+  "description": "mypy.ini فيه قيمة منطقية غير صالحة: رمز 2 بلا تشخيصات بموضع ملف (تعذّر).",
+  "defects": [
+    "code.types: إعداد غير صالح"
+  ],
+  "component": "mypy",
+  "kind": "config-error"
+}

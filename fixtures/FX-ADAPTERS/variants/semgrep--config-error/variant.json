@@ -1,0 +1,9 @@
+{
+  "name": "semgrep--config-error",
+  "description": "ملف قواعد بلا نمط (pattern) فتفشل الأداة.",
+  "defects": [
+    "sec.sast: قاعدة غير صالحة"
+  ],
+  "component": "semgrep",
+  "kind": "config-error"
+}

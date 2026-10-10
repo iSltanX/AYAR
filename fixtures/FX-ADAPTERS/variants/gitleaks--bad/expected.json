@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "gitleaks--bad",
+  "expectations": [
+    {
+      "check": "sec.secrets.files",
+      "component": "gitleaks",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "tool_rule": "generic-api-key",
+      "location": {
+        "path": "gitleaks/src/a.js",
+        "line": 2,
+        "anchor": "API_KEY"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "exit_code": 42
+    }
+  ]
+}

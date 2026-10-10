@@ -1,0 +1,9 @@
+{
+  "name": "tsc--config-error",
+  "description": "tsconfig يمدّد ملفًا غير موجود: TS5083 (تعذّر قراءة ملف الإعداد).",
+  "defects": [
+    "code.types: TS5083"
+  ],
+  "component": "tsc",
+  "kind": "config-error"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "mypy--bad",
+  "description": "خطأ نوع: تمرير نص حيث يُنتظر int (رمز 1).",
+  "defects": [
+    "code.types: arg-type"
+  ],
+  "component": "mypy",
+  "kind": "bad"
+}

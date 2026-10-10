@@ -1,0 +1,9 @@
+{
+  "name": "biome--config-error",
+  "description": "biome.json فيه مفتاح غير معروف فتفشل الأداة.",
+  "defects": [
+    "code.lint: إعداد غير صالح"
+  ],
+  "component": "biome",
+  "kind": "config-error"
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "jest--timeout",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "component": "jest",
+      "result": "انتهت المهلة",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "jest/test/add.test.js",
+        "line": 1,
+        "anchor": "ينتظر إلى الأبد"
+      },
+      "confidence": "مخالفة مثبتة",
+      "reason": "العملية لا تنتهي ضمن مهلة الفحص"
+    }
+  ]
+}

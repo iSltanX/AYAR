@@ -1,0 +1,4 @@
+timeout = 3
+max_retries = 0
+max_concurrency = 4
+no_progress = true

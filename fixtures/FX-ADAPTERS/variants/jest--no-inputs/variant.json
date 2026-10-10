@@ -1,0 +1,12 @@
+{
+  "name": "jest--no-inputs",
+  "description": "لا ملفات اختبار: Jest يخرج برمز 1 مع «No tests found».",
+  "defects": [
+    "beh.unit: لا ملفات اختبار"
+  ],
+  "delete": [
+    "jest/test/add.test.js"
+  ],
+  "component": "jest",
+  "kind": "no-inputs"
+}

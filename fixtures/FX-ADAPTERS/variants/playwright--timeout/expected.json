@@ -1,0 +1,21 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "playwright--timeout",
+  "expectations": [
+    {
+      "check": "beh.e2e",
+      "component": "playwright",
+      "result": "انتهت المهلة",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "playwright/tests/basic.spec.js",
+        "line": 3,
+        "anchor": "ينتظر إلى الأبد"
+      },
+      "confidence": "مخالفة مثبتة",
+      "reason": "العملية لا تنتهي ضمن مهلة الفحص"
+    }
+  ]
+}

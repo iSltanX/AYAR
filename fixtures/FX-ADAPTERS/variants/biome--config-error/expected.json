@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "biome--config-error",
+  "expectations": [
+    {
+      "check": "code.lint",
+      "component": "biome",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "biome/biome.json",
+        "line": 4,
+        "anchor": "rulez"
+      },
+      "confidence": null,
+      "origin": "الأداة",
+      "exit_code": 1,
+      "reason": "مفتاح إعداد غير معروف"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "osv--config-error",
+  "expectations": [
+    {
+      "check": "sec.deps",
+      "component": "osv",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "osv/package-lock.json",
+        "line": 1,
+        "anchor": "lockfileVersion"
+      },
+      "confidence": null,
+      "origin": "الأداة",
+      "exit_code": 128,
+      "reason": "الرمز 128 هنا لا يعني «لا ملفات قفل»: الخرج فيه «Error during extraction» لملف القفل نفسه، فيُميَّز بالخرج لا بالرمز وحده"
+    }
+  ]
+}

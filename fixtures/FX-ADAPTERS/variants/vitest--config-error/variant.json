@@ -1,0 +1,9 @@
+{
+  "name": "vitest--config-error",
+  "description": "إعداد Vitest يطلب بيئة غير موجودة فتفشل الأداة قبل تشغيل أي اختبار.",
+  "defects": [
+    "beh.unit: فشل إعداد الأداة"
+  ],
+  "component": "vitest",
+  "kind": "config-error"
+}

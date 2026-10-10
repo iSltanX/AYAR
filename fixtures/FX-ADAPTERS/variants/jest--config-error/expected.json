@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "jest--config-error",
+  "expectations": [
+    {
+      "check": "beh.unit",
+      "component": "jest",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "jest/jest.config.js",
+        "line": 3,
+        "anchor": "no-such-environment"
+      },
+      "confidence": null,
+      "origin": "الأداة",
+      "exit_code": 1,
+      "reason": "بيئة الاختبار المعلنة غير موجودة"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "tsc--no-inputs",
+  "description": "لا ملفات في include: TS18003 (AT-14: تعذّر).",
+  "defects": [
+    "code.types: TS18003"
+  ],
+  "delete": [
+    "tsc/src/index.ts"
+  ],
+  "component": "tsc",
+  "kind": "no-inputs"
+}

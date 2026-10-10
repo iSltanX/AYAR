@@ -1,0 +1,13 @@
+{
+  "name": "ayar-fx-adapter-pyright",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.8.1",
+  "scripts": {
+    "check": "pyright"
+  },
+  "devDependencies": {
+    "pyright": "1.1.414"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "playwright--bad",
+  "expectations": [
+    {
+      "check": "beh.e2e",
+      "component": "playwright",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "playwright/tests/basic.spec.js",
+        "line": 4,
+        "anchor": "يجمع عددين"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "exit_code": 1
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "lychee--needs-review",
+  "description": "رابط يعيد 403: يحتاج مراجعة (401 و403 و429 ليست كسرًا).",
+  "defects": [
+    "code.refs.external: 403"
+  ],
+  "component": "lychee",
+  "kind": "needs-review"
+}

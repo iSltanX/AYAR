@@ -1,0 +1,22 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "osv--no-lockfiles",
+  "expectations": [
+    {
+      "check": "sec.deps",
+      "component": "osv",
+      "result": "ناقص",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "osv/package.json",
+        "line": 6,
+        "anchor": "left-pad"
+      },
+      "confidence": null,
+      "exit_code": 128,
+      "reason": "ناقص: لا ملفات قفل"
+    }
+  ]
+}

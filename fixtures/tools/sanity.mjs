@@ -14,7 +14,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { FIXTURES_ROOT, materialize, readJson } from './materialize.mjs';
 
@@ -27,14 +27,25 @@ export function toolPath() {
   return [...extra, process.env.PATH].join(path.delimiter);
 }
 
+/** ينفّذ أمرًا في صدفة في مجموعة عمليات مستقلة، ويقتل المجموعة كلها عند انتهاء المهلة (لا عمليات يتيمة). */
 function sh(cmd, cwd, { env = {}, timeout = 180 } = {}) {
-  const t0 = Date.now();
-  const r = spawnSync('/bin/sh', ['-c', cmd], {
-    cwd, encoding: 'utf8', timeout: timeout * 1000, maxBuffer: 64 * 1024 * 1024, killSignal: 'SIGKILL',
-    env: { ...process.env, PATH: toolPath(), CI: '1', NO_COLOR: '1', FORCE_COLOR: '0', AYAR_FX_HOME: TC_HOME, FX_TOOLS: path.join(FIXTURES_ROOT, 'tools'), ...env },
+  return new Promise((resolve) => {
+    const t0 = Date.now();
+    const child = spawn('/bin/sh', ['-c', cmd], {
+      cwd, detached: true, stdio: ['ignore', 'pipe', 'pipe'],
+      env: { ...process.env, PATH: toolPath(), CI: '1', NO_COLOR: '1', FORCE_COLOR: '0', AYAR_FX_HOME: TC_HOME, FX_TOOLS: path.join(FIXTURES_ROOT, 'tools'), ...env },
+    });
+    let out = '';
+    let timedOut = false;
+    child.stdout.on('data', (d) => { out += d; });
+    child.stderr.on('data', (d) => { out += d; });
+    const timer = setTimeout(() => { timedOut = true; try { process.kill(-child.pid, 'SIGKILL'); } catch { /* انتهت */ } }, timeout * 1000);
+    child.on('close', (code, signal) => {
+      clearTimeout(timer);
+      try { process.kill(-child.pid, 'SIGKILL'); } catch { /* لا بقايا */ }
+      resolve({ code: code ?? (signal ? `signal:${signal}` : null), out: out.replace(/\u001b\[[0-9;]*m/g, ''), ms: Date.now() - t0, timedOut });
+    });
   });
-  const out = `${r.stdout ?? ''}${r.stderr ?? ''}`.replace(/\u001b\[[0-9;]*m/g, '');
-  return { code: r.status ?? (r.signal ? `signal:${r.signal}` : null), out, ms: Date.now() - t0, timedOut: r.error?.code === 'ETIMEDOUT' };
 }
 
 function excerpt(out, max = 1800) {
@@ -52,44 +63,58 @@ async function runProject(id, only) {
   saved.date = new Date().toISOString().slice(0, 10);
   const versions = {};
   for (const [name, cmd] of Object.entries(spec.versions ?? {})) {
-    const r = sh(cmd, os.tmpdir());
+    const r = await sh(cmd, os.tmpdir());
     versions[name] = r.out.split('\n').find((l) => l.trim())?.trim() ?? '?';
   }
   saved.versions = { ...(saved.versions ?? {}), ...versions };
   let bad = 0;
-  for (const [variant, runs] of Object.entries(spec.variants)) {
+  for (const [variant, vspec] of Object.entries(spec.variants)) {
     if (only.length && !only.includes(variant)) continue;
+    const runs = Array.isArray(vspec) ? vspec : vspec.runs;
+    const vcwd = Array.isArray(vspec) ? '' : (vspec.cwd ?? '');
+    const vsetup = Array.isArray(vspec) ? spec.setup : (vspec.setup ?? spec.setup);
+    const vprepare = Array.isArray(vspec) ? spec.prepare : (vspec.prepare ?? spec.prepare);
+    const bg = Array.isArray(vspec) ? null : vspec.bg;
+    let bgProc = null;
     const base = fs.mkdtempSync(path.join(os.tmpdir(), `ayar-fx-sanity-${id}-`));
     const rec = [];
     let dir;
     try {
-      dir = materialize(id, variant, path.join(base, 'p'));
+      dir = materialize(id, Array.isArray(vspec) ? variant : (vspec.variant ?? variant), path.join(base, 'p'));
+      const root = dir;
+      dir = path.join(root, vcwd);
       const needSetup = runs.some((r) => !r.pending);
-      if (needSetup && spec.setup) {
-        const s = sh(spec.setup, dir, { timeout: 600 });
-        if (s.code !== 0) { rec.push({ id: 'setup', cmd: spec.setup, ok: false, code: s.code, proves: 'تجهيز التبعيات', excerpt: excerpt(s.out) }); bad++; }
+      if (needSetup && vsetup) {
+        const s = await sh(vsetup, dir, { timeout: 600 });
+        if (s.code !== 0) { rec.push({ id: 'setup', cmd: vsetup, ok: false, code: s.code, proves: 'تجهيز التبعيات', excerpt: excerpt(s.out) }); bad++; }
       }
-      if (!rec.length && spec.prepare && runs.some((r) => !r.pending)) {
-        const p = sh(spec.prepare, dir, { timeout: 120 });
-        if (p.code !== 0) { rec.push({ id: 'prepare', cmd: spec.prepare, ok: false, code: p.code, proves: 'تهيئة النسخة المؤقتة', excerpt: excerpt(p.out) }); bad++; }
+      if (!rec.length && vprepare && runs.some((r) => !r.pending)) {
+        const p = await sh(vprepare, dir, { timeout: 120 });
+        if (p.code !== 0) { rec.push({ id: 'prepare', cmd: vprepare, ok: false, code: p.code, proves: 'تهيئة النسخة المؤقتة', excerpt: excerpt(p.out) }); bad++; }
+      }
+      if (!rec.length && bg) {
+        bgProc = spawn('/bin/sh', ['-c', bg], { cwd: dir, detached: true, stdio: 'ignore', env: { ...process.env, PATH: toolPath() } });
+        await new Promise((r) => setTimeout(r, 800));
       }
       if (!rec.length) {
         for (const r of runs) {
           if (r.pending) { rec.push({ id: r.id, ok: true, pending: true, proves: r.proves, reason: r.reason }); continue; }
-          const res = sh(r.cmd, dir, { env: r.env, timeout: r.timeout_s ?? 180 });
+          const res = await sh(r.cmd, dir, { env: r.env, timeout: r.timeout_s ?? 180 });
           const wantExit = Array.isArray(r.exit) ? r.exit : [r.exit ?? 0];
           const problems = [];
-          if (!wantExit.includes(res.code)) problems.push(`رمز الخروج ${res.code} بدل ${wantExit.join('|')}`);
+          if (wantExit.includes('timeout')) { if (!res.timedOut) problems.push('لم تنتهِ المهلة: العملية انتهت من نفسها'); }
+          else if (!wantExit.includes(res.code)) problems.push(`رمز الخروج ${res.code} بدل ${wantExit.join('|')}`);
           for (const m of r.match ?? []) if (!new RegExp(m, 'mu').test(res.out)) problems.push(`لم يظهر في الخرج: ${m}`);
           for (const m of r.nomatch ?? []) if (new RegExp(m, 'mu').test(res.out)) problems.push(`ظهر في الخرج ما لا يجوز: ${m}`);
           if (r.after) { const a = r.after(dir, res); if (a) problems.push(a); }
           const ok = problems.length === 0;
           if (!ok) bad++;
-          rec.push({ id: r.id, cmd: r.cmd, ok, code: res.code, ms: res.ms, proves: r.proves, problems, excerpt: excerpt(res.out, r.excerpt ?? 1200) });
+          rec.push({ id: r.id, cmd: r.cmd, ok, code: res.timedOut ? 'مهلة' : res.code, ms: res.ms, proves: r.proves, problems, excerpt: excerpt(res.out, r.excerpt ?? 1200) });
           console.log(`${ok ? '✓' : '✗'} ${id}/${variant}/${r.id} (exit ${res.code})${ok ? '' : ` — ${problems.join('; ')}`}`);
         }
       }
     } finally {
+      if (bgProc) { try { process.kill(-bgProc.pid, 'SIGKILL'); } catch { /* انتهت */ } }
       fs.rmSync(base, { recursive: true, force: true });
     }
     saved.variants[variant] = rec;

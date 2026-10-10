@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "eslint--config-error",
+  "expectations": [
+    {
+      "check": "code.lint",
+      "component": "eslint",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "eslint/eslint.config.js",
+        "line": 3,
+        "anchor": "no-such-rule-xyz"
+      },
+      "confidence": null,
+      "origin": "الأداة",
+      "exit_code": 2,
+      "reason": "ESLint برمز 2 (AT-14)"
+    }
+  ]
+}

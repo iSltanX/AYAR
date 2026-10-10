@@ -1,0 +1,9 @@
+{
+  "name": "ruff--config-error",
+  "description": "ruff.toml فيه قيمة غير صالحة (line-length نص): Ruff برمز 2 (AT-14: تعذّر، والمنشأ الأداة).",
+  "defects": [
+    "code.lint: إعداد غير صالح"
+  ],
+  "component": "ruff",
+  "kind": "config-error"
+}

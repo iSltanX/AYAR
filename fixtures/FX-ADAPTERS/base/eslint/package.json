@@ -1,0 +1,14 @@
+{
+  "name": "ayar-fx-adapter-eslint",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.8.1",
+  "scripts": {
+    "lint": "eslint src"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.12.0"
+  }
+}

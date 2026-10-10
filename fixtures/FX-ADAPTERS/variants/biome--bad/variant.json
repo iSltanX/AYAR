@@ -1,0 +1,9 @@
+{
+  "name": "biome--bad",
+  "description": "عبارة debugger (noDebugger) فيخرج Biome برمز 1.",
+  "defects": [
+    "code.lint: lint/suspicious/noDebugger"
+  ],
+  "component": "biome",
+  "kind": "bad"
+}

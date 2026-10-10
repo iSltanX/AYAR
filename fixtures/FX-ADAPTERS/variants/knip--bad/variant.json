@@ -1,0 +1,9 @@
+{
+  "name": "knip--bad",
+  "description": "ملف غير مستخدم src/orphan.js وتصدير غير مستخدم: Knip يخرج برمز 1.",
+  "defects": [
+    "code.unused: ملف وتصدير غير مستخدمان"
+  ],
+  "component": "knip",
+  "kind": "bad"
+}

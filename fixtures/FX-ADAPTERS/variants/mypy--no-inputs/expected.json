@@ -1,0 +1,19 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "mypy--no-inputs",
+  "expectations": [
+    {
+      "check": "code.types",
+      "component": "mypy",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "origin": "الأداة",
+      "exit_code": 2,
+      "reason": "There are no .py[i] files in directory (يُثبت في SANITY.md)"
+    }
+  ]
+}

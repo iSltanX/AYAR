@@ -1,0 +1,9 @@
+{
+  "name": "knip--config-error",
+  "description": "knip.json غير صالح (entry رقم بدل نص).",
+  "defects": [
+    "code.unused: إعداد غير صالح"
+  ],
+  "component": "knip",
+  "kind": "config-error"
+}

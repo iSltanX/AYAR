@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "knip--bad",
+  "expectations": [
+    {
+      "check": "code.unused",
+      "component": "knip",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "knip/src/orphan.js",
+        "line": 1,
+        "anchor": "neverUsed"
+      },
+      "confidence": "اشتباه",
+      "origin": "المشروع",
+      "exit_code": 1,
+      "reason": "ملف غير مستخدم: اشتباه بحسب الخطة (غير المستخدم «اشتباه»)"
+    }
+  ]
+}

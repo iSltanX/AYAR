@@ -1,0 +1,18 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "ruff--no-inputs",
+  "expectations": [
+    {
+      "check": "code.lint",
+      "component": "ruff",
+      "result": "ناقص",
+      "rule": null,
+      "rule_pending": true,
+      "location": null,
+      "confidence": null,
+      "exit_code": 0,
+      "reason": "رمز 0 و«All checks passed» لكن «No Python files found»: المدخلات المنفذة صفر فهو ناقص لا اجتياز"
+    }
+  ]
+}

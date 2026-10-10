@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "lychee--config-error",
+  "expectations": [
+    {
+      "check": "code.refs.external",
+      "component": "lychee",
+      "result": "تعذّر",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "lychee/lychee.toml",
+        "line": 1,
+        "anchor": "timeout"
+      },
+      "confidence": null,
+      "origin": "الأداة",
+      "exit_code": 3,
+      "reason": "lychee برمز 3 (خطأ إعداد) ← تعذّر"
+    }
+  ]
+}

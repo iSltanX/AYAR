@@ -1,0 +1,9 @@
+{
+  "name": "tsc--bad",
+  "description": "متغير محلي غير مستخدم: TS6133 (AT-14: أخفق، والمنشأ المشروع).",
+  "defects": [
+    "code.types: TS6133"
+  ],
+  "component": "tsc",
+  "kind": "bad"
+}

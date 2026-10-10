@@ -1,0 +1,22 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "lychee--timeout",
+  "expectations": [
+    {
+      "check": "code.refs.external",
+      "component": "lychee",
+      "result": "يحتاج مراجعة",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "lychee/README.md",
+        "line": 3,
+        "anchor": "/hang"
+      },
+      "confidence": "اشتباه",
+      "exit_code": 2,
+      "reason": "المهلة ليست رابطًا مكسورًا: لا تُحتسب 404 (الخطة 10.3)"
+    }
+  ]
+}

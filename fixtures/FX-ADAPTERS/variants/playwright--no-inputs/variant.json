@@ -1,0 +1,12 @@
+{
+  "name": "playwright--no-inputs",
+  "description": "لا اختبارات: Playwright يخرج برمز 1 مع «No tests found».",
+  "defects": [
+    "beh.e2e: لا اختبارات"
+  ],
+  "delete": [
+    "playwright/tests/basic.spec.js"
+  ],
+  "component": "playwright",
+  "kind": "no-inputs"
+}

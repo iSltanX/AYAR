@@ -1,0 +1,22 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "lychee--needs-review",
+  "expectations": [
+    {
+      "check": "code.refs.external",
+      "component": "lychee",
+      "result": "يحتاج مراجعة",
+      "rule": null,
+      "rule_pending": true,
+      "location": {
+        "path": "lychee/README.md",
+        "line": 3,
+        "anchor": "/forbidden"
+      },
+      "confidence": "اشتباه",
+      "exit_code": 2,
+      "reason": "403 منع وصول لا كسر"
+    }
+  ]
+}

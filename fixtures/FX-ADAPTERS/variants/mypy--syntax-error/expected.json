@@ -1,0 +1,24 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "mypy--syntax-error",
+  "expectations": [
+    {
+      "check": "code.types",
+      "component": "mypy",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "tool_rule": "syntax",
+      "location": {
+        "path": "mypy/src/a.py",
+        "line": 1,
+        "anchor": "def double"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "exit_code": 2,
+      "reason": "رمز 2 مع تشخيصات بموضع ملف فتُعد أخطاء مشروع لا فشل أداة"
+    }
+  ]
+}

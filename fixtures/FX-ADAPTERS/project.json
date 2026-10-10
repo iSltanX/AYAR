@@ -1,0 +1,231 @@
+{
+  "id": "FX-ADAPTERS",
+  "title": "FX-ADAPTERS — مشاريع المحولات",
+  "description": "مشروع صغير لكل محول (الخطة 19، G-06): vitest وjest وnode:test وplaywright وeslint وbiome وtsc وknip وpyright وpytest وruff وmypy وsemgrep وosv-scanner وgitleaks وlychee، بمتغيرات: سليم، ومعيب، وخطأ إعداد، وبلا مدخلات، ومهلة، وتعارض (حيث تتيحه الأداة). يغطي صفوف جدول AT-14. كل مجلد فرعي في base/ مكوّن مستقل بقفله.",
+  "kind": "overlay",
+  "variants": {
+    "good": {
+      "description": "النسخة السليمة لكل المحولات: كل مكوّن يمر بأداته (osv ينتظر E-09)."
+    },
+    "vitest--bad": {
+      "description": "اختبار فاشل: يتوقع add(2, 3) = 6."
+    },
+    "vitest--config-error": {
+      "description": "إعداد Vitest يطلب بيئة غير موجودة فتفشل الأداة قبل تشغيل أي اختبار."
+    },
+    "vitest--no-inputs": {
+      "description": "لا ملفات اختبار: Vitest يخرج برمز 1 مع «No test files found» (AT-14: ناقص)."
+    },
+    "vitest--timeout": {
+      "description": "اختبار لا ينتهي (وعد معلّق) وtestTimeout ضخم: تقتله مهلة عِيَار."
+    },
+    "vitest--conflict": {
+      "description": "مراسل مخصص يفرض رمز الخروج 0 رغم اختبار فاشل: تعارض بين الرمز والتقرير (AT-14)."
+    },
+    "jest--bad": {
+      "description": "اختبار فاشل: يتوقع add(2, 3) = 6."
+    },
+    "jest--config-error": {
+      "description": "إعداد Jest يطلب testEnvironment غير موجودة فتفشل الأداة."
+    },
+    "jest--no-inputs": {
+      "description": "لا ملفات اختبار: Jest يخرج برمز 1 مع «No tests found»."
+    },
+    "jest--timeout": {
+      "description": "اختبار لا ينتهي وtestTimeout ضخم: تقتله مهلة عِيَار."
+    },
+    "node-test--bad": {
+      "description": "اختبار فاشل: assert.equal(add(2, 3), 6)."
+    },
+    "node-test--no-inputs": {
+      "description": "لا ملفات اختبار: node --test يخرج برمز 0 مع «tests 0» (عدد الاختبارات المنفذة صفر ← ناقص)."
+    },
+    "node-test--timeout": {
+      "description": "اختبار لا ينتهي: تقتله مهلة عِيَار."
+    },
+    "playwright--bad": {
+      "description": "اختبار فاشل: expect(2 + 3).toBe(6)."
+    },
+    "playwright--config-error": {
+      "description": "ملف إعداد Playwright فيه خطأ صياغة فتفشل الأداة قبل التشغيل."
+    },
+    "playwright--no-inputs": {
+      "description": "لا اختبارات: Playwright يخرج برمز 1 مع «No tests found»."
+    },
+    "playwright--timeout": {
+      "description": "اختبار لا ينتهي بمهلة اختبار معطلة (test.setTimeout(0)): تقتله مهلة عِيَار."
+    },
+    "eslint--bad": {
+      "description": "متغير غير مستخدم (no-unused-vars) فيخرج ESLint برمز 1."
+    },
+    "eslint--config-error": {
+      "description": "قاعدة غير موجودة في ملف الإعداد: يخرج ESLint برمز 2 (AT-14: تعذّر، والمنشأ الأداة)."
+    },
+    "eslint--no-inputs": {
+      "description": "لا ملفات في الهدف src: ESLint يخرج برمز 2 مع «No files matching the pattern»."
+    },
+    "eslint--timeout": {
+      "description": "قاعدة مخصصة بحلقة لا تنتهي: تقتل مهلة عِيَار العملية."
+    },
+    "biome--bad": {
+      "description": "عبارة debugger (noDebugger) فيخرج Biome برمز 1."
+    },
+    "biome--config-error": {
+      "description": "biome.json فيه مفتاح غير معروف فتفشل الأداة."
+    },
+    "biome--no-inputs": {
+      "description": "لا ملفات في الهدف src."
+    },
+    "tsc--bad": {
+      "description": "متغير محلي غير مستخدم: TS6133 (AT-14: أخفق، والمنشأ المشروع)."
+    },
+    "tsc--config-error": {
+      "description": "tsconfig يمدّد ملفًا غير موجود: TS5083 (تعذّر قراءة ملف الإعداد)."
+    },
+    "tsc--no-inputs": {
+      "description": "لا ملفات في include: TS18003 (AT-14: تعذّر)."
+    },
+    "knip--bad": {
+      "description": "ملف غير مستخدم src/orphan.js وتصدير غير مستخدم: Knip يخرج برمز 1."
+    },
+    "knip--config-error": {
+      "description": "knip.json غير صالح (entry رقم بدل نص)."
+    },
+    "pyright--bad": {
+      "description": "خطأ نوع: تمرير نص حيث يُنتظر int."
+    },
+    "pyright--config-error": {
+      "description": "pyrightconfig.json غير صالح JSON."
+    },
+    "pyright--no-inputs": {
+      "description": "لا ملفات مصدر في include."
+    },
+    "pytest--bad": {
+      "description": "اختبار فاشل: assert add(2, 3) == 6 (رمز 1)."
+    },
+    "pytest--collection-error": {
+      "description": "خطأ صياغة في ملف اختبار فيخرج pytest برمز 2 مع خطأ جمع (AT-14: أخفق، والمنشأ المشروع)."
+    },
+    "pytest--usage-error": {
+      "description": "خيار addopts غير موجود في إعداد المشروع فيخرج pytest برمز 4 (AT-14: تعذّر)."
+    },
+    "pytest--no-tests": {
+      "description": "لا اختبارات: pytest برمز 5 (AT-14: ناقص)."
+    },
+    "pytest--timeout": {
+      "description": "اختبار لا ينتهي (حلقة نوم): تقتله مهلة عِيَار."
+    },
+    "pytest--conflict": {
+      "description": "خطاف في conftest.py يفرض رمز الخروج 0 رغم اختبار فاشل: تعارض بين الرمز وتقرير JUnit (AT-14)."
+    },
+    "ruff--bad": {
+      "description": "import غير مستخدم (F401) فيخرج Ruff برمز 1."
+    },
+    "ruff--config-error": {
+      "description": "ruff.toml فيه قيمة غير صالحة (line-length نص): Ruff برمز 2 (AT-14: تعذّر، والمنشأ الأداة)."
+    },
+    "ruff--no-inputs": {
+      "description": "لا ملفات Python في الهدف src."
+    },
+    "mypy--bad": {
+      "description": "خطأ نوع: تمرير نص حيث يُنتظر int (رمز 1)."
+    },
+    "mypy--syntax-error": {
+      "description": "خطأ صياغة في ملف مصدر فيخرج mypy برمز 2 مع تشخيص بموضع ملف [syntax] (AT-14: أخفق، والمنشأ المشروع)."
+    },
+    "mypy--config-error": {
+      "description": "mypy.ini فيه قيمة منطقية غير صالحة: رمز 2 بلا تشخيصات بموضع ملف (تعذّر)."
+    },
+    "mypy--no-inputs": {
+      "description": "لا ملفات .py في files=src."
+    },
+    "semgrep--bad": {
+      "description": "استدعاء eval بقيمة غير ثابتة: يخرج Semgrep برمز 0 مع نتائج (AT-14: حسب السياسة، وليس اجتيازًا)."
+    },
+    "semgrep--config-error": {
+      "description": "ملف قواعد بلا نمط (pattern) فتفشل الأداة."
+    },
+    "semgrep--no-inputs": {
+      "description": "لا ملفات مصدر في الهدف src."
+    },
+    "osv--no-lockfiles": {
+      "description": "تبعيات معلنة في package.json بلا ملف قفل: OSV-Scanner برمز 128 (AT-14: ناقص: لا ملفات قفل)."
+    },
+    "osv--bad": {
+      "description": "قفل فيه الحزمة المصطنعة ayar-vuln-fake@1.0.0 التي ستُعرَّف لها ثغرة تجريبية في قاعدة OSV المصغرة (E-09)."
+    },
+    "osv--config-error": {
+      "description": "ملف قفل تالف (JSON غير صالح): تعذّر قراءته."
+    },
+    "gitleaks--bad": {
+      "description": "سر مصطنع بصيغة مفتاح API: يخرج الفاحص برمز 42 (--exit-code 42)."
+    },
+    "gitleaks--config-error": {
+      "description": "gitleaks.toml غير صالح TOML."
+    },
+    "lychee--bad": {
+      "description": "رابط يعيد 404: lychee برمز 2 (404 مخالفة مثبتة)."
+    },
+    "lychee--timeout": {
+      "description": "رابط لا يستجيب أبدًا: مهلة lychee (AT-14: ليس رابطًا مكسورًا)."
+    },
+    "lychee--needs-review": {
+      "description": "رابط يعيد 403: يحتاج مراجعة (401 و403 و429 ليست كسرًا)."
+    },
+    "lychee--config-error": {
+      "description": "lychee.toml غير صالح."
+    }
+  },
+  "components": [
+    "vitest",
+    "jest",
+    "node-test",
+    "playwright",
+    "eslint",
+    "biome",
+    "tsc",
+    "knip",
+    "pyright",
+    "pytest",
+    "ruff",
+    "mypy",
+    "semgrep",
+    "osv",
+    "gitleaks",
+    "lychee"
+  ],
+  "deferred": [
+    {
+      "adapter": "stryker",
+      "reason": "اختياري وثقيل (10.3)؛ يُبنى مع DEV-6 أو DEV-8 حين يطلبه محوله"
+    },
+    {
+      "adapter": "k6",
+      "reason": "اختياري؛ ثنائي منفصل (Go) لا يلزم قبل محوله"
+    },
+    {
+      "adapter": "custom",
+      "reason": "أمر مخصص: لا أداة معينة؛ يغطيه FX-NOISY والسكربتات"
+    }
+  ],
+  "toolchain": {
+    "node": "24.16.0",
+    "pnpm": "12.8.1",
+    "uv": "0.13.0",
+    "semgrep": "1.180.0",
+    "osv-scanner": "2.6.0",
+    "lychee": "0.24.2",
+    "gitleaks": "8.30.1",
+    "vitest": "5.0.3",
+    "jest": "30.5.2",
+    "@playwright/test": "1.64.0",
+    "eslint": "10.12.0",
+    "@biomejs/biome": "2.5.15",
+    "typescript": "6.0.3",
+    "knip": "6.41.0",
+    "pyright": "1.1.414",
+    "pytest": "9.1.1",
+    "ruff": "0.16.10",
+    "mypy": "2.4.0"
+  }
+}

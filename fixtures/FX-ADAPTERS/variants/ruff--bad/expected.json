@@ -1,0 +1,23 @@
+{
+  "schema": "fixture-expect/1",
+  "project": "FX-ADAPTERS",
+  "variant": "ruff--bad",
+  "expectations": [
+    {
+      "check": "code.lint",
+      "component": "ruff",
+      "result": "أخفق",
+      "rule": null,
+      "rule_pending": true,
+      "tool_rule": "F401",
+      "location": {
+        "path": "ruff/src/a.py",
+        "line": 1,
+        "anchor": "import os"
+      },
+      "confidence": "مخالفة مثبتة",
+      "origin": "المشروع",
+      "exit_code": 1
+    }
+  ]
+}
