@@ -86,3 +86,6 @@ spikes/**/artifacts/
 tmp/
 .tmp/
 *.tmp
+
+# ── صفحة المراحل المولّدة: يولّدها المنسّق وينشرها ولا تُلتزم (ORG-10) ──
+docs/dashboard/ayar-phases.html

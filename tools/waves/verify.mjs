@@ -16,9 +16,11 @@ const track = id.startsWith('DEV') ? 'dev' : 'design';
 const branch = `phase/${id}`;
 const handoffPath = `docs/handoffs/${id}.md`;
 
+// من جذر المستودع، لأن مسارات ls-tree نسبية إلى المجلد الحالي
+const top = execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
 function git(args, opts = {}) {
   try {
-    return execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], ...opts }).trim();
+    return execFileSync('git', args, { cwd: top, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], ...opts }).trim();
   } catch {
     return null;
   }
