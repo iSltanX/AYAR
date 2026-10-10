@@ -5,7 +5,8 @@
 ._*
 .Spotlight-V100
 .Trashes
-Icon?
+# ملف أيقونة المجلد في macOS (Icon\r) دون مجلدات icons مع core.ignorecase (G-DEV1-04)
+Icon[!a-zA-Z0-9._-]
 
 # ── المحررات والأدوات المحلية ──
 .vscode/*
