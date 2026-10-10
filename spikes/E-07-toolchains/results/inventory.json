@@ -1,0 +1,301 @@
+{
+  "at": "2026-10-10T09:03:14.445Z",
+  "host": {
+    "arch": "arm64",
+    "platform": "darwin",
+    "release": "27.0.1"
+  },
+  "searchedDirs": [
+    "/opt/homebrew/bin",
+    "/usr/local/bin",
+    "/Users/abutalal/.local/bin",
+    "/Users/abutalal/.cargo/bin",
+    "/Users/abutalal/.bun/bin",
+    "/usr/bin",
+    "/bin",
+    "/usr/sbin",
+    "/sbin",
+    "/Users/abutalal/.nvm/versions/node/v20.20.2/bin",
+    "/Users/abutalal/.nvm/versions/node/v24.14.0/bin",
+    "/Users/abutalal/.nvm/versions/node/v24.16.0/bin"
+  ],
+  "tools": {
+    "node": [
+      {
+        "path": "/opt/homebrew/bin/node",
+        "realpath": "/opt/homebrew/Cellar/node@24/24.18.1/bin/node",
+        "version": "v24.18.1",
+        "code": 0,
+        "ms": 27,
+        "timedOut": false
+      },
+      {
+        "path": "/Users/abutalal/.nvm/versions/node/v20.20.2/bin/node",
+        "version": "v20.20.2",
+        "code": 0,
+        "ms": 63,
+        "timedOut": false
+      },
+      {
+        "path": "/Users/abutalal/.nvm/versions/node/v24.14.0/bin/node",
+        "version": "v24.14.0",
+        "code": 0,
+        "ms": 139,
+        "timedOut": false
+      },
+      {
+        "path": "/Users/abutalal/.nvm/versions/node/v24.16.0/bin/node",
+        "version": "v24.16.0",
+        "code": 0,
+        "ms": 13,
+        "timedOut": false
+      }
+    ],
+    "npm": [
+      {
+        "path": "/opt/homebrew/bin/npm",
+        "realpath": "/opt/homebrew/Cellar/node@24/24.18.1/lib/node_modules/npm/bin/npm-cli.js",
+        "version": "11.16.0",
+        "code": 0,
+        "ms": 137,
+        "timedOut": false
+      },
+      {
+        "path": "/Users/abutalal/.nvm/versions/node/v20.20.2/bin/npm",
+        "realpath": "/Users/abutalal/.nvm/versions/node/v20.20.2/lib/node_modules/npm/bin/npm-cli.js",
+        "version": "10.8.2",
+        "code": 0,
+        "ms": 76,
+        "timedOut": false
+      },
+      {
+        "path": "/Users/abutalal/.nvm/versions/node/v24.14.0/bin/npm",
+        "realpath": "/Users/abutalal/.nvm/versions/node/v24.14.0/lib/node_modules/npm/bin/npm-cli.js",
+        "version": "11.9.0",
+        "code": 0,
+        "ms": 112,
+        "timedOut": false
+      },
+      {
+        "path": "/Users/abutalal/.nvm/versions/node/v24.16.0/bin/npm",
+        "realpath": "/Users/abutalal/.nvm/versions/node/v24.16.0/lib/node_modules/npm/bin/npm-cli.js",
+        "version": "11.13.0",
+        "code": 0,
+        "ms": 80,
+        "timedOut": false
+      }
+    ],
+    "npx": [
+      {
+        "path": "/opt/homebrew/bin/npx",
+        "realpath": "/opt/homebrew/Cellar/node@24/24.18.1/lib/node_modules/npm/bin/npx-cli.js",
+        "version": "11.16.0",
+        "code": 0,
+        "ms": 52,
+        "timedOut": false
+      },
+      {
+        "path": "/Users/abutalal/.nvm/versions/node/v20.20.2/bin/npx",
+        "realpath": "/Users/abutalal/.nvm/versions/node/v20.20.2/lib/node_modules/npm/bin/npx-cli.js",
+        "version": "10.8.2",
+        "code": 0,
+        "ms": 61,
+        "timedOut": false
+      },
+      {
+        "path": "/Users/abutalal/.nvm/versions/node/v24.14.0/bin/npx",
+        "realpath": "/Users/abutalal/.nvm/versions/node/v24.14.0/lib/node_modules/npm/bin/npx-cli.js",
+        "version": "11.9.0",
+        "code": 0,
+        "ms": 525,
+        "timedOut": false
+      },
+      {
+        "path": "/Users/abutalal/.nvm/versions/node/v24.16.0/bin/npx",
+        "realpath": "/Users/abutalal/.nvm/versions/node/v24.16.0/lib/node_modules/npm/bin/npx-cli.js",
+        "version": "11.13.0",
+        "code": 0,
+        "ms": 62,
+        "timedOut": false
+      }
+    ],
+    "pnpm": [
+      {
+        "path": "/Users/abutalal/.nvm/versions/node/v24.14.0/bin/pnpm",
+        "realpath": "/Users/abutalal/.nvm/versions/node/v24.14.0/lib/node_modules/corepack/dist/pnpm.js",
+        "version": "12.8.1",
+        "code": 0,
+        "ms": 109,
+        "timedOut": false
+      },
+      {
+        "path": "/Users/abutalal/.nvm/versions/node/v24.16.0/bin/pnpm",
+        "realpath": "/Users/abutalal/.nvm/versions/node/v24.16.0/lib/node_modules/corepack/dist/pnpm.js",
+        "version": "12.8.1",
+        "code": 0,
+        "ms": 44,
+        "timedOut": false
+      }
+    ],
+    "yarn": [
+      {
+        "path": "/Users/abutalal/.nvm/versions/node/v24.14.0/bin/yarn",
+        "realpath": "/Users/abutalal/.nvm/versions/node/v24.14.0/lib/node_modules/corepack/dist/yarn.js",
+        "version": "1.22.22",
+        "code": 0,
+        "ms": 1467,
+        "timedOut": false
+      },
+      {
+        "path": "/Users/abutalal/.nvm/versions/node/v24.16.0/bin/yarn",
+        "realpath": "/Users/abutalal/.nvm/versions/node/v24.16.0/lib/node_modules/corepack/dist/yarn.js",
+        "version": "1.22.22",
+        "code": 0,
+        "ms": 242,
+        "timedOut": false
+      }
+    ],
+    "bun": [
+      {
+        "path": "/Users/abutalal/.bun/bin/bun",
+        "version": "1.3.14",
+        "code": 0,
+        "ms": 22,
+        "timedOut": false
+      }
+    ],
+    "corepack": [
+      {
+        "path": "/opt/homebrew/bin/corepack",
+        "realpath": "/opt/homebrew/Cellar/node@24/24.18.1/lib/node_modules/corepack/dist/corepack.js",
+        "version": "0.35.0",
+        "code": 0,
+        "ms": 48,
+        "timedOut": false
+      },
+      {
+        "path": "/Users/abutalal/.nvm/versions/node/v20.20.2/bin/corepack",
+        "realpath": "/Users/abutalal/.nvm/versions/node/v20.20.2/lib/node_modules/corepack/dist/corepack.js",
+        "version": "0.34.6",
+        "code": 0,
+        "ms": 205,
+        "timedOut": false
+      },
+      {
+        "path": "/Users/abutalal/.nvm/versions/node/v24.14.0/bin/corepack",
+        "realpath": "/Users/abutalal/.nvm/versions/node/v24.14.0/lib/node_modules/corepack/dist/corepack.js",
+        "version": "0.34.6",
+        "code": 0,
+        "ms": 42,
+        "timedOut": false
+      },
+      {
+        "path": "/Users/abutalal/.nvm/versions/node/v24.16.0/bin/corepack",
+        "realpath": "/Users/abutalal/.nvm/versions/node/v24.16.0/lib/node_modules/corepack/dist/corepack.js",
+        "version": "0.35.0",
+        "code": 0,
+        "ms": 33,
+        "timedOut": false
+      }
+    ],
+    "python3": [
+      {
+        "path": "/usr/bin/python3",
+        "version": "Python 3.9.6",
+        "code": 0,
+        "ms": 13,
+        "timedOut": false
+      }
+    ],
+    "python3.12": [
+      {
+        "path": "/opt/homebrew/bin/python3.12",
+        "realpath": "/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/bin/python3.12",
+        "version": "Python 3.12.13",
+        "code": 0,
+        "ms": 12,
+        "timedOut": false
+      }
+    ],
+    "git": [
+      {
+        "path": "/usr/bin/git",
+        "version": "git version 2.54.0 (Apple Git-157)",
+        "code": 0,
+        "ms": 7,
+        "timedOut": false
+      }
+    ],
+    "gh": [
+      {
+        "path": "/opt/homebrew/bin/gh",
+        "realpath": "/opt/homebrew/Cellar/gh/2.96.0/bin/gh",
+        "version": "gh version 2.96.0 (2026-07-02)",
+        "code": 0,
+        "ms": 97,
+        "timedOut": false
+      }
+    ],
+    "brew": [
+      {
+        "path": "/opt/homebrew/bin/brew",
+        "version": "Homebrew 7.0.7",
+        "code": 0,
+        "ms": 21,
+        "timedOut": false
+      }
+    ],
+    "xed": [
+      {
+        "path": "/usr/bin/xed",
+        "version": "xed version 27.0",
+        "code": 0,
+        "ms": 8,
+        "timedOut": false
+      }
+    ],
+    "xcodebuild": [
+      {
+        "path": "/usr/bin/xcodebuild",
+        "version": "Xcode 27.0",
+        "code": 0,
+        "ms": 178,
+        "timedOut": false
+      }
+    ],
+    "gitleaks": [
+      {
+        "path": "/opt/homebrew/bin/gitleaks",
+        "realpath": "/opt/homebrew/Cellar/gitleaks/8.30.1/bin/gitleaks",
+        "version": "8.30.1",
+        "code": 0,
+        "ms": 35,
+        "timedOut": false
+      }
+    ]
+  },
+  "versionManagers": {
+    "nvm": [
+      "v20.20.2",
+      "v24.14.0",
+      "v24.16.0"
+    ],
+    "nvmDefault": "24",
+    "fnm": null,
+    "mise": null,
+    "asdf": null,
+    "pyenv": null,
+    "uvPython": null,
+    "volta": null,
+    "corepackCache": [
+      "lastKnownGood.json",
+      "v1"
+    ]
+  },
+  "ownerShell": {
+    "code": 0,
+    "ms": 650,
+    "out": "node: function\nnpm: function\nnpx: function\npnpm: function\ncorepack: function\nyarn: function\nnvm: function\nuv: none\npython3: command\nPATH=~/.kimi-code/bin:~/.fly/bin:~/.fly/bin:/usr/local/bin:~/.bun/bin:~/.local/bin:~/.cargo/bin:/usr/bin:/bin:/usr/sbin:/sbin\nv24.16.0\n12.8.1\n",
+    "err": ""
+  }
+}

@@ -1,0 +1,1385 @@
+{
+  "at": "2026-10-10T09:07:50.574Z",
+  "rows": [
+    {
+      "tool": "vitest",
+      "variant": "good",
+      "setupCode": 0,
+      "exit": 0,
+      "signal": null,
+      "ms": 1473,
+      "reports": {
+        "vitest.json": "JSON صالح (877 بايت)",
+        "junit.xml": "XML (433 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "\n RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-good-dv0NQF/p/vitest\n\n ✓ test/add.test.js (1 test) 1ms\n\n Test Files  1 passed (1)\n      Tests  1 passed (1)\n   Start at  12:05:20\n   Duration  74ms (transform\n… [اقتُطع] …\nimport 26%, worker 11%, tests 6%)\n\nJSON report written to /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-reports-LMGSI5/vitest.json\nJUNIT report written to /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-reports-LMGSI5/junit.xml\n",
+      "stderr": "",
+      "cmd": "pnpm exec vitest run --reporter=default --reporter=json --reporter=junit --outputFile.json=$R/vitest.json --outputFile.junit=$R/junit.xml --update=none"
+    },
+    {
+      "tool": "vitest",
+      "variant": "vitest--bad",
+      "setupCode": 0,
+      "exit": 1,
+      "signal": null,
+      "ms": 1119,
+      "reports": {
+        "vitest.json": "JSON صالح (2720 بايت)",
+        "junit.xml": "XML (666 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "\n RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-vitest--bad-v6zdDu/p/vitest\n\n ❯ test/add.test.js (1 test | 1 failed) 3ms\n   × يجمع عددين 3ms\n\n Test Files  1 failed (1)\n      Tests  1 failed (1)\n   Start at \n… [اقتُطع] …\nmport 24%, tests 18%, worker 14%)\n\nJSON report written to /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-reports-v0IdEm/vitest.json\nJUNIT report written to /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-reports-v0IdEm/junit.xml\n",
+      "stderr": "\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯\n\n FAIL  test/add.test.js > يجمع عددين\nAssertionError: expected 5 to be 6 // Object.is equality\n\n- Expected\n+ Received\n\n- 6\n+ 5\n\n ❯ test/add.test.js:5:21\n      3|\n      4| it('يجمع عددين', () => {\n      5|   expect(add(2, 3)).toBe(6);\n       |                     ^\n      6| });\n      7|\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯\n\n",
+      "cmd": "pnpm exec vitest run --reporter=default --reporter=json --reporter=junit --outputFile.json=$R/vitest.json --outputFile.junit=$R/junit.xml --update=none"
+    },
+    {
+      "tool": "vitest",
+      "variant": "vitest--config-error",
+      "setupCode": 0,
+      "exit": 1,
+      "signal": null,
+      "ms": 1055,
+      "reports": {
+        "vitest.json": "JSON صالح (483 بايت)",
+        "junit.xml": "XML (1425 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "\n RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-vitest--config-error-wv4PaQ/p/vitest\n\n\n Test Files  no tests\n      Tests  no tests\n     Errors  1 error\n   Start at  12:05:23\n   Duration  60ms\n\nJSON report written to /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-reports-rANfPT/vitest.json\nJUNIT report written to /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-reports-rANfPT/junit.xml\n",
+      "stderr": " MISSING DEPENDENCY  Cannot find dependency 'vitest-environment-no-such-environment'\n\n⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯\n\nVitest caught 1 unhandled error during the test run.\nThis might cause false positive tests. Resolve unhandled errors to make sure yo\n… [اقتُطع] …\nde_modules/.pnpm/vitest@5.0.3_vite@8.3.4/node_modules/vitest/dist/chunks/base.DhkQeZwd.js:158:34\n ❯ process.onMessage node_modules/.pnpm/vitest@5.0.3_vite@8.3.4/node_modules/vitest/dist/chunks/init.D0qF-GGk.js:288:23\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n\n",
+      "cmd": "pnpm exec vitest run --reporter=default --reporter=json --reporter=junit --outputFile.json=$R/vitest.json --outputFile.junit=$R/junit.xml --update=none"
+    },
+    {
+      "tool": "vitest",
+      "variant": "vitest--no-inputs",
+      "setupCode": 0,
+      "exit": 1,
+      "signal": null,
+      "ms": 932,
+      "reports": {
+        "vitest.json": "JSON صالح (483 بايت)",
+        "junit.xml": "XML (130 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "\n RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-vitest--no-inputs-MP7FRG/p/vitest\n\nJSON report written to /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-reports-U4Wund/vitest.json\nJUNIT report written to /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-reports-U4Wund/junit.xml\n",
+      "stderr": "No test files found, exiting with code 1\n\ninclude: test/**/*.test.js\nexclude:  **/node_modules/**, **/.git/**\n\n",
+      "cmd": "pnpm exec vitest run --reporter=default --reporter=json --reporter=junit --outputFile.json=$R/vitest.json --outputFile.junit=$R/junit.xml --update=none"
+    },
+    {
+      "tool": "vitest",
+      "variant": "vitest--timeout",
+      "setupCode": 0,
+      "exit": "مهلة",
+      "signal": "SIGKILL",
+      "ms": 15016,
+      "reports": {
+        "vitest.json": "غير موجود",
+        "junit.xml": "ليس XML (0 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "\n RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-vitest--timeout-WcNR3V/p/vitest\n\n",
+      "stderr": "",
+      "cmd": "pnpm exec vitest run --reporter=default --reporter=json --reporter=junit --outputFile.json=$R/vitest.json --outputFile.junit=$R/junit.xml --update=none"
+    },
+    {
+      "tool": "vitest",
+      "variant": "vitest--conflict",
+      "setupCode": 0,
+      "exit": 1,
+      "signal": null,
+      "ms": 1103,
+      "reports": {
+        "vitest.json": "JSON صالح (2773 بايت)",
+        "junit.xml": "XML (664 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "\n RUN  v5.0.3 /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-vitest--conflict-8Jev3P/p/vitest\n\n ❯ test/add.test.js (1 test | 1 failed) 3ms\n   × يجمع عددين 3ms\n\n Test Files  1 failed (1)\n      Tests  1 failed (1)\n   Star\n… [اقتُطع] …\nmport 23%, tests 17%, worker 14%)\n\nJSON report written to /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-reports-Qpu5UT/vitest.json\nJUNIT report written to /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-reports-Qpu5UT/junit.xml\n",
+      "stderr": "\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯\n\n FAIL  test/add.test.js > يجمع عددين\nAssertionError: expected 5 to be 6 // Object.is equality\n\n- Expected\n+ Received\n\n- 6\n+ 5\n\n ❯ test/add.test.js:5:21\n      3|\n      4| it('يجمع عددين', () => {\n      5|   expect(add(2, 3)).toBe(6);\n       |                     ^\n      6| });\n      7|\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯\n\n",
+      "cmd": "pnpm exec vitest run --reporter=default --reporter=json --reporter=junit --outputFile.json=$R/vitest.json --outputFile.junit=$R/junit.xml --update=none"
+    },
+    {
+      "tool": "jest",
+      "variant": "good",
+      "setupCode": 0,
+      "exit": 0,
+      "signal": null,
+      "ms": 888,
+      "reports": {
+        "jest.json": "JSON صالح (1079 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "PASS test/add.test.js\n  ✓ يجمع عددين (1 ms)\n\nTest Suites: 1 passed, 1 total\nTests:       1 passed, 1 total\nSnapshots:   0 total\nTime:        0.196 s\nRan all test suites.\nTest results written to: ../../../../../../../../../var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-reports-KTuRDV/jest.json\n",
+      "cmd": "pnpm exec jest --ci --json --outputFile=$R/jest.json --testLocationInResults"
+    },
+    {
+      "tool": "jest",
+      "variant": "jest--bad",
+      "setupCode": 0,
+      "exit": 1,
+      "signal": null,
+      "ms": 760,
+      "reports": {
+        "jest.json": "JSON صالح (4842 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "FAIL test/add.test.js\n  ✕ يجمع عددين (1 ms)\n\n  ● يجمع عددين\n\n    expect(received).toBe(expected) // Object.is equality\n\n    Expected: 6\n    Received: 5\n\n      2 |\n      3 | test('يجمع عددين', () => {\n    > 4 |   expect(add(2, 3)).toBe(6);\n        |  \n… [اقتُطع] …\nes: 1 failed, 1 total\nTests:       1 failed, 1 total\nSnapshots:   0 total\nTime:        0.201 s\nRan all test suites.\nTest results written to: ../../../../../../../../../var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-reports-y5uSxx/jest.json\n",
+      "cmd": "pnpm exec jest --ci --json --outputFile=$R/jest.json --testLocationInResults"
+    },
+    {
+      "tool": "jest",
+      "variant": "jest--config-error",
+      "setupCode": 0,
+      "exit": 1,
+      "signal": null,
+      "ms": 447,
+      "reports": {
+        "jest.json": "غير موجود"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "● Validation Error:\n\n  Test environment no-such-environment cannot be found. Make sure the testEnvironment configuration option points to an existing node module.\n\n  Configuration Documentation:\n  https://jestjs.io/docs/configuration\n\n",
+      "cmd": "pnpm exec jest --ci --json --outputFile=$R/jest.json --testLocationInResults"
+    },
+    {
+      "tool": "jest",
+      "variant": "jest--no-inputs",
+      "setupCode": 0,
+      "exit": 1,
+      "signal": null,
+      "ms": 553,
+      "reports": {
+        "jest.json": "غير موجود"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "No tests found, exiting with code 1\nRun with `--passWithNoTests` to exit with code 0\nIn /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-jest--no-inputs-6NPh3v/p/jest\n  3 files checked.\n  testMatch: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-jest--no-inputs-6NPh3v/p/jest/test/**/*.test.js - 0 matches\n  testPathIgnorePatterns: /node_modules/ - 3 matches\n  testRegex:  - 0 matches\nPattern:  - 0 matches\n",
+      "cmd": "pnpm exec jest --ci --json --outputFile=$R/jest.json --testLocationInResults"
+    },
+    {
+      "tool": "jest",
+      "variant": "jest--timeout",
+      "setupCode": 0,
+      "exit": "مهلة",
+      "signal": "SIGKILL",
+      "ms": 15014,
+      "reports": {
+        "jest.json": "غير موجود"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "",
+      "cmd": "pnpm exec jest --ci --json --outputFile=$R/jest.json --testLocationInResults"
+    },
+    {
+      "tool": "node-test",
+      "variant": "good",
+      "setupCode": null,
+      "exit": 0,
+      "signal": null,
+      "ms": 85,
+      "reports": {
+        "junit.xml": "XML (418 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "✔ يجمع عددين (0.269292ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 36.429708\n",
+      "stderr": "",
+      "cmd": "node --test --test-reporter=junit --test-reporter-destination=$R/junit.xml --test-reporter=spec --test-reporter-destination=stdout"
+    },
+    {
+      "tool": "node-test",
+      "variant": "node-test--bad",
+      "setupCode": null,
+      "exit": 1,
+      "signal": null,
+      "ms": 76,
+      "reports": {
+        "junit.xml": "XML (1435 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "✖ يجمع عددين (0.512709ms)\nℹ tests 1\nℹ suites 0\nℹ pass 0\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 37.065416\n\n✖ failing tests:\n\ntest at test/add.test.js:5:1\n✖ يجمع عددين (0.512709ms)\n  AssertionError [ERR_ASSERTION]: Expected values to\n… [اقتُطع] …\nnal/test_runner/test:1177:17)\n      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 5,\n    expected: 6,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
+      "stderr": "",
+      "cmd": "node --test --test-reporter=junit --test-reporter-destination=$R/junit.xml --test-reporter=spec --test-reporter-destination=stdout"
+    },
+    {
+      "tool": "node-test",
+      "variant": "node-test--no-inputs",
+      "setupCode": null,
+      "exit": 0,
+      "signal": null,
+      "ms": 42,
+      "reports": {
+        "junit.xml": "XML (225 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "ℹ tests 0\nℹ suites 0\nℹ pass 0\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 5.1775\n",
+      "stderr": "",
+      "cmd": "node --test --test-reporter=junit --test-reporter-destination=$R/junit.xml --test-reporter=spec --test-reporter-destination=stdout"
+    },
+    {
+      "tool": "node-test",
+      "variant": "node-test--timeout",
+      "setupCode": null,
+      "exit": "مهلة",
+      "signal": "SIGKILL",
+      "ms": 15009,
+      "reports": {
+        "junit.xml": "XML (52 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "",
+      "cmd": "node --test --test-reporter=junit --test-reporter-destination=$R/junit.xml --test-reporter=spec --test-reporter-destination=stdout"
+    },
+    {
+      "tool": "playwright",
+      "variant": "good",
+      "setupCode": 0,
+      "exit": 0,
+      "signal": null,
+      "ms": 839,
+      "reports": {
+        "playwright.json": "JSON صالح (4108 بايت)",
+        "junit.xml": "XML (336 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "\nRunning 1 test using 1 worker\n\n  ✓  1 tests/basic.spec.js:4:1 › يجمع عددين (1ms)\n\n  1 passed (218ms)\n",
+      "stderr": "(node:42835) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n",
+      "cmd": "pnpm exec playwright test --reporter=list,json,junit --update-snapshots=none --output=$T/pw-out"
+    },
+    {
+      "tool": "playwright",
+      "variant": "playwright--bad",
+      "setupCode": 0,
+      "exit": 1,
+      "signal": null,
+      "ms": 646,
+      "reports": {
+        "playwright.json": "JSON صالح (6993 بايت)",
+        "junit.xml": "XML (1288 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "\nRunning 1 test using 1 worker\n\n  ✘  1 tests/basic.spec.js:4:1 › يجمع عددين (2ms)\n\n\n  1) tests/basic.spec.js:4:1 › يجمع عددين ──────────────────────────────────────────────────────────\n\n    Error: expect(received).toBe(expected) // Object.is equality\n… [اقتُطع] …\n ../../../../../../../../../var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-tmp-ER6gVC/pw-out/basic-يجمع-عددين/error-context.md\n\n  1 failed\n    tests/basic.spec.js:4:1 › يجمع عددين ───────────────────────────────────────────────────────────\n",
+      "stderr": "(node:42856) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n",
+      "cmd": "pnpm exec playwright test --reporter=list,json,junit --update-snapshots=none --output=$T/pw-out"
+    },
+    {
+      "tool": "playwright",
+      "variant": "playwright--config-error",
+      "setupCode": 0,
+      "exit": 1,
+      "signal": null,
+      "ms": 767,
+      "reports": {
+        "playwright.json": "غير موجود",
+        "junit.xml": "غير موجود"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "SyntaxError: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-playwright--config-error-Hwy8UR/p/playwright/playwright.config.js: Unexpected token (6:13)\n\n  4 |   testDir: 'tests',\n  5 |   reporter: 'list',\n> 6 |   retries\n… [اقتُطع] …\nplaywright/node_modules/.pnpm/playwright@1.64.0/node_modules/playwright/lib/program.js:55:7) {\n  code: 'BABEL_PARSE_ERROR',\n  reasonCode: 'UnexpectedToken',\n  loc: Position { line: 6, column: 13, index: 133 },\n  pos: 133,\n  syntaxPlugin: undefined\n}\n",
+      "cmd": "pnpm exec playwright test --reporter=list,json,junit --update-snapshots=none --output=$T/pw-out"
+    },
+    {
+      "tool": "playwright",
+      "variant": "playwright--no-inputs",
+      "setupCode": 0,
+      "exit": 1,
+      "signal": null,
+      "ms": 450,
+      "reports": {
+        "playwright.json": "JSON صالح (3085 بايت)",
+        "junit.xml": "XML (115 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "Error: No tests found\n\n",
+      "stderr": "",
+      "cmd": "pnpm exec playwright test --reporter=list,json,junit --update-snapshots=none --output=$T/pw-out"
+    },
+    {
+      "tool": "playwright",
+      "variant": "playwright--timeout",
+      "setupCode": 0,
+      "exit": "مهلة",
+      "signal": "SIGKILL",
+      "ms": 15023,
+      "reports": {
+        "playwright.json": "غير موجود",
+        "junit.xml": "غير موجود"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "\nRunning 1 test using 1 worker\n\n",
+      "stderr": "(node:42917) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n",
+      "cmd": "pnpm exec playwright test --reporter=list,json,junit --update-snapshots=none --output=$T/pw-out"
+    },
+    {
+      "tool": "eslint",
+      "variant": "good",
+      "setupCode": 0,
+      "exit": 0,
+      "signal": null,
+      "ms": 605,
+      "reports": {
+        "eslint.json": "JSON صالح (285 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "",
+      "cmd": "pnpm exec eslint src -f json -o $R/eslint.json"
+    },
+    {
+      "tool": "eslint",
+      "variant": "eslint--bad",
+      "setupCode": 0,
+      "exit": 1,
+      "signal": null,
+      "ms": 447,
+      "reports": {
+        "eslint.json": "JSON صالح (678 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "",
+      "cmd": "pnpm exec eslint src -f json -o $R/eslint.json"
+    },
+    {
+      "tool": "eslint",
+      "variant": "eslint--config-error",
+      "setupCode": 0,
+      "exit": 2,
+      "signal": null,
+      "ms": 432,
+      "reports": {
+        "eslint.json": "غير موجود"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "\nOops! Something went wrong! :(\n\nESLint: 10.12.0\n\nTypeError: Key \"rules\": Key \"no-such-rule-xyz\": Could not find \"no-such-rule-xyz\" in plugin \"@\".\n    at throwRuleNotFoundError (/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADA\n… [اقتُطع] …\n/src/hfs.js:614:3)\n    at async globSearch (/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-eslint--config-error-h7vPXM/p/eslint/node_modules/.pnpm/eslint@10.12.0/node_modules/eslint/lib/eslint/eslint-helpers.js:366:20)\n",
+      "cmd": "pnpm exec eslint src -f json -o $R/eslint.json"
+    },
+    {
+      "tool": "eslint",
+      "variant": "eslint--no-inputs",
+      "setupCode": 0,
+      "exit": 2,
+      "signal": null,
+      "ms": 360,
+      "reports": {
+        "eslint.json": "غير موجود"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "\nOops! Something went wrong! :(\n\nESLint: 10.12.0\n\nYou are linting \"src\", but all of the files matching the glob pattern \"src\" are ignored.\n\nIf you don't want to lint these files, remove the pattern \"src\" from the list of arguments passed to ESLint.\n\n\n… [اقتُطع] …\nttps://eslint.org/docs/latest/use/configure/configuration-files#specify-files-with-arbitrary-extensions\n\n  * If the file is ignored because it is located outside of the base path, change the location of your config file to be in a parent directory.\n\n",
+      "cmd": "pnpm exec eslint src -f json -o $R/eslint.json"
+    },
+    {
+      "tool": "eslint",
+      "variant": "eslint--timeout",
+      "setupCode": 0,
+      "exit": "مهلة",
+      "signal": "SIGKILL",
+      "ms": 15004,
+      "reports": {
+        "eslint.json": "غير موجود"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "",
+      "cmd": "pnpm exec eslint src -f json -o $R/eslint.json"
+    },
+    {
+      "tool": "biome",
+      "variant": "good",
+      "setupCode": 0,
+      "exit": 0,
+      "signal": null,
+      "ms": 1048,
+      "reports": {
+        "biome.json": "JSON صالح (227 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "The `json` and `json-pretty` reporters are experimental and may change in patch releases.\n",
+      "cmd": "pnpm exec biome lint --reporter=json --reporter-file=$R/biome.json src"
+    },
+    {
+      "tool": "biome",
+      "variant": "biome--bad",
+      "setupCode": 0,
+      "exit": 1,
+      "signal": null,
+      "ms": 919,
+      "reports": {
+        "biome.json": "JSON صالح (456 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "The `json` and `json-pretty` reporters are experimental and may change in patch releases.\nlint ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n  × Some errors were emitted while running checks.\n  \n\n",
+      "cmd": "pnpm exec biome lint --reporter=json --reporter-file=$R/biome.json src"
+    },
+    {
+      "tool": "biome",
+      "variant": "biome--config-error",
+      "setupCode": 0,
+      "exit": 1,
+      "signal": null,
+      "ms": 900,
+      "reports": {
+        "biome.json": "غير موجود"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-biome--config-error-sblzkW/p/biome/biome.json:4:5 deserialize ━━━━━━━━━━\n\n  × Found an unknown key `rulez`.\n  \n    2 │   \"linter\": {\n    3 │     \"enabled\": true,\n  > 4 │   \n… [اقتُطع] …\nown keys:\n  \n  - enabled\n  - rules\n  - includes\n  - domains\n  \n\nconfiguration ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n  × Biome exited because the configuration resulted in errors. Please fix them.\n  \n\n",
+      "cmd": "pnpm exec biome lint --reporter=json --reporter-file=$R/biome.json src"
+    },
+    {
+      "tool": "biome",
+      "variant": "biome--no-inputs",
+      "setupCode": 0,
+      "exit": 1,
+      "signal": null,
+      "ms": 920,
+      "reports": {
+        "biome.json": "JSON صالح (227 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "The `json` and `json-pretty` reporters are experimental and may change in patch releases.\nlint ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n  × No files were processed in the specified paths.\n  \n  i Check your biome.json or biome.jsonc to ensure the paths are not ignored by the configuration.\n  \n  i These paths were provided but ignored:\n  \n  - src\n  \n\n",
+      "cmd": "pnpm exec biome lint --reporter=json --reporter-file=$R/biome.json src"
+    },
+    {
+      "tool": "tsc",
+      "variant": "good",
+      "setupCode": 0,
+      "exit": 0,
+      "signal": null,
+      "ms": 518,
+      "reports": {},
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "",
+      "cmd": "pnpm exec tsc --noEmit -p tsconfig.json --pretty false"
+    },
+    {
+      "tool": "tsc",
+      "variant": "tsc--bad",
+      "setupCode": 0,
+      "exit": 2,
+      "signal": null,
+      "ms": 383,
+      "reports": {},
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "src/index.ts(2,9): error TS6133: 'unused' is declared but its value is never read.\n",
+      "stderr": "",
+      "cmd": "pnpm exec tsc --noEmit -p tsconfig.json --pretty false"
+    },
+    {
+      "tool": "tsc",
+      "variant": "tsc--config-error",
+      "setupCode": 0,
+      "exit": 2,
+      "signal": null,
+      "ms": 663,
+      "reports": {},
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "error TS5083: Cannot read file '/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-tsc--config-error-UXzxGh/p/tsc/missing-base.json'.\n",
+      "stderr": "",
+      "cmd": "pnpm exec tsc --noEmit -p tsconfig.json --pretty false"
+    },
+    {
+      "tool": "tsc",
+      "variant": "tsc--no-inputs",
+      "setupCode": 0,
+      "exit": 2,
+      "signal": null,
+      "ms": 280,
+      "reports": {},
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "error TS18003: No inputs were found in config file '/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-tsc--no-inputs-Lj50iA/p/tsc/tsconfig.json'. Specified 'include' paths were '[\"src\"]' and 'exclude' paths were '[]'.\n",
+      "stderr": "",
+      "cmd": "pnpm exec tsc --noEmit -p tsconfig.json --pretty false"
+    },
+    {
+      "tool": "knip",
+      "variant": "good",
+      "setupCode": 0,
+      "exit": 0,
+      "signal": null,
+      "ms": 1075,
+      "reports": {
+        "knip.json": "JSON صالح (14 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "",
+      "cmd": "pnpm exec knip --reporter json > $R/knip.json"
+    },
+    {
+      "tool": "knip",
+      "variant": "knip--bad",
+      "setupCode": 0,
+      "exit": 1,
+      "signal": null,
+      "ms": 869,
+      "reports": {
+        "knip.json": "JSON صالح (301 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "",
+      "cmd": "pnpm exec knip --reporter json > $R/knip.json"
+    },
+    {
+      "tool": "knip",
+      "variant": "knip--config-error",
+      "setupCode": 0,
+      "exit": 2,
+      "signal": null,
+      "ms": 811,
+      "reports": {
+        "knip.json": "JSON غير صالح (0 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "ERROR: Invalid input (location: entry)\n",
+      "cmd": "pnpm exec knip --reporter json > $R/knip.json"
+    },
+    {
+      "tool": "pyright",
+      "variant": "good",
+      "setupCode": 0,
+      "exit": 0,
+      "signal": null,
+      "ms": 868,
+      "reports": {
+        "pyright.json": "JSON صالح (251 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "",
+      "cmd": "pnpm exec pyright --outputjson > $R/pyright.json"
+    },
+    {
+      "tool": "pyright",
+      "variant": "pyright--bad",
+      "setupCode": 0,
+      "exit": 1,
+      "signal": null,
+      "ms": 728,
+      "reports": {
+        "pyright.json": "JSON صالح (937 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "",
+      "cmd": "pnpm exec pyright --outputjson > $R/pyright.json"
+    },
+    {
+      "tool": "pyright",
+      "variant": "pyright--config-error",
+      "setupCode": 0,
+      "exit": 3,
+      "signal": null,
+      "ms": 774,
+      "reports": {
+        "pyright.json": "JSON صالح (251 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "Config file \"/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-pyright--config-error-ArOmLX/p/pyright/pyrightconfig.json\" could not be parsed. Verify that format is correct.\n",
+      "cmd": "pnpm exec pyright --outputjson > $R/pyright.json"
+    },
+    {
+      "tool": "pyright",
+      "variant": "pyright--no-inputs",
+      "setupCode": 0,
+      "exit": 0,
+      "signal": null,
+      "ms": 647,
+      "reports": {
+        "pyright.json": "JSON صالح (251 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "",
+      "cmd": "pnpm exec pyright --outputjson > $R/pyright.json"
+    },
+    {
+      "tool": "pytest",
+      "variant": "good",
+      "setupCode": 0,
+      "exit": 0,
+      "signal": null,
+      "ms": 276,
+      "reports": {
+        "junit.xml": "XML (321 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-good-OFOAIT/p/pytest\n… [اقتُطع] …\n                                                      [100%]\n\n- generated xml file: /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-reports-13afAg/junit.xml -\n============================== 1 passed in 0.01s ===============================\n",
+      "stderr": "",
+      "cmd": ".venv/bin/python -m pytest --junit-xml=$R/junit.xml -p no:cacheprovider"
+    },
+    {
+      "tool": "pytest",
+      "variant": "pytest--bad",
+      "setupCode": 0,
+      "exit": 1,
+      "signal": null,
+      "ms": 261,
+      "reports": {
+        "junit.xml": "XML (551 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-pytest--bad-Z8a4by/p\n… [اقتُطع] …\n/junit.xml -\n=========================== short test summary info ============================\nFAILED tests/test_add.py::test_add - assert 5 == 6\n +  where 5 = add(2, 3)\n============================== 1 failed in 0.01s ===============================\n",
+      "stderr": "",
+      "cmd": ".venv/bin/python -m pytest --junit-xml=$R/junit.xml -p no:cacheprovider"
+    },
+    {
+      "tool": "pytest",
+      "variant": "pytest--collection-error",
+      "setupCode": 0,
+      "exit": 2,
+      "signal": null,
+      "ms": 320,
+      "reports": {
+        "junit.xml": "XML (1919 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-pytest--collection-e\n… [اقتُطع] …\n========== short test summary info ============================\nERROR tests/test_add.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n=============================== 1 error in 0.07s ===============================\n",
+      "stderr": "",
+      "cmd": ".venv/bin/python -m pytest --junit-xml=$R/junit.xml -p no:cacheprovider"
+    },
+    {
+      "tool": "pytest",
+      "variant": "pytest--usage-error",
+      "setupCode": 0,
+      "exit": 4,
+      "signal": null,
+      "ms": 240,
+      "reports": {
+        "junit.xml": "غير موجود"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "ERROR: usage: python -m pytest [options] [file_or_dir] [file_or_dir] [...]\npython -m pytest: error: unrecognized arguments: --no-such-option\n  inifile: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-pytest--usage-error-ey5Xy8/p/pytest/pyproject.toml\n  rootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-pytest--usage-error-ey5Xy8/p/pytest\n\n",
+      "cmd": ".venv/bin/python -m pytest --junit-xml=$R/junit.xml -p no:cacheprovider"
+    },
+    {
+      "tool": "pytest",
+      "variant": "pytest--no-tests",
+      "setupCode": 0,
+      "exit": 5,
+      "signal": null,
+      "ms": 255,
+      "reports": {
+        "junit.xml": "XML (243 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-pytest--no-tests-RCa\n… [اقتُطع] …\nonfigfile: pyproject.toml\ntestpaths: tests\ncollected 0 items\n\n- generated xml file: /var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-reports-KuGklY/junit.xml -\n============================ no tests ran in 0.00s =============================\n",
+      "stderr": "",
+      "cmd": ".venv/bin/python -m pytest --junit-xml=$R/junit.xml -p no:cacheprovider"
+    },
+    {
+      "tool": "pytest",
+      "variant": "pytest--timeout",
+      "setupCode": 0,
+      "exit": "مهلة",
+      "signal": "SIGKILL",
+      "ms": 15009,
+      "reports": {
+        "junit.xml": "غير موجود"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-pytest--timeout-lYviMb/p/pytest\nconfigfile: pyproject.toml\ntestpaths: tests\ncollected 1 item\n\ntests/test_add.py ",
+      "stderr": "",
+      "cmd": ".venv/bin/python -m pytest --junit-xml=$R/junit.xml -p no:cacheprovider"
+    },
+    {
+      "tool": "pytest",
+      "variant": "pytest--conflict",
+      "setupCode": 0,
+      "exit": 0,
+      "signal": null,
+      "ms": 314,
+      "reports": {
+        "junit.xml": "XML (551 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0\nrootdir: /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-pytest--conflict-h8E\n… [اقتُطع] …\n/junit.xml -\n=========================== short test summary info ============================\nFAILED tests/test_add.py::test_add - assert 5 == 6\n +  where 5 = add(2, 3)\n============================== 1 failed in 0.01s ===============================\n",
+      "stderr": "",
+      "cmd": ".venv/bin/python -m pytest --junit-xml=$R/junit.xml -p no:cacheprovider"
+    },
+    {
+      "tool": "ruff",
+      "variant": "good",
+      "setupCode": 0,
+      "exit": 0,
+      "signal": null,
+      "ms": 368,
+      "reports": {
+        "ruff.json": "JSON صالح (2 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "",
+      "cmd": ".venv/bin/ruff check --output-format json --output-file $R/ruff.json --no-cache src"
+    },
+    {
+      "tool": "ruff",
+      "variant": "ruff--bad",
+      "setupCode": 0,
+      "exit": 1,
+      "signal": null,
+      "ms": 357,
+      "reports": {
+        "ruff.json": "JSON صالح (816 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "",
+      "cmd": ".venv/bin/ruff check --output-format json --output-file $R/ruff.json --no-cache src"
+    },
+    {
+      "tool": "ruff",
+      "variant": "ruff--config-error",
+      "setupCode": 0,
+      "exit": 2,
+      "signal": null,
+      "ms": 368,
+      "reports": {
+        "ruff.json": "غير موجود"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "ruff failed\n  Cause: Failed to load configuration `/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-ruff--config-error-lhpXzQ/p/ruff/ruff.toml`\n  Cause: Failed to parse /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-ruff--config-error-lhpXzQ/p/ruff/ruff.toml\n  Cause: TOML parse error at line 1, column 15\n  |\n1 | line-length = \"wide\"\n  |               ^^^^^^\ninvalid type: string \"wide\", expected i64\n\n",
+      "cmd": ".venv/bin/ruff check --output-format json --output-file $R/ruff.json --no-cache src"
+    },
+    {
+      "tool": "ruff",
+      "variant": "ruff--no-inputs",
+      "setupCode": 0,
+      "exit": 0,
+      "signal": null,
+      "ms": 363,
+      "reports": {
+        "ruff.json": "JSON صالح (2 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "warning: No Python files found under the given path(s)\n",
+      "cmd": ".venv/bin/ruff check --output-format json --output-file $R/ruff.json --no-cache src"
+    },
+    {
+      "tool": "mypy",
+      "variant": "good",
+      "setupCode": 0,
+      "exit": 0,
+      "signal": null,
+      "ms": 1922,
+      "reports": {
+        "mypy.txt": "0 بايت",
+        "mypy.json": "JSON غير صالح (0 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "json_exit=0\n",
+      "stderr": "",
+      "cmd": ".venv/bin/python -m mypy --show-column-numbers --no-error-summary --no-color-output --cache-dir $T/mypy-cache > $R/mypy.txt; c=$?; .venv/bin/python -m mypy --show-column-numbers --no-error-summary --no-color-output --cache-dir $T/mypy-cache -O json > $R/mypy.json; echo \"json_exit=$?\"; exit $c"
+    },
+    {
+      "tool": "mypy",
+      "variant": "mypy--bad",
+      "setupCode": 0,
+      "exit": 1,
+      "signal": null,
+      "ms": 2175,
+      "reports": {
+        "mypy.txt": "101 بايت",
+        "mypy.json": "JSON صالح (221 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "json_exit=1\n",
+      "stderr": "",
+      "cmd": ".venv/bin/python -m mypy --show-column-numbers --no-error-summary --no-color-output --cache-dir $T/mypy-cache > $R/mypy.txt; c=$?; .venv/bin/python -m mypy --show-column-numbers --no-error-summary --no-color-output --cache-dir $T/mypy-cache -O json > $R/mypy.json; echo \"json_exit=$?\"; exit $c"
+    },
+    {
+      "tool": "mypy",
+      "variant": "mypy--syntax-error",
+      "setupCode": 0,
+      "exit": 2,
+      "signal": null,
+      "ms": 1670,
+      "reports": {
+        "mypy.txt": "60 بايت",
+        "mypy.json": "JSON صالح (174 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "json_exit=2\n",
+      "stderr": "",
+      "cmd": ".venv/bin/python -m mypy --show-column-numbers --no-error-summary --no-color-output --cache-dir $T/mypy-cache > $R/mypy.txt; c=$?; .venv/bin/python -m mypy --show-column-numbers --no-error-summary --no-color-output --cache-dir $T/mypy-cache -O json > $R/mypy.json; echo \"json_exit=$?\"; exit $c"
+    },
+    {
+      "tool": "mypy",
+      "variant": "mypy--config-error",
+      "setupCode": 0,
+      "exit": 2,
+      "signal": null,
+      "ms": 1462,
+      "reports": {
+        "mypy.txt": "0 بايت",
+        "mypy.json": "JSON غير صالح (0 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "json_exit=2\n",
+      "stderr": "mypy.ini: File contains no section headers.\nfile: 'mypy.ini', line: 1\n'[mypy\\n'\nusage: mypy [-h] [-v] [-V] [more options; see below]\n            [-m MODULE] [-p PACKAGE] [-c PROGRAM_TEXT] [files ...]\nmypy: error: Missing target module, package, files\n… [اقتُطع] …\n contains no section headers.\nfile: 'mypy.ini', line: 1\n'[mypy\\n'\nusage: mypy [-h] [-v] [-V] [more options; see below]\n            [-m MODULE] [-p PACKAGE] [-c PROGRAM_TEXT] [files ...]\nmypy: error: Missing target module, package, files, or command.\n",
+      "cmd": ".venv/bin/python -m mypy --show-column-numbers --no-error-summary --no-color-output --cache-dir $T/mypy-cache > $R/mypy.txt; c=$?; .venv/bin/python -m mypy --show-column-numbers --no-error-summary --no-color-output --cache-dir $T/mypy-cache -O json > $R/mypy.json; echo \"json_exit=$?\"; exit $c"
+    },
+    {
+      "tool": "mypy",
+      "variant": "mypy--no-inputs",
+      "setupCode": 0,
+      "exit": 2,
+      "signal": null,
+      "ms": 1461,
+      "reports": {
+        "mypy.txt": "0 بايت",
+        "mypy.json": "JSON غير صالح (0 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "json_exit=2\n",
+      "stderr": "There are no .py[i] files in directory 'src'\nThere are no .py[i] files in directory 'src'\n",
+      "cmd": ".venv/bin/python -m mypy --show-column-numbers --no-error-summary --no-color-output --cache-dir $T/mypy-cache > $R/mypy.txt; c=$?; .venv/bin/python -m mypy --show-column-numbers --no-error-summary --no-color-output --cache-dir $T/mypy-cache -O json > $R/mypy.json; echo \"json_exit=$?\"; exit $c"
+    },
+    {
+      "tool": "semgrep",
+      "variant": "good",
+      "setupCode": null,
+      "exit": 0,
+      "signal": null,
+      "ms": 1576,
+      "reports": {
+        "semgrep.json": "JSON صالح (1326 بايت)",
+        "semgrep.sarif": "JSON صالح (793 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "",
+      "cmd": "semgrep scan --no-git-ignore --config rules/ayar-eval.yml --metrics=off --disable-version-check --json-output=$R/semgrep.json --sarif-output=$R/semgrep.sarif --quiet src"
+    },
+    {
+      "tool": "semgrep",
+      "variant": "semgrep--bad",
+      "setupCode": null,
+      "exit": 0,
+      "signal": null,
+      "ms": 1036,
+      "reports": {
+        "semgrep.json": "JSON صالح (1691 بايت)",
+        "semgrep.sarif": "JSON صالح (1204 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "                  \n                  \n┌────────────────┐\n│ 1 Code Finding │\n└────────────────┘\n            \n    src/a.js\n   ❯❯❱ rules.ayar-test.no-eval\n          ❰❰ Blocking ❱❱\n          استخدام eval بقيمة غير ثابتة (قاعدة اختبار مصغرة، ليست من حزمة عِيَار)\n                                                                              \n            2┆ return eval(userInput);\n\n",
+      "stderr": "",
+      "cmd": "semgrep scan --no-git-ignore --config rules/ayar-eval.yml --metrics=off --disable-version-check --json-output=$R/semgrep.json --sarif-output=$R/semgrep.sarif --quiet src"
+    },
+    {
+      "tool": "semgrep",
+      "variant": "semgrep--config-error",
+      "setupCode": null,
+      "exit": 7,
+      "signal": null,
+      "ms": 925,
+      "reports": {
+        "semgrep.json": "JSON صالح (708 بايت)",
+        "semgrep.sarif": "JSON صالح (659 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "",
+      "cmd": "semgrep scan --no-git-ignore --config rules/ayar-eval.yml --metrics=off --disable-version-check --json-output=$R/semgrep.json --sarif-output=$R/semgrep.sarif --quiet src"
+    },
+    {
+      "tool": "semgrep",
+      "variant": "semgrep--no-inputs",
+      "setupCode": null,
+      "exit": 0,
+      "signal": null,
+      "ms": 1095,
+      "reports": {
+        "semgrep.json": "JSON صالح (433 بايت)",
+        "semgrep.sarif": "JSON صالح (793 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "",
+      "cmd": "semgrep scan --no-git-ignore --config rules/ayar-eval.yml --metrics=off --disable-version-check --json-output=$R/semgrep.json --sarif-output=$R/semgrep.sarif --quiet src"
+    },
+    {
+      "tool": "osv",
+      "variant": "good",
+      "setupCode": null,
+      "exit": 127,
+      "signal": null,
+      "ms": 75,
+      "reports": {
+        "osv.json": "JSON صالح (124 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "Warning: --output has been deprecated in favor of --output-file\nScanning dir .\nStarting filesystem walk for root: /\nScanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-good-pn7bBZ/p/osv/package-lock.json file and fou\n… [اقتُطع] …\noad db for npm ecosystem: unable to fetch OSV database: no offline version of the OSV database is available\nError during extraction: (extracting as vulnmatch/osvlocal) unable to fetch OSV database: no offline version of the OSV database is available\n",
+      "cmd": "osv-scanner scan source -r . --offline --format json --output $R/osv.json"
+    },
+    {
+      "tool": "osv",
+      "variant": "osv--no-lockfiles",
+      "setupCode": null,
+      "exit": 128,
+      "signal": null,
+      "ms": 51,
+      "reports": {
+        "osv.json": "غير موجود"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "Warning: --output has been deprecated in favor of --output-file\nScanning dir .\nStarting filesystem walk for root: /\nEnd status: 1 dirs visited, 2 inodes visited, 0 Extract calls, 116.209µs elapsed, 116µs wall time\nNo package sources found, --help for usage information.\n",
+      "cmd": "osv-scanner scan source -r . --offline --format json --output $R/osv.json"
+    },
+    {
+      "tool": "osv",
+      "variant": "osv--bad",
+      "setupCode": null,
+      "exit": 127,
+      "signal": null,
+      "ms": 39,
+      "reports": {
+        "osv.json": "JSON صالح (124 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "Warning: --output has been deprecated in favor of --output-file\nScanning dir .\nStarting filesystem walk for root: /\nScanned /private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-osv--bad-Xhs4Bl/p/osv/package-lock.json file and\n… [اقتُطع] …\noad db for npm ecosystem: unable to fetch OSV database: no offline version of the OSV database is available\nError during extraction: (extracting as vulnmatch/osvlocal) unable to fetch OSV database: no offline version of the OSV database is available\n",
+      "cmd": "osv-scanner scan source -r . --offline --format json --output $R/osv.json"
+    },
+    {
+      "tool": "osv",
+      "variant": "osv--config-error",
+      "setupCode": null,
+      "exit": 128,
+      "signal": null,
+      "ms": 39,
+      "reports": {
+        "osv.json": "غير موجود"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "Warning: --output has been deprecated in favor of --output-file\nScanning dir .\nStarting filesystem walk for root: /\nEnd status: 1 dirs visited, 3 inodes visited, 1 Extract calls, 152.458µs elapsed, 153µs wall time\nError during extraction: (extracting\n… [اقتُطع] …\nt/packagelockjson) private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-e07-FX-ADAPTERS-osv--config-error-brDmYk/p/osv/package-lock.json: could not extract: unexpected end of JSON input\nNo package sources found, --help for usage information.\n",
+      "cmd": "osv-scanner scan source -r . --offline --format json --output $R/osv.json"
+    },
+    {
+      "tool": "gitleaks",
+      "variant": "good",
+      "setupCode": null,
+      "exit": 0,
+      "signal": null,
+      "ms": 56,
+      "reports": {
+        "secrets.json": "JSON صالح (3 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "12:07PM INF scanned ~46 bytes (46 bytes) in 2.17ms\n12:07PM INF no leaks found\n",
+      "cmd": "gitleaks dir . --config gitleaks.toml --redact=100 --no-banner --report-format json --report-path $R/secrets.json --exit-code 42"
+    },
+    {
+      "tool": "gitleaks",
+      "variant": "gitleaks--bad",
+      "setupCode": null,
+      "exit": 42,
+      "signal": null,
+      "ms": 21,
+      "reports": {
+        "secrets.json": "JSON صالح (500 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "12:07PM INF scanned ~174 bytes (174 bytes) in 1.47ms\n12:07PM WRN leaks found: 1\n",
+      "cmd": "gitleaks dir . --config gitleaks.toml --redact=100 --no-banner --report-format json --report-path $R/secrets.json --exit-code 42"
+    },
+    {
+      "tool": "gitleaks",
+      "variant": "gitleaks--config-error",
+      "setupCode": null,
+      "exit": 1,
+      "signal": null,
+      "ms": 9,
+      "reports": {
+        "secrets.json": "غير موجود"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "12:07PM FTL unable to load gitleaks config, err: While parsing config: toml: expected character ]\n",
+      "cmd": "gitleaks dir . --config gitleaks.toml --redact=100 --no-banner --report-format json --report-path $R/secrets.json --exit-code 42"
+    },
+    {
+      "tool": "lychee",
+      "variant": "good",
+      "setupCode": null,
+      "exit": 0,
+      "signal": null,
+      "ms": 395,
+      "reports": {
+        "links.json": "JSON صالح (398 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "",
+      "cmd": "lychee --format json --output $R/links.json --max-concurrency 4 --max-retries 0 --timeout 3 --config lychee.toml README.md"
+    },
+    {
+      "tool": "lychee",
+      "variant": "lychee--bad",
+      "setupCode": null,
+      "exit": 2,
+      "signal": null,
+      "ms": 214,
+      "reports": {
+        "links.json": "JSON صالح (752 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "Hint: You can configure accepted/rejected response codes with `-a` or `--accept`\n",
+      "cmd": "lychee --format json --output $R/links.json --max-concurrency 4 --max-retries 0 --timeout 3 --config lychee.toml README.md"
+    },
+    {
+      "tool": "lychee",
+      "variant": "lychee--timeout",
+      "setupCode": null,
+      "exit": 2,
+      "signal": null,
+      "ms": 3213,
+      "reports": {
+        "links.json": "JSON صالح (743 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "",
+      "cmd": "lychee --format json --output $R/links.json --max-concurrency 4 --max-retries 0 --timeout 3 --config lychee.toml README.md"
+    },
+    {
+      "tool": "lychee",
+      "variant": "lychee--needs-review",
+      "setupCode": null,
+      "exit": 2,
+      "signal": null,
+      "ms": 219,
+      "reports": {
+        "links.json": "JSON صالح (757 بايت)"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": "Hint: You can configure accepted/rejected response codes with `-a` or `--accept`\n",
+      "cmd": "lychee --format json --output $R/links.json --max-concurrency 4 --max-retries 0 --timeout 3 --config lychee.toml README.md"
+    },
+    {
+      "tool": "lychee",
+      "variant": "lychee--config-error",
+      "setupCode": null,
+      "exit": 3,
+      "signal": null,
+      "ms": 16,
+      "reports": {
+        "links.json": "غير موجود"
+      },
+      "sideEffects": {
+        "added": [],
+        "changed": [],
+        "removed": []
+      },
+      "stdout": "",
+      "stderr": " [ERROR] Error while loading config: Cannot load configuration file `lychee.toml`: Failed to load config from lychee.toml\n\nCaused by:\n    0: Failed to parse configuration file\n    1: TOML parse error at line 1, column 11\n         |\n       1 | timeout = \"soon\"\n         |           ^^^^^^\n       invalid type: string \"soon\", expected u64\n       \nSee: https://github.com/lycheeverse/lychee/blob/lychee-v0.24.2/lychee.example.toml\n",
+      "cmd": "lychee --format json --output $R/links.json --max-concurrency 4 --max-retries 0 --timeout 3 --config lychee.toml README.md"
+    }
+  ]
+}
