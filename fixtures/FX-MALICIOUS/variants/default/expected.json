@@ -39,7 +39,7 @@
       },
       "confidence": "مخالفة مثبتة",
       "origin": "المشروع",
-      "tool_rule": "eval",
+      "tool_rule": "ayar.js.eval-dynamic",
       "reason": "eval بقيمة غير ثابتة؛ Semgrep بلا --config auto وبلا استدعاء git (AT-01)"
     },
     {
@@ -54,7 +54,7 @@
       },
       "confidence": "مخالفة مثبتة",
       "origin": "المشروع",
-      "tool_rule": "subprocess-shell-true",
+      "tool_rule": "ayar.py.subprocess-shell-true",
       "reason": "أمر صدفة بقيمة متغيرة"
     },
     {
