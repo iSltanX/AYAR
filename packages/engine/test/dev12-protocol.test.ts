@@ -2,7 +2,8 @@
 // execution's unified report without its findings, and the declared outputs it wrote with their sizes now and at the
 // end of the previous complete round; profile.versions — the saved versions and what each changed; reports.copies —
 // «انسخ للنموذج» counted from the audit records; data.purge — everything AYAR keeps about the projects and what it
-// fetched, the settings kept; the narrow-scope threshold as a setting; and the safe stop when the disk runs low (13.5).
+// fetched, the settings kept; the narrow-scope threshold as a setting; tasks.gaps — the units of logic with no test
+// file, a «اختبار وحدة» card each (J4); and the safe stop when the disk runs low (13.5).
 import type { CheckReport, ProfileVersion, ReportBuilt, RunDetail } from '@ayar/protocol';
 import { GLOBAL_TARGET } from '@ayar/protocol';
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
@@ -190,6 +191,22 @@ describe('the run list (18.1 «الالتزام والملف»)', () => {
     const d = await runCheck('code.refs.local@.');
     expect(d.run.commit).toBe(commit);
     expect(d.run.profileVersion).toBeGreaterThanOrEqual(1);
+  }, 120_000);
+});
+
+describe('tasks.gaps (J4, D-DEV12-05)', () => {
+  it('lists the units of logic with no test file of their name from the latest files snapshot, and each makes a «اختبار وحدة» card', async () => {
+    mkdirSync(join(path, 'src'), { recursive: true });
+    mkdirSync(join(path, 'test'), { recursive: true });
+    writeFileSync(join(path, 'src', 'money.js'), 'export const cents = (x) => Math.round(x * 100);\n');
+    writeFileSync(join(path, 'src', 'parse.js'), 'export const parse = (s) => Number(s);\n');
+    writeFileSync(join(path, 'test', 'parse.test.js'), "import '../src/parse.js';\n");
+    await runCheck('code.refs.local@.');
+    const gaps = ok<{ files: string[]; total: number; truncated: boolean }>(await engine.invoke('tasks.gaps', { projectId }));
+    expect(gaps).toEqual({ files: ['src/money.js'], total: 1, truncated: false });
+    const card = ok<{ task: { card: { type: string; location: string | null } } }>(await engine.invoke('task.create', { projectId, source: { kind: 'testGap', checkId: 'beh.unit', file: gaps.files[0]! } }));
+    expect(card.task.card.type).toBe('unit_test');
+    expect(card.task.card.location).toContain('src/money.js');
   }, 120_000);
 });
 
