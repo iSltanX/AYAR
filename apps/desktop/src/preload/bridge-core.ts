@@ -3,6 +3,7 @@
 // numbering, a new engine stream, or a replaced port tells the UI to resync.
 import {
   BRIDGE_TOPICS,
+  type BridgeDrop,
   isEventTopic,
   isRendererCommand,
   parseCommandPayload,
@@ -30,6 +31,17 @@ export interface BridgeDeps {
 export interface BridgeCore {
   api: AyarBridge;
   acceptPort(port: PortLike): void;
+  /** The main process's answer to a drop (protocol 1.6), delivered to the page as `bridge.drop`. */
+  acceptDrop(result: unknown): void;
+}
+
+/** Only the two shapes of BridgeDrop pass, with a selection token of its exact form. */
+function parseDrop(raw: unknown): BridgeDrop | null {
+  if (typeof raw !== 'object' || raw === null) return null;
+  const r = raw as Record<string, unknown>;
+  if (r.ok === true && typeof r.selectionToken === 'string' && /^sel_[A-Za-z0-9_-]{43}$/.test(r.selectionToken)) return { ok: true, selectionToken: r.selectionToken };
+  if (r.ok === false && (r.reason === 'not_a_directory' || r.reason === 'multiple' || r.reason === 'no_path')) return { ok: false, reason: r.reason };
+  return null;
 }
 
 const isBridgeTopic = (t: unknown): t is (typeof BRIDGE_TOPICS)[number] => (BRIDGE_TOPICS as readonly unknown[]).includes(t);
@@ -39,6 +51,8 @@ export function createBridgeCore(deps: BridgeDeps): BridgeCore {
   const lastSeq = new Map<string, number>();
   let engineStream: string | null = null;
   let port: PortLike | null = null;
+  /** A drop answered before the page subscribed (a folder dropped on the Dock icon at launch) waits for it. */
+  let pendingDrop: BridgeDrop | null = null;
 
   const dispatch = (topic: string, message: unknown) => {
     for (const h of handlers.get(topic) ?? []) {
@@ -79,6 +93,11 @@ export function createBridgeCore(deps: BridgeDeps): BridgeCore {
       const h = handler as (m: unknown) => void;
       set.add(h);
       handlers.set(topic, set);
+      if (topic === 'bridge.drop' && pendingDrop) {
+        const d = pendingDrop;
+        pendingDrop = null;
+        queueMicrotask(() => dispatch('bridge.drop', d));
+      }
       return () => {
         set.delete(h);
       };
@@ -87,6 +106,12 @@ export function createBridgeCore(deps: BridgeDeps): BridgeCore {
 
   return {
     api,
+    acceptDrop(raw) {
+      const drop = parseDrop(raw);
+      if (!drop) return;
+      if (handlers.get('bridge.drop')?.size) dispatch('bridge.drop', drop);
+      else pendingDrop = drop;
+    },
     acceptPort(next) {
       const replaced = port !== null;
       port?.close();

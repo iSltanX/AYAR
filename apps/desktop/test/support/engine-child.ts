@@ -19,9 +19,19 @@ export function realEngine(env: NodeJS.ProcessEnv = {}): EngineChild {
   };
 }
 
-/** A child that never answers and ignores SIGTERM: only SIGKILL ends it. */
-export function stubbornChild(): EngineChild {
-  const child = spawn(process.execPath, ['-e', "process.on('SIGTERM', () => {}); setInterval(() => {}, 1000)"], { stdio: 'ignore' });
+/**
+ * A child that never answers and ignores SIGTERM: only SIGKILL ends it. `ready` resolves once its SIGTERM handler is
+ * installed (it says so on stdout), so a test never signals it earlier (G-WAVE6-01: a fixed wait raced a slow start).
+ */
+export function stubbornChild(): EngineChild & { ready: Promise<void> } {
+  const child = spawn(process.execPath, ['-e', "process.on('SIGTERM', () => {}); process.stdout.write('ready\\n'); setInterval(() => {}, 1000)"], { stdio: ['ignore', 'pipe', 'ignore'] });
+  const ready = new Promise<void>((resolve) => {
+    let out = '';
+    child.stdout!.on('data', (d: Buffer) => {
+      out += d.toString();
+      if (out.includes('ready\n')) resolve();
+    });
+  });
   const exited = new Promise<number | string>((r) => child.once('exit', (code, signal) => r(code ?? signal ?? -1)));
   const listeners: (() => void)[] = [];
   child.once('exit', () => listeners.forEach((l) => l()));
@@ -37,6 +47,7 @@ export function stubbornChild(): EngineChild {
     },
     transport,
     exited,
+    ready,
     kill: (signal) => {
       child.kill(signal);
     },

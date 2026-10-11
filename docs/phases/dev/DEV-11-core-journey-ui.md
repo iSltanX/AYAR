@@ -13,7 +13,7 @@ owner_inputs: []
 model: Claude Opus 5.5
 effort: high
 model_reason: شاشات مربوطة بأحداث حية وتطابق تصميمًا معتمدًا
-scope: [apps/desktop/src/renderer/, apps/desktop/src/main/, apps/desktop/src/preload/, apps/desktop/test/, apps/desktop/package.json, apps/desktop/vite.renderer.config.ts, packages/i18n/, packages/protocol/, package-lock.json]
+scope: [apps/desktop/src/renderer/, apps/desktop/src/main/, apps/desktop/src/preload/, apps/desktop/test/, apps/desktop/package.json, apps/desktop/vite.renderer.config.ts, packages/i18n/, packages/protocol/, packages/engine/, package-lock.json]
 goal: بناء الشاشات الثماني الأساسية من التصميم المعتمد وربطها بالمحرك — المشاريع، والاكتشاف، واعتماد الملف، ونظرة عامة، وخطة الفحص الكامل، والمتابعة الحية، والنتائج، وتقرير «للنموذج» — حتى تكتمل الرحلة J1 وJ10 داخل التطبيق.
 start:
   - DEV-9 مغلقة (المحرك كامل)

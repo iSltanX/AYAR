@@ -1,8 +1,25 @@
 // The system interactions the UI may ask for (C-01): folder and file dialogs and the clipboard, as an
 // interface the gateway calls. No screens here: these are macOS's own dialogs.
-import { clipboard, dialog, type BrowserWindow, type MessageBoxOptions } from 'electron';
-import { lstat, realpath } from 'node:fs/promises';
+import { clipboard, dialog, Menu, shell, type BrowserWindow, type MenuItemConstructorOptions, type MessageBoxOptions } from 'electron';
+import { execFile } from 'node:child_process';
+import { lstat, realpath, stat } from 'node:fs/promises';
+import { join, sep } from 'node:path';
+import { promisify } from 'node:util';
+import type { NativeMenuEntry } from '@ayar/protocol';
 import type { SystemServices } from './gateway.ts';
+import { controlsFromAppleLanguages } from './window-controls.ts';
+
+const run = promisify(execFile);
+
+let controls: Promise<'left' | 'right'> | null = null;
+
+function menuTemplate(entries: readonly NativeMenuEntry[], choose: (id: string) => void): MenuItemConstructorOptions[] {
+  return entries.map((e): MenuItemConstructorOptions => {
+    if (e.kind === 'separator') return { type: 'separator' };
+    if (e.kind === 'header') return { label: e.label, enabled: false };
+    return { label: e.label, enabled: e.enabled, ...(e.accelerator ? { accelerator: e.accelerator, registerAccelerator: false } : {}), click: () => choose(e.id) };
+  });
+}
 
 export function electronSystemServices(parent: () => BrowserWindow | null): SystemServices {
   const owner = () => parent() ?? undefined;
@@ -34,6 +51,36 @@ export function electronSystemServices(parent: () => BrowserWindow | null): Syst
       const w = owner();
       const r = w ? await dialog.showMessageBox(w, opts) : await dialog.showMessageBox(opts);
       return r.response === 1;
+    },
+    windowControls() {
+      controls ??= run('/usr/bin/defaults', ['read', '-g', 'AppleLanguages'], { timeout: 3000 })
+        .then((r) => controlsFromAppleLanguages(r.stdout))
+        .catch(() => 'left' as const);
+      return controls;
+    },
+    async reveal(path) {
+      shell.showItemInFolder(path);
+    },
+    async fileInside(root, relative) {
+      try {
+        const realRoot = await realpath(root);
+        const file = await realpath(join(realRoot, relative));
+        if (!file.startsWith(realRoot + sep)) return null;
+        return (await stat(file)).isFile() ? file : null;
+      } catch {
+        return null;
+      }
+    },
+    async openInEditor(path) {
+      await run('/usr/bin/open', ['-t', path], { timeout: 10_000 });
+    },
+    popupMenu(entries, at) {
+      return new Promise((resolve) => {
+        let chosen: string | null = null;
+        const menu = Menu.buildFromTemplate(menuTemplate(entries, (id) => (chosen = id)));
+        const w = owner();
+        menu.popup({ ...(w ? { window: w } : {}), ...(at ? { x: at.x, y: at.y } : {}), callback: () => resolve(chosen) });
+      });
     },
     async checkFolder(path) {
       try {

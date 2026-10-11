@@ -101,10 +101,19 @@ describe('engine supervisor (C-01)', () => {
   });
 
   it('stops with SIGTERM, then SIGKILL after the grace period when the engine ignores it', async () => {
-    const { sup } = make({ spawn: stubbornChild, stopGraceMs: 300, handshakeTimeoutMs: 60_000 });
+    let ready: Promise<void> = Promise.resolve();
+    const { sup } = make({
+      spawn: () => {
+        const child = stubbornChild();
+        ready = child.ready;
+        return child;
+      },
+      stopGraceMs: 300,
+      handshakeTimeoutMs: 60_000,
+    });
     sup.start();
     const pid = sup.pid!;
-    await new Promise((r) => setTimeout(r, 200));
+    await ready; // its SIGTERM handler is installed (G-WAVE6-01)
     const t0 = Date.now();
     await sup.stop();
     expect(Date.now() - t0).toBeGreaterThanOrEqual(290);
