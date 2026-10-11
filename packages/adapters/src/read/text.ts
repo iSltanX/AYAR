@@ -48,6 +48,6 @@ export function normalizePath(raw: string, root: string, cwd: string = root): No
   const abs = (posix.isAbsolute(p) ? posix.normalize(p) : posix.join(cwd, p)).normalize('NFC');
   const r = posix.normalize(root).normalize('NFC');
   const rel = posix.relative(r, abs);
-  if (rel === '' || rel.startsWith('..') || posix.isAbsolute(rel)) return { path: posix.basename(abs), outside: true };
+  if (rel === '' || rel === '..' || rel.startsWith('../') || posix.isAbsolute(rel)) return { path: posix.basename(abs), outside: true };
   return { path: rel, outside: false };
 }

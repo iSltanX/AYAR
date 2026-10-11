@@ -27,6 +27,8 @@ export interface ParseJob {
   thresholds: Record<string, unknown> | null;
   outputs: string[];
   customSuccess: CheckSpec['customSuccess'];
+  /** When the execution started (epoch ms): a report the project holds counts only if written since. */
+  startedAt: number;
   /** The component's files in the run's inventory (countFiles). */
   inventory: string[];
   hmacKey: Uint8Array;
@@ -83,7 +85,9 @@ export function projectReader(root: string): ProjectReader {
       return null;
     }
   };
+  // Bounded by bytes, not by count: 64 MB of texts at most in a worker.
   const cache = new Map<string, string | null>();
+  let cached = 0;
   return {
     read: (rel) => {
       if (cache.has(rel)) return cache.get(rel)!;
@@ -97,8 +101,12 @@ export function projectReader(root: string): ProjectReader {
           text = null;
         }
       }
-      if (cache.size > 512) cache.clear();
+      if (cached + (text?.length ?? 0) > 64 * 1024 * 1024) {
+        cache.clear();
+        cached = 0;
+      }
       cache.set(rel, text);
+      cached += text?.length ?? 0;
       return text;
     },
     exists: (rel) => {
@@ -122,6 +130,23 @@ export function projectReader(root: string): ProjectReader {
       }
     },
   };
+}
+
+/** C-15 on a report the tool writes into the project: inside the root, no link, within the limit, written now. */
+export function projectReport(root: string, rel: string, startedAt: number): { text: string | null; problem: 'missing' | 'stale' | 'too_large' | null; size: number | null } {
+  if (!rel || rel.includes('\0') || posix.isAbsolute(rel)) return { text: null, problem: 'missing', size: null };
+  const abs = posix.normalize(posix.join(root, rel));
+  if (!abs.startsWith(`${posix.normalize(root)}/`)) return { text: null, problem: 'missing', size: null };
+  try {
+    const st = lstatSync(abs);
+    if (!st.isFile()) return { text: null, problem: 'missing', size: null };
+    if (st.size > REPORT_LIMITS.maxBytes) return { text: null, problem: 'too_large', size: st.size };
+    // A second of slack for file systems that round modification times.
+    if (st.mtimeMs < startedAt - 1000) return { text: null, problem: 'stale', size: st.size };
+    return { text: readFileSync(abs, 'utf8'), problem: null, size: st.size };
+  } catch {
+    return { text: null, problem: 'missing', size: null };
+  }
 }
 
 /** The last megabyte of a log, as text. */
@@ -163,7 +188,7 @@ export function anchorOf(f: ParsedFinding, read: (rel: string) => string | null,
   if (a.kind === 'secret') {
     let value: string | null = null;
     const span = /^span:(\d+):(\d+):(\d+)$/.exec(a.value);
-    if (span && path) {
+    if (span && path && !f.location?.outside) {
       const text = read(path);
       const line = text?.split('\n')[Number(span[1]) - 1];
       if (line !== undefined) value = line.slice(Number(span[2]) - 1, Number(span[3]) > 0 ? Number(span[3]) : undefined);
@@ -227,6 +252,7 @@ export function runJob(job: Job, cancelled: () => boolean = () => false): JobRes
       outputs: job.outputs,
       exists: reader.exists,
       customSuccess: job.customSuccess,
+      projectReport: (rel: string) => projectReport(job.root, rel, job.startedAt),
     };
     report = adapter.parseReports(ctx, job.exit);
     exit = adapter.exitMap(job.exit, report, ctx);
@@ -244,7 +270,8 @@ export function runJob(job: Job, cancelled: () => boolean = () => false): JobRes
       listDir: (rel) => listDir(job.root, rel),
       gzipSize: (rel) => {
         const t = reader.size(rel);
-        if (t === null) return null;
+        // A file over the report limit is not compressed in memory: its size is enough to exceed a budget.
+        if (t === null || t > REPORT_LIMITS.maxBytes) return t;
         try {
           return gzipSync(readFileSync(posix.join(job.root, rel))).length;
         } catch {

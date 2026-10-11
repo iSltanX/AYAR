@@ -38,6 +38,11 @@ describe('7.3: the ordered rules (D-30)', () => {
     for (const code of REPORT_PROBLEMS) expect(ReasonSchema.safeParse(classify(input('beh.unit', report({ problems: [{ code, file: 'r', detail: 'd' }] }))).reason).success, code).toBe(true);
   });
 
+  it('no pass without evidence: a test report where no test ran is «ناقص», whatever the exit map let through (review M6)', () => {
+    expect(classify(input('custom.x', report({ tests: { total: 0, passed: 0, failed: 0, skipped: 0, errors: 0, flaky: 0 } })))).toMatchObject({ outcome: 'missing', reason: { key: 'verdict.reason.noTestsRan' } });
+    expect(classify(input('beh.unit', report({ tests: { total: 3, passed: 0, failed: 0, skipped: 3, errors: 0, flaky: 0 } })))).toMatchObject({ outcome: 'missing' });
+  });
+
   it('rule 5: an exit that contradicts the reports is «تعذّر», never a pass', () => {
     const r = classify(input('beh.unit', report({ tests: tests(1, 3), findings: [finding('test.failed', { anchor: { kind: 'test', value: 'a' } })] }), { exit: { kind: 'conflict', reason: { key: 'adapter.reason.conflict', params: { exit: 0, failed: 1 } } } }));
     expect(r).toMatchObject({ outcome: 'unavailable', origin: 'tool', reason: { key: 'adapter.reason.conflict' } });

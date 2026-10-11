@@ -126,13 +126,14 @@
           ]
         },
         "rule": {
-          "description": "معرّف قاعدة عِيَار. null مع rule_pending=true حتى تُعرَّف في الكتالوج (ORG-06، DEV-6).",
+          "description": "معرّف قاعدة عِيَار من packages/catalog/data/rules.json لكل اكتشاف متوقع (موضع ودرجة ثبوت)، وnull حيث لا اكتشاف. أكملته DEV-6 (المهمة 8).",
           "type": [
             "string",
             "null"
           ]
         },
         "rule_pending": {
+          "description": "مهجور منذ DEV-6: كان يعلّم قاعدة لم تُعرَّف بعد. يرفضه validate.mjs.",
           "type": "boolean"
         },
         "tool_rule": {

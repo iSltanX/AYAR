@@ -42,8 +42,8 @@ export function rescrub(db: Db, redactor: Redactor): { rows: number } {
       rows++;
     }
     // DEV-5's JSON columns: a check's command and raw result (its last lines), plans, and setup previews; DEV-6's:
-    // a finding's place, and the reader of a check run.
-    const jsonColumns: [string, string][] = [['check_runs', 'command_json'], ['check_runs', 'raw_json'], ['check_runs', 'notes_json'], ['plans', 'plan_json'], ['setup_actions', 'preview_json'], ['findings', 'location_json'], ['check_runs', 'reader_json']];
+    // a finding's place, the reader of a check run, a reason (a tool's first error line), and the indices.
+    const jsonColumns: [string, string][] = [['check_runs', 'command_json'], ['check_runs', 'raw_json'], ['check_runs', 'notes_json'], ['plans', 'plan_json'], ['setup_actions', 'preview_json'], ['findings', 'location_json'], ['check_runs', 'reader_json'], ['check_runs', 'outcome_reason'], ['runs', 'purity_json'], ['rounds', 'purity_json']];
     for (const [table, column] of jsonColumns) {
       if (!has(table, column)) continue;
       for (const r of db.all<{ rid: number; v: string }>(`SELECT rowid AS rid, ${column} AS v FROM ${table} WHERE ${column} IS NOT NULL`)) {
@@ -54,7 +54,7 @@ export function rescrub(db: Db, redactor: Redactor): { rows: number } {
       }
     }
     // DEV-6: the findings' texts (a tool's message, an expected and an actual value).
-    const textColumns: [string, string][] = [['findings', 'message_redacted'], ['findings', 'expected_text'], ['findings', 'actual_text']];
+    const textColumns: [string, string][] = [['findings', 'message_redacted'], ['findings', 'expected_text'], ['findings', 'actual_text'], ['findings', 'tool_rule_id']];
     for (const [table, column] of textColumns) {
       if (!has(table, column)) continue;
       for (const r of db.all<{ rid: number; v: string }>(`SELECT rowid AS rid, ${column} AS v FROM ${table} WHERE ${column} IS NOT NULL`)) {

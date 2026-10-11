@@ -4,7 +4,7 @@
 // HTML or component file, the attributes of HTML tags. Pure functions: no process, no write; the engine runs them in
 // a worker thread that can be stopped (C-13 «تعمل في خيوط عمل… وتقبل الإلغاء»).
 import type { ExitSignal, Fact, JsonValue, ParsedReport } from '@ayar/protocol';
-import { emptyReport } from '@ayar/adapters';
+import { emptyReport, finding, pushFinding } from '@ayar/adapters';
 import { posix } from 'node:path';
 
 export interface AnalyzerInput {
@@ -54,6 +54,18 @@ export class Cancelled extends Error {
     super('cancelled');
     this.name = 'Cancelled';
   }
+}
+
+/**
+ * A file the analysis should read: its text, or — when it cannot be read (over the reader's size, unreadable, a
+ * link) — a finding that says so and a count, never a silent skip that would let the check pass over unread content.
+ */
+export function readOrSay(i: AnalyzerInput, r: ParsedReport, file: string): string | null {
+  const text = i.read(file);
+  if (text !== null) return text;
+  r.info.unreadable = (typeof r.info.unreadable === 'number' ? r.info.unreadable : 0) + 1;
+  pushFinding(r, finding({ rule: 'analysis.unparsable-file', origin: 'tool', message: `${file} could not be read (over the size AYAR reads, unreadable, or a link), so it was not analyzed`, location: { path: file }, anchor: { kind: 'text', value: `unreadable:${file}` } }));
+  return null;
 }
 
 export function checkCancel(i: AnalyzerInput): void {

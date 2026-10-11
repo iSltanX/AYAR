@@ -26,21 +26,30 @@ export function isSnapshotMissing(message: string): boolean {
   return SNAPSHOT.test(message) && /missing|doesn't exist|not (?:been )?written|new snapshot|writing/i.test(message);
 }
 
-/** Fills a report from one or more attempts (one, unless beh.stability repeats them). */
+/** A name's result within one attempt: a failure of any test of that name wins, then flaky, then a pass. */
+const RANK: Record<TestResult['status'], number> = { failed: 3, flaky: 2, passed: 1, skipped: 0 };
+
+/**
+ * Fills a report from one or more attempts (one, unless beh.stability repeats them). Within an attempt, two tests of
+ * the same full name (a static title in it.each, a repeated title) are one name that failed if either failed: a
+ * failure is never mistaken for flakiness. Across attempts, a name whose result changed is flaky (D-20).
+ */
 export function fillTests(r: ParsedReport, attempts: readonly Attempt[]): void {
-  const byName = new Map<string, TestResult[]>();
-  for (const a of attempts) {
+  const perAttempt = attempts.map((a) => {
+    const m = new Map<string, TestResult>();
     for (const t of a.tests) {
-      const list = byName.get(t.fullName) ?? [];
-      list.push(t);
-      byName.set(t.fullName, list);
+      const prev = m.get(t.fullName);
+      if (!prev || RANK[t.status] > RANK[prev.status]) m.set(t.fullName, t);
     }
-  }
+    return m;
+  });
+  const names = [...new Set(perAttempt.flatMap((m) => [...m.keys()]))];
   let passed = 0;
   let failed = 0;
   let skipped = 0;
   let flaky = 0;
-  for (const [name, results] of byName) {
+  for (const name of names) {
+    const results = perAttempt.map((m) => m.get(name)).filter((t): t is TestResult => t !== undefined);
     const statuses = new Set(results.map((t) => t.status));
     const last = results.at(-1)!;
     if (statuses.has('flaky') || (statuses.has('passed') && statuses.has('failed'))) {
@@ -54,6 +63,14 @@ export function fillTests(r: ParsedReport, attempts: readonly Attempt[]): void {
     } else if (statuses.has('passed')) passed++;
     else skipped++;
   }
+  // A single attempt counts its tests one by one (two of one name are two tests); repetitions count by name.
+  if (attempts.length === 1) {
+    const all = attempts[0]!.tests;
+    const by = (st: TestResult['status']) => all.filter((t) => t.status === st).length;
+    passed = by('passed');
+    failed = by('failed');
+    skipped = by('skipped');
+  }
   const errors = attempts.reduce((n, a) => n + a.collectionErrors.length, 0);
   // A collection error is the project's (a syntax or import error in a test file): a failure of its own.
   const seen = new Set<string>();
@@ -66,7 +83,7 @@ export function fillTests(r: ParsedReport, attempts: readonly Attempt[]): void {
       pushFinding(r, finding({ rule: 'test.collection-error', message: e.message, location: e.location, anchor: { kind: 'code', value: '' } }));
     }
   }
-  r.tests = { total: byName.size, passed, failed, skipped, errors, flaky };
+  r.tests = { total: attempts.length === 1 ? attempts[0]!.tests.length : names.length, passed, failed, skipped, errors, flaky };
   if (attempts.length > 1) r.info.attempts = attempts.length;
 }
 

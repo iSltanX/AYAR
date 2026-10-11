@@ -15,5 +15,8 @@
   "purity.reason.stateChanged": "The state changed during the scan",
   "purity.reason.guardUnreviewed": "Integrity findings without a review ({count})",
   "purity.reason.modelClaimsOpen": "Model claims neither proven locally nor decided ({count})",
-  "purity.reason.reviewsExpired": "Mandatory reviews whose scope changed ({count})"
+  "purity.reason.reviewsExpired": "Mandatory reviews whose scope changed ({count})",
+  "purity.reason.integrityNotEvaluated": "Nothing of the integrity was checked in this round",
+  "purity.reason.notApplicable": "Required checks that did not apply when run ({count})",
+  "purity.note.retryDiffered": "The retry on the same state gave {retry} for {instance}; the round keeps {kept}"
 }

@@ -57,6 +57,12 @@ export interface ParseContext {
   outputs: readonly string[];
   exists(rel: string): boolean;
   customSuccess: CheckSpec['customSuccess'];
+  /**
+   * A report the tool writes into the project (Stryker's, a custom check's declared file): its text only when this
+   * execution wrote it (modified since it started) and within the report limit (C-15); otherwise why not — a file
+   * left from before never stands in for a report that was not written.
+   */
+  projectReport(rel: string): { text: string | null; problem: 'missing' | 'stale' | 'too_large' | null; size: number | null };
 }
 
 /** A line of output, read live (9.6 point 5): progress, and a provisional finding when it names one. */

@@ -8,6 +8,7 @@
   "verdict.reason.review": "Needs review: suspicions that need your decision ({count})",
   "verdict.reason.warnings": "Warning: warnings the warnings policy counts ({count})",
   "verdict.reason.testsPassed": "Passed: the tests passed ({passed} of {total})",
+  "verdict.reason.noTestsRan": "Missing: no test ran to a pass in the report ({total} tests), and there is no pass without evidence",
   "verdict.reason.passed": "Passed: no violation in the report",
   "verdict.reason.passedWithNotes": "Passed, with notes that do not change the outcome ({notes})",
   "verdict.reason.readerFailed": "Unavailable: the tool's reports could not be read ({detail})",

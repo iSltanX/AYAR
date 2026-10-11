@@ -4,7 +4,7 @@
 // profile's threshold itself: `thresholds.break` is empty by default, S-30) and k6 (0 passes, 99 the thresholds failed).
 import type { ExitSignal } from '@ayar/protocol';
 import { emptyReport, filesNamed, finding, firstErrorLine, oversize, projectTemplate, pushFinding, reason, type Adapter, type ParseContext } from '../framework.ts';
-import { arr, int, isRecord, num, readJson, rec, str } from '../read/guards.ts';
+import { arr, int, isRecord, num, readJson, rec, REPORT_LIMITS, str } from '../read/guards.ts';
 import { readJUnit } from '../read/junit.ts';
 import { readSarif } from '../read/sarif.ts';
 import { cleanMessage, normalizePath, stripAnsi } from '../read/text.ts';
@@ -86,8 +86,12 @@ export const custom: Adapter = {
     if (s.report) {
       // Into {reports} (kept by the executor), or a file of the project read as it is now.
       const kept = ctx.files.find((f) => f.name === s.report!.split('/').pop());
-      const text = kept && !oversize(kept) ? kept.text : ctx.read(s.report);
-      if (text === null) r.problems.push({ code: 'missing', file: s.report, detail: 'the declared report was not written' });
+      const big = kept ? oversize(kept) : null;
+      const fromProject = kept ? null : ctx.projectReport(s.report);
+      const text = kept ? (big ? null : kept.text) : fromProject!.text;
+      if (big) r.problems.push(big);
+      else if (fromProject?.problem === 'too_large') r.problems.push({ code: 'too_large', file: s.report, detail: `${fromProject.size ?? 0} bytes; the limit is ${REPORT_LIMITS.maxBytes}` });
+      else if (text === null) r.problems.push({ code: 'missing', file: s.report, detail: fromProject?.problem === 'stale' ? 'the declared report was not written in this run (the one there is from before)' : 'the declared report was not written' });
       else if (/^\s*</.test(text)) {
         const x = readJUnit(text, s.report);
         if (!x.ok) r.problems.push(x.problem);
@@ -148,11 +152,12 @@ export const stryker: Adapter = {
     const r = emptyReport(this, ['mutation-report']);
     // Stryker writes its report into the project (a declared side effect, `reports/`): read as it is after the run.
     const rel = `${ctx.component === '.' ? '' : `${ctx.component}/`}reports/mutation/mutation.json`;
-    const text = ctx.read(rel);
-    if (text === null) {
-      r.problems.push({ code: 'missing', file: rel, detail: 'stryker did not write its JSON report' });
+    const got = ctx.projectReport(rel);
+    if (got.text === null) {
+      r.problems.push(got.problem === 'too_large' ? { code: 'too_large', file: rel, detail: `${got.size ?? 0} bytes; the limit is ${REPORT_LIMITS.maxBytes}` } : { code: 'missing', file: rel, detail: got.problem === 'stale' ? 'stryker did not write its JSON report in this run (the one there is from before)' : 'stryker did not write its JSON report' });
       return r;
     }
+    const text = got.text;
     const j = readJson(text, rel);
     if (!j.ok) {
       r.problems.push(j.problem);
@@ -161,7 +166,9 @@ export const stryker: Adapter = {
     const { score, survived } = mutationScore(rec(rec(j.value).files));
     for (const s of survived) pushFinding(r, finding({ rule: 'mutant.survived', toolRule: s.mutator || null, message: cleanMessage(`${s.mutator}: ${s.replacement}`, 500), location: { path: normalizePath(s.path, ctx.root, ctx.cwd).path, ...(s.line ? { line: s.line } : {}) }, anchor: { kind: 'code', value: '' } }));
     r.info.score = score;
-    const threshold = Number(ctx.thresholds?.mutationScore ?? ctx.thresholds?.break);
+    // 7.4: a threshold is a number the profile declares; nothing else becomes one (null or '' is not 0).
+    const declared = ctx.thresholds?.mutationScore ?? ctx.thresholds?.break;
+    const threshold = typeof declared === 'number' ? declared : NaN;
     if (Number.isFinite(threshold)) {
       r.info.threshold = threshold;
       if (score !== null && score < threshold) pushFinding(r, finding({ rule: 'mutation.score-below', message: `mutation score ${score.toFixed(2)} below ${threshold}`, location: null, anchor: { kind: 'text', value: 'mutation-score' }, expected: String(threshold), actual: score.toFixed(2) }));

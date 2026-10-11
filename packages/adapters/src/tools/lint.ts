@@ -42,6 +42,8 @@ export const eslint: Adapter = {
     const r = emptyReport(this, ['eslint-json']);
     if (exit.exitCode === 2) return r;
     const v = onlyReport(this, ctx, 'eslint.json', r);
+    // ESLint lists every file it linted, messages or not: none listed is nothing linted.
+    if (Array.isArray(v)) r.info.files = v.length;
     for (const file of arr(v).map(rec)) {
       const p = normalizePath(str(file.filePath), ctx.root, ctx.cwd);
       for (const m of arr(file.messages).map(rec)) {
@@ -64,6 +66,8 @@ export const eslint: Adapter = {
     if (exit.exitCode === 2) return { kind: 'tool_error', reason: reason('adapter.reason.configError', { tool: 'eslint', code: 2, detail: firstErrorLine(stripAnsi(ctx.stderr || ctx.stdout)) }) };
     if (report.problems.length) return { kind: 'ok' };
     const errors = report.findings.filter((f) => f.rule === 'lint.error').length;
+    // Exit 0 having linted nothing (every file ignored): no input, never a pass.
+    if (exit.exitCode === 0 && report.info.files === 0) return { kind: 'missing', reason: reason('adapter.reason.noInputFiles', { tool: 'eslint' }) };
     if (exit.exitCode === 0) return errors ? { kind: 'conflict', reason: reason('adapter.reason.conflictExitPass', { tool: 'eslint', exit: 0, failed: errors }) } : { kind: 'ok' };
     // 1: errors, or warnings over the project's --max-warnings.
     if (exit.exitCode === 1) return errors || report.findings.length ? { kind: 'ok' } : { kind: 'conflict', reason: reason('adapter.reason.conflictExitFail', { tool: 'eslint', exit: 1 }) };
@@ -149,6 +153,7 @@ export const biome: Adapter = {
     const errors = report.findings.filter((f) => f.rule === 'lint.error').length;
     // Exit 1 with nothing processed: Biome's own error «No files were processed» (E-07), the tool's.
     if (exit.exitCode === 1 && errors === 0 && report.info.processed === 0) return { kind: 'tool_error', reason: reason('adapter.reason.noFilesProcessed', { tool: 'biome' }) };
+    if (exit.exitCode === 0 && report.info.processed === 0) return { kind: 'missing', reason: reason('adapter.reason.noInputFiles', { tool: 'biome' }) };
     if (exit.exitCode === 0) return errors ? { kind: 'conflict', reason: reason('adapter.reason.conflictExitPass', { tool: 'biome', exit: 0, failed: errors }) } : { kind: 'ok' };
     if (exit.exitCode === 1) return errors || report.findings.length ? { kind: 'ok' } : { kind: 'conflict', reason: reason('adapter.reason.conflictExitFail', { tool: 'biome', exit: 1 }) };
     return unknownExit(this, exit.exitCode);

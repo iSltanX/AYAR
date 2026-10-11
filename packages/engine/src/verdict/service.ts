@@ -51,7 +51,7 @@ export interface ReportInput {
 }
 
 export type JudgeRequest =
-  | { kind: 'parse'; adapter: string; cwd: string; reports: ReportInput[]; stdoutPath: string | null; stderrPath: string | null; exit: ExitInfo; inventory: string[]; outputs: string[] }
+  | { kind: 'parse'; adapter: string; cwd: string; reports: ReportInput[]; stdoutPath: string | null; stderrPath: string | null; exit: ExitInfo; inventory: string[]; outputs: string[]; startedAt: number }
   | { kind: 'analyze'; analyzer: string; files: string[]; facts: Fact[] };
 
 export interface JudgedFinding {
@@ -139,7 +139,7 @@ export class VerdictService {
     const base = { root: o.root, component: spec.component, checkId: spec.checkId, thresholds: spec.thresholds, hmacKey: this.#o.hmacKey.key };
     const job: Job =
       o.req.kind === 'parse'
-        ? { kind: 'parse', adapter: o.req.adapter, cwd: o.req.cwd, reports: o.req.reports, stdoutPath: o.req.stdoutPath, stderrPath: o.req.stderrPath, exit: o.req.exit, outputs: o.req.outputs, customSuccess: spec.customSuccess, inventory: o.req.inventory, ...base }
+        ? { kind: 'parse', adapter: o.req.adapter, cwd: o.req.cwd, reports: o.req.reports, stdoutPath: o.req.stdoutPath, stderrPath: o.req.stderrPath, exit: o.req.exit, outputs: o.req.outputs, customSuccess: spec.customSuccess, inventory: o.req.inventory, startedAt: o.req.startedAt, ...base }
         : { kind: 'analyze', analyzer: o.req.analyzer, files: o.req.files, references: spec.referenceValues, facts: o.req.facts, ...base };
     let result: JobResult;
     try {
@@ -201,16 +201,26 @@ export class VerdictService {
   #falseAlarms(projectId: string, prints: readonly string[]): Map<string, string> {
     const out = new Map<string, string>();
     if (!prints.length) return out;
-    const rows = this.#o.db.all<{ id: string; target_ref: string; fingerprint: string | null }>(
-      "SELECT r.id, r.target_ref, f.fingerprint FROM reviews r LEFT JOIN findings f ON f.id = r.target_ref WHERE r.project_id = ? AND r.target_type = 'finding' AND r.decision = ? ORDER BY r.created_at",
+    // Every review of a finding, oldest first: the latest decision on a fingerprint is the one that holds. The
+    // fingerprint is read from the review itself (scope_json, as DEV-9 writes it) before the finding row, which
+    // retention may have deleted with its run [D-DEV6-14].
+    const rows = this.#o.db.all<{ id: string; target_ref: string; decision: string; scope_json: string; fingerprint: string | null }>(
+      "SELECT r.id, r.target_ref, r.decision, r.scope_json, f.fingerprint FROM reviews r LEFT JOIN findings f ON f.id = r.target_ref WHERE r.project_id = ? AND r.target_type = 'finding' ORDER BY r.created_at, r.rowid",
       projectId,
-      FALSE_ALARM,
     );
     const wanted = new Set(prints);
+    const latest = new Map<string, { id: string; decision: string }>();
     for (const r of rows) {
-      const fp = r.fingerprint ?? r.target_ref;
-      if (wanted.has(fp)) out.set(fp, r.id);
+      let scoped: unknown = null;
+      try {
+        scoped = (JSON.parse(r.scope_json) as { fingerprint?: unknown }).fingerprint;
+      } catch {
+        scoped = null;
+      }
+      const fp = typeof scoped === 'string' ? scoped : (r.fingerprint ?? r.target_ref);
+      if (wanted.has(fp)) latest.set(fp, { id: r.id, decision: r.decision });
     }
+    for (const [fp, r] of latest) if (r.decision === FALSE_ALARM) out.set(fp, r.id);
     return out;
   }
 
@@ -381,7 +391,7 @@ export class VerdictService {
     const total = onlyResolved ? 0 : (db.get<{ n: number }>(`SELECT count(*) AS n ${from} WHERE ${where.join(' AND ')}`, ...params)?.n ?? 0);
     const rows = onlyResolved
       ? []
-      : db.all<FindingRow>(`SELECT fi.*, c.run_id AS run_id ${from} WHERE ${where.join(' AND ')} ORDER BY CASE fi.effect WHEN 'violation' THEN 0 WHEN 'review' THEN 1 WHEN 'warning' THEN 2 WHEN 'note' THEN 3 ELSE 4 END, fi.display_id LIMIT ? OFFSET ?`, ...params, f.limit ?? 200, f.offset ?? 0);
+      : db.all<FindingRow>(`SELECT fi.*, c.run_id AS run_id ${from} WHERE ${where.join(' AND ')} ORDER BY CASE fi.effect WHEN 'violation' THEN 0 WHEN 'review' THEN 1 WHEN 'warning' THEN 2 WHEN 'note' THEN 3 ELSE 4 END, fi.display_id, fi.rowid LIMIT ? OFFSET ?`, ...params, f.limit ?? 200, f.offset ?? 0);
     const excludedByReview = db.get<{ n: number }>(`SELECT count(*) AS n ${from} WHERE ${excludedWhere.join(' AND ')}`, ...params)?.n ?? 0;
     const wantResolved = !f.crossRun?.length || f.crossRun.includes('resolved');
     return { findings: rows.map((r) => this.#view(r)), total, resolved: runId && wantResolved ? this.#resolved(projectId, runId, f) : [], excludedByReview };
@@ -414,11 +424,13 @@ export class VerdictService {
     const row = db.get<FindingRow>('SELECT fi.*, c.run_id AS run_id FROM findings fi JOIN check_runs c ON c.id = fi.check_run_id WHERE fi.id = ?', findingId);
     if (!row) throw new CommandError('not_found', { reason: 'finding' });
     const history = db.all<{ run_id: string; check_run_id: string; finished_at: string | null; outcome: string | null }>(
-      'SELECT c.run_id, c.id AS check_run_id, c.finished_at, c.outcome FROM findings fi JOIN check_runs c ON c.id = fi.check_run_id WHERE fi.fingerprint = ? AND fi.id <> ? AND c.check_id = ? AND c.component = ? ORDER BY c.finished_at DESC LIMIT 100',
+      // The same project only: two copies of one repository share their fingerprints, never their history.
+      'SELECT c.run_id, c.id AS check_run_id, c.finished_at, c.outcome FROM findings fi JOIN check_runs c ON c.id = fi.check_run_id JOIN runs r ON r.id = c.run_id WHERE fi.fingerprint = ? AND fi.id <> ? AND c.check_id = ? AND c.component = ? AND r.project_id = (SELECT project_id FROM runs WHERE id = ?) ORDER BY c.finished_at DESC, c.rowid DESC LIMIT 100',
       row.fingerprint,
       row.id,
       row.check_id,
       row.component,
+      row.run_id,
     );
     return { finding: this.#view(row), history: history.map((h) => ({ runId: h.run_id, checkRunId: h.check_run_id, at: h.finished_at, outcome: (h.outcome as CheckOutcome | null) ?? null })) };
   }

@@ -20,7 +20,7 @@ function ctx(o: { files?: Record<string, string>; stdout?: string; stderr?: stri
     return { name: slash > 0 ? k.slice(slash + 1) : k, step: slash > 0 ? Number(k.slice(0, slash)) : 1, text, size: text.length, truncated: false };
   });
   const project = o.project ?? {};
-  return { root: ROOT, cwd: o.cwd ?? ROOT, component: '.', checkId: o.checkId ?? 'beh.unit', files, stdout: o.stdout ?? '', stderr: o.stderr ?? '', read: (rel) => project[rel] ?? null, countFiles: () => o.count ?? 1, thresholds: o.thresholds ?? null, outputs: [], exists: (rel) => rel in project, customSuccess: (o.customSuccess ?? null) as CheckSpec['customSuccess'] };
+  return { root: ROOT, cwd: o.cwd ?? ROOT, component: '.', checkId: o.checkId ?? 'beh.unit', files, stdout: o.stdout ?? '', stderr: o.stderr ?? '', read: (rel) => project[rel] ?? null, countFiles: () => o.count ?? 1, thresholds: o.thresholds ?? null, outputs: [], exists: (rel) => rel in project, customSuccess: (o.customSuccess ?? null) as CheckSpec['customSuccess'], projectReport: (rel) => (rel in project ? { text: project[rel]!, problem: null, size: project[rel]!.length } : { text: null, problem: 'missing', size: null }) };
 }
 const exitOf = (code: number | null, steps?: (number | null)[]) => ({ exitCode: code, signal: null, steps: (steps ?? [code]).map((c, i) => ({ n: i + 1, exitCode: c, ended: 'exited' })) });
 function run(a: Adapter, c: ParseContext, code: number | null, steps?: (number | null)[]): { report: ParsedReport; exit: ExitSignal } {
@@ -103,6 +103,22 @@ const TEST_FILE = { 'test/add.test.js': "import { it } from 'vitest';\n\nit('ي�
 
 describe('Vitest (AT-14)', () => {
   const v = A('vitest');
+  it('two tests of one name in one run, one failing: a failure, never «متذبذب» (review M2)', () => {
+    const { report } = run(v, ctx({ files: { 'vitest.json': vitestJson([{ title: 'x', status: 'passed' }, { title: 'x', status: 'failed', msg: 'boom' }]) } }), 1);
+    expect(report).toMatchObject({ signals: { flaky: false }, tests: { total: 2, passed: 1, failed: 1, flaky: 0 } });
+    expect(report.findings.map((x) => x.rule)).toEqual(['test.failed']);
+  });
+  it('the only test file failing to load is the project\'s failure, not the tool\'s (review minor 3)', () => {
+    const broken = JSON.stringify({ numTotalTests: 0, testResults: [{ name: `${ROOT}/test/add.test.js`, status: 'failed', message: 'Failed to parse source for import analysis', assertionResults: [] }] });
+    const r = run(v, ctx({ files: { 'vitest.json': broken } }), 1);
+    expect(r.exit).toEqual({ kind: 'ok' });
+    expect(r.report.findings.map((x) => [x.rule, x.location?.path])).toEqual([['test.collection-error', 'test/add.test.js']]);
+  });
+  it('a test that prints «No test files found» does not hide its report (review M3)', () => {
+    const r = run(v, ctx({ files: { 'vitest.json': vitestJson([{ title: 'a', status: 'failed', msg: 'x' }]) }, stdout: 'No test files found' }), 1);
+    expect(r.exit).toEqual({ kind: 'ok' });
+    expect(r.report.signals.noInputs).toBe(false);
+  });
   it('a failing test is a failure, at its line', () => {
     const { report, exit } = run(v, ctx({ files: { 'vitest.json': vitestJson([{ title: 'يجمع عددين', status: 'failed', msg: 'expected 5 to be 6' }]) }, project: TEST_FILE }), 1);
     expect(exit).toEqual({ kind: 'ok' });
@@ -277,5 +293,23 @@ describe('build and custom (AT-14)', () => {
     expect(run(A('custom-command'), ctx({ checkId: 'custom.x', customSuccess: { exitCode: 0, outputContains: 'OK' }, stdout: 'all OK' }), 0).report.findings).toEqual([]);
     expect(run(A('custom-command'), ctx({ checkId: 'custom.x', customSuccess: { exitCode: 0 } }), 3).report.findings[0]).toMatchObject({ rule: 'custom.failed', expected: '0', actual: '3' });
     expect(run(A('custom-command'), ctx({ checkId: 'custom.x', customSuccess: null }), 0).exit).toMatchObject({ kind: 'tool_error', reason: { key: 'adapter.reason.noSuccessCriterion' } });
+  });
+});
+
+describe('reports the project writes (StrykerJS, a custom check\'s declared file)', () => {
+  const mutation = JSON.stringify({ files: { 'src/a.js': { mutants: [{ status: 'Killed' }, { status: 'Survived', mutatorName: 'BooleanLiteral', replacement: 'false', location: { start: { line: 3 } } }] } } });
+  const at = (problem: 'missing' | 'stale' | 'too_large' | null, text: string | null = null): ParseContext => ({ ...ctx({ checkId: 'beh.mutation', thresholds: { mutationScore: 60 } }), projectReport: () => ({ text, problem, size: text?.length ?? 60_000_000 }) });
+  it('reads a report written in this run, and decides by the declared threshold only', () => {
+    const r = run(A('stryker'), at(null, mutation), 0);
+    expect(r.report.info).toMatchObject({ score: 50, threshold: 60 });
+    expect(r.report.findings.map((f) => f.rule)).toEqual(['mutant.survived', 'mutation.score-below']);
+    // A threshold that is not a number is none: «ناقص إعداد», never an invented 0 (7.4).
+    expect(run(A('stryker'), { ...at(null, mutation), thresholds: { mutationScore: null } }, 0).exit).toMatchObject({ kind: 'missing', reason: { key: 'adapter.reason.noThreshold' } });
+  });
+  it('never takes a report left from before, nor one over the limit', () => {
+    expect(run(A('stryker'), at('stale'), 0).report.problems).toEqual([expect.objectContaining({ code: 'missing', detail: expect.stringContaining('from before') as string })]);
+    expect(run(A('stryker'), at('too_large'), 0).report.problems).toEqual([expect.objectContaining({ code: 'too_large' })]);
+    const custom = { ...at('stale'), customSuccess: { exitCode: 0, report: 'out/junit.xml' } as CheckSpec['customSuccess'], checkId: 'custom.x' };
+    expect(run(A('custom-command'), custom, 0).report.problems).toEqual([expect.objectContaining({ code: 'missing' })]);
   });
 });

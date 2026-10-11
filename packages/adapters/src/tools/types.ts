@@ -99,7 +99,11 @@ export const svelteCheck: Adapter = {
     if (text === null) return r;
     let completed = false;
     for (const line of stripAnsi(text).split('\n')) {
-      if (/^\d+\s+COMPLETED\s/.test(line)) completed = true;
+      const done = /^\d+\s+COMPLETED\s+(\d+)\s+FILES/.exec(line);
+      if (done) {
+        completed = true;
+        r.info.files = Number(done[1]);
+      } else if (/^\d+\s+COMPLETED\s/.test(line)) completed = true;
       const m = SVELTE_LINE.exec(line);
       if (!m) continue;
       const p = normalizePath(m[2]!, ctx.root, ctx.cwd);
@@ -112,6 +116,7 @@ export const svelteCheck: Adapter = {
     if (report.problems.length) return { kind: 'ok' };
     if (!report.info.completed) return { kind: 'tool_error', reason: reason('adapter.reason.stoppedBeforeTests', { tool: 'svelte-check', detail: firstErrorLine(stripAnsi(ctx.stderr || ctx.stdout)) }) };
     const errors = report.findings.filter((f) => f.level === 'error').length;
+    if (exit.exitCode === 0 && report.info.files === 0) return { kind: 'missing', reason: reason('adapter.reason.noInputFiles', { tool: 'svelte-check' }) };
     if (exit.exitCode === 0) return errors ? { kind: 'conflict', reason: reason('adapter.reason.conflictExitPass', { tool: 'svelte-check', exit: 0, failed: errors }) } : { kind: 'ok' };
     if (exit.exitCode === 1) return errors || report.findings.length ? { kind: 'ok' } : { kind: 'conflict', reason: reason('adapter.reason.conflictExitFail', { tool: 'svelte-check', exit: 1 }) };
     return unknownExit(this, exit.exitCode);

@@ -87,7 +87,7 @@ export const semgrep: Adapter = {
           pushFinding(r, finding({ rule: id, toolRule: id, message: str(extra.message), location: { path: p.path, ...(p.outside ? { outside: true } : {}), ...(line ? { line } : {}), ...(column ? { column } : {}) }, anchor: { kind: 'code', value: '' } }));
         } else {
           // The project's rule: ERROR breaks the criterion, WARNING is the warnings policy's, INFO a note.
-          pushFinding(r, finding({ rule: 'sast.project-rule', toolRule: id, proof: sev === 'INFO' ? 'suggestion' : 'proven', level: sev === 'ERROR' ? 'error' : sev === 'WARNING' ? 'warning' : null, message: str(extra.message), location: { path: p.path, ...(line ? { line } : {}) }, anchor: { kind: 'code', value: '' } }));
+          pushFinding(r, finding({ rule: 'sast.project-rule', toolRule: id, proof: sev === 'INFO' ? 'suggestion' : 'proven', level: sev === 'ERROR' ? 'error' : sev === 'WARNING' ? 'warning' : null, message: str(extra.message), location: { path: p.path, ...(p.outside ? { outside: true } : {}), ...(line ? { line } : {}) }, anchor: { kind: 'code', value: '' } }));
         }
       }
       // Semgrep's own errors: a target it could not parse is a note (its other targets were scanned); a rule error
@@ -103,6 +103,8 @@ export const semgrep: Adapter = {
     if (bad !== undefined) return { kind: 'tool_error', reason: reason('adapter.reason.configError', { tool: 'semgrep', code: bad ?? -1, detail: firstErrorLine(stripAnsi(ctx.stderr || ctx.stdout)) }) };
     if (report.problems.length) return { kind: 'ok' };
     if (report.signals.configError) return { kind: 'tool_error', reason: reason('adapter.reason.configError', { tool: 'semgrep', code: 0, detail: 'rule error' }) };
+    // It says which targets it scanned: none is nothing read, never a pass.
+    if (report.info.scanned === 0 && !report.findings.length) return { kind: 'missing', reason: reason('adapter.reason.noInputFiles', { tool: 'semgrep' }) };
     return { kind: 'ok' };
   },
 };
@@ -230,7 +232,9 @@ function secretsParse(a: Adapter, ctx: ParseContext, history: boolean): ParsedRe
       const file = str(leak.File);
       const commit = str(leak.Commit);
       // In the files: relative to the root (`dir .`); in the history: a path of the repository.
-      const p = history ? { path: posix.normalize(file).replace(/^\.\//, '').normalize('NFC'), outside: false } : normalizePath(file, ctx.root, ctx.cwd);
+      // In the history, a path of the repository's tree: relative, never above it (a crafted tree is kept outside).
+      const inTree = posix.normalize(file).replace(/^\.\//, '').normalize('NFC');
+      const p = history ? (posix.isAbsolute(inTree) || inTree === '..' || inTree.startsWith('../') ? { path: posix.basename(inTree), outside: true } : { path: inTree, outside: false }) : normalizePath(file, ctx.root, ctx.cwd);
       const line = int(leak.StartLine);
       const start = int(leak.StartColumn);
       const end = int(leak.EndColumn);
@@ -350,7 +354,7 @@ export const lychee: Adapter = {
               rule: broken ? 'link.broken' : 'link.unverified',
               toolRule: Number.isFinite(code) ? String(code) : kind === 'timeout' ? 'timeout' : null,
               message: `${url}: ${str(status.text, kind)}`,
-              location: { path: p.path, ...(line ? { line } : {}) },
+              location: { path: p.path, ...(p.outside ? { outside: true } : {}), ...(line ? { line } : {}) },
               anchor: { kind: 'text', value: url },
             }));
           }

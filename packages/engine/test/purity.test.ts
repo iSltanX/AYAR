@@ -142,6 +142,8 @@ describe('11.3 and 11.4: the rules of counting (AT-21)', () => {
     expect(round(all, { ...CLEAN, modelClaimsOpen: 2 }).verdict).toBe('incomplete');
     expect(round(all, { ...CLEAN, reviewsExpired: 1 }).verdict).toBe('incomplete');
     expect(round(all, { ...CLEAN, checks: [...CLEAN.checks.slice(1), { checkId: 'integ.guard', outcome: 'unavailable' }] })).toMatchObject({ verdict: 'incomplete', incompleteReasons: [{ key: 'purity.reason.integrityCheck', params: { check: 'integ.guard', outcome: 'unavailable' } }] });
+    // No integrity check at all is not a clean integrity (review, minor 1).
+    expect(round(all, { ...CLEAN, checks: [] })).toMatchObject({ verdict: 'incomplete', karat: 24, incompleteReasons: [{ key: 'purity.reason.integrityNotEvaluated' }] });
     // A blocking failure still blocks, whatever the integrity says.
     expect(round([...all, check('beh.unit', 'failed', { blocking: true })], { ...CLEAN, stateChanged: true }).verdict).toBe('blocked');
   });

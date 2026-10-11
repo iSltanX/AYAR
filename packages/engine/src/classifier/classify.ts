@@ -141,7 +141,9 @@ export function classify(i: ClassifyInput): Classification {
   if (counts.review > 0) return done('needs_review', { key: 'verdict.reason.review', params: { count: counts.review } });
   // 9. Warnings the policy counts.
   if (counts.warnings > 0) return done('warning', { key: 'verdict.reason.warnings', params: { count: counts.warnings } });
-  // 10. A pass, with the evidence the adapter vouched for (its exit map said ok).
+  // 10. A pass, with the evidence the adapter vouched for (its exit map said ok); a test report where no test ran
+  //     vouches for nothing: «ناقص» (2.5 «لا اجتياز بلا دليل»), whatever an adapter's map let through.
+  if (tests && tests.passed + tests.flaky === 0) return done('missing', { key: 'verdict.reason.noTestsRan', params: { total: tests.total } });
   if (tests) return done('passed', { key: 'verdict.reason.testsPassed', params: { passed: tests.passed, total: tests.total } });
   return done('passed', { key: counts.notes > 0 ? 'verdict.reason.passedWithNotes' : 'verdict.reason.passed', params: { notes: counts.notes } });
 }

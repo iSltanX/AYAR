@@ -43,7 +43,7 @@ export const vitest: Adapter = {
     const out = stripAnsi(`${ctx.stdout}\n${ctx.stderr}`);
     r.signals.noInputs = /No test files found/.test(out);
     const attempts: Attempt[] = [];
-    const perStep: { total: number; failed: number }[] = [];
+    const perStep: { total: number; failed: number; loadFailures: number }[] = [];
     const steps = Math.max(1, exit.steps.length);
     for (let n = 1; n <= steps; n++) {
       const json = filesNamed(ctx, 'vitest.json').find((f) => f.step === n);
@@ -89,9 +89,13 @@ export const vitest: Adapter = {
         if (x.ok) for (const c of x.value.cases.filter((k) => k.classname === 'vitest unhandled errors')) attempt.collectionErrors.push({ message: c.message, location: null });
       }
       const failed = attempt.tests.filter((t) => t.status === 'failed').length + attempt.collectionErrors.length;
-      perStep.push({ total: attempt.tests.length, failed });
+      // A test file that did not load is the project's (a syntax or import error); an error Vitest caught outside any
+      // file (an environment that does not start) is the tool's.
+      perStep.push({ total: attempt.tests.length, failed, loadFailures: attempt.collectionErrors.filter((e) => e.location !== null).length });
       attempts.push(attempt);
     }
+    // The message alone never outranks a report that holds tests: the output also carries what the tests print.
+    if (attempts.some((a) => a.tests.length || a.collectionErrors.length)) r.signals.noInputs = false;
     if (attempts.length) fillTests(r, attempts);
     r.info.perStep = perStep;
     if (!attempts.length && r.signals.noInputs) r.tests = { total: 0, passed: 0, failed: 0, skipped: 0, errors: 0, flaky: 0 };
@@ -103,12 +107,11 @@ export const vitest: Adapter = {
     const codes = exit.steps.length ? exit.steps.map((s) => s.exitCode) : [exit.exitCode];
     if (codes.some((c) => c !== 0 && c !== 1)) return unknownExit(this, codes.find((c) => c !== 0 && c !== 1) ?? null);
     // Each attempt's exit agrees with its own report (7.3 rule 5).
-    const per = (report.info.perStep as { total: number; failed: number }[] | undefined) ?? [];
+    const per = (report.info.perStep as { total: number; failed: number; loadFailures: number }[] | undefined) ?? [];
     for (const [i, p] of per.entries()) {
       if (codes[i] === 0 && p.failed > 0) return { kind: 'conflict', reason: reason('adapter.reason.conflictExitPass', { tool: 'vitest', exit: 0, failed: p.failed }) };
       if (codes[i] === 1 && p.failed === 0 && p.total > 0) return { kind: 'conflict', reason: reason('adapter.reason.conflictExitFail', { tool: 'vitest', exit: 1 }) };
-      if (codes[i] === 1 && p.total === 0 && p.failed > 0) return { kind: 'tool_error', reason: reason('adapter.reason.stoppedBeforeTests', { tool: 'vitest', detail: firstErrorLine(stripAnsi(ctx.stderr)) }) };
-      if (codes[i] === 1 && p.total === 0) return { kind: 'tool_error', reason: reason('adapter.reason.stoppedBeforeTests', { tool: 'vitest', detail: firstErrorLine(stripAnsi(ctx.stderr)) }) };
+      if (codes[i] === 1 && p.total === 0 && p.loadFailures === 0) return { kind: 'tool_error', reason: reason('adapter.reason.stoppedBeforeTests', { tool: 'vitest', detail: firstErrorLine(stripAnsi(ctx.stderr)) }) };
     }
     const repeated = repeatedExit(codes.length, report.tests, 'vitest');
     if (repeated) return repeated;

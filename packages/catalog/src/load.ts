@@ -280,6 +280,9 @@ function rulesIssues(rules: CatalogData['rules'], semgrep: SemgrepData, checkIds
     // D-34: only a proven finding breaks the criterion or is a warning; a suspicion or a suggestion has no level (a
     // proven signal with no level, test.flaky, is rule 7 of 7.3).
     if (r.proof !== 'proven' && r.level !== null) issues.push(`rule ${r.id}: only a proven rule has a level`);
+    // And a proven rule has one: without it, a proven finding would weigh nothing. test.flaky alone is rule 7's,
+    // carried by the report's flaky signal.
+    if (r.proof === 'proven' && r.level === null && r.id !== 'test.flaky') issues.push(`rule ${r.id}: a proven rule needs a level`);
   }
   for (const s of sectionIds) if (!rules.sectionCodes[s as SectionId]) issues.push(`rules: section ${s} has no code`);
   const codes = new Set<string>();

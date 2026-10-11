@@ -30,7 +30,8 @@ function decode(s: string, line: number): string {
     if (!whole.endsWith(';')) throw new XmlError('malformed', `line ${line}: an unterminated reference ${whole}`);
     if (ent.startsWith('#x')) return safeCodePoint(parseInt(ent.slice(2), 16), line);
     if (ent.startsWith('#')) return safeCodePoint(parseInt(ent.slice(1), 10), line);
-    const v = PREDEFINED[ent];
+    // Own entries only: `&toString;` is not one of the five.
+    const v = Object.hasOwn(PREDEFINED, ent) ? PREDEFINED[ent] : undefined;
     if (v === undefined) throw new XmlError('malformed', `line ${line}: an undeclared entity &${ent}; (no DTD is read)`);
     return v;
   });

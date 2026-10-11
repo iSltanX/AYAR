@@ -210,6 +210,8 @@ export function startEngine(o: StartEngineOptions): EngineHandle {
       if (maintenance) clearInterval(maintenance);
       services?.projects.cancelAll();
       const finish = () => {
+        // The verdict's worker threads end with the engine (their jobs are dropped).
+        void services?.verdict.pool.close().catch(() => undefined);
         bus?.close();
         try {
           result?.db?.close();

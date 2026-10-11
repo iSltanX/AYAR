@@ -66,6 +66,8 @@ export const jest: Adapter = {
       perStep.push({ total: attempt.tests.length, failed: attempt.tests.filter((t) => t.status === 'failed').length + attempt.collectionErrors.length });
       attempts.push(attempt);
     }
+    // The message alone never outranks a report that holds tests: the output also carries what the tests print.
+    if (attempts.some((a) => a.tests.length || a.collectionErrors.length)) r.signals.noInputs = false;
     if (attempts.length) fillTests(r, attempts);
     r.info.perStep = perStep;
     return r;

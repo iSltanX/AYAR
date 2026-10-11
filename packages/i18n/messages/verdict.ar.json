@@ -8,6 +8,7 @@
   "verdict.reason.review": "يحتاج مراجعة: اشتباهات تحتاج قرارك ({count})",
   "verdict.reason.warnings": "تحذير: تحذيرات تعدّها سياسة التحذيرات ({count})",
   "verdict.reason.testsPassed": "اجتاز: نجحت الاختبارات ({passed} من {total})",
+  "verdict.reason.noTestsRan": "ناقص: لم ينجح أي اختبار يُعتدّ به في التقرير (الاختبارات {total})، فلا اجتياز بلا دليل",
   "verdict.reason.passed": "اجتاز: لا مخالفة في التقرير",
   "verdict.reason.passedWithNotes": "اجتاز، مع ملاحظات لا تغيّر النتيجة ({notes})",
   "verdict.reason.readerFailed": "تعذّر: لم تُقرأ تقارير الأداة ({detail})",

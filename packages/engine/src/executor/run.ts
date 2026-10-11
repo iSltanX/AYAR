@@ -752,27 +752,31 @@ export class RunService {
       sideEffects = diffManifests(before, after, { declared: ctx.declared, tracked: await trackedPaths(ports.fs, ctx.root) });
       await add('side-effects.json', 'side_effects', new TextEncoder().encode(JSON.stringify(sideEffects, null, 2)));
     }
-    // The reports, step by step (`<reports>/<n>/`): a single step's keep their own names.
+    // The raw reports never outlive this block, whatever happens in it (D-46: only their redacted copies are kept).
     const reports: ReportInput[] = [];
-    const single = inv.plan.steps.length === 1;
-    await this.#collectReports(reportsDir, async (name, path, size) => {
-      const slash = name.indexOf('/');
-      const step = slash > 0 && /^\d+$/.test(name.slice(0, slash)) ? Number(name.slice(0, slash)) : 1;
-      const own = slash > 0 && /^\d+$/.test(name.slice(0, slash)) ? name.slice(slash + 1) : name;
-      const evName = `reports/${single ? own : name}`;
-      const target = posix.join(evDir, evName);
-      await ports.fs.mkdir(posix.dirname(target), 0o700);
-      // C-15: a report over the limit is not read, so not kept either: its size is, as the reason of «تعذّر».
-      const over = size > REPORT_READ_LIMIT;
-      const counts = over ? {} : await this.#redactInto(path, target, redactor);
-      if (over && !(await ports.fs.writeFileExclusive(target, new TextEncoder().encode(`⟦not kept: the report was ${size} bytes, over the read limit of ${REPORT_READ_LIMIT} (C-15)⟧\n`), 0o600))) throw new Error(`evidence exists: ${evName}`);
-      const ref = await add(evName, 'report', undefined, { counts, truncated: over });
-      reports.push({ name: own, step, path: evidence.store.absolute(ref.relPath), size, truncated: over });
-    });
-    // E-10's stand-in git: how it was called, as evidence (AT-01: no git on the project from a static tool).
-    const nogit = await ports.fs.readFilePrefix(posix.join(tmpDir, NOGIT_LOG), 1024 * 1024).catch(() => null);
-    if (nogit) await add(NOGIT_LOG, 'trace', new TextEncoder().encode(redactor.redactText(new TextDecoder().decode(nogit.data)).text));
-    await ports.fs.remove(tmpRoot);
+    try {
+      // The reports, step by step (`<reports>/<n>/`): a single step's keep their own names.
+      const single = inv.plan.steps.length === 1;
+      await this.#collectReports(reportsDir, async (name, path, size) => {
+        const slash = name.indexOf('/');
+        const step = slash > 0 && /^\d+$/.test(name.slice(0, slash)) ? Number(name.slice(0, slash)) : 1;
+        const own = slash > 0 && /^\d+$/.test(name.slice(0, slash)) ? name.slice(slash + 1) : name;
+        const evName = `reports/${single ? own : name}`;
+        const target = posix.join(evDir, evName);
+        await ports.fs.mkdir(posix.dirname(target), 0o700);
+        // C-15: a report over the limit is not read, so not kept either: its size is, as the reason of «تعذّر».
+        const over = size > REPORT_READ_LIMIT;
+        const counts = over ? {} : await this.#redactInto(path, target, redactor);
+        if (over && !(await ports.fs.writeFileExclusive(target, new TextEncoder().encode(`⟦not kept: the report was ${size} bytes, over the read limit of ${REPORT_READ_LIMIT} (C-15)⟧\n`), 0o600))) throw new Error(`evidence exists: ${evName}`);
+        const ref = await add(evName, 'report', undefined, { counts, truncated: over });
+        reports.push({ name: own, step, path: evidence.store.absolute(ref.relPath), size, truncated: over });
+      });
+      // E-10's stand-in git: how it was called, as evidence (AT-01: no git on the project from a static tool).
+      const nogit = await ports.fs.readFilePrefix(posix.join(tmpDir, NOGIT_LOG), 1024 * 1024).catch(() => null);
+      if (nogit) await add(NOGIT_LOG, 'trace', new TextEncoder().encode(redactor.redactText(new TextDecoder().decode(nogit.data)).text));
+    } finally {
+      await ports.fs.remove(tmpRoot);
+    }
 
     // The outcome the process itself gives (7.3 rule 1; 7.5), and the notes of 9.7 and 17.
     const notes: string[] = [];
@@ -856,6 +860,7 @@ export class RunService {
       exit: { exitCode: r.exitCode, signal: r.signal, steps: steps.map((s) => ({ n: s.n, exitCode: s.exitCode, ended: s.ended })) },
       inventory: ctx.inventory,
       outputs: ctx.outputs,
+      startedAt: startedWall.getTime(),
     };
     const judgement = await this.#o.verdict.judge(spec, { projectId: ctx.projectId, root: ctx.root, req, signal: active.quit.signal });
     if (judgement.outcome === 'cancelled') return this.#finishCheck(e, 'cancelled', { key: 'run.reason.appQuit' }, raw, notes, r);
@@ -978,12 +983,32 @@ export class RunService {
   #finishCheck(e: Exec, outcome: CheckOutcome | null, reason: Reason | null, raw: RawCheckResult | null, notes: readonly string[], r?: ProcessResult, ok?: boolean, verdict?: Verdict, inheritedOrigin?: string | null): void {
     const { db } = this.#o;
     const row = this.#checkRow(e.checkRunId);
+    const origin = verdict?.judgement.origin ?? inheritedOrigin ?? null;
+    try {
+      this.#saveCheck(e, row, outcome, reason, raw, notes, origin, r, verdict);
+    } catch (err) {
+      // The outcome could not be kept (the findings or the row): «تعذّر», written on its own, never a verdict that
+      // only lives in memory for the dependants to trust.
+      this.#o.logger.log('error', 'a check result could not be saved', { checkRunId: e.checkRunId, error: err instanceof Error ? err.message.slice(0, 300) : String(err) });
+      outcome = 'unavailable';
+      reason = { key: 'run.reason.internal' };
+      ok = false;
+      verdict = undefined;
+      db.run("UPDATE check_runs SET state = 'finished', outcome = 'unavailable', auto_outcome = 'unavailable', outcome_reason = ?, finished_at = ? WHERE id = ?", JSON.stringify(reason), this.#now(), e.checkRunId);
+    }
     e.state = 'done';
     e.outcome = outcome;
     e.raw = raw;
     // 7.3 rule 2: a dependant runs only after its dependency succeeded.
     e.ok = ok ?? (outcome === 'passed' || outcome === 'warning');
-    const origin = verdict?.judgement.origin ?? inheritedOrigin ?? null;
+    this.#o.events.emit('check.state', this.#checkView(this.#checkRow(e.checkRunId)));
+    if (verdict) this.#o.verdict.emitFinal(row.run_id, e.checkRunId);
+    this.#emitRun(row.run_id);
+  }
+
+  /** The outcome of an execution and its findings, in one transaction (DEV-6). */
+  #saveCheck(e: Exec, row: CheckRunRow, outcome: CheckOutcome | null, reason: Reason | null, raw: RawCheckResult | null, notes: readonly string[], origin: string | null, r: ProcessResult | undefined, verdict: Verdict | undefined): void {
+    const { db } = this.#o;
     db.transaction(() => {
       if (verdict) this.#o.verdict.persist({ projectId: this.#projectOf(row.run_id), runId: row.run_id, checkRunId: e.checkRunId, spec: { checkId: e.item.checkId, component: e.item.component, section: e.item.section }, judgement: verdict.judgement, evidenceIds: verdict.evidenceIds });
       db.run(
@@ -1009,9 +1034,6 @@ export class RunService {
         e.checkRunId,
       );
     });
-    this.#o.events.emit('check.state', this.#checkView(this.#checkRow(e.checkRunId)));
-    if (verdict) this.#o.verdict.emitFinal(row.run_id, e.checkRunId);
-    this.#emitRun(row.run_id);
   }
 
   #projectOf(runId: string): string {
@@ -1044,6 +1066,7 @@ export class RunService {
   async #collectReports(dir: string, each: (name: string, path: string, size: number) => Promise<void>): Promise<number> {
     const { fs } = this.#o.ports;
     let n = 0;
+    const used = new Set<string>();
     const walk = async (rel: string) => {
       const entries = await fs.readdirEntries(rel ? posix.join(dir, rel) : dir).catch(() => []);
       for (const x of entries.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))) {
@@ -1051,7 +1074,11 @@ export class RunService {
         if (x.kind === 'directory') await walk(r);
         else if (x.kind === 'file') {
           const st = await fs.lstat(posix.join(dir, r));
-          await each(r.replace(/[^A-Za-z0-9._/-]/g, '_'), posix.join(dir, r), st?.size ?? 0);
+          // A name made safe for the evidence store, and never the same as another's (`a b` and `a_b`).
+          let name = r.replace(/[^A-Za-z0-9._/-]/g, '_');
+          for (let k = 2; used.has(name); k++) name = `${r.replace(/[^A-Za-z0-9._/-]/g, '_')}-${k}`;
+          used.add(name);
+          await each(name, posix.join(dir, r), st?.size ?? 0);
           n++;
         }
       }

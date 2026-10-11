@@ -7,7 +7,7 @@
 import { finding, pushFinding } from '@ayar/adapters';
 import { parse } from '@babel/parser';
 import { posix } from 'node:path';
-import { checkCancel, factValues, OK, refValue, report, type Analyzer, type AnalyzerInput } from './common.ts';
+import { checkCancel, factValues, OK, readOrSay, refValue, report, type Analyzer, type AnalyzerInput } from './common.ts';
 import { globMatch } from './design.ts';
 
 // ── code.size ───────────────────────────────────────────────────────────────────────────────────────────────
@@ -200,7 +200,7 @@ export const complexityAnalyzer: Analyzer = {
     }
     for (const file of files) {
       checkCancel(i);
-      const code = i.read(file);
+      const code = readOrSay(i, r, file);
       if (code === null) continue;
       const measures = measureFunctions(code, file);
       if (!measures) {

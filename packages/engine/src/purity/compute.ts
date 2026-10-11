@@ -50,7 +50,7 @@ const lcm = (a: bigint, b: bigint): bigint => (a / gcd(a, b)) * b;
 export const outcomeWord = (o: CheckOutcome): string => o.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase());
 
 /** The outcomes that keep a check out of the count, in the order the reasons list them (11.4 rule 1). */
-const NOT_COUNTED: readonly CheckOutcome[] = ['failed', 'warning', 'needs_review', 'flaky', 'missing', 'unavailable', 'timed_out', 'cancelled', 'interrupted', 'skipped'];
+const NOT_COUNTED: readonly CheckOutcome[] = ['failed', 'warning', 'needs_review', 'flaky', 'missing', 'unavailable', 'timed_out', 'cancelled', 'interrupted', 'skipped', 'not_applicable'];
 
 /** Is this instance in R (11.2): required, applicable, of the index, with a criterion, and in scope. */
 export function inR(c: PurityCheckInput, scope: PurityScope): boolean {
@@ -118,12 +118,15 @@ export function computePurity(input: PurityInput): PurityResult {
   for (const c of [...integ.checks].sort((a, b) => (a.checkId < b.checkId ? -1 : 1))) {
     if (c.outcome !== 'passed' && c.outcome !== 'not_applicable') reasons.push({ key: 'purity.reason.integrityCheck', params: { check: c.checkId, outcome: c.outcome ?? 'absent' } });
   }
+  // A round with no integrity check at all has not been checked for integrity: never «نقي» by an empty list.
+  const unevaluated = input.scope.kind === 'round' && integ.checks.length === 0;
+  if (unevaluated) reasons.push({ key: 'purity.reason.integrityNotEvaluated' });
   if (integ.stateChanged) reasons.push({ key: 'purity.reason.stateChanged' });
   if (integ.guardUnreviewed) reasons.push({ key: 'purity.reason.guardUnreviewed', params: { count: integ.guardUnreviewed } });
   if (integ.modelClaimsOpen) reasons.push({ key: 'purity.reason.modelClaimsOpen', params: { count: integ.modelClaimsOpen } });
   if (integ.reviewsExpired) reasons.push({ key: 'purity.reason.reviewsExpired', params: { count: integ.reviewsExpired } });
 
-  const integrityHolds = integ.checks.every((c) => c.outcome === 'passed' || c.outcome === 'not_applicable') && !integ.stateChanged && integ.guardUnreviewed === 0 && integ.modelClaimsOpen === 0 && integ.reviewsExpired === 0;
+  const integrityHolds = !unevaluated && integ.checks.every((c) => c.outcome === 'passed' || c.outcome === 'not_applicable') && !integ.stateChanged && integ.guardUnreviewed === 0 && integ.modelClaimsOpen === 0 && integ.reviewsExpired === 0;
   let verdict: PurityResult['verdict'] = null;
   if (input.scope.kind === 'round') {
     if (blockingFailures.length) verdict = 'blocked';
@@ -131,7 +134,7 @@ export function computePurity(input: PurityInput): PurityResult {
     else verdict = 'pure';
   }
   // A section is «جزئي»: no verdict, and its reasons are its own checks' (the integrity reasons are the round's).
-  const incompleteReasons = input.scope.kind === 'section' ? reasons.filter((r) => !['purity.reason.integrityCheck', 'purity.reason.stateChanged', 'purity.reason.guardUnreviewed', 'purity.reason.modelClaimsOpen', 'purity.reason.reviewsExpired'].includes(r.key)) : verdict === 'pure' ? [] : reasons;
+  const incompleteReasons = input.scope.kind === 'section' ? reasons.filter((r) => !['purity.reason.integrityCheck', 'purity.reason.integrityNotEvaluated', 'purity.reason.stateChanged', 'purity.reason.guardUnreviewed', 'purity.reason.modelClaimsOpen', 'purity.reason.reviewsExpired'].includes(r.key)) : verdict === 'pure' ? [] : reasons;
 
   return {
     formula: PURITY_FORMULA,

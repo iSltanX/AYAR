@@ -39,6 +39,7 @@ type Reply = { ok: true; result: JobResult } | { ok: false; cancelled: boolean; 
  */
 export function workerPool(entry: URL | string, max = 2, fallback?: { run: (job: Job, cancelled: () => boolean) => JobResult; onFallback: (error: string) => void }): VerdictPool {
   let broken: string | null = null;
+  let closed = false;
   // A worker takes a path or a URL object, never a URL string (an entry's import.meta.url).
   const target = typeof entry === 'string' && entry.startsWith('file:') ? new URL(entry) : entry;
   let active = 0;
@@ -58,11 +59,11 @@ export function workerPool(entry: URL | string, max = 2, fallback?: { run: (job:
   };
   return {
     async run(job, o = {}) {
-      if (o.signal?.aborted) throw new JobCancelled();
+      if (o.signal?.aborted || closed) throw new JobCancelled();
       if (broken !== null && fallback) return inlinePool(fallback.run).run(job, o);
       await slot();
       try {
-        if (o.signal?.aborted) throw new JobCancelled();
+        if (o.signal?.aborted || closed) throw new JobCancelled();
         return await new Promise<JobResult>((resolve, reject) => {
           const flag = new Int32Array(new SharedArrayBuffer(4));
           const w = new Worker(target, { workerData: { [WORKER_MARKER]: true }, stdout: false, stderr: false });
@@ -88,7 +89,7 @@ export function workerPool(entry: URL | string, max = 2, fallback?: { run: (job:
           if (o.timeoutMs) timers.push(setTimeout(() => stop(new JobFailed('the job outlived its time', true)), o.timeoutMs));
           // A worker that never started (its module could not load): the job runs here instead, once and for all.
           const unstarted = (error: string) => {
-            if (ready || !fallback) return false;
+            if (settled || ready || !fallback) return false;
             broken = error;
             fallback.onFallback(error);
             done(() => void inlinePool(fallback.run).run(job, o).then(resolve, reject));
@@ -103,13 +104,18 @@ export function workerPool(entry: URL | string, max = 2, fallback?: { run: (job:
           });
           w.once('error', (e: Error) => unstarted(e.message) || done(() => reject(new JobFailed(e.message))));
           w.once('exit', (code) => unstarted(`exit ${code}`) || done(() => reject(new JobFailed(`the worker exited (${code})`))));
-          w.postMessage({ job, flag });
+          try {
+            w.postMessage({ job, flag });
+          } catch (e) {
+            done(() => reject(new JobFailed(e instanceof Error ? e.message : String(e))));
+          }
         });
       } finally {
         release();
       }
     },
     async close() {
+      closed = true;
       await Promise.all([...workers].map((w) => w.terminate()));
       workers.clear();
     },

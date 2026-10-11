@@ -129,8 +129,9 @@ export class SetupService {
     const { fs } = this.#o.ports;
     const base = await this.#o.environment.base();
     const home = base.env.HOME ?? '';
-    const cache = base.env.PLAYWRIGHT_BROWSERS_PATH && base.env.PLAYWRIGHT_BROWSERS_PATH !== '0' ? base.env.PLAYWRIGHT_BROWSERS_PATH : posix.join(home, 'Library/Caches/ms-playwright');
-    if (!cache.startsWith('/')) return false;
+    // PLAYWRIGHT_BROWSERS_PATH=0: the browsers live beside playwright-core in node_modules (.local-browsers).
+    const hermetic = base.env.PLAYWRIGHT_BROWSERS_PATH === '0';
+    const cacheOf = (core: string) => (hermetic ? posix.join(core, '.local-browsers') : base.env.PLAYWRIGHT_BROWSERS_PATH ? base.env.PLAYWRIGHT_BROWSERS_PATH : posix.join(home, 'Library/Caches/ms-playwright'));
     for (const dir of [...new Set([component, '.'])]) {
       // Node's own resolution from the project (pnpm's links included): @playwright/test → playwright → its core.
       let browsers: string | null = null;
@@ -152,6 +153,8 @@ export class SetupService {
       } catch {
         continue;
       }
+      const cache = cacheOf(posix.dirname(browsers));
+      if (!cache.startsWith('/')) return false;
       const wanted = [['chromium-headless-shell', 'chromium_headless_shell'], ['chromium', 'chromium']].filter(([n]) => revisions[n!]).map(([n, d]) => posix.join(cache, `${d}-${revisions[n!]}`));
       if (!wanted.length) continue;
       for (const w of wanted) if (!(await fs.lstat(w).catch(() => null))?.isDirectory) return false;
@@ -531,7 +534,8 @@ export async function packageVersion(fs: EnginePorts['fs'], root: string, compon
   for (const dir of [...new Set([component, '.'])]) {
     const pkg = posix.join(root, dir, 'node_modules', name, 'package.json');
     const real = await fs.realpath(pkg).catch(() => null);
-    if (real) {
+    // pnpm's links stay inside the project; one that leads elsewhere is not the project's package.
+    if (real && real.startsWith(`${root}/`)) {
       try {
         const v = (JSON.parse(new TextDecoder().decode((await fs.readFilePrefix(real, 256 * 1024)).data)) as { version?: unknown }).version;
         if (typeof v === 'string') return v;

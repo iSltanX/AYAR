@@ -36,6 +36,12 @@ describe('the limits (G-DEV1-05)', () => {
 });
 
 describe('XML without a DTD (C-15)', () => {
+  it('decodes the five entities only, never an inherited name', () => {
+    expect(readXml('<a>&lt;&amp;</a>', 'x.xml')).toMatchObject({ ok: true });
+    expect(readXml('<a>&toString;</a>', 'x.xml')).toMatchObject({ ok: false, problem: { code: 'malformed' } });
+    expect(readXml('<a>&constructor;</a>', 'x.xml')).toMatchObject({ ok: false });
+  });
+
   it('reads elements, attributes, text, CDATA and the five entities', () => {
     const x = readXml('<?xml version="1.0"?>\n<a x="1 &amp; 2"><b>t &lt;3 &#x41;</b><![CDATA[<raw>]]><!-- c --><c/></a>', 'r.xml');
     expect(x.ok).toBe(true);
@@ -70,6 +76,11 @@ describe('FX-REPORTS (AT-39, AT-14)', () => {
 });
 
 describe('text and paths (T3, C-15)', () => {
+  it('keeps a folder whose name starts with two dots inside the root', () => {
+    expect(normalizePath('/p/..cache/a.js', '/p', '/p')).toEqual({ path: '..cache/a.js', outside: false });
+    expect(normalizePath('/x/a.js', '/p', '/p')).toEqual({ path: 'a.js', outside: true });
+  });
+
   it('removes ANSI and shows the direction controls', () => {
     expect(stripAnsi('\u001b[31mred\u001b[39m \u001b]8;;http://x\u0007link\u001b]8;;\u0007')).toBe('red link');
     expect(visibleBidi('a‮b')).toBe('a⟪U+202E⟫b');

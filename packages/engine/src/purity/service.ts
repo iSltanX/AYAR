@@ -10,7 +10,7 @@
 // The integrity inputs (11.4 rules 6 to 9) are the round's integ.* outcomes and its state; what DEV-9 adds (the
 // guard's findings without a review, open model claims, expired reviews) comes in through the same interface.
 import type { Catalog } from '@ayar/catalog';
-import type { CheckOutcome, CheckSpec, IntegrityInputs, PurityMeta, PurityResult, PurityScope, PuritySummary } from '@ayar/protocol';
+import type { CheckOutcome, CheckSpec, IntegrityInputs, PurityMeta, PurityResult, PurityScope, PuritySummary, Reason } from '@ayar/protocol';
 import { PurityResult as PuritySchema, RunPlan as PlanSchema } from '@ayar/protocol';
 import { newId } from '../host/ids.ts';
 import type { EvidenceService } from '../evidence/service.ts';
@@ -129,16 +129,21 @@ export class PurityService {
       db.all<{ instance: string; check_run_id: string | null; outcome: string | null; reviewed: number; attempts_json: string }>('SELECT instance, check_run_id, outcome, reviewed, attempts_json FROM round_checks WHERE round_id = ?', roundId).map((r) => [r.instance, { instance: r.instance, checkRunId: r.check_run_id, outcome: (r.outcome as CheckOutcome | null) ?? null, reviewed: r.reviewed === 1, attempts: JSON.parse(r.attempts_json) as string[] }]),
     );
     const specs = this.#specs(run);
+    // 9.12 point 4: a retry whose outcome differs from the one the round keeps is recorded with the round.
+    const notes: Reason[] = [];
     for (const retry of this.#membersOfRun(run.id).values()) {
       const before = members.get(retry.instance);
       const policy = specs.get(retry.instance)?.flakyPolicy ?? 'flaky';
       const m = mergeOutcome(before?.outcome ?? null, retry.outcome, policy);
       const attempts = [...(before?.attempts ?? []), ...retry.attempts];
-      if (m.took === 'before' && before) members.set(retry.instance, { ...before, attempts });
+      if (m.took === 'before' && before) {
+        members.set(retry.instance, { ...before, attempts });
+        if (retry.outcome !== null && retry.outcome !== before.outcome && !INDECISIVE.includes(retry.outcome)) notes.push({ key: 'purity.note.retryDiffered', params: { instance: retry.instance, kept: before.outcome ?? 'absent', retry: retry.outcome } });
+      }
       else members.set(retry.instance, { instance: retry.instance, checkRunId: retry.checkRunId, outcome: m.outcome, reviewed: m.took === 'retry' ? retry.reviewed : false, attempts });
     }
     const base = round.base_run_id ? db.get<{ state_changed: number | null }>('SELECT state_changed FROM runs WHERE id = ?', round.base_run_id) : null;
-    const result = this.#compute(run, { kind: 'round', roundId }, members, base?.state_changed === 1 || run.state_changed === 1, round.snapshot_id);
+    const result = { ...this.#compute(run, { kind: 'round', roundId }, members, base?.state_changed === 1 || run.state_changed === 1, round.snapshot_id), notes };
     db.transaction(() => {
       db.run('UPDATE rounds SET verdict = ?, purity_json = ?, updated_at = ? WHERE id = ?', result.verdict, JSON.stringify(result), ports.clock.now().toISOString(), roundId);
       for (const m of members.values()) db.run('INSERT INTO round_checks (round_id, instance, check_run_id, outcome, reviewed, attempts_json) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (round_id, instance) DO UPDATE SET check_run_id = excluded.check_run_id, outcome = excluded.outcome, reviewed = excluded.reviewed, attempts_json = excluded.attempts_json', roundId, m.instance, m.checkRunId, m.outcome, m.reviewed ? 1 : 0, JSON.stringify(m.attempts));

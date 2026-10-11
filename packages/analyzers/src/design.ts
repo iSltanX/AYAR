@@ -9,7 +9,7 @@ import { finding, pushFinding } from '@ayar/adapters';
 import type { ExitSignal } from '@ayar/protocol';
 import postcss from 'postcss';
 import { posix } from 'node:path';
-import { checkCancel, factValues, htmlTags, OK, refValue, report, styleSources, type Analyzer, type AnalyzerInput } from './common.ts';
+import { checkCancel, factValues, htmlTags, OK, readOrSay, refValue, report, styleSources, type Analyzer, type AnalyzerInput } from './common.ts';
 import { stripJsonComments } from './manifest.ts';
 
 // ── tokens ──────────────────────────────────────────────────────────────────────────────────────────────────
@@ -201,7 +201,7 @@ export const tokensAnalyzer: Analyzer = {
     const files = styleFiles(i, cfg.scope, cfg.exclude).filter((f) => !sourceFiles.has(f));
     for (const file of files) {
       checkCancel(i);
-      const text = i.read(file);
+      const text = readOrSay(i, r, file);
       if (text === null) continue;
       for (const s of styleSources(file, text)) {
         let root: postcss.Root;
@@ -294,7 +294,7 @@ export const fontsAnalyzer: Analyzer = {
     const remote = (file: string, line: number, url: string) => pushFinding(r, finding({ rule: 'fonts.remote', level: cfg.localOnly ? 'error' : 'warning', message: `a font loaded from ${url.replace(/^(https?:)?\/\//, '').split('/')[0]}; AYAR loads nothing from the network while scanning`, location: { path: file, line }, anchor, actual: url }));
     for (const file of files) {
       checkCancel(i);
-      const text = i.read(file);
+      const text = readOrSay(i, r, file);
       if (text === null) continue;
       // Pages: a stylesheet from a font host (`<link href="https://fonts.googleapis.com/…">`).
       if (/\.html?$/i.test(file)) {
@@ -359,7 +359,7 @@ export const rtlAnalyzer: Analyzer = {
     const pages = factValues(i, 'ui.entryPages').flatMap((f) => (f.files as string[] | undefined) ?? []);
     for (const page of pages) {
       checkCancel(i);
-      const text = i.read(page);
+      const text = readOrSay(i, r, page);
       if (text === null) continue;
       const html = htmlTags(text).find((t) => t.name === 'html');
       if (!html) continue;
@@ -370,7 +370,7 @@ export const rtlAnalyzer: Analyzer = {
     // Physical properties: suggestions, by number and place (a physical property may be intended).
     for (const file of styleFiles(i, null, [])) {
       checkCancel(i);
-      const text = i.read(file);
+      const text = readOrSay(i, r, file);
       if (text === null) continue;
       for (const s of styleSources(file, text)) {
         try {

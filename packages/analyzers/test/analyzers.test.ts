@@ -160,3 +160,18 @@ describe('the inventory of tests and gaps (C-13, for C-20)', () => {
     expect(lcovGaps('SF:/p/a.js\nFN:2,g\nFNDA:0,g\nLF:3\nLH:0\nend_of_record\n', '/p')).toEqual([{ file: 'a.js', kind: 'function-not-executed', name: 'g', line: 2 }, { file: 'a.js', kind: 'not-executed' }]);
   });
 });
+
+describe('a file the analysis cannot read (review M5)', () => {
+  it('is said, with a finding and a count, never skipped in silence', () => {
+    const { root, cleanup } = materialize('FX-NOTEST', 'good');
+    try {
+      const i = input(root, { checkId: 'code.refs.local' });
+      const md = i.files.find((f) => f.endsWith('.md'))!;
+      const r = run('refs-local', { ...i, read: (rel) => (rel === md ? null : i.read(rel)) });
+      expect(r.report.findings).toEqual(expect.arrayContaining([expect.objectContaining({ rule: 'analysis.unparsable-file', origin: 'tool', location: { path: md } })]));
+      expect(r.report.info.unreadable).toBe(1);
+    } finally {
+      cleanup();
+    }
+  });
+});

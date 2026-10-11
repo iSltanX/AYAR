@@ -22,6 +22,8 @@ export function readSarif(text: string, file: string): Read<{ results: SarifResu
   const root = rec(j.value);
   if (str(root.version) !== '2.1.0') return problem('unsupported', file, `SARIF version ${str(root.version, 'missing')}; AYAR reads 2.1.0`);
   if (!Array.isArray(root.runs)) return problem('incomplete', file, 'runs is missing');
+  // No run at all: no tool says it looked at anything, so nothing is vouched for (never a pass by absence).
+  if (!root.runs.length) return problem('incomplete', file, 'runs is empty: no tool run is recorded');
   const results: SarifResult[] = [];
   const tools: string[] = [];
   for (const [n, run] of arr(root.runs).entries()) {

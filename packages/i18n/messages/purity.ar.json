@@ -15,5 +15,8 @@
   "purity.reason.stateChanged": "تغيرت الحالة أثناء الفحص",
   "purity.reason.guardUnreviewed": "آثار نزاهة بلا مراجعة ({count})",
   "purity.reason.modelClaimsOpen": "ادعاءات نموذج لم تثبت محليًا ولا قرار فيها ({count})",
-  "purity.reason.reviewsExpired": "مراجعات إلزامية تغيّر نطاقها ({count})"
+  "purity.reason.reviewsExpired": "مراجعات إلزامية تغيّر نطاقها ({count})",
+  "purity.reason.integrityNotEvaluated": "لم يُفحص شيء من النزاهة في هذه الجولة",
+  "purity.reason.notApplicable": "فحوص مطلوبة لم تنطبق عند التشغيل ({count})",
+  "purity.note.retryDiffered": "الإعادة على الحالة نفسها أعطت {retry} لـ {instance}، وبقيت نتيجة الجولة {kept}"
 }

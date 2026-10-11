@@ -5,7 +5,7 @@
 import { finding, pushFinding } from '@ayar/adapters';
 import postcss from 'postcss';
 import { posix } from 'node:path';
-import { checkCancel, ext, htmlTags, isLocalRef, lineIndex, OK, report, splitRef, styleSources, type Analyzer, type AnalyzerInput } from './common.ts';
+import { checkCancel, ext, htmlTags, isLocalRef, lineIndex, OK, readOrSay, report, splitRef, styleSources, type Analyzer, type AnalyzerInput } from './common.ts';
 
 /** GitHub's heading slug: lower case, punctuation dropped (Unicode letters and digits kept), spaces to hyphens. */
 export function slug(heading: string): string {
@@ -57,11 +57,12 @@ export function referencesOf(rel: string, text: string): Ref[] {
       if (/^\s*(```|~~~)/.test(line)) fence = !fence;
       if (!fence) {
         const noCode = line.replace(/`[^`]*`/g, (c) => ' '.repeat(c.length));
-        // [text](target "title"), ![alt](target), and reference definitions `[x]: target`.
-        for (const m of noCode.matchAll(/!?\[[^\]]*\]\(\s*<?([^)\s>]+)>?(?:\s+["'][^"']*["'])?\s*\)/g)) out.push({ file: rel, line: at(offset), ref: m[1]! });
+        // [text](target "title"), ![alt](target), and reference definitions `[x]: target`. The spans are bounded, so a
+        // long hostile line costs linear time, never quadratic.
+        for (const m of noCode.matchAll(/!?\[[^\]]{0,1000}\]\(\s*<?([^)\s>]{1,2000})>?(?:\s+["'][^"']{0,1000}["'])?\s*\)/g)) out.push({ file: rel, line: at(offset), ref: m[1]! });
         const def = /^\s{0,3}\[[^\]]+\]:\s*<?(\S+?)>?(?:\s+["'(].*)?$/.exec(noCode);
         if (def) out.push({ file: rel, line: at(offset), ref: def[1]! });
-        for (const m of noCode.matchAll(/<(?:img|a)\b[^>]*\b(?:src|href)\s*=\s*["']([^"']+)["']/gi)) out.push({ file: rel, line: at(offset), ref: m[1]! });
+        for (const m of noCode.matchAll(/<(?:img|a)\b[^>]{0,2000}?\b(?:src|href)\s*=\s*["']([^"']{1,2000})["']/gi)) out.push({ file: rel, line: at(offset), ref: m[1]! });
       }
       offset += line.length + 1;
     }
@@ -120,7 +121,7 @@ export const refsAnalyzer: Analyzer = {
     let checked = 0;
     for (const file of sources) {
       checkCancel(i);
-      const text = i.read(file);
+      const text = readOrSay(i, r, file);
       if (text === null) continue;
       for (const ref of referencesOf(file, text)) {
         if (ref.ref === '\u0000unparsable') {
