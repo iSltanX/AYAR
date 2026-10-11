@@ -2,11 +2,11 @@
 // interface the gateway calls. No screens here: these are macOS's own dialogs.
 import { clipboard, dialog, Menu, shell, type BrowserWindow, type MenuItemConstructorOptions, type MessageBoxOptions } from 'electron';
 import { execFile } from 'node:child_process';
-import { lstat, realpath, stat } from 'node:fs/promises';
-import { join, sep } from 'node:path';
+import { lstat, realpath } from 'node:fs/promises';
 import { promisify } from 'node:util';
 import type { NativeMenuEntry } from '@ayar/protocol';
 import type { SystemServices } from './gateway.ts';
+import { fileInside } from './file-inside.ts';
 import { controlsFromAppleLanguages } from './window-controls.ts';
 
 const run = promisify(execFile);
@@ -62,16 +62,7 @@ export function electronSystemServices(parent: () => BrowserWindow | null): Syst
       shell.showItemInFolder(path);
       return Promise.resolve();
     },
-    async fileInside(root, relative) {
-      try {
-        const realRoot = await realpath(root);
-        const file = await realpath(join(realRoot, relative));
-        if (!file.startsWith(realRoot + sep)) return null;
-        return (await stat(file)).isFile() ? file : null;
-      } catch {
-        return null;
-      }
-    },
+    fileInside,
     async openInEditor(path) {
       await run('/usr/bin/open', ['-t', path], { timeout: 10_000 });
     },

@@ -27,5 +27,7 @@
   "app.projectType.vscodeExtension": "VS Code extension",
   "app.projectType.obsidianPlugin": "Obsidian plugin",
   "app.customCheck.definition": "A custom check the profile defines: it runs the declared command and judges by its exit code and declared outputs.",
-  "app.customCheck.limits": "It proves only what its command measures. AYAR does not know what the command covers or leaves out."
+  "app.customCheck.limits": "It proves only what its command measures. AYAR does not know what the command covers or leaves out.",
+  "app.drop.notFolder": "Nothing was added: drop the project folder, not a file.",
+  "app.drop.multiple": "Nothing was added: drop one folder at a time."
 }

@@ -36,7 +36,8 @@ export async function addProjectFromDialog(app: AppState): Promise<void> {
  * permission, since a drop does not pass the open panel (E-05), so the explanation comes first (FR-59, 13.3).
  */
 export async function addDroppedProject(app: AppState, drop: BridgeDrop): Promise<void> {
-  if (!drop.ok) return;
+  // Something other than one folder: nothing is added, and a screen reader hears why (no visual state is designed).
+  if (!drop.ok) return app.announce(drop.reason === 'multiple' ? app.t('app.drop.multiple') : app.t('app.drop.notFolder'));
   if (drop.location) {
     app.navigate({ name: 'discovery', projectId: null, discoveryId: null, pending: null, permission: { selectionToken: drop.selectionToken, location: drop.location, display: drop.display } });
     return;

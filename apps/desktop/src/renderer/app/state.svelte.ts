@@ -2,7 +2,7 @@
 // (D-54), the projects, the engine's health, the live runs, and what the frame shows for the current page (its
 // primary action, its inspector, its search). Screens read and set it; the engine stays the source of truth.
 import { getContext, setContext, type Snippet } from 'svelte';
-import { createTranslator, resolveLanguage, type Lang } from '@ayar/i18n';
+import { createTranslator, resolveLanguage, type Lang, type Translate } from '@ayar/i18n';
 import type { EngineHealth, PendingConfirmation, Project, ProtectedLocation } from '@ayar/protocol';
 import type { ToastMessage, WindowControls } from '../lib/shell.ts';
 import { attempt, on } from './client.ts';
@@ -149,6 +149,11 @@ export class AppState {
     this.toast = toast;
     if (this.#toastTimer) clearTimeout(this.#toastTimer);
     this.#toastTimer = setTimeout(() => (this.toast = null), 4000);
+  }
+
+  /** The messages in the app's language, for actions outside a component (an announcement). */
+  get t(): Translate {
+    return createTranslator(this.lang);
   }
 
   announce(text: string): void {

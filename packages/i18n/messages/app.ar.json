@@ -27,5 +27,7 @@
   "app.projectType.vscodeExtension": "إضافة VS Code",
   "app.projectType.obsidianPlugin": "إضافة Obsidian",
   "app.customCheck.definition": "فحص مخصص يعرّفه ملف المعايير: يشغّل الأمر المعلن، ويحكم برمز خروجه وبما يعلنه من مخرجات.",
-  "app.customCheck.limits": "يثبت ما يقيسه أمره وحده. لا يعرف عِيَار ما يغطيه الأمر ولا ما يتركه."
+  "app.customCheck.limits": "يثبت ما يقيسه أمره وحده. لا يعرف عِيَار ما يغطيه الأمر ولا ما يتركه.",
+  "app.drop.notFolder": "لم يُضف شيء: أفلت مجلد المشروع، لا ملفًا.",
+  "app.drop.multiple": "لم يُضف شيء: أفلت مجلدًا واحدًا في المرة."
 }
