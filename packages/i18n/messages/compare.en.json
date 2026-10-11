@@ -1,0 +1,9 @@
+{
+  "compare.note.profileDiffers": "Different profile (version {from} → {to}); the comparison is indirect",
+  "compare.note.catalogDiffers": "Different catalog ({from} → {to}); the comparison is indirect",
+  "compare.note.formulaDiffers": "Different index formula ({from} → {to}); the numbers are not comparable",
+  "compare.note.toolsDiffer": "Different tool versions: {tools} ({count})",
+  "compare.note.environmentDiffers": "Different run environment or environment source",
+  "compare.note.scopeDiffers": "Different scope ({from} → {to} criteria/checks); the comparison is indirect",
+  "compare.note.blockingGrew": "Blocking failures grew ({from} → {to}); a karat change is not called an improvement"
+}

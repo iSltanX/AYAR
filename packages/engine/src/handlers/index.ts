@@ -9,6 +9,9 @@ import { groupsDelete, groupsList, groupsSave, internalPrepareQuit, runCancel, r
 import { findingGet, resultsQuery } from './results.ts';
 import { baselineApprove, baselinesList, capturesList } from './probe.ts';
 import { settingsGet, settingsSet } from './settings.ts';
+import { compareRuns, internalClipboardText, internalRecordCopy, reportBuild, reportExport, reportsList, tasksVerify, taskUpdate } from './reports.ts';
+import { reviewRecord, reviewsList } from './reviews.ts';
+import { aiChecksGenerate, aiChecksGet, aiChecksImportResults, aiChecksList, aiChecksNeeds, aiChecksProvideInput, aiChecksSave } from './ai-checks.ts';
 import { readinessEvaluate, setupExecute, setupPreview, toolsInstall, toolsList, toolsPreview, toolsRemove, toolsVerify } from './setup.ts';
 
 export const HANDLERS: HandlerTable = {
@@ -67,4 +70,22 @@ export const HANDLERS: HandlerTable = {
   'captures.list': capturesList,
   'baselines.list': baselinesList,
   'baseline.approve': baselineApprove,
+  // DEV-9
+  'report.build': reportBuild,
+  'reports.list': reportsList,
+  'report.export': reportExport,
+  'compare.runs': compareRuns,
+  'internal.clipboardText': internalClipboardText,
+  'internal.recordCopy': internalRecordCopy,
+  'task.update': taskUpdate,
+  'tasks.verify': tasksVerify,
+  'review.record': reviewRecord,
+  'reviews.list': reviewsList,
+  'aiChecks.needs': aiChecksNeeds,
+  'aiChecks.provideInput': aiChecksProvideInput,
+  'aiChecks.generate': aiChecksGenerate,
+  'aiChecks.save': aiChecksSave,
+  'aiChecks.importResults': aiChecksImportResults,
+  'aiChecks.get': aiChecksGet,
+  'aiChecks.list': aiChecksList,
 };

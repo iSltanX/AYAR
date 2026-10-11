@@ -26,6 +26,10 @@ import { BaselineService } from '../probe/baselines.ts';
 import { BrowserService, type BrowserBuild } from '../probe/browser.ts';
 import { ProbeService } from '../probe/service.ts';
 import { ToolsService } from '../tools/service.ts';
+import { IntegrityService } from '../integrity/service.ts';
+import { ReviewsService } from '../reviews/service.ts';
+import { ReportsService } from '../reports/service.ts';
+import { AiChecksService } from '../ai-checks/service.ts';
 import type { EventBus } from './event-bus.ts';
 import type { RunGate } from './run-gate.ts';
 
@@ -57,6 +61,14 @@ export interface EngineServices {
   /** C-14 (DEV-7): the probe's browser and the reference images. */
   browsers: BrowserService;
   baselines: BaselineService;
+  /** C-22 (DEV-9): the integrity guard and the four integrity checks. */
+  integrity: IntegrityService;
+  /** C-16 (DEV-9): human reviews (FR-34, D-35). */
+  reviews: ReviewsService;
+  /** C-21 and C-23 (DEV-9): report/1, its two formats, the clipboard text, the exports, the comparison. */
+  reports: ReportsService;
+  /** C-25 (DEV-9): model checks — needs, instruction files, result files as claims. */
+  aiChecks: AiChecksService;
   /**
    * C-18 after the fact [D-DEV4-07]: redacts the stored rows again with the current rules (new sensitive values,
    * new user patterns), and the backups too (G-DEV4-01). A failure is logged, never fatal (re-review R4).
@@ -111,8 +123,8 @@ export function createServices(o: ServicesInput): EngineServices {
       return { shell: s['environment.shell'] ?? null, timeoutSeconds: s['environment.timeoutSeconds'] ?? 10 };
     },
   });
-  const tasks = new TasksService({ db: o.db, catalog: o.catalog, ports: o.ports, logger: o.logger });
   const evidence = new EvidenceService({ db: o.db, layout: o.layout, ports: o.ports, logger: o.logger, hmacKey: o.hmacKey, redaction });
+  const tasks = new TasksService({ db: o.db, catalog: o.catalog, ports: o.ports, logger: o.logger, evidence });
   const tools = new ToolsService({
     db: o.db,
     ports: o.ports,
@@ -128,6 +140,7 @@ export function createServices(o: ServicesInput): EngineServices {
   const baselines = new BaselineService({ db: o.db, ports: o.ports, layout: o.layout, evidence, logger: o.logger });
   const probe = new ProbeService({ host: o.ports.probe, logger: o.logger });
   let runs: RunService | null = null;
+  let tasksVerify: ((runId: string, projectId: string) => Promise<void>) | null = null;
   const setup = new SetupService({ db: o.db, catalog: o.catalog, ports: o.ports, layout: o.layout, logger: o.logger, events: o.events, profiles, projects, environment, tools, browsers, redaction, supervisor, runActive: (p) => runs?.busy(p) ?? false });
   const planner = new PlannerService({ db: o.db, catalog: o.catalog, ports: o.ports, profiles, setup });
   // C-13: the readers run in worker threads (two at a time), started from the engine's own entry module; if none
@@ -138,6 +151,11 @@ export function createServices(o: ServicesInput): EngineServices {
   });
   const verdict = new VerdictService({ db: o.db, catalog: o.catalog, ports: o.ports, logger: o.logger, events: o.events, pool, hmacKey: o.hmacKey, redaction });
   const purity = new PurityService({ db: o.db, catalog: o.catalog, ports: o.ports, logger: o.logger, evidence });
-  runs = new RunService({ db: o.db, catalog: o.catalog, ports: o.ports, layout: o.layout, logger: o.logger, events: o.events, runGate: o.runGate, planner, projects, environment, redaction, evidence, tools, supervisor, verdict, purity, setupActive: (p) => setup.busyFor(p), probe, browsers, baselines });
-  return { redaction, profiles, projects, environment, tasks, evidence, tools, setup, planner, runs, verdict, purity, browsers, baselines, rescrubStored };
+  const integrity = new IntegrityService({ db: o.db, catalog: o.catalog, logger: o.logger, evidence, verdict });
+  runs = new RunService({ db: o.db, catalog: o.catalog, ports: o.ports, layout: o.layout, logger: o.logger, events: o.events, runGate: o.runGate, planner, projects, environment, redaction, evidence, tools, supervisor, verdict, purity, setupActive: (p) => setup.busyFor(p), probe, browsers, baselines, integrity, afterRun: (runId, projectId) => tasksVerify?.(runId, projectId) ?? Promise.resolve() });
+  const reviews = new ReviewsService({ db: o.db, catalog: o.catalog, ports: o.ports, logger: o.logger, evidence, purity, verdict, integrity, tasks, projects, runs });
+  const reports = new ReportsService({ db: o.db, catalog: o.catalog, ports: o.ports, logger: o.logger, evidence, redaction, purity, verdict, projects, profiles, tasks, runs, integrity });
+  const aiChecks = new AiChecksService({ db: o.db, catalog: o.catalog, ports: o.ports, logger: o.logger, redaction, projects, profiles, verdict, events: o.events, evidence });
+  tasksVerify = (runId, projectId) => tasks.verifyAfterRun(runId, projectId).then(() => undefined);
+  return { redaction, profiles, projects, environment, tasks, evidence, tools, setup, planner, runs, verdict, purity, browsers, baselines, integrity, reviews, reports, aiChecks, rescrubStored };
 }
