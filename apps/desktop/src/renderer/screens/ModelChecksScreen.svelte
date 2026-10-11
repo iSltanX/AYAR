@@ -39,7 +39,13 @@
 
   async function load(): Promise<void> {
     // The model's result files are read as the page opens (FR-68): a refused one says why, nothing else changes.
-    await attempt('aiChecks.importResults', { projectId });
+    const imported = await attempt('aiChecks.importResults', { projectId });
+    // The claims check applies once discovery saw a result file (C-06 reads .ayar/ai-results/): claims that arrived
+    // since the project was last read have it read again (read only), so «أثبِت بإعادة الفحص» settles them.
+    if (imported.ok && imported.result.claims.length) {
+      const p = await attempt('profile.get', { projectId });
+      if (p.ok && !p.result.checks.some((s) => s.checkId === 'integ.model-claims' && s.applicable)) void attempt('project.rescan', { projectId });
+    }
     const [n, l, r, k] = await Promise.all([attempt('aiChecks.needs', { projectId }), attempt('aiChecks.list', { projectId }), attempt('reviews.list', { projectId }), attempt('tasks.list', { projectId })]);
     if (n.ok) {
       // A bound field needs its value before the card binds it (a bindable with a fallback refuses undefined).

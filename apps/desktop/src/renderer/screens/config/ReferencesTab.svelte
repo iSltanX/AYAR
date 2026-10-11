@@ -109,37 +109,58 @@
   let newSize = $state('');
   let newTheme = $state('');
   let newLang = $state('');
+  // Each add takes its field and empties it before saving, so a value typed while the save runs is not lost.
   async function addState(): Promise<void> {
-    if (!/^[a-z][a-z0-9-]{0,39}$/.test(newState) || !newPath.trim()) return;
-    await save('states', { states: [...stateList, { id: newState, path: newPath.trim() }] });
+    const id = newState;
+    const path = newPath.trim();
+    if (!/^[a-z][a-z0-9-]{0,39}$/.test(id) || !path) return;
     newState = '';
     newPath = '';
+    await save('states', { states: [...stateList, { id, path }] });
+  }
+  function addFont(): void {
+    const f = font.trim();
+    font = '';
+    void save('fonts', [...new Set([...fonts, f])]);
+  }
+  function addOutput(): void {
+    const o = newOutput.trim();
+    newOutput = '';
+    void save('outputs', [...new Set([...outputs, o])]);
   }
   const removeState = (id: string) => save('states', stateList.length > 1 ? { states: stateList.filter((s) => s.id !== id) } : null);
-  async function setMatrix(patch: Obj): Promise<void> {
-    if (!target) return;
-    const next: Obj = { ...target, ...patch };
-    for (const [k, v] of Object.entries(patch)) if (v === null) delete next[k];
-    await save('renderTarget', next);
+  /**
+   * The matrix's changes, one after the other: each is made from the target as the previous save left it, so two
+   * quick additions do not overwrite each other.
+   */
+  let matrixQueue: Promise<void> = Promise.resolve();
+  function setMatrix(change: () => Obj): Promise<void> {
+    matrixQueue = matrixQueue.then(async () => {
+      if (!target) return;
+      const patch = change();
+      const next: Obj = { ...target, ...patch };
+      for (const [k, v] of Object.entries(patch)) if (v === null) delete next[k];
+      await save('renderTarget', next);
+    });
+    return matrixQueue;
   }
   async function addSize(): Promise<void> {
     const m = /^(\d{3,4})\s*[x×]\s*(\d{3,4})$/.exec(newSize.trim());
     if (!m) return;
-    await setMatrix({ viewports: [...viewports, { name: `w${m[1]}`, width: Number(m[1]), height: Number(m[2]) }] });
     newSize = '';
+    await setMatrix(() => ({ viewports: [...viewports.filter((v) => v.name !== `w${m[1]}`), { name: `w${m[1]}`, width: Number(m[1]), height: Number(m[2]) }] }));
   }
   async function addAxis(k: 'themes' | 'languages', value: string): Promise<void> {
     if (!/^[a-z][a-z0-9-]{0,39}$/.test(value)) return;
-    const values = [...new Set([...axis(k), value])];
-    const activation = obj(target?.[k])?.activation ?? (k === 'themes' ? { kind: 'media' } : { kind: 'query', param: 'lang' });
-    await setMatrix({ [k]: { values, activation } });
     if (k === 'themes') newTheme = '';
     else newLang = '';
+    await setMatrix(() => ({ [k]: { values: [...new Set([...axis(k), value])], activation: obj(target?.[k])?.activation ?? (k === 'themes' ? { kind: 'media' } : { kind: 'query', param: 'lang' }) } }));
   }
-  const removeAxis = (k: 'themes' | 'languages', value: string) => {
-    const values = axis(k).filter((x) => x !== value);
-    return setMatrix({ [k]: values.length ? { values, activation: obj(target?.[k])?.activation ?? { kind: 'media' } } : null });
-  };
+  const removeAxis = (k: 'themes' | 'languages', value: string) =>
+    setMatrix(() => {
+      const values = axis(k).filter((x) => x !== value);
+      return { [k]: values.length ? { values, activation: obj(target?.[k])?.activation ?? { kind: 'media' } } : null };
+    });
   const total = $derived(Math.max(1, stateList.length) * Math.max(1, viewports.length) * Math.max(1, axis('themes').length) * Math.max(1, axis('languages').length));
 
   // ── outputs and the recovery command ───────────────────────────────────────────────────────────────────────
@@ -170,7 +191,7 @@
     <span class="key">{t('configui.refs.fonts')}</span>
     {#each fonts as f (f)}<button type="button" class="chip" aria-label={t('configui.remove', { item: f })} onclick={() => void save('fonts', fonts.length > 1 ? fonts.filter((x) => x !== f) : null)}>{f}<Icon name="x" size={12} /></button>{/each}
     <input class="text short" aria-label={t('configui.refs.addFont')} bind:value={font} />
-    <Button kind="quiet" icon="plus" disabled={!font.trim()} onclick={() => void save('fonts', [...new Set([...fonts, font.trim()])]).then(() => (font = ''))}>{t('configui.add')}</Button>
+    <Button kind="quiet" icon="plus" disabled={!font.trim()} onclick={() => addFont()}>{t('configui.add')}</Button>
   </div>
   <div class="ref-row">
     <span class="key">{t('configui.refs.label.renderTarget')}</span>
@@ -245,7 +266,7 @@
   {#if target}
     <div class="ref-row">
       <span class="key">{t('configui.refs.sizes')}</span>
-      {#each viewports as v (str(v.name))}<button type="button" class="chip" aria-label={t('configui.remove', { item: str(v.width) })} onclick={() => void setMatrix({ viewports: viewports.length > 1 ? viewports.filter((x) => x.name !== v.name) : null })}><bdi dir="ltr">{str(v.width)}×{str(v.height)}</bdi><Icon name="x" size={12} /></button>{/each}
+      {#each viewports as v (str(v.name))}<button type="button" class="chip" aria-label={t('configui.remove', { item: str(v.width) })} onclick={() => void setMatrix(() => ({ viewports: viewports.length > 1 ? viewports.filter((x) => x.name !== v.name) : null }))}><bdi dir="ltr">{str(v.width)}×{str(v.height)}</bdi><Icon name="x" size={12} /></button>{/each}
       <input class="text short" dir="ltr" aria-label={t('configui.refs.sizeHint')} placeholder={t('configui.refs.sizeHint')} bind:value={newSize} />
       <Button kind="quiet" icon="plus" onclick={() => void addSize()}>{t('configui.add')}</Button>
     </div>
@@ -266,7 +287,7 @@
     <span class="key">{t('configui.refs.label.outputs')}</span>
     {#each outputs as o (o)}<button type="button" class="chip" aria-label={t('configui.remove', { item: o })} onclick={() => void save('outputs', outputs.length > 1 ? outputs.filter((x) => x !== o) : null)}><bdi dir="ltr">{o}</bdi><Icon name="x" size={12} /></button>{/each}
     <input class="text short" dir="ltr" aria-label={t('configui.refs.label.outputs')} bind:value={newOutput} />
-    <Button kind="quiet" icon="plus" disabled={!newOutput.trim()} onclick={() => void save('outputs', [...new Set([...outputs, newOutput.trim()])]).then(() => (newOutput = ''))}>{t('configui.add')}</Button>
+    <Button kind="quiet" icon="plus" disabled={!newOutput.trim()} onclick={() => addOutput()}>{t('configui.add')}</Button>
   </div>
   <div class="ref-row">
     <span class="key">{t('configui.refs.label.recoveryCommand')}</span>
