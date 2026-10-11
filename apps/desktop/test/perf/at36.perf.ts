@@ -99,8 +99,9 @@ function footprintMb(pids: number[]): number | null {
   const dir = mkdtempSync(join(tmpdir(), 'ayar-perf-fp-'));
   try {
     execFileSync('/usr/bin/footprint', ['-j', join(dir, 'fp.json'), ...pids.map(String)], { stdio: 'ignore' });
-    const j = JSON.parse(readFileSync(join(dir, 'fp.json'), 'utf8')) as { processes: { footprint: number }[] };
-    return j.processes.reduce((s, p) => s + p.footprint, 0) / 2 ** 20;
+    const j = JSON.parse(readFileSync(join(dir, 'fp.json'), 'utf8')) as { processes: { footprint?: number }[] };
+    const total = j.processes.reduce((s, p) => s + (typeof p.footprint === 'number' ? p.footprint : 0), 0) / 2 ** 20;
+    return Number.isFinite(total) && total > 0 ? total : null;
   } catch {
     return null;
   } finally {
