@@ -11,7 +11,45 @@ import { fillTests, isSnapshotMissing, repeatedExit, testsExit, type Attempt, ty
 import { repeatsOf } from './vitest.ts';
 import { posix } from 'node:path';
 
-function walk(suite: Record<string, unknown>, titles: string[], rootDir: string, ctx: ParseContext, out: TestResult[]): void {
+/** The compatibility matrix (13.3 «مصفوفة التوافق»): each project (a browser) by test title, bounded. */
+type Grid = Map<string, Map<string, TestResult['status']>>;
+const GRID_PROJECTS = 20;
+const GRID_TITLES = 40;
+
+function mark(grid: Grid, project: string, title: string, status: TestResult['status']): void {
+  if (!project || !title) return;
+  let row = grid.get(project);
+  if (!row) {
+    if (grid.size >= GRID_PROJECTS) return;
+    row = new Map();
+    grid.set(project, row);
+  }
+  const prev = row.get(title);
+  // One title can be several tests (a describe of the same name): the worst of them stands.
+  const rank = { failed: 3, flaky: 2, passed: 1, skipped: 0 } as const;
+  if (prev === undefined ? row.size < GRID_TITLES : rank[status] > rank[prev]) row.set(title, status);
+}
+
+/** The attempts' matrices as one: a cell whose result changed between attempts is flaky (D-20), as fillTests counts. */
+function mergeGrids(grids: readonly Grid[]): Record<string, Record<string, TestResult['status']>> | null {
+  // Maps, then own properties (a project named «__proto__» is a name like any other).
+  const out: Grid = new Map();
+  for (const grid of grids) {
+    for (const [project, row] of grid) {
+      let cells = out.get(project);
+      if (!cells) out.set(project, (cells = new Map<string, TestResult['status']>()));
+      for (const [title, status] of row) {
+        const prev = cells.get(title);
+        const changed = prev !== undefined && prev !== status;
+        const flaky = changed && (prev === 'flaky' || status === 'flaky' || (prev !== 'skipped' && status !== 'skipped'));
+        cells.set(title, prev === undefined || !changed ? status : flaky ? 'flaky' : prev === 'skipped' ? status : prev);
+      }
+    }
+  }
+  return out.size ? Object.fromEntries([...out].map(([project, row]) => [project, Object.fromEntries(row)])) : null;
+}
+
+function walk(suite: Record<string, unknown>, titles: string[], rootDir: string, ctx: ParseContext, out: TestResult[], grid: Grid): void {
   const here = str(suite.title);
   const path = here && !here.endsWith('.js') && !here.endsWith('.ts') && !/\.(m|c)?[jt]sx?$/.test(here) ? [...titles, here] : titles;
   for (const spec of arr(suite.specs).map(rec)) {
@@ -30,16 +68,18 @@ function walk(suite: Record<string, unknown>, titles: string[], rootDir: string,
       const at = rec(rec(failedResult?.error).location);
       const atLine = int(at.line);
       const inHook = atLine !== undefined && line !== undefined && atLine < line && str(at.file) !== '' && normalizePath(str(at.file), ctx.root, ctx.cwd).path === p.path;
+      const result: TestResult['status'] = status === 'expected' ? 'passed' : status === 'flaky' ? 'flaky' : status === 'skipped' ? 'skipped' : 'failed';
+      mark(grid, project, str(spec.title).slice(0, 200), result);
       out.push({
         fullName: [p.path ?? file, ...path, str(spec.title), project ? `[${project}]` : ''].filter(Boolean).join(' › '),
-        status: status === 'expected' ? 'passed' : status === 'flaky' ? 'flaky' : status === 'skipped' ? 'skipped' : 'failed',
+        status: result,
         location: { path: p.path, ...(p.outside ? { outside: true } : {}), ...(inHook ? { line: atLine } : line ? { line } : {}) },
         message,
         snapshotMissing: status === 'unexpected' && isSnapshotMissing(message),
       });
     }
   }
-  for (const s of arr(suite.suites).map(rec)) walk(s, path, rootDir, ctx, out);
+  for (const s of arr(suite.suites).map(rec)) walk(s, path, rootDir, ctx, out, grid);
 }
 
 export const playwright: Adapter = {
@@ -63,6 +103,7 @@ export const playwright: Adapter = {
     const r = emptyReport(this, ['playwright-json']);
     const attempts: Attempt[] = [];
     const perStep: { total: number; failed: number }[] = [];
+    const grids: Grid[] = [];
     for (let n = 1; n <= Math.max(1, exit.steps.length); n++) {
       const f = filesNamed(ctx, 'playwright.json').find((x) => x.step === n);
       if (!f) {
@@ -82,7 +123,9 @@ export const playwright: Adapter = {
       const root = rec(j.value);
       const rootDir = str(rec(root.config).rootDir, ctx.cwd);
       const attempt: Attempt = { tests: [], collectionErrors: [] };
-      for (const s of arr(root.suites).map(rec)) walk(s, [], rootDir, ctx, attempt.tests);
+      const grid: Grid = new Map();
+      grids.push(grid);
+      for (const s of arr(root.suites).map(rec)) walk(s, [], rootDir, ctx, attempt.tests, grid);
       // Global errors: «No tests found» is no input; anything else (a test file that does not load) the project's.
       for (const e of arr(root.errors).map(rec)) {
         const msg = stripAnsi(str(e.message));
@@ -98,6 +141,8 @@ export const playwright: Adapter = {
     }
     if (attempts.length) fillTests(r, attempts);
     r.info.perStep = perStep;
+    const byProject = mergeGrids(grids);
+    if (byProject) r.info.byProject = byProject;
     return r;
   },
   exitMap(exit, report, ctx): ExitSignal {

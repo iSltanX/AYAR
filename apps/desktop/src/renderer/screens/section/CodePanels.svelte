@@ -14,12 +14,12 @@
   import { useLocale } from '../../lib/locale.ts';
   import { PROOF_TAGS } from '../../lib/tags.ts';
   import { attempt, copyText } from '../../app/client.ts';
-  import { badgeOf, clockMs } from '../../app/format.ts';
+  import { badgeOf, durationShort } from '../../app/format.ts';
   import { logLines } from '../../app/logs.ts';
   import { groupBy, loadPanelData, messageParts, numberOf, type CheckData } from '../../app/panels.ts';
   import { sizeText } from '../../app/results.ts';
   import type { SectionModel } from '../../app/sections.ts';
-  import { commandOf } from '../../app/specs.ts';
+  import { commandOf, reasonsOf } from '../../app/specs.ts';
   import { useApp } from '../../app/state.svelte.ts';
   import Panel from './Panel.svelte';
 
@@ -28,8 +28,10 @@
     model: SectionModel;
     /** «عرّف ميزانية…»: the profile's references, where budgets are defined. */
     ondefine: (ref: string) => void;
+    /** «افتح السجل»: the inspector's log of an instance. */
+    oninspect: (instance: string) => void;
   }
-  let { projectId, model, ondefine }: Props = $props();
+  let { projectId, model, ondefine, oninspect }: Props = $props();
   const app = useApp();
   const { t, lang } = useLocale();
 
@@ -142,8 +144,10 @@
       <div class="log-head">
         <button class="fold" type="button" aria-expanded={logOpen} onclick={() => (logOpen = !logOpen)}>
           <Icon name={logOpen ? 'chevron-up' : 'chevron-down'} size={16} />
-          <span>{t('sectionui.code.lastLog', { lines: buildLog?.totalLines ?? 0, duration: clockMs(build.exec.check.durationMs) })}</span>
+          <span>{t('sectionui.code.lastLog', { lines: buildLog?.totalLines ?? 0, duration: durationShort(t, build.exec.check.durationMs) })}</span>
         </button>
+        <span class="spacer"></span>
+        <Button kind="quiet" onclick={() => oninspect(build.exec.check.instance)}>{t('sectionui.behavior.openLog')}</Button>
       </div>
       {#if logOpen && buildLog}<LogViewer lines={buildLog.lines} totalLines={buildLog.totalLines} follow={false} />{/if}
       {#if build.report?.outputs.length}
@@ -227,9 +231,14 @@
   </Panel>
 {/if}
 
+{#snippet notIncluded(spec: CheckSpec)}{#if !spec.included}<ReadinessBadge readiness="not-included" size="sm" />{/if}{/snippet}
+
 {#if unusedSpec}
-  <Panel title={t('sectionui.code.unused')} checkId="code.unused" result={resultOf(unused)} testid="panel-unused">
-    {#if unused}
+  {#snippet unusedTags()}{@render notIncluded(unusedSpec)}{/snippet}
+  <Panel title={t('sectionui.code.unused')} checkId="code.unused" result={unusedSpec.included ? resultOf(unused) : undefined} tags={unusedTags} testid="panel-unused">
+    {#if !unusedSpec.included && !unused}
+      <p class="note">{reasonsOf(t, lang, unusedSpec.reasons).text}</p>
+    {:else if unused}
       <h3 class="sub">{t('sectionui.code.missingDeps', { count: missingDeps.length })}</h3>
       {#if missingDeps.length}
         <table class="ptable">
@@ -275,7 +284,9 @@
 {/if}
 
 {#if specOf('code.complexity')}
-  <Panel title={t('sectionui.code.complexity')} checkId="code.complexity" result={resultOf(complexity)} testid="panel-complexity" note={complexity ? t('sectionui.code.complexityNote') : t('sectionui.panel.notRun')}>
+  {@const complexitySpec = specOf('code.complexity')!}
+  {#snippet complexityTags()}{@render notIncluded(complexitySpec)}{/snippet}
+  <Panel title={t('sectionui.code.complexity')} checkId="code.complexity" result={complexitySpec.included ? resultOf(complexity) : undefined} tags={complexityTags} testid="panel-complexity" note={complexity ? t('sectionui.code.complexityNote') : complexitySpec.included ? t('sectionui.panel.notRun') : reasonsOf(t, lang, complexitySpec.reasons).text}>
     {#if functions.length}
       <table class="ptable">
         <thead><tr><th scope="col">{t('sectionui.code.function')}</th><th scope="col">{t('sectionui.code.file')}</th><th scope="col">{t('sectionui.code.cyclomatic')}</th><th scope="col">{t('sectionui.code.length')}</th><th scope="col">{t('sectionui.code.threshold')}</th><th scope="col"><span class="visually-hidden">{t('sectionui.column.actions')}</span></th></tr></thead>
@@ -313,6 +324,9 @@
     padding: var(--space-8) var(--space-12);
     border-radius: var(--radius-card);
     background: var(--bg-sunken);
+  }
+  .spacer {
+    flex: 1;
   }
   .fold {
     display: inline-flex;

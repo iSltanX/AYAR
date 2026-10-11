@@ -172,6 +172,14 @@ export function clockMs(ms: number | null | undefined): string {
   return h > 0 ? `${h}:${String(m).padStart(2, '0')}:${ss}` : `${m}:${ss}`;
 }
 
+/** «35 ث» / «2 د 5 ث»: a duration as the panels write it (a tenth of a second below ten seconds). */
+export function durationShort(t: Translate, ms: number | null | undefined): string {
+  const v = Math.max(0, ms ?? 0);
+  if (v < 10_000) return t('sectionui.duration.seconds', { value: Math.round(v / 100) / 10 });
+  const s = Math.round(v / 1000);
+  return s < 60 ? t('sectionui.duration.seconds', { value: s }) : t('sectionui.duration.minutes', { minutes: Math.floor(s / 60), seconds: s % 60 });
+}
+
 /** Seconds since an ISO time, at `now`. */
 export function secondsSince(iso: string | null | undefined, now: number): number {
   if (!iso) return 0;

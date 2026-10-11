@@ -120,6 +120,46 @@ describe('check.report on a build', () => {
   }, 300_000);
 });
 
+describe('the human accessibility review, item by item (10.3)', () => {
+  it('stays «يحتاج مراجعة» until all four items are decided, then passes, and a rejected item fails it', async () => {
+    const { dir, cleanup: done } = tempDir('ayar-DEV-12-review-');
+    const e = await engineFor(dir, { path: LOGIN_PATH });
+    try {
+      const p = join(dir, 'site');
+      mkdirSync(p);
+      writeFileSync(join(p, 'index.html'), '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>موقع</title></head><body><main><h1>مرحبًا</h1><button>ابدأ</button></main></body></html>\n');
+      const { projectId: id } = await addProject(e, p);
+      const prof = await approveAll(e, id);
+      const spec = prof.checks.find((c) => c.checkId === 'design.a11y.review');
+      expect(spec?.applicable).toBe(true);
+      const runReview = async () => {
+        const pl = await plan(e, id, { kind: 'check', instance: spec!.instance });
+        const d = await waitRun(e, (await startRun(e, pl.id)).runId);
+        return d.checks.find((c) => c.instance === spec!.instance)!;
+      };
+      const first = await runReview();
+      expect(first.outcome).toBe('needs_review');
+      const record = (item: string, decision: string) => e.invoke('review.record', { target: { type: 'check', id: first.checkRunId, item }, decision, note: '' });
+      for (const item of ['keyboard', 'screenReader', 'zoom']) {
+        const r = ok<{ check: { outcome: string | null } }>(await record(item, 'accept'));
+        expect(r.check.outcome).toBe('needs_review');
+      }
+      const last = ok<{ check: { outcome: string | null }; review: { target: { item?: string } } }>(await record('colorIndependence', 'accept'));
+      expect([last.check.outcome, last.review.target.item]).toEqual(['passed', 'colorIndependence']);
+      expect((await runReview()).outcome).toBe('passed');
+      ok(await record('zoom', 'reject'));
+      const again = await runReview();
+      // A rejected item is never a pass: the next run reads «يحتاج مراجعة» with why (DEV-7's rule for a decision).
+      expect(again.outcome).toBe('needs_review');
+      const listed = ok<{ reviews: { target: { item?: string } }[] }>(await e.invoke('reviews.list', { projectId: id }));
+      expect(listed.reviews.filter((r) => r.target.item).length).toBe(5);
+    } finally {
+      await e.close();
+      done();
+    }
+  }, 300_000);
+});
+
 describe('reports.copies', () => {
   it('counts «انسخ للنموذج» of the project from the audit records', async () => {
     expect(ok<{ count: number }>(await engine.invoke('reports.copies', { projectId, days: 30 })).count).toBe(0);

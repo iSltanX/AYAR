@@ -13,7 +13,7 @@
 import type { Catalog } from '@ayar/catalog';
 import { adapterById } from '@ayar/adapters';
 import type { CheckOutcome, CheckReport, CheckRunDetail, CheckRunView, CheckSpec, EvidenceRef, JsonValue, ParsedReport, PlanItem, RawCheckResult, Reason, RunCounts, RunDetail, RunList, RunPlan, RunView, SideEffects, VerdictCounts } from '@ayar/protocol';
-import { RawCheckResult as RawSchema, RunPlan as PlanSchema } from '@ayar/protocol';
+import { A11Y_REVIEW_ITEMS, RawCheckResult as RawSchema, RunPlan as PlanSchema } from '@ayar/protocol';
 import { createHash } from 'node:crypto';
 import { posix } from 'node:path';
 import { computeChildEnv } from '../environment/child-env.ts';
@@ -29,6 +29,7 @@ import type { EnginePorts, FileWriter, Logger } from '../ports/index.ts';
 import { latestSnapshot } from '../profile/service.ts';
 import { approvalsOf, latestProfile } from '../profile/store.ts';
 import { stateSinceRound } from '../purity/since-round.ts';
+import { reviewItems } from '../reviews/service.ts';
 import type { PlannerService } from '../planner/service.ts';
 import type { ProjectsService } from '../projects/service.ts';
 import type { PurityService } from '../purity/service.ts';
@@ -1244,22 +1245,32 @@ export class RunService {
       e.instance,
     );
     let why: string | null = 'none';
-    if (row) {
+    // DEV-12 (10.3): reviewed item by item: all four accepted and holding, or why not.
+    const items = reviewItems(db, ctx.projectId, e.instance);
+    const now = new Map(ctx.lastManifest.files.map((f) => [f[0], f[5]]));
+    const holds = async (r: { scope_json: string; snapshot_id: string | null }): Promise<boolean> => {
       let files: string[] = [];
       try {
-        const scoped = (JSON.parse(row.scope_json) as { files?: unknown }).files;
+        const scoped = (JSON.parse(r.scope_json) as { files?: unknown }).files;
         files = Array.isArray(scoped) ? scoped.filter((x): x is string => typeof x === 'string') : [];
       } catch {
         files = [];
       }
-      const then = row.snapshot_id ? await this.#o.evidence.snapshots.load(row.snapshot_id).catch(() => null) : null;
-      const now = new Map(ctx.lastManifest.files.map((f) => [f[0], f[5]]));
+      const then = r.snapshot_id ? await this.#o.evidence.snapshots.load(r.snapshot_id).catch(() => null) : null;
       const before = new Map((then?.files ?? []).map((f) => [f[0], f[5]]));
-      const changed = !then || files.some((f) => before.get(f) !== now.get(f));
-      why = changed ? 'expired' : row.decision === 'accept' || row.decision === 'passed' ? null : `decision:${row.decision}`;
+      return !!then && files.every((f) => before.get(f) === now.get(f));
+    };
+    if (items.size) {
+      const missing = A11Y_REVIEW_ITEMS.filter((i) => !items.has(i));
+      const rejected = [...items.entries()].filter(([, r]) => r.decision === 'reject').map(([i]) => i);
+      const expired: string[] = [];
+      for (const [i, r] of items) if (!(await holds(r))) expired.push(i);
+      why = rejected.length ? `items-rejected:${rejected.join(',')}` : expired.length ? `items-expired:${expired.join(',')}` : missing.length ? `items-missing:${missing.join(',')}` : null;
+    } else if (row) {
+      why = !(await holds(row)) ? 'expired' : row.decision === 'accept' || row.decision === 'passed' ? null : `decision:${row.decision}`;
     }
-    const report = { reader: 'human-review', readerVersion: '1.0.0', formats: [], tests: null, findings: [] as ParsedReport['findings'], findingsDropped: 0, signals: { noInputs: false, collectionError: false, configError: false, flaky: false, unresolved: 0 }, problems: [], info: { review: row?.id ?? null, recordedAt: row?.created_at ?? null } } satisfies ParsedReport;
-    if (why) report.findings.push({ rule: 'review.pending', toolRule: null, severity: null, proof: null, level: null, origin: 'project', message: why === 'none' ? 'no human accessibility review is recorded for this interface' : why === 'expired' ? 'the recorded review no longer holds: files of its scope changed since' : `the recorded review decided ${why.slice('decision:'.length)}`, location: null, anchor: { kind: 'text', value: `review|${e.instance}` }, expected: null, actual: null });
+    const report = { reader: 'human-review', readerVersion: '1.0.0', formats: [], tests: null, findings: [] as ParsedReport['findings'], findingsDropped: 0, signals: { noInputs: false, collectionError: false, configError: false, flaky: false, unresolved: 0 }, problems: [], info: { review: row?.id ?? null, recordedAt: row?.created_at ?? null, items: Object.fromEntries([...items.entries()].map(([i, r]) => [i, r.decision])) } } satisfies ParsedReport;
+    if (why) report.findings.push({ rule: 'review.pending', toolRule: null, severity: null, proof: null, level: null, origin: 'project', message: why === 'none' ? 'no human accessibility review is recorded for this interface' : why === 'expired' ? 'the recorded review no longer holds: files of its scope changed since' : why.startsWith('items-missing:') ? `the human review of ${why.slice('items-missing:'.length)} is not recorded yet` : why.startsWith('items-expired:') ? `the review of ${why.slice('items-expired:'.length)} no longer holds: files of its scope changed since` : why.startsWith('items-rejected:') ? `the review of ${why.slice('items-rejected:'.length)} was rejected` : `the recorded review decided ${why.slice('decision:'.length)}`, location: null, anchor: { kind: 'text', value: `review|${e.instance}` }, expected: null, actual: null });
     const judgement = this.#o.verdict.classifyReport(spec, { projectId: ctx.projectId, report, exit: { kind: 'ok' }, anchors: report.findings.map(() => createHash('sha256').update(`text\nreview|${e.instance}`).digest('hex')), guard: this.#o.integrity.effectsOn(ctx.guard, e.instance) });
     this.#finishCheck(e, judgement.outcome, judgement.reason, null, [], undefined, undefined, { judgement, evidenceIds: [], reader: { id: 'human-review', version: '1.0.0', formats: [] } });
   }

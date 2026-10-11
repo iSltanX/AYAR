@@ -271,7 +271,18 @@ export const permissionsAnalyzer: Analyzer = {
     const apis = [...arr(v.permissions), ...arr(v.optional_permissions)].filter((x): x is string => typeof x === 'string');
     const hosts = [...arr(v.host_permissions), ...arr(v.optional_host_permissions)].filter((x): x is string => typeof x === 'string');
     const all = [...new Set([...apis, ...hosts])];
-    const code = i.files.filter((f) => /\.(js|jsx|ts|tsx|mjs|cjs|mts|cts|svelte|vue)$/.test(f) && !/\.(test|spec)\./.test(f)).map((f) => i.read(f) ?? '').join('\n');
+    const sources = i.files.filter((f) => /\.(js|jsx|ts|tsx|mjs|cjs|mts|cts|svelte|vue)$/.test(f) && !/\.(test|spec)\./.test(f)).map((f) => ({ f, text: i.read(f) ?? '' }));
+    const code = sources.map((x) => x.text).join('\n');
+    /** DEV-12 (13.3 «جدول الصلاحيات»): where the code first calls a permission's API namespace, for the panel. */
+    const firstUse = (perm: string): { path: string; line: number } | null => {
+      if (isHost(perm) || NO_NAMESPACE.has(perm)) return null;
+      const re = new RegExp(`\\b(chrome|browser)\\s*\\.\\s*${perm.split('.')[0]!.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
+      for (const x of sources) {
+        const at = x.text.search(re);
+        if (at >= 0) return { path: x.f, line: x.text.slice(0, at).split('\n').length };
+      }
+      return null;
+    };
     for (const perm of all) {
       const line = lineOfText(m.text, `"${perm}"`);
       const location = { path: m.rel, ...(line ? { line } : {}) };
@@ -287,6 +298,9 @@ export const permissionsAnalyzer: Analyzer = {
       }
     }
     r.info.permissions = all.length;
+    // DEV-12: every permission with what the policy says and where it is used (facts for the panel, not a judgement).
+    r.info.policy = p.rel;
+    r.info.permissionsTable = all.slice(0, 100).map((perm) => ({ permission: perm, inPolicy: p.policy.reasons.has(perm), reason: p.policy.reasons.get(perm) ?? null, use: firstUse(perm) }));
     return { report: r, exit: OK };
   },
 };

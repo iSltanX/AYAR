@@ -28,8 +28,13 @@
   import { findingsCount, karatOf, latestCounts, loadSection, optionalAction, readinessOfInstance, type SectionModel } from '../app/sections.ts';
   import { commandOf, reasonsOf } from '../app/specs.ts';
   import { useApp, type SectionId } from '../app/state.svelte.ts';
+  import BehaviorPanels from './section/BehaviorPanels.svelte';
   import CodePanels from './section/CodePanels.svelte';
+  import DesignPanels from './section/DesignPanels.svelte';
+  import DesignReference from './section/DesignReference.svelte';
   import CustomChecks from './section/CustomChecks.svelte';
+  import PerformancePanels from './section/PerformancePanels.svelte';
+  import SecurityPanels from './section/SecurityPanels.svelte';
 
   let { projectId, section }: { projectId: string; section: SectionId } = $props();
   const app = useApp();
@@ -44,16 +49,22 @@
   let notApplicableOpen = $state(false);
   let savingGroup = $state(false);
   let starting = $state(false);
+  /** 10.2: the reference board, folded once nothing is missing, opened by the header's «المرجع». */
+  let showReference = $state(false);
 
   /** The sections with panels of their own (screens 10–14): their list is folded once a check ran (D-DES5-05). */
   const PANELS: readonly SectionId[] = ['design', 'security', 'code', 'behavior', 'performance'];
   let folded = false;
   async function load(): Promise<void> {
     model = await loadSection(projectId, section);
-    // Folded once, on the first reading: security keeps its list open, as its approved screen shows (11.1).
-    if (!folded && model && PANELS.includes(section) && section !== 'security' && model.latest.size > 0) listOpen = false;
+    // Folded once, on the first reading: security keeps its list open, as its approved screen shows (11.1), and so
+    // does design while a reference is missing (10.1: the board leads, the list follows it open).
+    if (!folded && model && PANELS.includes(section) && section !== 'security' && !(section === 'design' && referenceMissing(model)) && model.latest.size > 0) listOpen = false;
     folded = true;
   }
+  /** 10.1: a design reference is missing (a configuration a design check lacks); the board then leads the page. */
+  const referenceMissing = (m: SectionModel) => m.profile.checks.some((s) => s.section === 'design' && s.applicable && s.missing.some((x) => x.kind === 'configuration'));
+  const designRefMissing = $derived(section === 'design' && !!model && referenceMissing(model));
   /** «عرّف…»: the profile's references (screen 19 «المراجع»). */
   const define = (_ref: string) => app.navigate({ name: 'profile', projectId });
   $effect(() => {
@@ -173,10 +184,13 @@
           <p class="no-karat">{t('sectionui.noCriteria')}</p>
         {/if}
         <span class="spacer"></span>
+        {#if section === 'design' && !designRefMissing}<Button kind="quiet" icon="sliders-horizontal" aria-pressed={showReference} onclick={() => (showReference = !showReference)}>{t('sectionui.design.refToggle')}</Button>{/if}
         <Button kind="secondary" icon="play" disabled={!selected.length || starting} onclick={() => void runSelected()}>{selected.length ? t('shell.selectionBar.runSelected', { count: selected.length }) : t('ui.action.runSelected')}</Button>
         <Button kind="primary" icon="play" disabled={!included.length || starting} onclick={() => void run({ kind: 'section', section })}>{t('ui.action.runSection')}</Button>
       </div>
     </header>
+
+    {#if designRefMissing}<DesignReference {projectId} {model} ondefine={define} onchanged={() => void load()} />{/if}
 
     {#if section === 'custom'}
       <CustomChecks {projectId} {model} bind:selected oninspect={(i: string) => (inspected = i)} onchanged={() => void load()} onrun={(i: string) => void runOne(i)} onrunselected={() => void runSelected()} onrungroup={(id: string) => void run({ kind: 'savedGroup', groupId: id })} />
@@ -243,7 +257,14 @@
       </section>
     {/if}
 
-    {#if section === 'code'}<CodePanels {projectId} {model} ondefine={define} />{/if}
+    {#if section === 'design'}
+      {#if showReference && !designRefMissing}<DesignReference {projectId} {model} ondefine={define} onchanged={() => void load()} />{/if}
+      <DesignPanels {projectId} {model} onchanged={() => void load()} />
+    {/if}
+    {#if section === 'code'}<CodePanels {projectId} {model} ondefine={define} oninspect={(i: string) => ((inspected = i), (inspectorTab = 'log'))} />{/if}
+    {#if section === 'security'}<SecurityPanels {projectId} {model} />{/if}
+    {#if section === 'behavior'}<BehaviorPanels {projectId} {model} oninspect={(i: string) => ((inspected = i), (inspectorTab = 'log'))} onchanged={() => void load()} />{/if}
+    {#if section === 'performance'}<PerformancePanels {projectId} {model} ondefine={define} />{/if}
 
     {#if model.optional.length}
       <section class="card optional" aria-labelledby="optional-title" data-testid="section-optional">
@@ -467,6 +488,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-8);
+    white-space: nowrap;
   }
   .date,
   .muted {

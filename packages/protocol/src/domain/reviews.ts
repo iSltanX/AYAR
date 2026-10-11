@@ -19,7 +19,16 @@ export const REVIEW_DECISIONS = ['accept', 'reject', 'false_positive', 'card', '
 export const ReviewDecision = z.enum(REVIEW_DECISIONS);
 export type ReviewDecision = z.infer<typeof ReviewDecision>;
 
-export const ReviewTarget = z.strictObject({ type: ReviewTargetType, id: Id });
+/**
+ * 10.3 «المراجعة البشرية» (protocol 1.7, DEV-12): the four items of design.a11y.review — the keyboard, the screen reader
+ * on the main path, the 200% zoom, and the states understood without colour — each reviewed on its own, with its
+ * decision, date and scope. The check passes when all four are accepted and hold; a rejected one fails it.
+ */
+export const A11Y_REVIEW_ITEMS = ['keyboard', 'screenReader', 'zoom', 'colorIndependence'] as const;
+export const A11yReviewItem = z.enum(A11Y_REVIEW_ITEMS);
+export type A11yReviewItem = z.infer<typeof A11yReviewItem>;
+
+export const ReviewTarget = z.strictObject({ type: ReviewTargetType, id: Id, item: A11yReviewItem.optional() });
 export type ReviewTarget = z.infer<typeof ReviewTarget>;
 
 export const ReviewRecord = z.strictObject({
