@@ -32,6 +32,7 @@
   import AdvisorScreen from './AdvisorScreen.svelte';
   import RunsScreen from './RunsScreen.svelte';
   import CompareScreen from './CompareScreen.svelte';
+  import ConfigScreen from './ConfigScreen.svelte';
   import AccessState from './states/AccessState.svelte';
 
   const app = useApp();
@@ -129,7 +130,7 @@
     else if (id === 'modelChecks') app.navigate({ name: 'modelChecks', projectId });
     else if (id === 'tasks') app.navigate({ name: 'tasks', projectId, advisor: null });
     else if (id === 'runs') app.navigate({ name: 'runs', projectId });
-    else if (id === 'projectConfiguration') app.navigate({ name: 'profile', projectId });
+    else if (id === 'projectConfiguration') app.navigate({ name: 'config', projectId, tab: 'file' });
   }
 
   /** «الفحص الكامل»: the monitor of this project's active full run, or the plan. */
@@ -326,6 +327,8 @@
     {/if}
   {:else if route.name === 'runs'}
     {#key route.projectId}<RunsScreen projectId={route.projectId} />{/key}
+  {:else if route.name === 'config'}
+    {#key `${route.projectId}:${route.tab}`}<ConfigScreen projectId={route.projectId} tab={route.tab} />{/key}
   {:else if route.name === 'compare'}
     {#key `${route.fromRunId}:${route.toRunId}`}<CompareScreen projectId={route.projectId} fromRunId={route.fromRunId} toRunId={route.toRunId} />{/key}
   {/if}

@@ -69,7 +69,7 @@
   const referenceMissing = (m: SectionModel) => m.profile.checks.some((s) => s.section === 'design' && s.applicable && s.missing.some((x) => x.kind === 'configuration'));
   const designRefMissing = $derived(section === 'design' && !!model && referenceMissing(model));
   /** «عرّف…»: the profile's references (screen 19 «المراجع»). */
-  const define = (_ref: string) => app.navigate({ name: 'profile', projectId });
+  const define = (_ref: string) => app.navigate({ name: 'config', projectId, tab: 'references' });
   $effect(() => {
     void load();
   });
@@ -117,8 +117,8 @@
   async function act(spec: CheckSpec): Promise<void> {
     if (!model) return;
     const a = optionalAction(model, spec);
-    if (a.kind === 'approve') app.navigate({ name: 'profile', projectId });
-    else if (a.kind === 'define') app.navigate({ name: 'profile', projectId });
+    if (a.kind === 'approve') app.navigate({ name: 'config', projectId, tab: 'approval' });
+    else if (a.kind === 'define') app.navigate({ name: 'config', projectId, tab: 'references' });
     else if (a.kind === 'include') {
       const r = await attempt('profile.update', { projectId, patch: { checks: { [spec.instance]: { included: true } } } });
       if (r.ok) await load();

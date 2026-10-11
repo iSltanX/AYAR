@@ -88,6 +88,8 @@ import runsuiAr from './runsui.ar.json' with { type: 'json' };
 import runsuiEn from './runsui.en.json' with { type: 'json' };
 import compareuiAr from './compareui.ar.json' with { type: 'json' };
 import compareuiEn from './compareui.en.json' with { type: 'json' };
+import configuiAr from './configui.ar.json' with { type: 'json' };
+import configuiEn from './configui.en.json' with { type: 'json' };
 
 export const MESSAGE_FILES = {
   adapter: { ar: adapterAr, en: adapterEn },
@@ -131,6 +133,7 @@ export const MESSAGE_FILES = {
   monitor: { ar: monitorAr, en: monitorEn },
   resultsui: { ar: resultsuiAr, en: resultsuiEn },
   // DEV-12: the remaining screens (one scope per screen family).
+  configui: { ar: configuiAr, en: configuiEn },
   compareui: { ar: compareuiAr, en: compareuiEn },
   runsui: { ar: runsuiAr, en: runsuiEn },
   tasksui: { ar: tasksuiAr, en: tasksuiEn },
@@ -142,6 +145,6 @@ export const MESSAGE_FILES = {
 export type Scope = keyof typeof MESSAGE_FILES;
 
 export const MESSAGES = {
-  ar: { ...adapterAr, ...advisorAr, ...alertsAr, ...analyzerAr, ...catalogAr, ...commonAr, ...controlsAr, ...discoveryAr, ...environmentAr, ...errorsAr, ...glossaryAr, ...menuAr, ...planAr, ...probeAr, ...profileAr, ...projectsAr, ...purityAr, ...resultsAr, ...runAr, ...setupAr, ...sheetsAr, ...shellAr, ...statusAr, ...uiAr, ...verdictAr, ...reportAr, ...integrityAr, ...compareAr, ...tasksAr, ...aichecksAr, ...appAr, ...projectlistAr, ...discoveruiAr, ...approvalAr, ...overviewAr, ...scanplanAr, ...monitorAr, ...resultsuiAr, ...sectionuiAr, ...statesuiAr, ...modeluiAr, ...tasksuiAr, ...runsuiAr, ...compareuiAr },
-  en: { ...adapterEn, ...advisorEn, ...alertsEn, ...analyzerEn, ...catalogEn, ...commonEn, ...controlsEn, ...discoveryEn, ...environmentEn, ...errorsEn, ...glossaryEn, ...menuEn, ...planEn, ...probeEn, ...profileEn, ...projectsEn, ...purityEn, ...resultsEn, ...runEn, ...setupEn, ...sheetsEn, ...shellEn, ...statusEn, ...uiEn, ...verdictEn, ...reportEn, ...integrityEn, ...compareEn, ...tasksEn, ...aichecksEn, ...appEn, ...projectlistEn, ...discoveruiEn, ...approvalEn, ...overviewEn, ...scanplanEn, ...monitorEn, ...resultsuiEn, ...sectionuiEn, ...statesuiEn, ...modeluiEn, ...tasksuiEn, ...runsuiEn, ...compareuiEn },
+  ar: { ...adapterAr, ...advisorAr, ...alertsAr, ...analyzerAr, ...catalogAr, ...commonAr, ...controlsAr, ...discoveryAr, ...environmentAr, ...errorsAr, ...glossaryAr, ...menuAr, ...planAr, ...probeAr, ...profileAr, ...projectsAr, ...purityAr, ...resultsAr, ...runAr, ...setupAr, ...sheetsAr, ...shellAr, ...statusAr, ...uiAr, ...verdictAr, ...reportAr, ...integrityAr, ...compareAr, ...tasksAr, ...aichecksAr, ...appAr, ...projectlistAr, ...discoveruiAr, ...approvalAr, ...overviewAr, ...scanplanAr, ...monitorAr, ...resultsuiAr, ...sectionuiAr, ...statesuiAr, ...modeluiAr, ...tasksuiAr, ...runsuiAr, ...compareuiAr, ...configuiAr },
+  en: { ...adapterEn, ...advisorEn, ...alertsEn, ...analyzerEn, ...catalogEn, ...commonEn, ...controlsEn, ...discoveryEn, ...environmentEn, ...errorsEn, ...glossaryEn, ...menuEn, ...planEn, ...probeEn, ...profileEn, ...projectsEn, ...purityEn, ...resultsEn, ...runEn, ...setupEn, ...sheetsEn, ...shellEn, ...statusEn, ...uiEn, ...verdictEn, ...reportEn, ...integrityEn, ...compareEn, ...tasksEn, ...aichecksEn, ...appEn, ...projectlistEn, ...discoveruiEn, ...approvalEn, ...overviewEn, ...scanplanEn, ...monitorEn, ...resultsuiEn, ...sectionuiEn, ...statesuiEn, ...modeluiEn, ...tasksuiEn, ...runsuiEn, ...compareuiEn, ...configuiEn },
 } as const;
