@@ -100,7 +100,11 @@ async function run(): Promise<void> {
   const deliver = (e: ParsedEvent): DeliveredEvent => ({ topic: e.topic, stream: e.stream, seq: e.seq, at: e.at, payload: e.payload });
 
   const supervisor = new EngineSupervisor({
-    spawn: () => spawnUtilityEngine(paths.engine, (text) => logger.log('warn', 'engine stderr', { text: text.slice(0, 4000) })),
+    spawn: () =>
+      spawnUtilityEngine(paths.engine, (text) => logger.log('warn', 'engine stderr', { text: text.slice(0, 4000) }), {
+        entry: paths.probe,
+        onStderr: (text) => logger.log('warn', 'probe stderr', { text: text.slice(0, 4000) }),
+      }),
     config: { dataDir, hmacKeySource: 'file', appVersion: app.getVersion() },
     logPath: join(dataDir, 'logs', 'engine.log'),
     onHealth: (payload) => {

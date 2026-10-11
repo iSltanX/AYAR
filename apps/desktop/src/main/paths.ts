@@ -22,5 +22,7 @@ export function bundlePaths() {
     renderer: join(root, 'dist', 'renderer'),
     preload: join(root, 'dist', 'preload', 'preload.cjs'),
     engine: join(root, 'dist', 'engine', 'engine.mjs'),
+    /** C-14 (DEV-7): the web probe's utilityProcess entry, beside the engine (axe.min.js with them). */
+    probe: join(root, 'dist', 'engine', 'probe.mjs'),
   };
 }
