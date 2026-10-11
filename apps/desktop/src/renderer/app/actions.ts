@@ -1,7 +1,7 @@
 // The flows more than one page starts (13.4 J1): adding a project from the folder dialog (⌘O, the empty state,
 // the title bar) or by dropping a folder, with the steps C-05 may stop at (a broad folder, a privacy permission).
 // The UI holds tokens only; the path stays in the main process (D-29).
-import type { BridgeDrop, RunSelection } from '@ayar/protocol';
+import type { BridgeDrop, CheckSpec, RunSelection } from '@ayar/protocol';
 import { attempt } from './client.ts';
 import type { AppState } from './state.svelte.ts';
 
@@ -57,4 +57,15 @@ export async function runSelection(app: AppState, projectId: string, selection: 
   await app.runs.load(s.result.runId);
   app.navigate({ name: 'scan', projectId, runId: s.result.runId });
   return true;
+}
+
+/**
+ * «أثبِت بإعادة الفحص» on a model claim (12.9, AT-44): the local check the claim names, with integ.model-claims after
+ * it when it applies, so the same run settles the claim — proven by a finding at its place, or left open.
+ */
+export function proveClaim(app: AppState, projectId: string, checks: readonly CheckSpec[], checkId: string): Promise<boolean> {
+  const spec = checks.find((s) => s.checkId === checkId && s.applicable);
+  if (!spec) return Promise.resolve(false);
+  const claims = checks.find((s) => s.checkId === 'integ.model-claims' && s.applicable);
+  return runSelection(app, projectId, claims ? { kind: 'group', instances: [spec.instance, claims.instance] } : { kind: 'check', instance: spec.instance });
 }

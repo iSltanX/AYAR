@@ -1,6 +1,6 @@
 // The engine's handler table. Each phase adds the handlers of its commands here, one line per command.
 import type { HandlerTable } from '../host/dispatcher.ts';
-import { advisorSuggest, taskCreate, tasksList } from './advisor.ts';
+import { advisorSuggest, taskCreate, tasksGaps, tasksList } from './advisor.ts';
 import { dataPurge } from './data.ts';
 import { environmentResolve } from './environment.ts';
 import { evidenceToken, internalEvidencePath } from './evidence.ts';
@@ -40,6 +40,7 @@ export const HANDLERS: HandlerTable = {
   'advisor.suggest': advisorSuggest,
   'task.create': taskCreate,
   'tasks.list': tasksList,
+  'tasks.gaps': tasksGaps,
   // DEV-5
   'readiness.evaluate': readinessEvaluate,
   'setup.preview': setupPreview,

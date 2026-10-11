@@ -17,7 +17,7 @@
   import { useLocale } from '../lib/locale.ts';
   import type { ClaimDecision } from '../lib/results.ts';
   import type { ReviewRecord } from '../lib/sheets.ts';
-  import { runSelection } from '../app/actions.ts';
+  import { proveClaim } from '../app/actions.ts';
   import { attempt, copyText } from '../app/client.ts';
   import { day, dayTime, reasonText } from '../app/format.ts';
   import { findingTitle } from '../app/results.ts';
@@ -132,8 +132,7 @@
   async function prove(c: ModelClaim): Promise<void> {
     if (!c.matchedCheckId) return;
     const p = await attempt('profile.get', { projectId });
-    const spec = p.ok ? p.result.checks.find((s) => s.checkId === c.matchedCheckId && s.applicable) : undefined;
-    if (spec) await runSelection(app, projectId, { kind: 'check', instance: spec.instance });
+    if (p.ok) await proveClaim(app, projectId, p.result.checks, c.matchedCheckId);
   }
   /** «مرفوض» opens on the one refused last; the others say why in a line. */
   let openRejected = $state<string | null>(null);

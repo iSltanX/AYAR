@@ -80,6 +80,15 @@
     const sizes = target && Array.isArray(target.viewports) ? target.viewports.length : 1;
     return n === null ? null : { states: n, sizes, themes: axis('themes'), langs: axis('languages'), total: n * sizes * axis('themes') * axis('languages') };
   });
+  /** States kept in a file of the project: the board names the file and the other axes (the file holds the count). */
+  const statesFile = $derived.by(() => {
+    const v = refValue('states');
+    return v && typeof v === 'object' && !Array.isArray(v) && typeof (v as { file?: unknown }).file === 'string' ? (v as { file: string }).file : null;
+  });
+  const axes = $derived.by(() => {
+    const axis = (k: string) => (target && typeof target[k] === 'object' && target[k] !== null && !Array.isArray(target[k]) && Array.isArray((target[k] as { values?: unknown }).values) ? (target[k] as { values: unknown[] }).values.length : 1);
+    return { sizes: target && Array.isArray(target.viewports) ? target.viewports.length : 1, themes: axis('themes'), langs: axis('languages') };
+  });
   /** The visual comparison needs the reference images: they are «ناقص» only where it applies. */
   const visualApplies = $derived(designSpecs.some((s) => s.checkId === 'design.visual' && s.applicable));
   type RefItem = { ref: string; icon: 'palette' | 'file-text' | 'layers' | 'external-link' | 'image'; values: string[]; missing: boolean; discovered: boolean; note: string };
@@ -92,7 +101,7 @@
     return [
       item('tokens', 'palette', list(refValue('tokens'))),
       item('fonts', 'file-text', list(refValue('fonts'))),
-      item('states', 'layers', matrix ? [t('sectionui.design.matrix', matrix)] : []),
+      item('states', 'layers', matrix ? [t('sectionui.design.matrix', matrix)] : statesFile ? [t('sectionui.design.matrixFile', { file: statesFile, ...axes })] : []),
       { ref: 'renderTarget', icon: 'external-link', values: targetText, missing: targetMissing, discovered: discoveredRef('renderTarget'), note: t(targetMissing ? 'sectionui.design.ref.targetMissing' : discoveredRef('renderTarget') ? 'sectionui.design.ref.targetDiscovered' : 'sectionui.design.ref.target') },
       { ref: 'baselines', icon: 'image', values: baselines.length ? [t('sectionui.design.baselines', { count: baselines.length })] : [], missing: visualApplies && !baselines.length, discovered: false, note: baselines.length ? t('sectionui.design.ref.baselinesSome') : t('sectionui.design.ref.baselinesNone') },
     ];

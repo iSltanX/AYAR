@@ -100,6 +100,8 @@
   // ── the state matrix ───────────────────────────────────────────────────────────────────────────────────────
   const states = $derived(obj(refs.states));
   const stateList = $derived(Array.isArray(states?.states) ? (states.states as Obj[]) : []);
+  /** States kept in a file of the project (with their network simulation and expectations): named, not counted here. */
+  const statesFile = $derived(typeof states?.file === 'string' ? states.file : null);
   const viewports = $derived(Array.isArray(target?.viewports) ? (target.viewports as Obj[]) : []);
   const axis = (k: 'themes' | 'languages') => (obj(target?.[k]) && Array.isArray(obj(target?.[k])!.values) ? (obj(target?.[k])!.values as string[]) : []);
   let newState = $state('');
@@ -231,9 +233,10 @@
 </section>
 
 <section class="card">
-  <div class="card-head"><h2 class="card-title">{t('configui.refs.matrix')}</h2><span class="spacer"></span><span class="small muted">{t('sectionui.design.matrix', { states: stateList.length, sizes: Math.max(1, viewports.length), themes: Math.max(1, axis('themes').length), langs: Math.max(1, axis('languages').length), total })}</span></div>
+  <div class="card-head"><h2 class="card-title">{t('configui.refs.matrix')}</h2><span class="spacer"></span><span class="small muted">{statesFile ? t('sectionui.design.matrixFile', { file: statesFile, sizes: Math.max(1, viewports.length), themes: Math.max(1, axis('themes').length), langs: Math.max(1, axis('languages').length) }) : t('sectionui.design.matrix', { states: stateList.length, sizes: Math.max(1, viewports.length), themes: Math.max(1, axis('themes').length), langs: Math.max(1, axis('languages').length), total })}</span></div>
   <div class="ref-row">
     <span class="key">{t('configui.refs.states')}</span>
+    {#if statesFile}<span class="val mono"><bdi dir="ltr">{statesFile}</bdi></span>{/if}
     {#each stateList as s (str(s.id))}<button type="button" class="chip" aria-label={t('configui.remove', { item: str(s.id) })} onclick={() => void removeState(str(s.id))}><bdi dir="ltr">{str(s.id)}</bdi><Icon name="x" size={12} /></button>{/each}
     <input class="text short" dir="ltr" aria-label={t('configui.refs.stateName')} placeholder={t('configui.refs.stateName')} bind:value={newState} />
     <input class="text short" dir="ltr" aria-label={t('configui.refs.statePath')} placeholder={t('configui.refs.statePath')} bind:value={newPath} />

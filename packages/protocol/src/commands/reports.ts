@@ -2,6 +2,7 @@
 // (DEV-9) gives report.build, report.export, task.update and the comparison their contracts.
 import { Id, Lang } from '../common.ts';
 import { AdvisorContext, AdvisorResult } from '../domain/advisor.ts';
+import { RelPath } from '../domain/discovery.ts';
 import { ReportBuilt, ReportExported, ReportOptions, ReportRecord, RunComparison } from '../domain/reports.ts';
 import { TaskPatch, TaskRecord, TaskSource, TaskVerification } from '../domain/tasks.ts';
 import { DestinationToken } from '../tokens.ts';
@@ -72,6 +73,11 @@ export const reportCommands = {
   // The card's lifecycle (12.8, C-20; DEV-9, D-DEV8-11): the user's transitions; «متحققة» comes from a run alone.
   'task.update': defineCommand({ ...renderer, owner: 'C-20', implementedIn: 'DEV-9', payload: z.strictObject({ taskId: Id, patch: TaskPatch }), result: z.strictObject({ task: TaskRecord }) }),
   /** 12.8 «ما يثبته عِيَار عند الإغلاق»: verifies the open cards of a project against a finished run (the engine does it after every run too). */
+  /**
+   * C-20 source 2 for the screens (protocol 1.7, DEV-12: J4): the units of logic with no test file of their name, from
+   * the latest snapshot of the project's files, each offered as a `testGap` card («أنشئ بطاقة»).
+   */
+  'tasks.gaps': defineCommand({ ...renderer, owner: 'C-20', since: '1.7', implementedIn: 'DEV-12', payload: z.strictObject({ projectId: Id }), result: z.strictObject({ files: z.array(RelPath).max(500), total: z.int().nonnegative(), truncated: z.boolean() }) }),
   'tasks.verify': defineCommand({ ...renderer, owner: 'C-20', since: '1.5', implementedIn: 'DEV-9', payload: z.strictObject({ projectId: Id, runId: Id.optional() }), result: z.strictObject({ verified: z.array(z.strictObject({ task: TaskRecord, verification: TaskVerification })) }) }),
   // FR-46 and FR-18: recommendations for a change context, from the knowledge base (kb/1) and the project's facts.
   'advisor.suggest': defineCommand({

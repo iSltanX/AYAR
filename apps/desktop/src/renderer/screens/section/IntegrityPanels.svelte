@@ -16,7 +16,7 @@
   import { useLocale } from '../../lib/locale.ts';
   import type { ClaimDecision } from '../../lib/results.ts';
   import type { ReviewRecord } from '../../lib/sheets.ts';
-  import { runSelection } from '../../app/actions.ts';
+  import { proveClaim } from '../../app/actions.ts';
   import { attempt, copyText } from '../../app/client.ts';
   import { badgeOf, checkTitle, day, reasonText } from '../../app/format.ts';
   import { loadPanelData, type CheckData } from '../../app/panels.ts';
@@ -156,8 +156,7 @@
   }
   /** «أثبِت بإعادة الفحص»: the local check the claim names, run now. */
   function prove(c: ModelClaim): void {
-    const spec = model.profile.checks.find((s) => s.checkId === c.matchedCheckId && s.applicable);
-    if (spec) void runSelection(app, projectId, { kind: 'check', instance: spec.instance });
+    if (c.matchedCheckId) void proveClaim(app, projectId, model.profile.checks, c.matchedCheckId);
   }
 
   // ── the reviews (11.4 rule 6) ──────────────────────────────────────────────────────────────────────────────

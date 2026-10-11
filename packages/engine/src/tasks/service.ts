@@ -70,6 +70,15 @@ export class TasksService {
     return untestedUnits(paths).map((g) => g.file);
   }
 
+  /** tasks.gaps (DEV-12, J4): those units in the project's latest files snapshot, at most 500, for «أنشئ بطاقة». */
+  async gaps(projectId: string): Promise<{ files: string[]; total: number; truncated: boolean }> {
+    const snap = this.#o.db.get<{ id: string }>('SELECT id FROM snapshots WHERE project_id = ? ORDER BY created_at DESC, rowid DESC LIMIT 1', projectId);
+    const manifest = snap && this.#o.evidence ? await this.#o.evidence.snapshots.load(snap.id).catch(() => null) : null;
+    const paths = manifest ? manifest.files.filter((f) => f[6] !== 'link').map((f) => f[0]).filter((f) => !f.startsWith('node_modules/') && !f.includes('/node_modules/')) : [];
+    const all = TasksService.gapsIn(paths);
+    return { files: all.slice(0, 500), total: all.length, truncated: all.length > 500 };
+  }
+
   #finding(findingId: string, projectId: string): FindingForCard {
     const f = this.#o.db.get<{ id: string; display_id: string; check_id: string; rule_id: string | null; title_key: string; message_redacted: string | null; location_json: string | null; severity: string; project_id: string }>(
       'SELECT f.id, f.display_id, f.check_id, f.rule_id, f.title_key, f.message_redacted, f.location_json, f.severity, r.project_id FROM findings f JOIN check_runs c ON c.id = f.check_run_id JOIN runs r ON r.id = c.run_id WHERE f.id = ?',

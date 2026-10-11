@@ -97,6 +97,21 @@
     carded = [...carded, findingId];
     app.showToast({ kind: 'created', id: r.result.task.displayId });
   }
+  // ── the units with no test file (C-20 source 2, J4; D-DEV12-05): a «اختبار وحدة» card each ─────────────────────
+  let gaps = $state<{ files: string[]; total: number; truncated: boolean }>({ files: [], total: 0, truncated: false });
+  $effect(() => {
+    void model.latest.size;
+    void attempt('tasks.gaps', { projectId }).then((r) => {
+      if (r.ok) gaps = r.result;
+    });
+  });
+  let gapCarded = $state<string[]>([]);
+  async function gapCard(file: string): Promise<void> {
+    const r = await attempt('task.create', { projectId, source: { kind: 'testGap', checkId: 'beh.unit', file } });
+    if (!r.ok) return;
+    gapCarded = [...gapCarded, file];
+    app.showToast({ kind: 'created', id: r.result.task.displayId });
+  }
   async function include(instance: string): Promise<void> {
     const r = await attempt('profile.update', { projectId, patch: { checks: { [instance]: { included: true } } } });
     if (r.ok) onchanged();
@@ -141,6 +156,22 @@
         </tbody>
       </table>
     {/if}
+  </Panel>
+{/if}
+
+{#if specsOf('beh.unit').length && gaps.files.length}
+  <Panel title={t('sectionui.behavior.gaps', { count: gaps.total })} testid="panel-gaps" note={gaps.truncated ? `${t('sectionui.behavior.gapsNote')} ${t('sectionui.behavior.gapsTruncated', { shown: gaps.files.length, total: gaps.total })}` : t('sectionui.behavior.gapsNote')}>
+    <table class="ptable">
+      <thead><tr><th scope="col">{t('sectionui.code.file')}</th><th scope="col"><span class="visually-hidden">{t('sectionui.column.actions')}</span></th></tr></thead>
+      <tbody>
+        {#each gaps.files as file (file)}
+          <tr data-file={file}>
+            <td>{@render value(file)}</td>
+            <td class="end"><Button kind="secondary" disabled={gapCarded.includes(file)} onclick={() => void gapCard(file)}>{t('ui.action.createCard')}</Button></td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
   </Panel>
 {/if}
 
