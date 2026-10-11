@@ -121,5 +121,7 @@ export const PuritySummary = z.strictObject({
   partial: z.boolean(),
   section: z.string().nullable(),
   roundId: Id.nullable(),
+  /** Protocol 1.6 (DEV-11): `ROUND-NNN`, as the purity card and the reports name the round. */
+  roundDisplayId: z.string().nullable().optional(),
 });
 export type PuritySummary = z.infer<typeof PuritySummary>;

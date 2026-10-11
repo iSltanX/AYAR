@@ -1,4 +1,20 @@
 <script lang="ts">
-  // The UI mount point (DEV-3, task 9): deliberately empty. No visual element and no style until the design
-  // is approved (AGENTS.md 7); the screens and components arrive in DEV-10 to DEV-12.
+  // The app root (DEV-11): reads the settings, the window buttons' corner and the projects, then shows the frame
+  // in the UI language. A change of language re-mounts the subtree (Locale is set once per subtree).
+  import { onDestroy, onMount } from 'svelte';
+  import Locale from './components/Locale.svelte';
+  import Shell from './screens/Shell.svelte';
+  import { AppState, provideApp } from './app/state.svelte.ts';
+
+  const app = provideApp(new AppState());
+  onMount(() => void app.init());
+  onDestroy(() => app.destroy());
 </script>
+
+{#if app.ready}
+  {#key app.lang}
+    <Locale lang={app.lang}>
+      <Shell />
+    </Locale>
+  {/key}
+{/if}

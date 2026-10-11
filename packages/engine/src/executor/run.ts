@@ -28,6 +28,7 @@ import type { RunGate } from '../host/run-gate.ts';
 import type { EnginePorts, FileWriter, Logger } from '../ports/index.ts';
 import { latestSnapshot } from '../profile/service.ts';
 import { approvalsOf, latestProfile } from '../profile/store.ts';
+import { stateSinceRound } from '../purity/since-round.ts';
 import type { PlannerService } from '../planner/service.ts';
 import type { ProjectsService } from '../projects/service.ts';
 import type { PurityService } from '../purity/service.ts';
@@ -54,6 +55,8 @@ import type { ProbeService } from '../probe/service.ts';
 import type { ProbeOutcome, VisualComparison } from '@ayar/probe';
 import type { GuardContext, IntegrityService } from '../integrity/service.ts';
 
+/** check.tail's longest line (protocol 1.6): a longer one is cut and marked. */
+const TAIL_LINE_CHARS = 20_000;
 /** At most this many provisional findings are sent per execution (9.6 point 5: the final reading decides). */
 const PROVISIONAL_MAX = 200;
 /** A raw report is read with a limit (C-15): 50 MB; beyond it, the part read is kept and the report is not judged. */
@@ -188,6 +191,8 @@ interface Active {
   /** Aborted when the app quits: a report still being read is dropped, and the run ends the short way. */
   quit: AbortController;
   wake: () => void;
+  /** The redacted output counters and last lines of each running check (check.tail, protocol 1.6). */
+  tails: Map<string, OutputTotals>;
 }
 
 /**
@@ -367,7 +372,7 @@ export class RunService {
     const plan = PlanSchema.parse(JSON.parse(row.plan_json));
     const projectId = plan.projectId;
     let wake = () => {};
-    const active: Active = { runId, projectId, plan, cancel: null, procs: new Map(), cancelledChecks: new Set(), services: null, waiting: new Map(), collecting: new Set(), quit: new AbortController(), wake: () => wake() };
+    const active: Active = { runId, projectId, plan, cancel: null, procs: new Map(), cancelledChecks: new Set(), services: null, waiting: new Map(), collecting: new Set(), quit: new AbortController(), wake: () => wake(), tails: new Map() };
     this.#active.set(runId, active);
     // A run cancelled while it waited in the queue never starts.
     if (db.get<{ state: string }>('SELECT state FROM runs WHERE id = ?', runId)!.state !== 'queued') return;
@@ -742,6 +747,7 @@ export class RunService {
     const child = childFor(inv.plan.steps[0]!.env);
     const evDir = await evidence.store.open(ctx.projectId, runId, e.checkRunId);
     const totals: OutputTotals = { lines: 0, tail: [] };
+    active.tails.set(e.checkRunId, totals);
     const redactor = this.#o.redaction.redactor();
     const onSegment = (stream: 'stdout' | 'stderr', offset: number, length: number) => this.#o.events.log(runId, e.checkRunId, { stream, offset, length });
     // 9.6 point 5: the adapter's live parser turns a line into a provisional finding, confirmed or dropped by the
@@ -822,6 +828,8 @@ export class RunService {
             processor: `${Math.round(s.cpuPercent)}%`,
             silentMs: s.silentMs,
             linesSeen: totals.lines,
+            // Protocol 1.6 (DEV-11): the group's resident memory, for the monitor's resource meter (13.3).
+            memoryKb: s.rssKb,
           });
         },
       });
@@ -1619,6 +1627,24 @@ export class RunService {
     this.#o.events.emit('run.state', this.view(runId));
   }
 
+  /**
+   * check.tail (protocol 1.6): the last lines of a check's output. While it runs, from the executor's redacted
+   * counters (9.7 keeps the last 200 lines); afterwards, from its raw result. Never the log file's path.
+   */
+  tail(checkRunId: string, maxLines = 200): { lines: string[]; totalLines: number; live: boolean } {
+    const n = Math.max(1, Math.min(200, maxLines));
+    // AT-29: a line longer than the contract's 20,000 characters is cut, marked with «…», never refused whole.
+    const cut = (lines: readonly string[]) => lines.map((l) => (l.length > TAIL_LINE_CHARS ? `${l.slice(0, TAIL_LINE_CHARS - 1)}…` : l));
+    for (const a of this.#active.values()) {
+      const t = a.tails.get(checkRunId);
+      if (t) return { lines: cut(t.tail.slice(-n)), totalLines: t.lines, live: true };
+    }
+    const row = this.#o.db.get<{ raw_json: string | null }>('SELECT raw_json FROM check_runs WHERE id = ?', checkRunId);
+    if (!row) throw new CommandError('not_found', { reason: 'check_run' });
+    const tail = row.raw_json ? RawSchema.parse(JSON.parse(row.raw_json)).tail : [];
+    return { lines: cut(tail.slice(-n)), totalLines: tail.length, live: false };
+  }
+
   list(projectId: string): RunList {
     if (!this.#o.db.get('SELECT id FROM projects WHERE id = ?', projectId)) throw new CommandError('not_found', { reason: 'project' });
     const ids = this.#o.db.all<{ id: string }>("SELECT id FROM runs WHERE project_id = ? ORDER BY coalesce(started_at, '9999') DESC, display_id DESC", projectId);
@@ -1638,7 +1664,9 @@ export class RunService {
         stateChange = diffManifests(a, b, { declared: this.#declared(row.project_id, plan.success ? plan.data : (null as unknown as RunPlan)), tracked: root ? await trackedPaths(this.#o.ports.fs, root) : null });
       }
     }
-    return { run, plan: plan.success ? plan.data : null, checks, stateChange, purity: TERMINAL_RUN.includes(row.state) ? this.#o.purity.resultOf(runId) : null };
+    // DEV-11: a finished run's state against the latest complete round (13.5 «قديم»).
+    const sinceRound = TERMINAL_RUN.includes(row.state) ? await stateSinceRound(this.#o.db, this.#o.evidence, row) : null;
+    return { run, plan: plan.success ? plan.data : null, checks, stateChange, purity: TERMINAL_RUN.includes(row.state) ? this.#o.purity.resultOf(runId) : null, ...(sinceRound ? { sinceRound } : {}) };
   }
 
   keep(runId: string, keep: boolean): RunView {

@@ -1,0 +1,12 @@
+{
+  "monitor.started": "بدأ {time} · منذ {elapsed}",
+  "monitor.remaining": "المتبقي تقديريًا {duration}",
+  "monitor.note.running": "لا حكم قبل انتهاء كل الفحوص. الإخفاق الظاهر نهائي لفحصه، والحكم العام ما زال «جارٍ».",
+  "monitor.note.cancelling": "يُلغى التشغيل: تتوقف الفحوص الجارية، وتُحفظ النتائج والأدلة الجزئية. لا عيار لتشغيل لم يكتمل.",
+  "monitor.note.queued": "ينتظر دوره: تشغيل آخر جارٍ، وهذا التالي في الصف ({position}).",
+  "monitor.sleep": "توقف الجهاز {minutes, plural, one {دقيقة واحدة} two {دقيقتين} few {# دقائق} many {# دقيقة} other {# دقيقة}} أثناء الفحص ({from}–{to}). لا تُحسب الفجوة من مهل الفحوص.",
+  "monitor.step.lines": "{count, plural, zero {لا خرج بعد} one {سطر واحد من الخرج} two {سطران من الخرج} few {# أسطر من الخرج} many {# سطرًا من الخرج} other {# سطر من الخرج}}",
+  "monitor.sectionSummary": "{status} {count}",
+  "monitor.cancelCheck": "ألغِ «{name}»",
+  "monitor.step.cells": "يعرض الحالات"
+}

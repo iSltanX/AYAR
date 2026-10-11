@@ -32,6 +32,8 @@
     /** Results and inspector: also create a verification card when copying. */
     createCard?: boolean;
     disabled?: boolean;
+    /** The segmented control shows no selection: one of the results' tabs is selected instead (D-DES4-07). */
+    viewEmpty?: boolean;
     oncopy?: () => void;
     onviewchange?: (view: ReportView) => void;
     onscopechange?: (scope: CopyScope) => void;
@@ -48,6 +50,7 @@
     redactedKinds,
     createCard = $bindable(false),
     disabled = false,
+    viewEmpty = false,
     oncopy,
     onviewchange,
     onscopechange,
@@ -91,7 +94,7 @@
     <Checkbox bind:checked={createCard} label={t('results.copyBar.createCard')} onchange={(v: boolean) => oncreatecardchange?.(v)} />
   {/if}
   {#if tabs && !instructions}
-    <SegmentedControl bind:value={view} options={viewOptions} label={t('results.copyBar.view')} onchange={(v: ReportView) => onviewchange?.(v)} />
+    <SegmentedControl bind:value={view} options={viewOptions} label={t('results.copyBar.view')} empty={viewEmpty} onchange={(v: ReportView) => onviewchange?.(v)} />
   {/if}
 </div>
 

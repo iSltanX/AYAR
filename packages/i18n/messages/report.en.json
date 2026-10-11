@@ -174,5 +174,6 @@
   "report.next.claimProven": "Proven by a local check.",
   "report.next.claimDecided": "Your decision is recorded.",
   "report.split.byFindings": "The report exceeded its limit ({limit} characters): split it by findings — select fewer, then copy.",
-  "report.split.bySections": "The report exceeded its limit ({limit} characters): split it by sections — copy one section at a time."
+  "report.split.bySections": "The report exceeded its limit ({limit} characters): split it by sections — copy one section at a time.",
+  "report.human.meaning.cancelled": "The run was cancelled before its checks ended, so it has no verdict and no {karatWord}. “Re-run incomplete” completes the same round while the code is unchanged."
 }

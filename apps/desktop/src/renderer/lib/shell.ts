@@ -14,6 +14,7 @@ export const NAV_SECTIONS = ['design', 'security', 'code', 'behavior', 'performa
 export const NAV_PROJECT = ['modelChecks', 'tasks', 'runs', 'projectConfiguration'] as const;
 export const NAV_BOTTOM = ['tools', 'settings'] as const;
 export type NavId =
+  | 'projects'
   | (typeof NAV_TOP)[number]
   | (typeof NAV_SECTIONS)[number]
   | (typeof NAV_PROJECT)[number]
@@ -21,6 +22,8 @@ export type NavId =
 
 /** The label key and the Lucide 16 glyph of each destination, as in the Figma sidebar. */
 export const NAV: Readonly<Record<NavId, { key: MessageKey; icon: LucideName }>> = {
+  /** The app level (D-DES4-09): the project list, with the folder glyph. */
+  projects: { key: 'ui.nav.projects', icon: 'folder' },
   overview: { key: 'ui.nav.overview', icon: 'layout-dashboard' },
   fullScan: { key: 'ui.nav.fullScan', icon: 'scan-search' },
   design: { key: 'ui.section.design', icon: 'palette' },
@@ -108,5 +111,8 @@ export function countProgress(done: number, total: number): { done: number; tota
   return { done: d, total: t, fraction: t > 0 ? d / t : 0 };
 }
 
-/** What a toast says was copied (Toast 117:9781: Kind report | card | instructions). */
-export type ToastMessage = { kind: 'report'; count: number } | { kind: 'card' | 'instructions'; id: string };
+/**
+ * What a toast says was copied (Toast 117:9781: Kind report | card | instructions), or — DEV-11, the same toast with
+ * another sentence — the card created from a finding («أنشئ بطاقة»).
+ */
+export type ToastMessage = { kind: 'report'; count: number } | { kind: 'card' | 'instructions' | 'created'; id: string };

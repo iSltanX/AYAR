@@ -17,6 +17,9 @@ export const discoveryEvents = {
       currentDir: z.string(),
       /** Ecosystems recognized so far (9.2 «الأنواع المكتشفة حتى الآن»). */
       kinds: z.array(z.string()),
+      /** Protocol 1.6 (DEV-11): 9.2 «المجلدات المتخطاة» — how many so far, and the first few, relative to the root. */
+      skipped: z.int().nonnegative().optional(),
+      skippedDirs: z.array(z.string()).max(8).optional(),
     }),
     since: '1.0',
     implementedIn: 'DEV-4',

@@ -11,7 +11,8 @@
   import ProjectSwitcher from './ProjectSwitcher.svelte';
 
   interface Props {
-    project: { name: string; path?: string };
+    /** The project shown; absent at the app level (D-DES4-09: the project list and adding a project). */
+    project?: { name: string; path?: string };
     /** The destination shown now (selected, aria-current="page"). */
     current: NavId;
     /** Section badges: failures (count) or missing (needs setup). */
@@ -39,15 +40,19 @@
 
 <nav class="sidebar" aria-label={t('shell.sidebar.label')}>
   <div class="stack">
-    <ProjectSwitcher name={project.name} path={project.path} onclick={() => onprojectmenu?.()} />
-    <hr />
-    {#each NAV_TOP as id (id)}{@render item(id)}{/each}
-    <div class="stack" role="group" aria-labelledby="{uid}-sections">
-      <NavGroupHeader id="{uid}-sections" label={t('ui.nav.sections')} />
-      {#each NAV_SECTIONS as id (id)}{@render item(id)}{/each}
-    </div>
-    <hr />
-    {#each NAV_PROJECT as id (id)}{@render item(id)}{/each}
+    {#if project}
+      <ProjectSwitcher name={project.name} path={project.path} onclick={() => onprojectmenu?.()} />
+      <hr />
+      {#each NAV_TOP as id (id)}{@render item(id)}{/each}
+      <div class="stack" role="group" aria-labelledby="{uid}-sections">
+        <NavGroupHeader id="{uid}-sections" label={t('ui.nav.sections')} />
+        {#each NAV_SECTIONS as id (id)}{@render item(id)}{/each}
+      </div>
+      <hr />
+      {#each NAV_PROJECT as id (id)}{@render item(id)}{/each}
+    {:else}
+      {@render item('projects')}
+    {/if}
   </div>
   <div class="stack">
     <hr />

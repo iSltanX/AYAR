@@ -12,24 +12,26 @@
     /** The group's accessible name. */
     label: string;
     disabled?: boolean;
+    /** Nothing selected here: the selection is in a sibling control (D-DES4-07, the results' six views). */
+    empty?: boolean;
     onchange?: (value: T) => void;
   }
-  let { value = $bindable(), options, label, disabled = false, onchange }: Props = $props();
+  let { value = $bindable(), options, label, disabled = false, empty = false, onchange }: Props = $props();
   let buttons: HTMLButtonElement[] = $state([]);
 
   const enabled = $derived(options.map((o) => !disabled && !o.disabled));
-  const current = $derived(Math.max(0, options.findIndex((o) => o.value === value)));
+  const current = $derived(empty ? -1 : Math.max(0, options.findIndex((o) => o.value === value)));
 
   function select(i: number) {
     const o = options[i];
     if (!o || !enabled[i]) return;
-    if (o.value !== value) {
+    if (o.value !== value || empty) {
       value = o.value;
       onchange?.(o.value);
     }
   }
   function keydown(e: KeyboardEvent) {
-    const to = arrowTarget(e, current, enabled, 'both');
+    const to = arrowTarget(e, Math.max(0, current), enabled, 'both');
     if (to === null) return;
     e.preventDefault();
     select(to);
@@ -42,7 +44,7 @@
     <Segment
       bind:element={buttons[i]}
       selected={i === current}
-      tabindex={i === current ? 0 : -1}
+      tabindex={i === Math.max(0, current) ? 0 : -1}
       disabled={!enabled[i]}
       onclick={() => select(i)}
       onkeydown={keydown}>{o.label}</Segment

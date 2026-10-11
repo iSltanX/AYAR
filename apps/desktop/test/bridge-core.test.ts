@@ -94,3 +94,27 @@ describe('bridge core (C-02)', () => {
     expect(errors).toHaveLength(1);
   });
 });
+
+describe('bridge core: a dropped folder (protocol 1.6)', () => {
+  const token = `sel_${'a'.repeat(43)}`;
+
+  it('delivers the main process’s answer as bridge.drop, and keeps one that came before the page listened', async () => {
+    const { core } = setup();
+    core.acceptDrop({ ok: true, selectionToken: token, location: 'documents', display: '~/Documents/rasd' });
+    const got: unknown[] = [];
+    core.api.subscribe('bridge.drop', (m) => got.push(m));
+    await Promise.resolve();
+    expect(got).toEqual([{ ok: true, selectionToken: token, location: 'documents', display: '~/Documents/rasd' }]);
+    core.acceptDrop({ ok: false, reason: 'multiple' });
+    expect(got).toEqual([{ ok: true, selectionToken: token, location: 'documents', display: '~/Documents/rasd' }, { ok: false, reason: 'multiple' }]);
+  });
+
+  it('passes only the two shapes, never a path or an extra field', () => {
+    const { core } = setup();
+    const got: unknown[] = [];
+    core.api.subscribe('bridge.drop', (m) => got.push(m));
+    for (const bad of [null, 'x', { ok: true, selectionToken: '/Users/me' }, { ok: true, path: '/Users/me' }, { ok: false, reason: 'other' }]) core.acceptDrop(bad);
+    core.acceptDrop({ ok: true, selectionToken: token, path: '/Users/me', location: '/Users/me/Documents' });
+    expect(got).toEqual([{ ok: true, selectionToken: token, location: null, display: '' }]);
+  });
+});

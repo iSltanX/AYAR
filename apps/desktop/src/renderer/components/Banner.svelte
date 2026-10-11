@@ -8,7 +8,16 @@
   import Button from './Button.svelte';
   import Icon from './Icon.svelte';
 
-  type Props = { kind: 'needs-approval'; count: number; onshowdiff?: () => void } | { kind: 'engine-restarting' };
+  type Props =
+    | {
+        kind: 'needs-approval';
+        count: number;
+        /** A screen's own sentence and button, where the approved screen words them (DES-4 5.3: «اعتمد الآن»). */
+        message?: string;
+        actionLabel?: string;
+        onshowdiff?: () => void;
+      }
+    | { kind: 'engine-restarting' };
   let props: Props = $props();
   const { t } = useLocale();
 </script>
@@ -16,9 +25,9 @@
 <div class="banner {props.kind}" role={props.kind === 'engine-restarting' ? 'status' : undefined} data-kind={props.kind}>
   {#if props.kind === 'needs-approval'}
     <Icon name="file-check" size={16} />
-    <span class="message">{t('shell.banner.needsApproval', { count: props.count })}</span>
+    <span class="message">{props.message ?? t('shell.banner.needsApproval', { count: props.count })}</span>
     <span class="spacer"></span>
-    <Button kind="secondary" onclick={() => props.kind === 'needs-approval' && props.onshowdiff?.()}>{t('shell.banner.showDiff')}</Button>
+    <Button kind="secondary" onclick={() => props.kind === 'needs-approval' && props.onshowdiff?.()}>{props.actionLabel ?? t('shell.banner.showDiff')}</Button>
   {:else}
     <Icon name="info" size={16} />
     <span class="message">{t('shell.banner.engineRestarting')}</span>

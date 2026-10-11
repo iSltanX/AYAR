@@ -41,7 +41,19 @@ export type CostTag = z.infer<typeof CostTag>;
 /** The head of the report (12.1 «رأس التقرير»). */
 export const ReportHead = z.strictObject({
   project: z.strictObject({ id: Id, name: z.string(), ecosystems: z.array(z.string()) }),
-  run: z.strictObject({ id: Id, displayId: z.string(), kind: z.string(), startedAt: IsoTimestamp.nullable(), finishedAt: IsoTimestamp.nullable(), durationMs: z.int().nonnegative().nullable(), roundDisplayId: z.string().nullable() }).nullable(),
+  run: z
+    .strictObject({
+      id: Id,
+      displayId: z.string(),
+      kind: z.string(),
+      startedAt: IsoTimestamp.nullable(),
+      finishedAt: IsoTimestamp.nullable(),
+      durationMs: z.int().nonnegative().nullable(),
+      roundDisplayId: z.string().nullable(),
+      /** Protocol 1.6 (DEV-11): the run was cancelled — no verdict and no karat (plan 4 «أُلغي التشغيل»). */
+      cancelled: z.literal(true).optional(),
+    })
+    .nullable(),
   /** The run's selection as words (full, section, chosen checks). */
   scope: z.strictObject({ kind: z.string(), section: z.string().nullable(), instances: z.int().nonnegative(), criteria: z.int().nonnegative(), checks: z.int().nonnegative() }),
   verdict: z.enum(['pure', 'incomplete', 'blocked']).nullable(),
@@ -50,7 +62,14 @@ export const ReportHead = z.strictObject({
   counts: z.partialRecord(CheckOutcome, z.int().nonnegative()),
   versions: z.strictObject({ ayar: z.string(), profile: z.int().nullable(), profileHash: z.string().nullable(), catalog: z.string(), template: z.literal(MODEL_REPORT_TEMPLATE), tools: z.record(z.string(), z.string()) }),
   environment: z.strictObject({ source: z.string().nullable(), os: z.string(), node: z.string().nullable(), python: z.string().nullable(), packageManager: z.string().nullable() }),
-  state: z.strictObject({ branch: z.string().nullable(), commit: z.string().nullable(), dirty: z.boolean().nullable(), snapshotId: Id.nullable() }),
+  state: z.strictObject({
+    branch: z.string().nullable(),
+    commit: z.string().nullable(),
+    dirty: z.boolean().nullable(),
+    snapshotId: Id.nullable(),
+    /** Protocol 1.6 (DEV-11): the state against the latest complete round's (D-31's rule); absent with no round. */
+    sinceRound: z.enum(['same', 'changed']).optional(),
+  }),
   createdAt: IsoTimestamp,
 });
 export type ReportHead = z.infer<typeof ReportHead>;

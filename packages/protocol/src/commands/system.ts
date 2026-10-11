@@ -1,12 +1,32 @@
 // Commands the main process executes itself (C-01), added to 6.5 [D-DEV3-03]: the UI needs a way to ask for
 // the system dialogs that mint path tokens, for a confirmation token after it showed a destructive action,
 // and for the supervisor's state. None of them returns a path.
+import { Id } from '../common.ts';
 import { DestinationToken, SelectionToken, SourceToken, ConfirmationToken } from '../tokens.ts';
 import { z } from '../zod.ts';
 import { defineCommand } from './define.ts';
 import { EngineHealth } from '../events/engine.ts';
 
 const base = { owner: 'C-01', handler: 'main', audience: 'renderer', since: '1.0', implementedIn: 'DEV-3' } as const;
+/** Protocol 1.6 (DEV-11, D-DEV11-02): what the screens need from the main process and macOS itself. */
+const shell = { ...base, since: '1.6', implementedIn: 'DEV-11' } as const;
+
+/**
+ * One entry of a native menu the renderer asks for (D-DES3-07: context menus are macOS menus). The renderer sends
+ * the translated text; the main process only shows it and answers with the chosen id. No path, no command.
+ */
+export const NativeMenuEntry = z.discriminatedUnion('kind', [
+  z.strictObject({
+    kind: z.literal('item'),
+    id: z.string().regex(/^[a-zA-Z][\w.:-]{0,127}$/),
+    label: z.string().min(1).max(200),
+    accelerator: z.string().max(40).optional(),
+    enabled: z.boolean(),
+  }),
+  z.strictObject({ kind: z.literal('separator') }),
+  z.strictObject({ kind: z.literal('header'), label: z.string().min(1).max(200) }),
+]);
+export type NativeMenuEntry = z.infer<typeof NativeMenuEntry>;
 
 const Cancelled = z.strictObject({ cancelled: z.literal(true) });
 
@@ -46,5 +66,33 @@ export const systemCommands = {
     result: z.union([z.strictObject({ confirmationToken: ConfirmationToken }), Cancelled]),
   }),
   'engine.status': defineCommand({ ...base, payload: z.strictObject({}), result: EngineHealth }),
+  /**
+   * D-54 (E-23): where macOS draws the window buttons, from the first language of the system's global preferences
+   * (never from the app's own language), so the title bar reserves that corner.
+   */
+  'window.layout': defineCommand({ ...shell, payload: z.strictObject({}), result: z.strictObject({ controls: z.enum(['left', 'right']) }) }),
+  /** 13.3 «أظهر في Finder»: the main process reads the project's folder from the engine; the UI sends its id only. */
+  'project.reveal': defineCommand({ ...shell, payload: z.strictObject({ projectId: Id }), result: z.strictObject({ revealed: z.literal(true) }) }),
+  /**
+   * 13.3 «افتح في المحرر» (E-17): the file of a finding, resolved inside its project's real root by the main process,
+   * opened with the default of E-17 (`open -t`). The editor template setting is DEV-12's.
+   */
+  'editor.open': defineCommand({ ...shell, payload: z.strictObject({ findingId: Id }), result: z.strictObject({ opened: z.literal(true) }) }),
+  /** D-DES3-07: a native context menu at the pointer; the chosen item's id, or null when it was dismissed. */
+  'menu.popup': defineCommand({
+    ...shell,
+    payload: z.strictObject({ entries: z.array(NativeMenuEntry).min(1).max(40), x: z.int().min(0).max(100_000).optional(), y: z.int().min(0).max(100_000).optional() }),
+    result: z.strictObject({ id: z.string().nullable() }),
+  }),
+  /**
+   * A short text the user sees and copies (an id, a command, a path) — never a report: reports go through
+   * clipboard.copy, built and redacted by the engine (FR-44). The text is already what the engine handed the
+   * renderer (redacted); the clipboard is written only on the user's own action (AT-23).
+   */
+  'clipboard.copyText': defineCommand({
+    ...shell,
+    payload: z.strictObject({ text: z.string().min(1).max(4096).regex(/^[^\u0000-\u0008\u000b-\u001f\u007f]*$/) }),
+    result: z.strictObject({ copied: z.literal(true) }),
+  }),
   'engine.restart': defineCommand({ ...base, payload: z.strictObject({}), result: z.strictObject({ accepted: z.boolean() }) }),
 };

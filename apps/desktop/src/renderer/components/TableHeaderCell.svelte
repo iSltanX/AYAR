@@ -18,14 +18,16 @@
     fill?: boolean;
     /** Where a label wider than its column overflows: past its end (default) or back over its start. */
     overflow?: 'end' | 'start';
+    /** Inside a native <th>, which is the column header itself: no role of its own (DEV-11 tables). */
+    native?: boolean;
     /** Called with the new order: ascending first, then it toggles. */
     onsort?: (direction: SortDirection) => void;
   }
-  let { label, sortable = true, sort, fill = false, overflow = 'end', onsort }: Props = $props();
+  let { label, sortable = true, sort, fill = false, overflow = 'end', native = false, onsort }: Props = $props();
   const ariaSort = $derived(sort === 'asc' ? 'ascending' : sort === 'desc' ? 'descending' : undefined);
 </script>
 
-<div class="header-cell" class:fill class:overflow-start={overflow === 'start'} role="columnheader" aria-sort={ariaSort}>
+<div class="header-cell" class:fill class:overflow-start={overflow === 'start'} role={native ? undefined : 'columnheader'} aria-sort={native ? undefined : ariaSort}>
   {#if sortable}
     <button type="button" class="sort" class:sorted={sort !== undefined} onclick={() => onsort?.(sort === 'asc' ? 'desc' : 'asc')}>
       <span class="inner">

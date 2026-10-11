@@ -306,6 +306,7 @@ export class Renderer {
     const h = report.head;
     const blocking = report.checks.filter((c) => c.blocking && c.outcome === 'failed');
     const needsSetup = report.notRun.filter((n) => n.outcome === 'missing').length;
+    if (h.run?.cancelled) return t('report.human.meaning.cancelled', { karatWord: this.term('karat') });
     if (h.verdict === 'blocked') return t('report.human.meaning.blocked', { checks: blocking.map((c) => `${this.checkTitle(c.checkId)} (\`${c.checkId}\`)`).join(t('report.human.and')) || '—', karat: h.karat ?? 0, blockingWord: this.term('blocking'), setup: needsSetup });
     if (h.verdict === 'pure') return t('report.human.meaning.pure', { karatWord: this.term('karat'), criteria: h.scope.criteria });
     if (h.verdict === 'incomplete') {

@@ -95,5 +95,8 @@
   "sheets.alert.removeTool.confirm": "أزل الأداة",
   "sheets.alert.purgeData.message": "احذف كل بيانات عِيَار؟",
   "sheets.alert.purgeData.informative": "تُحذف المشاريع المضافة وتشغيلاتها وأدلتها والأدوات المنزّلة من هذا الجهاز. لا يُمس أي مستودع. لا يمكن التراجع.",
-  "sheets.alert.purgeData.confirm": "احذف البيانات"
+  "sheets.alert.purgeData.confirm": "احذف البيانات",
+  "sheets.permission.location.icloud": "iCloud Drive",
+  "sheets.permission.location.removable": "الوحدات الخارجية",
+  "sheets.permission.location.network": "وحدات الشبكة"
 }

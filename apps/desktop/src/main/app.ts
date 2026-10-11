@@ -6,7 +6,7 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { IPC, protocolError, z, type DeliveredEvent, type EngineHealth, type ParsedEvent } from '@ayar/protocol';
-import { createFileLogger, ensureDataDir, nodeFileSystem, stderrLogger, systemClock, type Logger } from '@ayar/engine/host-support';
+import { createFileLogger, ensureDataDir, nodeFileSystem, protectedLocation, stderrLogger, systemClock, type Logger } from '@ayar/engine/host-support';
 import { resolveLanguage } from '@ayar/i18n';
 import { serveAppRequest } from './app-protocol.ts';
 import { spawnUtilityEngine } from './engine-utility.ts';
@@ -47,6 +47,15 @@ interface Diagnostics {
   dataDir: string;
   health: EngineHealth[];
 }
+
+// A folder dropped on the Dock icon before the app is ready waits for the window (C-01).
+const pendingOpenFiles: string[] = [];
+let openFileHandler: ((path: string) => void) | null = null;
+app.on('open-file', (e, path) => {
+  e.preventDefault();
+  if (openFileHandler) openFileHandler(path);
+  else pendingOpenFiles.push(path);
+});
 
 if (!app.requestSingleInstanceLock()) {
   app.exit(0);
@@ -131,6 +140,8 @@ async function run(): Promise<void> {
     system: electronSystemServices(() => mainWindow),
     tokens,
     language: () => resolveLanguage('system', app.getPreferredSystemLanguages()),
+    locationOf: (real) => protectedLocation(real, app.getPath('home')),
+    home: app.getPath('home'),
     log: (level, message, fields) => logger.log(level, message, fields),
   });
   protocol.handle(EVIDENCE_SCHEME, (req) =>
@@ -156,6 +167,23 @@ async function run(): Promise<void> {
   ipcMain.on(IPC.eventsPortRequest, (event) => {
     if (isTrusted(event)) ports.attach(event.sender);
   });
+  // C-01 «السحب والإفلات»: the preload sends the dropped paths here alone; the page gets a selection token back
+  // as `bridge.drop`, never the path. A folder dropped on the Dock icon arrives as open-file (below).
+  const DropPaths = z.strictObject({ paths: z.array(z.string().max(4096)).max(16) });
+  ipcMain.on(IPC.dropResolve, (event, raw: unknown) => {
+    if (!isTrusted(event)) return;
+    const d = DropPaths.safeParse(raw);
+    void gateway.resolveDrop(d.success ? d.data.paths : []).then((result) => {
+      if (!event.sender.isDestroyed()) event.sender.send(IPC.dropResult, result);
+    });
+  });
+  const deliverOpenFile = (path: string) => {
+    void gateway.resolveDrop([path]).then((result) => {
+      if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send(IPC.dropResult, result);
+    });
+  };
+  openFileHandler = deliverOpenFile;
+
   let cspLogged = 0;
   ipcMain.on(IPC.cspViolation, (event, raw: unknown) => {
     if (!isTrusted(event)) return;
@@ -168,7 +196,7 @@ async function run(): Promise<void> {
     else if (cspLogged % 1000 === 0) logger.log('error', 'CSP violations continue', { total: cspLogged });
   });
 
-  const openWindow = () => {
+  const openWindow = (): BrowserWindow => {
     const win = createMainWindow(paths.preload, !app.isPackaged, (message, fields) => logger.log('error', message, fields));
     const id = win.webContents.id;
     trusted.add(id);
@@ -177,10 +205,14 @@ async function run(): Promise<void> {
       if (mainWindow === win) mainWindow = null;
     });
     mainWindow = win;
+    return win;
   };
 
   supervisor.start();
-  openWindow();
+  // What was dropped on the Dock icon at launch reaches the page once it can listen.
+  openWindow().webContents.once('did-finish-load', () => {
+    for (const path of pendingOpenFiles.splice(0)) deliverOpenFile(path);
+  });
   app.on('activate', () => {
     if (!mainWindow) openWindow();
   });

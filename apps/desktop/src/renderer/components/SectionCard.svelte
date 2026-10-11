@@ -35,6 +35,10 @@
     openItems?: string;
     /** model-checks: the four figures. */
     metrics?: ModelCheckMetrics;
+    /** default: a line in place of the section karat (DES-4: «لم يُشغَّل بعد», «لا معيار مطلوب في هذا القسم، فلا عيار له»). */
+    note?: string;
+    /** «افتح» unavailable (the page it opens is not built yet). */
+    disabled?: boolean;
     onopen?: () => void;
   }
   let {
@@ -47,6 +51,8 @@
     blocksPure = 0,
     openItems,
     metrics = { needs: 0, generated: 0, reports: 0, unresolved: 0 },
+    note,
+    disabled = false,
     onopen,
   }: Props = $props();
   const { t } = useLocale();
@@ -74,7 +80,7 @@
   </header>
 
   {#if variant === 'default'}
-    <SectionKarat value={karat} {criteria} />
+    {#if note}<p class="small">{note}</p>{:else}<SectionKarat value={karat} {criteria} />{/if}
     <ul class="counts" aria-label={t('results.sectionCard.counts')}>
       {#each shownCounts as [result, count] (result)}
         <li class="count"><StatusSymbol symbol={result} size={12} alone /><span class="number">{count}</span></li>
@@ -94,7 +100,7 @@
   {#if gaps && variant !== 'model-checks'}<p class="small">{gaps}</p>{/if}
 
   <footer class="footer">
-    <Button kind="secondary" aria-label={t('results.sectionCard.openNamed', { name })} onclick={onopen}>{t('results.sectionCard.open')}</Button>
+    <Button kind="secondary" {disabled} aria-label={t('results.sectionCard.openNamed', { name })} onclick={onopen}>{t('results.sectionCard.open')}</Button>
   </footer>
 </section>
 

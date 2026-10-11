@@ -30,5 +30,13 @@
   "controls.menu.copyId": "Copy ID",
   "controls.runMenu.currentSection": "Current section: {section}",
   "controls.runMenu.selected": "Selected ({count})",
-  "controls.runMenu.savedGroups": "Saved groups"
+  "controls.runMenu.savedGroups": "Saved groups",
+  "controls.dropZone.label": "Or drag the folder here",
+  "controls.risk.title": "Dangerous command: it may delete files or write outside the project",
+  "controls.risk.detail": "Not part of “Approve all”. Read the command, then approve it on its own.",
+  "controls.risk.approve": "Approve this command",
+  "controls.resource.cpu": "CPU",
+  "controls.resource.memory": "Memory",
+  "controls.reportData.label": "Data from the project",
+  "controls.dropZone.active": "Drop the folder for AYAR to read"
 }

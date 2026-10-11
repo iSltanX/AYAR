@@ -1,17 +1,22 @@
 // The IPC gateway (C-01, D-29): command filtering, payload validation, tokens minted by the main process and
 // resolved into grants, previews bound to their confirmation, and the main-process commands.
-import { protocolError, type CommandName, type EngineHealth, type Grants, type InvokeResult } from '@ayar/protocol';
+import { protocolError, type CommandName, type EngineHealth, type Grants, type InvokeResult, type NativeMenuEntry } from '@ayar/protocol';
 import { describe, expect, it } from 'vitest';
 import type { DestructiveAlert } from '../src/main/destructive-alert.ts';
 import { Gateway, type EngineLink, type SystemServices } from '../src/main/gateway.ts';
 import { TokenRegistry } from '../src/main/tokens.ts';
+import { controlsFromAppleLanguages } from '../src/main/window-controls.ts';
 
 type Call = { command: CommandName; payload: unknown; grants: Grants | undefined };
 
-function setup(o: { engine?: (c: Call) => InvokeResult<unknown>; picked?: string | null; folder?: string | null; dialogThrows?: boolean; confirm?: boolean; lang?: 'ar' | 'en' } = {}) {
+function setup(o: { engine?: (c: Call) => InvokeResult<unknown>; picked?: string | null; folder?: string | null; dialogThrows?: boolean; confirm?: boolean; lang?: 'ar' | 'en'; menuChoice?: string | null; file?: string | null } = {}) {
   const calls: Call[] = [];
   const clipboard: string[] = [];
   const alerts: DestructiveAlert[] = [];
+  const revealed: string[] = [];
+  const opened: string[] = [];
+  const asked: { root: string; rel: string }[] = [];
+  const menus: NativeMenuEntry[][] = [];
   let now = 0;
   let seed = 0;
   const tokens = new TokenRegistry({ randomBytes: (n) => new Uint8Array(n).fill(++seed % 250), clock: { wall: () => 1_800_000_000_000 + now, mono: () => now } });
@@ -38,9 +43,26 @@ function setup(o: { engine?: (c: Call) => InvokeResult<unknown>; picked?: string
       alerts.push(a);
       return Promise.resolve(o.confirm ?? true);
     },
+    windowControls: () => Promise.resolve('right'),
+    reveal: (p) => {
+      revealed.push(p);
+      return Promise.resolve();
+    },
+    fileInside: (root, rel) => {
+      asked.push({ root, rel });
+      return Promise.resolve(o.file === undefined ? `${root}/${rel}` : o.file);
+    },
+    openInEditor: (p) => {
+      opened.push(p);
+      return Promise.resolve();
+    },
+    popupMenu: (entries) => {
+      menus.push([...entries]);
+      return Promise.resolve(o.menuChoice ?? null);
+    },
   };
-  const gw = new Gateway({ engine, system, tokens, language: () => o.lang ?? 'ar' });
-  return { gw, calls, clipboard, alerts, advance: (ms: number) => (now += ms) };
+  const gw = new Gateway({ engine, system, tokens, language: () => o.lang ?? 'ar', locationOf: (p) => (p.includes('/Documents/') ? 'documents' : null), home: '/private/Users/me' });
+  return { gw, calls, clipboard, alerts, revealed, opened, asked, menus, advance: (ms: number) => (now += ms) };
 }
 
 const ok = <T>(r: InvokeResult<T>): T => {
@@ -211,5 +233,99 @@ describe('gateway: main-process commands', () => {
     const { gw } = setup();
     expect(await gw.invoke({ command: 'engine.status', payload: {} })).toMatchObject({ ok: true, result: { state: 'ready', source: 'engine' } });
     expect(await gw.invoke({ command: 'engine.restart', payload: {} })).toEqual({ ok: true, result: { accepted: false } });
+  });
+});
+
+describe('gateway: the screens\u2019 main-process commands (protocol 1.6)', () => {
+  const project = { id: 'prj_1', rootPath: '/Users/me/مشاريع/رصد' };
+  const engine = (c: Call): InvokeResult<unknown> => {
+    if (c.command === 'project.get') return { ok: true, result: { project, snapshot: null } };
+    if (c.command === 'finding.get') return { ok: true, result: { finding: { runId: 'run_1', location: { path: 'src/a.ts', line: 3 } }, history: [] } };
+    if (c.command === 'run.get') return { ok: true, result: { run: { projectId: 'prj_1' } } };
+    return { ok: false, error: protocolError('not_found') };
+  };
+
+  it('window.layout answers the window buttons\u2019 corner (D-54)', async () => {
+    const { gw } = setup();
+    expect(await gw.invoke({ command: 'window.layout', payload: {} })).toEqual({ ok: true, result: { controls: 'right' } });
+  });
+
+  it('project.reveal shows the project\u2019s real root in Finder, from its id alone', async () => {
+    const { gw, revealed } = setup({ engine });
+    expect(await gw.invoke({ command: 'project.reveal', payload: { projectId: 'prj_1' } })).toEqual({ ok: true, result: { revealed: true } });
+    expect(revealed).toEqual([project.rootPath]);
+    expect(await gw.invoke({ command: 'project.reveal', payload: { projectId: 'prj_1', path: '/etc' } })).toMatchObject({ ok: false, error: { code: 'invalid_payload' } });
+  });
+
+  it('editor.open resolves the finding\u2019s file inside its project\u2019s root, and refuses one outside it', async () => {
+    const good = setup({ engine });
+    expect(await good.gw.invoke({ command: 'editor.open', payload: { findingId: 'fnd_1' } })).toEqual({ ok: true, result: { opened: true } });
+    expect(good.asked).toEqual([{ root: project.rootPath, rel: 'src/a.ts' }]);
+    expect(good.opened).toEqual([`${project.rootPath}/src/a.ts`]);
+    const escaped = setup({ engine, file: null });
+    expect(await escaped.gw.invoke({ command: 'editor.open', payload: { findingId: 'fnd_1' } })).toMatchObject({ ok: false, error: { code: 'not_found' } });
+    expect(escaped.opened).toEqual([]);
+    const outside = setup({ engine: (c) => (c.command === 'finding.get' ? { ok: true, result: { finding: { runId: 'run_1', location: { path: '/etc/passwd', outside: true } }, history: [] } } : engine(c)) });
+    expect(await outside.gw.invoke({ command: 'editor.open', payload: { findingId: 'fnd_1' } })).toMatchObject({ ok: false, error: { code: 'not_found' } });
+    expect(outside.asked).toEqual([]);
+  });
+
+  it('menu.popup shows the native menu and returns only an enabled item the renderer offered', async () => {
+    const entries: NativeMenuEntry[] = [
+      { kind: 'item', id: 'project.open', label: 'افتح', enabled: true },
+      { kind: 'separator' },
+      { kind: 'item', id: 'project.remove', label: 'أزل من عِيَار…', enabled: false },
+    ];
+    const chosen = setup({ menuChoice: 'project.open' });
+    expect(await chosen.gw.invoke({ command: 'menu.popup', payload: { entries } })).toEqual({ ok: true, result: { id: 'project.open' } });
+    expect(chosen.menus).toEqual([entries]);
+    expect(await setup({ menuChoice: 'project.remove' }).gw.invoke({ command: 'menu.popup', payload: { entries } })).toEqual({ ok: true, result: { id: null } });
+    expect(await setup({ menuChoice: 'shell.exec' }).gw.invoke({ command: 'menu.popup', payload: { entries } })).toEqual({ ok: true, result: { id: null } });
+    expect(await setup().gw.invoke({ command: 'menu.popup', payload: { entries } })).toEqual({ ok: true, result: { id: null } });
+    expect(await setup().gw.invoke({ command: 'menu.popup', payload: { entries: [] } })).toMatchObject({ ok: false, error: { code: 'invalid_payload' } });
+  });
+
+  it('clipboard.copyText writes a short visible text, never asking the engine, and refuses control characters', async () => {
+    const { gw, calls, clipboard } = setup();
+    expect(await gw.invoke({ command: 'clipboard.copyText', payload: { text: 'beh.unit' } })).toEqual({ ok: true, result: { copied: true } });
+    expect(await gw.invoke({ command: 'clipboard.copyText', payload: { text: 'npm run test\n--watch=false' } })).toEqual({ ok: true, result: { copied: true } });
+    expect(clipboard).toEqual(['beh.unit', 'npm run test\n--watch=false']);
+    expect(calls).toEqual([]);
+    for (const text of ['', 'a\u001b[31mred', 'x'.repeat(4097), 'a\rb'])
+      expect(await gw.invoke({ command: 'clipboard.copyText', payload: { text } })).toMatchObject({ ok: false, error: { code: 'invalid_payload' } });
+    expect(clipboard).toHaveLength(2);
+  });
+});
+
+describe('gateway: a dropped folder (C-01 «السحب والإفلات»)', () => {
+  it('turns one real directory into a selection token for project.add, as the folder dialog does', async () => {
+    const { gw, calls } = setup();
+    const drop = await gw.resolveDrop(['/Users/me/مشاريع تجريبية/مكتبة «النصوص»']);
+    expect(drop).toMatchObject({ ok: true, location: null, display: '~/مشاريع تجريبية/مكتبة «النصوص»' });
+    expect(await gw.resolveDrop(['/Users/me/Documents/rasd'])).toMatchObject({ ok: true, location: 'documents', display: '~/Documents/rasd' });
+    const token = (drop as { selectionToken: string }).selectionToken;
+    expect(token).toMatch(/^sel_[A-Za-z0-9_-]{43}$/);
+    await gw.invoke({ command: 'project.add', payload: { selectionToken: token } });
+    expect(calls[0]!.grants).toEqual({ selectionToken: { kind: 'selection', path: '/private/Users/me/مشاريع تجريبية/مكتبة «النصوص»' } });
+    // Redeemed once, and only by project.add.
+    expect(await gw.invoke({ command: 'project.add', payload: { selectionToken: token } })).toMatchObject({ ok: false, error: { code: 'token_invalid' } });
+    const again = (await gw.resolveDrop(['/Users/me/x'])) as { selectionToken: string };
+    expect(await gw.invoke({ command: 'project.relocate', payload: { projectId: 'prj_1', selectionToken: again.selectionToken } })).toMatchObject({ ok: false, error: { code: 'token_invalid' } });
+  });
+
+  it('refuses a file or a link, several items, and nothing at all, minting nothing', async () => {
+    expect(await setup({ folder: null }).gw.resolveDrop(['/Users/me/file.txt'])).toEqual({ ok: false, reason: 'not_a_directory' });
+    expect(await setup().gw.resolveDrop(['/a', '/b'])).toEqual({ ok: false, reason: 'multiple' });
+    expect(await setup().gw.resolveDrop([])).toEqual({ ok: false, reason: 'no_path' });
+    expect(await setup().gw.resolveDrop(['relative/path', ''])).toEqual({ ok: false, reason: 'no_path' });
+  });
+});
+
+describe('window buttons corner (D-54, E-23)', () => {
+  it('follows the first language of the global AppleLanguages list', () => {
+    expect(controlsFromAppleLanguages('(\n    "ar-SA",\n    "en-SA"\n)\n')).toBe('right');
+    expect(controlsFromAppleLanguages('(\n    "en-US",\n    "ar"\n)\n')).toBe('left');
+    expect(controlsFromAppleLanguages('(\n    he\n)')).toBe('right');
+    expect(controlsFromAppleLanguages('')).toBe('left');
   });
 });

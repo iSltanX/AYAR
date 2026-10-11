@@ -15,7 +15,10 @@ import {
   type CommandPayload,
   type EngineHealth,
   type Grants,
+  type BridgeDrop,
   type InvokeResult,
+  type NativeMenuEntry,
+  type ProtectedLocation,
   type ProtocolError,
   z,
 } from '@ayar/protocol';
@@ -33,6 +36,16 @@ export interface SystemServices {
   checkFolder(path: string): Promise<string | null>;
   /** D-DEV3-15: a native alert attached to the window; true only when the user clicked its confirm button. */
   confirmDestructive(alert: DestructiveAlert): Promise<boolean>;
+  /** D-54 (E-23): the corner of the window buttons, from the system's first language in its global preferences. */
+  windowControls(): Promise<'left' | 'right'>;
+  /** 13.3 «أظهر في Finder». */
+  reveal(path: string): Promise<void>;
+  /** The real path of a regular file inside the real root, or null (a link out of it, `..`, a folder, nothing). */
+  fileInside(root: string, relative: string): Promise<string | null>;
+  /** E-17's default: the file in the default text editor (`open -t`). */
+  openInEditor(path: string): Promise<void>;
+  /** D-DES3-07: a native context menu; the chosen item's id, or null. */
+  popupMenu(entries: readonly NativeMenuEntry[], at?: { x: number; y: number }): Promise<string | null>;
 }
 
 export interface EngineLink {
@@ -47,6 +60,10 @@ export interface GatewayOptions {
   tokens: TokenRegistry;
   /** The language of the native texts (the system's, like the menus). */
   language?: () => Lang;
+  /** The protected location of a real path (E-05): the engine's own rule, injected (FR-59). */
+  locationOf?: (realPath: string) => ProtectedLocation | null;
+  /** The user's home, to show a dropped folder as «~/…» in the permission sheet (D-DEV11-04). */
+  home?: string;
   log?: (level: 'info' | 'warn' | 'error', message: string, fields?: Record<string, string | number | boolean | null>) => void;
 }
 
@@ -129,6 +146,29 @@ export class Gateway {
     return {};
   }
 
+  /**
+   * A folder dropped on the window or the Dock icon (C-01 «السحب والإفلات», protocol 1.6): one directory that is not a
+   * symbolic link, checked like a picked folder, becomes a selection token for project.add. The page gets the token.
+   */
+  async resolveDrop(paths: readonly string[]): Promise<BridgeDrop> {
+    const usable = paths.filter((p) => typeof p === 'string' && p.startsWith('/') && !p.includes('\0'));
+    if (usable.length === 0) return { ok: false, reason: 'no_path' };
+    if (usable.length > 1) return { ok: false, reason: 'multiple' };
+    const real = await this.#o.system.checkFolder(usable[0]!);
+    if (real === null) return { ok: false, reason: 'not_a_directory' };
+    const home = this.#o.home;
+    const display = home && (real === home || real.startsWith(`${home}/`)) ? `~${real.slice(home.length)}` : real;
+    return { ok: true, selectionToken: this.#o.tokens.issue({ kind: 'selection', path: real }, 'project.add'), location: this.#o.locationOf?.(real) ?? null, display };
+  }
+
+  /** The project's real root, from the engine (the UI names the project by id only). */
+  async #projectRoot(projectId: string): Promise<InvokeResult<string>> {
+    const r = await this.#o.engine.request('project.get', { projectId });
+    if (!r.ok) return r;
+    const root = (r.result as { project?: { rootPath?: unknown } }).project?.rootPath;
+    return typeof root === 'string' && root.startsWith('/') ? { ok: true, result: root } : fail(protocolError('not_found', { reason: 'project' }));
+  }
+
   async #main(command: CommandName, payload: unknown): Promise<InvokeResult<unknown>> {
     const { system, tokens, engine } = this.#o;
     switch (command) {
@@ -161,10 +201,47 @@ export class Gateway {
         const targetValue = bound && bound.kind === 'confirmation' && bound.targetField === null ? '*' : id;
         return { ok: true, result: { confirmationToken: tokens.issue({ kind: 'confirmation', command: target, target: targetValue, digest: null }) } };
       }
+      case 'window.layout':
+        return { ok: true, result: { controls: await system.windowControls() } };
+      case 'project.reveal': {
+        const root = await this.#projectRoot((payload as CommandPayload<'project.reveal'>).projectId);
+        if (!root.ok) return root;
+        await system.reveal(root.result);
+        return { ok: true, result: { revealed: true } };
+      }
+      case 'editor.open': {
+        // The finding names its file relative to the project; the main process finds the project through the run,
+        // resolves the file inside the real root, and opens it. A path outside the root is never opened (C-15).
+        const found = await engine.request('finding.get', { findingId: (payload as CommandPayload<'editor.open'>).findingId });
+        if (!found.ok) return found;
+        const finding = (found.result as { finding: { runId: string; location: { path: string | null; outside?: boolean } | null } }).finding;
+        const rel = finding.location?.path;
+        if (!rel || finding.location?.outside) return fail(protocolError('not_found', { reason: 'no_file' }));
+        const run = await engine.request('run.get', { runId: finding.runId });
+        if (!run.ok) return run;
+        const root = await this.#projectRoot((run.result as { run: { projectId: string } }).run.projectId);
+        if (!root.ok) return root;
+        const file = await system.fileInside(root.result, rel);
+        if (file === null) return fail(protocolError('not_found', { reason: 'no_file' }));
+        await system.openInEditor(file);
+        return { ok: true, result: { opened: true } };
+      }
+      case 'menu.popup': {
+        const { entries, x, y } = payload as CommandPayload<'menu.popup'>;
+        const id = await system.popupMenu(entries, x !== undefined && y !== undefined ? { x, y } : undefined);
+        // Only an id the renderer offered, and only an enabled item, comes back.
+        const offered = entries.some((e) => e.kind === 'item' && e.enabled && e.id === id);
+        return { ok: true, result: { id: offered ? id : null } };
+      }
       case 'engine.status':
         return { ok: true, result: engine.status() };
       case 'engine.restart':
         return { ok: true, result: { accepted: engine.restart() } };
+      case 'clipboard.copyText': {
+        const { text } = payload as CommandPayload<'clipboard.copyText'>;
+        await system.writeClipboard(text);
+        return { ok: true, result: { copied: true } };
+      }
       case 'clipboard.copy': {
         // FR-44: always the model format, fetched from the engine; then the copy is recorded (G-21).
         const { kind, id } = payload as CommandPayload<'clipboard.copy'>;

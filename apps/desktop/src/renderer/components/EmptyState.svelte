@@ -9,20 +9,24 @@
 
   interface Props {
     kind: EmptyKind;
+    /** A screen's own wording, where the approved screen changes the component's (DES-4 1.1: «أضف أول مشروع»). */
+    title?: string;
+    body?: string;
+    actionLabel?: string;
     /** The single action (add a project, show the plan, suggest checks, clear the filters). */
     onaction?: () => void;
   }
-  let { kind, onaction }: Props = $props();
+  let { kind, title, body, actionLabel, onaction }: Props = $props();
   const { t } = useLocale();
   const spec = $derived(EMPTY_STATES[kind]);
 </script>
 
 <div class="empty">
   <span class="icon"><Icon name={spec.icon} size={24} /></span>
-  <p class="title">{t(spec.title)}</p>
-  <p class="body">{t(spec.body)}</p>
+  <p class="title">{title ?? t(spec.title)}</p>
+  <p class="body">{body ?? t(spec.body)}</p>
   {#if spec.action}
-    <Button kind={spec.action.kind} onclick={onaction}>{t(spec.action.label)}</Button>
+    <Button kind={spec.action.kind} onclick={onaction}>{actionLabel ?? t(spec.action.label)}</Button>
   {/if}
 </div>
 

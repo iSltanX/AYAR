@@ -12,8 +12,12 @@
     cycle: Cycle;
     size?: 'sm' | 'md';
     motion?: 'animated' | 'static';
+    /** A count after the label, as a summary writes it (DES-4 6.1: «في الانتظار 8»). */
+    count?: number;
+    /** A label in place of the cycle's name (the run's kind with it: «فحص كامل · جارٍ»). */
+    label?: string;
   }
-  let { cycle, size = 'md', motion = 'animated' }: Props = $props();
+  let { cycle, size = 'md', motion = 'animated', count, label }: Props = $props();
   const { t } = useLocale();
   const px = $derived(size === 'md' ? 16 : 12);
   const stillNodes = $derived(
@@ -33,10 +37,13 @@
       </svg>
     </span>
   {/if}
-  <span class="label">{t(`status.cycle.${cycle}`)}</span>
+  <span class="label">{label ?? t(`status.cycle.${cycle}`)}{#if count !== undefined}&nbsp;<span class="count">{count}</span>{/if}</span>
 </span>
 
 <style>
+  .count {
+    font-variant-numeric: tabular-nums;
+  }
   .cycle {
     display: inline-flex;
     align-items: center;

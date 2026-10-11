@@ -4,8 +4,8 @@ track: dev
 number: 11
 stage: interface
 title: واجهة الرحلة الأساسية — من أول مشروع إلى النسخ للنموذج
-status: not-started
-status_date: 2026-10-09
+status: delivered
+status_date: 2026-10-11
 depends_on: [DEV-9, DEV-10]
 design_gates: [DES-4]
 owner_gates: []
@@ -13,7 +13,7 @@ owner_inputs: []
 model: Claude Opus 5.5
 effort: high
 model_reason: شاشات مربوطة بأحداث حية وتطابق تصميمًا معتمدًا
-scope: [apps/desktop/src/renderer/, apps/desktop/src/main/, apps/desktop/src/preload/, apps/desktop/test/, apps/desktop/package.json, apps/desktop/vite.renderer.config.ts, packages/i18n/, packages/protocol/, package-lock.json]
+scope: [apps/desktop/src/renderer/, apps/desktop/src/main/, apps/desktop/src/preload/, apps/desktop/test/, apps/desktop/package.json, apps/desktop/vite.renderer.config.ts, packages/i18n/, packages/protocol/, packages/engine/, package-lock.json]
 goal: بناء الشاشات الثماني الأساسية من التصميم المعتمد وربطها بالمحرك — المشاريع، والاكتشاف، واعتماد الملف، ونظرة عامة، وخطة الفحص الكامل، والمتابعة الحية، والنتائج، وتقرير «للنموذج» — حتى تكتمل الرحلة J1 وJ10 داخل التطبيق.
 start:
   - DEV-9 مغلقة (المحرك كامل)
@@ -119,8 +119,8 @@ closing_commit:
 
 ## 11. حالة التقدم ونقطة الاستئناف
 
-- **الحالة:** لم تبدأ.
-- **آخر تحديث:** 2026-10-09.
-- **المنجز:** —
-- **آخر commit:** —
-- **نقطة الاستئناف:** المهمة 1 (الإطار).
+- **الحالة:** سُلّمت وتنتظر الدمج (الجلسة الرئيسية، تنفيذ متتابع ORG-16، بـ Claude Opus 5.5).
+- **آخر تحديث:** 2026-10-11.
+- **الخلاصة:** الشاشات الثماني مبنية من تصميم DES-4 ومربوطة بالمحرك باللغتين والوضعين، مع الإطار والاختصارات ومكوّنات C-30 ومعرضها، والبروتوكول 1.6، وأربعة إصلاحات محرك وجدها التكامل. والفروق العشرة عن التصميم اعتمدها المالك (D-DEV11-12). و`npm run verify` نجح، ورحلة الواجهة الشاملة 16/16. التفاصيل في `docs/handoffs/DEV-11.md`.
+- **المواضع المؤقتة:** أُزيلت كلها (قسم «التنظيف» في التسليم).
+- **نقطة الاستئناف:** لا شيء؛ الدمج والإغلاق للجلسة الرئيسية.

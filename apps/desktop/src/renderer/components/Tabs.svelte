@@ -19,9 +19,11 @@
     panelId?: (value: string) => string;
     /** The id of the tab element for a tab value, for the panel's aria-labelledby. */
     tabId?: (value: string) => string;
+    /** Nothing selected here: the selection is in a sibling control (D-DES4-07, the results' six views). */
+    empty?: boolean;
     onchange?: (value: string) => void;
   }
-  let { value = $bindable(), kind, tabs, label, panelId, tabId, onchange }: Props = $props();
+  let { value = $bindable(), kind, tabs, label, panelId, tabId, empty = false, onchange }: Props = $props();
   const { t } = useLocale();
   let buttons: HTMLButtonElement[] = $state([]);
 
@@ -29,18 +31,18 @@
     tabs ?? (kind ? TAB_SETS[kind].map((x) => ({ value: x.value, label: t(x.key) })) : []),
   );
   const enabled = $derived(items.map((o) => !o.disabled));
-  const current = $derived(Math.max(0, items.findIndex((o) => o.value === value)));
+  const current = $derived(empty ? -1 : Math.max(0, items.findIndex((o) => o.value === value)));
 
   function select(i: number) {
     const o = items[i];
     if (!o || !enabled[i]) return;
-    if (o.value !== value) {
+    if (o.value !== value || empty) {
       value = o.value;
       onchange?.(o.value);
     }
   }
   function keydown(e: KeyboardEvent) {
-    const to = arrowTarget(e, current, enabled, 'horizontal');
+    const to = arrowTarget(e, Math.max(0, current), enabled, 'horizontal');
     if (to === null) return;
     e.preventDefault();
     select(to);
@@ -54,7 +56,7 @@
       bind:element={buttons[i]}
       id={tabId?.(o.value)}
       selected={i === current}
-      tabindex={i === current ? 0 : -1}
+      tabindex={i === Math.max(0, current) ? 0 : -1}
       disabled={o.disabled}
       aria-controls={panelId?.(o.value)}
       onclick={() => select(i)}
