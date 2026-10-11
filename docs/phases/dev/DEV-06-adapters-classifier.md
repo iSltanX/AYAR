@@ -4,7 +4,7 @@ track: dev
 number: 6
 stage: engine
 title: المحوّلات والمحلّلات والمصنّف ومؤشر النقاء
-status: delivered
+status: closed
 status_date: 2026-10-11
 depends_on: [DEV-5]
 design_gates: []
@@ -24,7 +24,7 @@ outputs:
   - C-16 المصنّف وC-19 حاسب النقاء
   - حزمة قواعد Semgrep الخاصة بعِيَار
   - إكمال معرّفات القواعد في ملفات توقع المشاريع
-closing_commit:
+closing_commit: 50b1a92
 ---
 
 # DEV-6 — المحوّلات والمحلّلات والمصنّف ومؤشر النقاء

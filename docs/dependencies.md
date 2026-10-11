@@ -25,6 +25,8 @@
 | خط Cairo (متغير، `Cairo-Variable.ttf`) | google/fonts عند `a2c83dae` | OFL-1.1 | خط العناوين، مضمّن في الواجهة، وترخيصه في `public/licenses/`. أضافته DEV-10 | `apps/desktop` (الواجهة) |
 | خط Almarai (Regular وBold) | google/fonts عند `3d8d20e8` | OFL-1.1 | خط النص، مضمّن في الواجهة، وترخيصه في `public/licenses/`. أضافته DEV-10 | `apps/desktop` (الواجهة) |
 | أيقونات Lucide (المستخدمة وحدها، مولّدة في `icons.generated.ts` من lucide-static) | 1.48.0 | ISC | أيقونات الواجهة (A-12، D-DES2-03). أضافتها DEV-10 | `apps/desktop` (الواجهة) |
+| @babel/parser | 8.0.7 | MIT | شجرة JS وTS لـ `code.complexity` (التعقيد الدوري وطول الدالة) دون تشغيل شيء. أضافته DEV-6 (G-26) | `packages/analyzers` |
+| postcss | 8.5.29 | MIT | قراءة CSS لـ `design.tokens.static` و`design.fonts.static` و`design.rtl.static` ومراجع CSS في `code.refs.local`. أضافته DEV-6 (G-26) | `packages/analyzers` |
 
 و`node:sqlite` (طبقة التخزين، E-03) مضمّن في Node داخل Electron، فلا حزمة له.
 
@@ -54,6 +56,8 @@
 | playwright-core | 1.64.0 | Apache-2.0 | قيادة Electron في اختبارات الأمان (G-05)؛ ويستخدمه المسبار لاحقًا (C-14) |
 | lucide-static | 1.48.0 | ISC | مصدر عقد الأيقونات لمولّد `icons.generated.ts` وقت التطوير؛ لا تُشحن الحزمة نفسها. أضافتها DEV-10 |
 | axe-core | 4.13.0 | MPL-2.0 | فحص الإتاحة في اختبارات Electron للواجهة (AT-40). أضافته DEV-10 |
+| @stryker-mutator/core | 10.0.0 | Apache-2.0 | قياس قوة الاختبار على المصنّف والنقاء والإخفاء والمخطِّط (الخطة 19، Q-05)، بـ `npm run test:mutation`. أضافته DEV-6 |
+| qs (تجاوز في الجذر) | 6.16.0 | BSD-3-Clause | تبعية غير مباشرة لـ `typed-rest-client` تحت Stryker، بتجاوز يسد ثغرتي 6.15.1 (G-DEV6-07، G-DEV6-09). أضافته DEV-6 |
 
 ## 4. من قائمة 6.6 ولم يُضف بعد
 
@@ -61,15 +65,13 @@
 
 | الحزمة | الإصدار في 6.6 | الترخيص | المرحلة المتوقعة |
 |---|---|---|---|
-| fast-xml-parser | 5.11.2 | MIT | DEV-6 (JUnit) |
+| fast-xml-parser | 5.11.2 | MIT | لم تحتجه DEV-6: قارئ XML داخلي محروس لـ JUnit (`packages/adapters/src/read/xml.ts`) |
 | picomatch | 4.0.7 | MIT | لم تحتجه DEV-4 (الاكتشاف بـ `ignore`)؛ يُضاف حين تحتاجه مرحلة |
 | pixelmatch | 8.0.0 | ISC | DEV-7 |
 | @axe-core/playwright | 4.13.0 | MPL-2.0 | DEV-7. وأضافت DEV-10 axe-core 4.13.0 للاختبار (القسم 3)، ويُتحقق من إصداره عند تضمينه في المسبار |
 | better-sqlite3 | 13.0.3 | MIT | لا يُضاف: E-03 حسمت `node:sqlite` |
-| **G-26:** @babel/parser | — | — | DEV-6 (المحللات، C-13) |
-| **G-26:** postcss | — | — | DEV-6 (`design.tokens.static`) |
 | **G-26:** مكتبة الضغط | — | — | DEV-5 (المحتوى المعنون، C-17)؛ وقد يكفي `node:zlib` المضمّن |
 
 ## 5. خلاصة تراخيص ملف القفل
 
-`npm query '*'` على ملف القفل في 2026-10-10: 297 حزمة، منها 6 حزم عِيَار نفسها (`UNLICENSED`، خاصة). والبقية: MIT (224)، وApache-2.0 (24)، وISC (16)، وBSD-2-Clause (12)، وBlueOak-1.0.0 (9)، وBSD-3-Clause (3)، وMPL-2.0 (2: `lightningcss` وملفه الثنائي، أداة بناء في Vite لا تُشحن)، و`MIT OR CC0-1.0` (1). **لا ترخيص من عائلة GPL.**
+`npm query '*'` على ملف القفل في 2026-10-11 (بعد DEV-6): 451 حزمة، منها 9 حزم عِيَار نفسها (`UNLICENSED`، خاصة). والبقية: MIT (347)، وApache-2.0 (38)، وISC (23)، وBSD-2-Clause (12)، وBlueOak-1.0.0 (9)، وBSD-3-Clause (7)، وMPL-2.0 (3: `lightningcss` وملفه الثنائي، أداة بناء في Vite لا تُشحن، و`axe-core` للاختبار)، و`MIT OR CC0-1.0` (1)، وCC-BY-4.0 (1: `caniuse-lite`، بيانات تطوير تحت Stryker لا تُشحن)، و0BSD (1: `tslib`، تطوير). **لا ترخيص من عائلة GPL.**
