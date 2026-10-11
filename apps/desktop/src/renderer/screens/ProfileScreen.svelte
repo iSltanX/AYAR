@@ -207,6 +207,8 @@
     selectedInstance = spec.instance;
   }
 
+  /** The profile file in the repository (14.2): a path, not a sentence. */
+  const REPO_PROFILE = '.ayar/profile.json';
   const isNeeded = (c: CheckSpec) => pendingBy.has(c.instance) && approvedBefore.has(c.instance);
   const dangerOf = (c: CheckSpec): ChangeItem | undefined => dangerous.find((d) => d.instance === c.instance);
 </script>
@@ -247,7 +249,7 @@
     {#if danger}<RiskNotice disabled={busy} onapprove={() => void approve([c.instance])} />{/if}
     <p class="because">
       <span>{c.checkId.startsWith('custom.') ? t('approval.customBecause') : t('approval.because')}</span>
-      {#if c.checkId.startsWith('custom.')}<Tag><bdi dir="ltr">.ayar/profile.json</bdi></Tag>{:else}<span>{why.text}</span>{/if}
+      {#if c.checkId.startsWith('custom.')}<Tag><bdi dir="ltr">{REPO_PROFILE}</bdi></Tag>{:else}<span>{why.text}</span>{/if}
       {#each why.refs as ref (ref)}<Tag>{ref}</Tag>{/each}
     </p>
   </article>
