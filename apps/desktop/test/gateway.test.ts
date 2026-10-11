@@ -61,7 +61,7 @@ function setup(o: { engine?: (c: Call) => InvokeResult<unknown>; picked?: string
       return Promise.resolve(o.menuChoice ?? null);
     },
   };
-  const gw = new Gateway({ engine, system, tokens, language: () => o.lang ?? 'ar' });
+  const gw = new Gateway({ engine, system, tokens, language: () => o.lang ?? 'ar', locationOf: (p) => (p.includes('/Documents/') ? 'documents' : null), home: '/private/Users/me' });
   return { gw, calls, clipboard, alerts, revealed, opened, asked, menus, advance: (ms: number) => (now += ms) };
 }
 
@@ -290,7 +290,8 @@ describe('gateway: a dropped folder (C-01 «السحب والإفلات»)', () 
   it('turns one real directory into a selection token for project.add, as the folder dialog does', async () => {
     const { gw, calls } = setup();
     const drop = await gw.resolveDrop(['/Users/me/مشاريع تجريبية/مكتبة «النصوص»']);
-    expect(drop.ok).toBe(true);
+    expect(drop).toMatchObject({ ok: true, location: null, display: '~/مشاريع تجريبية/مكتبة «النصوص»' });
+    expect(await gw.resolveDrop(['/Users/me/Documents/rasd'])).toMatchObject({ ok: true, location: 'documents', display: '~/Documents/rasd' });
     const token = (drop as { selectionToken: string }).selectionToken;
     expect(token).toMatch(/^sel_[A-Za-z0-9_-]{43}$/);
     await gw.invoke({ command: 'project.add', payload: { selectionToken: token } });

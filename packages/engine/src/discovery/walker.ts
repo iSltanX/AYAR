@@ -74,7 +74,7 @@ export interface WalkOptions {
   extraOutputDirs?: ReadonlySet<string>;
   /** Folders (relative) that are component roots: their output folders are recorded too. */
   isComponentRoot?: (rel: string) => boolean;
-  onProgress?: (p: { filesSeen: number; dirsSeen: number; currentDir: string; markers: ReadonlySet<string> }) => void;
+  onProgress?: (p: { filesSeen: number; dirsSeen: number; currentDir: string; markers: ReadonlySet<string>; skipped: number; skippedDirs: readonly string[] }) => void;
 }
 
 export class DiscoveryCancelled extends Error {
@@ -94,6 +94,22 @@ const MARKERS: Record<string, string> = {
   'go.mod': 'go',
   'Package.swift': 'swift',
   'tsconfig.json': 'typescript',
+  // DEV-11 (9.2 «ما اكتُشف حتى الآن»): the tools a lock or configuration file names on sight.
+  'pnpm-lock.yaml': 'pnpm',
+  'yarn.lock': 'yarn',
+  'package-lock.json': 'npm',
+  'uv.lock': 'uv',
+  'poetry.lock': 'poetry',
+  'vite.config.ts': 'vite',
+  'vite.config.js': 'vite',
+  'vite.config.mjs': 'vite',
+  'vitest.config.ts': 'vitest',
+  'vitest.config.js': 'vitest',
+  'vitest.config.mjs': 'vitest',
+  'playwright.config.ts': 'playwright',
+  'playwright.config.js': 'playwright',
+  'jest.config.js': 'jest',
+  'jest.config.ts': 'jest',
 };
 
 export function sensitiveKind(name: string): 'env' | 'key' | 'credentials' | null {
@@ -134,7 +150,8 @@ export async function walk(o: WalkOptions): Promise<WalkResult> {
   };
 
   let lastDir = '.';
-  const progress = () => o.onProgress?.({ filesSeen: r.files.size, dirsSeen: r.dirs.size, currentDir: lastDir, markers });
+  // 9.2 «المجلدات المتخطاة» (protocol 1.6): how many, and the first few by name, as the progress shows them.
+  const progress = () => o.onProgress?.({ filesSeen: r.files.size, dirsSeen: r.dirs.size, currentDir: lastDir, markers, skipped: r.skipped.length, skippedDirs: r.skipped.slice(0, 8).map((x) => x.path) });
 
   async function outputSize(rel: string): Promise<{ sizeBytes: number; entries: number; approximate: boolean }> {
     let size = 0;

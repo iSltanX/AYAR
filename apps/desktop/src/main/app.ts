@@ -6,7 +6,7 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { IPC, protocolError, z, type DeliveredEvent, type EngineHealth, type ParsedEvent } from '@ayar/protocol';
-import { createFileLogger, ensureDataDir, nodeFileSystem, stderrLogger, systemClock, type Logger } from '@ayar/engine/host-support';
+import { createFileLogger, ensureDataDir, nodeFileSystem, protectedLocation, stderrLogger, systemClock, type Logger } from '@ayar/engine/host-support';
 import { resolveLanguage } from '@ayar/i18n';
 import { serveAppRequest } from './app-protocol.ts';
 import { spawnUtilityEngine } from './engine-utility.ts';
@@ -140,6 +140,8 @@ async function run(): Promise<void> {
     system: electronSystemServices(() => mainWindow),
     tokens,
     language: () => resolveLanguage('system', app.getPreferredSystemLanguages()),
+    locationOf: (real) => protectedLocation(real, app.getPath('home')),
+    home: app.getPath('home'),
     log: (level, message, fields) => logger.log(level, message, fields),
   });
   protocol.handle(EVIDENCE_SCHEME, (req) =>

@@ -95,5 +95,8 @@
   "sheets.alert.removeTool.confirm": "Remove tool",
   "sheets.alert.purgeData.message": "Delete all AYAR data?",
   "sheets.alert.purgeData.informative": "Added projects, their runs and evidence, and downloaded tools are deleted from this Mac. No repository is touched. This cannot be undone.",
-  "sheets.alert.purgeData.confirm": "Delete data"
+  "sheets.alert.purgeData.confirm": "Delete data",
+  "sheets.permission.location.icloud": "iCloud Drive",
+  "sheets.permission.location.removable": "External volumes",
+  "sheets.permission.location.network": "Network volumes"
 }

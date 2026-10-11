@@ -10,7 +10,7 @@
   "shell.runBar.count": "{status}: {count}",
   "shell.runBar.elapsed": "المدة",
   "shell.progress.complete": "اكتمل {done} من {total}",
-  "shell.progress.noTotal": "الإجمالي غير معروف، فلا نسبة.",
+  "shell.progress.noTotal": "الإجمالي غير معروف بعد، فلا نسبة.",
   "shell.banner.needsApproval": "تغييرات تحتاج اعتمادًا ({count})",
   "shell.banner.showDiff": "اعرض الفرق…",
   "shell.banner.engineRestarting": "توقف المحرك، يُعاد تشغيله",

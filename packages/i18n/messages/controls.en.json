@@ -30,5 +30,6 @@
   "controls.menu.copyId": "Copy ID",
   "controls.runMenu.currentSection": "Current section: {section}",
   "controls.runMenu.selected": "Selected ({count})",
-  "controls.runMenu.savedGroups": "Saved groups"
+  "controls.runMenu.savedGroups": "Saved groups",
+  "controls.dropZone.label": "Or drag the folder here"
 }

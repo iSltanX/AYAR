@@ -25,7 +25,7 @@ export interface DiscoverOptions {
   signal: AbortSignal;
   /** HMAC of a file's content (C-18 fingerprints), for AYAR's model-result files. */
   fingerprint: (data: Uint8Array) => string;
-  onProgress?: (p: { filesSeen: number; dirsSeen: number; currentDir: string; markers: ReadonlySet<string> }) => void;
+  onProgress?: (p: { filesSeen: number; dirsSeen: number; currentDir: string; markers: ReadonlySet<string>; skipped: number; skippedDirs: readonly string[] }) => void;
 }
 
 export interface DiscoveryResult {

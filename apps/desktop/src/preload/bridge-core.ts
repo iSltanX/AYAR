@@ -3,7 +3,9 @@
 // numbering, a new engine stream, or a replaced port tells the UI to resync.
 import {
   BRIDGE_TOPICS,
+  ProtectedLocation as LocationSchema,
   type BridgeDrop,
+  type ProtectedLocation,
   isEventTopic,
   isRendererCommand,
   parseCommandPayload,
@@ -35,11 +37,17 @@ export interface BridgeCore {
   acceptDrop(result: unknown): void;
 }
 
+const LOCATIONS = LocationSchema.options;
+
 /** Only the two shapes of BridgeDrop pass, with a selection token of its exact form. */
 function parseDrop(raw: unknown): BridgeDrop | null {
   if (typeof raw !== 'object' || raw === null) return null;
   const r = raw as Record<string, unknown>;
-  if (r.ok === true && typeof r.selectionToken === 'string' && /^sel_[A-Za-z0-9_-]{43}$/.test(r.selectionToken)) return { ok: true, selectionToken: r.selectionToken };
+  if (r.ok === true && typeof r.selectionToken === 'string' && /^sel_[A-Za-z0-9_-]{43}$/.test(r.selectionToken)) {
+    const location = typeof r.location === 'string' && (LOCATIONS as readonly string[]).includes(r.location) ? (r.location as ProtectedLocation) : null;
+    const display = typeof r.display === 'string' ? r.display.slice(0, 4096) : '';
+    return { ok: true, selectionToken: r.selectionToken, location, display };
+  }
   if (r.ok === false && (r.reason === 'not_a_directory' || r.reason === 'multiple' || r.reason === 'no_path')) return { ok: false, reason: r.reason };
   return null;
 }

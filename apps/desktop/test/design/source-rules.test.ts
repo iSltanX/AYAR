@@ -140,8 +140,9 @@ describe('CSP and safe rendering (15.2, C-03)', () => {
   });
 });
 
-describe('no hard-coded text in components (C-24)', () => {
-  const components = sources.filter((f) => rel(f).startsWith('components/') && f.endsWith('.svelte'));
+describe('no hard-coded text in components and screens (C-24)', () => {
+  // DEV-11: the screens follow the components' rule — every visible string comes from a message key.
+  const components = sources.filter((f) => (rel(f).startsWith('components/') || rel(f).startsWith('screens/') || rel(f) === 'App.svelte') && f.endsWith('.svelte'));
 
   it('writes no Arabic letters in component templates', () => {
     expect(components.filter((f) => /[؀-ۿ]/.test(template(read(f)))).map(rel)).toEqual([]);

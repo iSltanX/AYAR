@@ -2,6 +2,7 @@
 // These are types and constants only, so the renderer imports nothing at runtime from here but names.
 import type { CommandPayload, RendererCommandName, RendererResult } from './commands/index.ts';
 import type { ProtocolError } from './errors.ts';
+import type { ProtectedLocation } from './domain/projects.ts';
 import type { EventPayload, EventTopic } from './events/index.ts';
 
 export type InvokeResult<T> = { ok: true; result: T } | { ok: false; error: ProtocolError };
@@ -18,7 +19,16 @@ export interface BridgeResync {
  * takes its path from the drop event and hands it to the main process alone, which checks it and mints a selection
  * token for project.add. The page receives the token, never the path.
  */
-export type BridgeDrop = { ok: true; selectionToken: string } | { ok: false; reason: 'not_a_directory' | 'multiple' | 'no_path' };
+export type BridgeDrop =
+  /** `location`: the protected location macOS asks a permission for, since a drop does not pass the open panel (E-05, FR-59). */
+  | {
+      ok: true;
+      selectionToken: string;
+      location: ProtectedLocation | null;
+      /** For the permission sheet only (D-DEV11-04): the folder, home-abbreviated. No command takes a path. */
+      display: string;
+    }
+  | { ok: false; reason: 'not_a_directory' | 'multiple' | 'no_path' };
 
 export interface DeliveredEvent<T extends EventTopic = EventTopic> {
   topic: T;

@@ -7,12 +7,14 @@
   interface Props {
     readiness: Readiness;
     size?: 'sm' | 'md';
+    /** A narrower wording of the same readiness, as an approved screen writes it (DES-4 1.2: «أداة ناقصة»). */
+    label?: string;
   }
-  let { readiness, size = 'md' }: Props = $props();
+  let { readiness, size = 'md', label }: Props = $props();
   const { t } = useLocale();
 </script>
 
-<span class="badge {size}" data-readiness={readiness}>{t(`status.readiness.${readiness}`)}</span>
+<span class="badge {size}" data-readiness={readiness}>{label ?? t(`status.readiness.${readiness}`)}</span>
 
 <style>
   .badge {

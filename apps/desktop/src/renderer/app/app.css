@@ -1,0 +1,10 @@
+/* The app's document (DEV-11): the window frame fills the BrowserWindow; the design system's base rules apply. */
+html,
+body,
+#app {
+  block-size: 100%;
+}
+
+body {
+  overflow: hidden;
+}

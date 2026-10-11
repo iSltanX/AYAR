@@ -30,5 +30,6 @@
   "controls.menu.copyId": "انسخ المعرّف",
   "controls.runMenu.currentSection": "القسم الحالي: {section}",
   "controls.runMenu.selected": "المحدد ({count})",
-  "controls.runMenu.savedGroups": "المجموعات المحفوظة"
+  "controls.runMenu.savedGroups": "المجموعات المحفوظة",
+  "controls.dropZone.label": "أو اسحب المجلد هنا"
 }

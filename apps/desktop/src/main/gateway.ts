@@ -18,6 +18,7 @@ import {
   type BridgeDrop,
   type InvokeResult,
   type NativeMenuEntry,
+  type ProtectedLocation,
   type ProtocolError,
   z,
 } from '@ayar/protocol';
@@ -59,6 +60,10 @@ export interface GatewayOptions {
   tokens: TokenRegistry;
   /** The language of the native texts (the system's, like the menus). */
   language?: () => Lang;
+  /** The protected location of a real path (E-05): the engine's own rule, injected (FR-59). */
+  locationOf?: (realPath: string) => ProtectedLocation | null;
+  /** The user's home, to show a dropped folder as «~/…» in the permission sheet (D-DEV11-04). */
+  home?: string;
   log?: (level: 'info' | 'warn' | 'error', message: string, fields?: Record<string, string | number | boolean | null>) => void;
 }
 
@@ -151,7 +156,9 @@ export class Gateway {
     if (usable.length > 1) return { ok: false, reason: 'multiple' };
     const real = await this.#o.system.checkFolder(usable[0]!);
     if (real === null) return { ok: false, reason: 'not_a_directory' };
-    return { ok: true, selectionToken: this.#o.tokens.issue({ kind: 'selection', path: real }, 'project.add') };
+    const home = this.#o.home;
+    const display = home && (real === home || real.startsWith(`${home}/`)) ? `~${real.slice(home.length)}` : real;
+    return { ok: true, selectionToken: this.#o.tokens.issue({ kind: 'selection', path: real }, 'project.add'), location: this.#o.locationOf?.(real) ?? null, display };
   }
 
   /** The project's real root, from the engine (the UI names the project by id only). */

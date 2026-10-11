@@ -6,4 +6,6 @@ export { createFileLogger, stderrLogger } from './node/file-logger.ts';
 export { nodeFileSystem } from './node/fs.ts';
 export { systemClock } from './node/clock.ts';
 export { StorageError } from './storage/errors.ts';
+/** C-01 (DEV-11): the main process names the protected location of a dropped folder with the engine's own rule (E-05). */
+export { protectedLocation } from './projects/locations.ts';
 export type { Logger, LogFields, LogLevel } from './ports/index.ts';

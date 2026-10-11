@@ -114,6 +114,10 @@ export const PROTECTED_LOCATIONS = {
   documents: 'sheets.permission.location.documents',
   desktop: 'sheets.permission.location.desktop',
   downloads: 'sheets.permission.location.downloads',
+  // DEV-11: every location the engine names (E-05: a USB volume asks too).
+  icloud: 'sheets.permission.location.icloud',
+  removable: 'sheets.permission.location.removable',
+  network: 'sheets.permission.location.network',
 } as const satisfies Record<string, MessageKey>;
 export type ProtectedLocation = keyof typeof PROTECTED_LOCATIONS;
 

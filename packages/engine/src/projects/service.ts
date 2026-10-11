@@ -336,7 +336,7 @@ export class ProjectsService {
   }
 
   /** A discovery of the project now, redacted (C-18 before anything is kept), not saved. */
-  async #snapshotNow(projectId: string, signal: AbortSignal, onProgress: ((p: { filesSeen: number; dirsSeen: number; currentDir: string; markers: ReadonlySet<string> }) => void) | null): Promise<DiscoverySnapshot> {
+  async #snapshotNow(projectId: string, signal: AbortSignal, onProgress: ((p: { filesSeen: number; dirsSeen: number; currentDir: string; markers: ReadonlySet<string>; skipped: number; skippedDirs: readonly string[] }) => void) | null): Promise<DiscoverySnapshot> {
     const { db, redaction } = this.#o;
     const started = this.#o.ports.clock.monotonicMs();
     const row = this.#row(projectId);
@@ -382,7 +382,7 @@ export class ProjectsService {
       if (signal.aborted) throw new DiscoveryCancelled();
       // C-18 before any save: every string of the facts, the inventory and the warnings.
       const snapshot = await this.#snapshotNow(projectId, signal, (p) => {
-        if (!signal.aborted) events.emit('discovery.progress', { projectId, discoveryId, filesSeen: p.filesSeen, dirsSeen: p.dirsSeen, currentDir: p.currentDir, kinds: [...p.markers].sort() });
+        if (!signal.aborted) events.emit('discovery.progress', { projectId, discoveryId, filesSeen: p.filesSeen, dirsSeen: p.dirsSeen, currentDir: p.currentDir, kinds: [...p.markers].sort(), skipped: p.skipped, skippedDirs: [...p.skippedDirs] });
       });
       const settings = profiles.settingsOf(projectId);
       const specs = profiles.specs(snapshot, settings);

@@ -60,6 +60,12 @@ import tasksAr from './tasks.ar.json' with { type: 'json' };
 import tasksEn from './tasks.en.json' with { type: 'json' };
 import aichecksAr from './aichecks.ar.json' with { type: 'json' };
 import aichecksEn from './aichecks.en.json' with { type: 'json' };
+import appAr from './app.ar.json' with { type: 'json' };
+import appEn from './app.en.json' with { type: 'json' };
+import projectlistAr from './projectlist.ar.json' with { type: 'json' };
+import projectlistEn from './projectlist.en.json' with { type: 'json' };
+import discoveruiAr from './discoverui.ar.json' with { type: 'json' };
+import discoveruiEn from './discoverui.en.json' with { type: 'json' };
 
 export const MESSAGE_FILES = {
   adapter: { ar: adapterAr, en: adapterEn },
@@ -93,11 +99,15 @@ export const MESSAGE_FILES = {
   compare: { ar: compareAr, en: compareEn },
   tasks: { ar: tasksAr, en: tasksEn },
   aichecks: { ar: aichecksAr, en: aichecksEn },
+  // DEV-11: the screens of the core journey (one scope per screen, `app` for the frame).
+  app: { ar: appAr, en: appEn },
+  projectlist: { ar: projectlistAr, en: projectlistEn },
+  discoverui: { ar: discoveruiAr, en: discoveruiEn },
 } as const;
 
 export type Scope = keyof typeof MESSAGE_FILES;
 
 export const MESSAGES = {
-  ar: { ...adapterAr, ...advisorAr, ...alertsAr, ...analyzerAr, ...catalogAr, ...commonAr, ...controlsAr, ...discoveryAr, ...environmentAr, ...errorsAr, ...glossaryAr, ...menuAr, ...planAr, ...probeAr, ...profileAr, ...projectsAr, ...purityAr, ...resultsAr, ...runAr, ...setupAr, ...sheetsAr, ...shellAr, ...statusAr, ...uiAr, ...verdictAr, ...reportAr, ...integrityAr, ...compareAr, ...tasksAr, ...aichecksAr },
-  en: { ...adapterEn, ...advisorEn, ...alertsEn, ...analyzerEn, ...catalogEn, ...commonEn, ...controlsEn, ...discoveryEn, ...environmentEn, ...errorsEn, ...glossaryEn, ...menuEn, ...planEn, ...probeEn, ...profileEn, ...projectsEn, ...purityEn, ...resultsEn, ...runEn, ...setupEn, ...sheetsEn, ...shellEn, ...statusEn, ...uiEn, ...verdictEn, ...reportEn, ...integrityEn, ...compareEn, ...tasksEn, ...aichecksEn },
+  ar: { ...adapterAr, ...advisorAr, ...alertsAr, ...analyzerAr, ...catalogAr, ...commonAr, ...controlsAr, ...discoveryAr, ...environmentAr, ...errorsAr, ...glossaryAr, ...menuAr, ...planAr, ...probeAr, ...profileAr, ...projectsAr, ...purityAr, ...resultsAr, ...runAr, ...setupAr, ...sheetsAr, ...shellAr, ...statusAr, ...uiAr, ...verdictAr, ...reportAr, ...integrityAr, ...compareAr, ...tasksAr, ...aichecksAr, ...appAr, ...projectlistAr, ...discoveruiAr },
+  en: { ...adapterEn, ...advisorEn, ...alertsEn, ...analyzerEn, ...catalogEn, ...commonEn, ...controlsEn, ...discoveryEn, ...environmentEn, ...errorsEn, ...glossaryEn, ...menuEn, ...planEn, ...probeEn, ...profileEn, ...projectsEn, ...purityEn, ...resultsEn, ...runEn, ...setupEn, ...sheetsEn, ...shellEn, ...statusEn, ...uiEn, ...verdictEn, ...reportEn, ...integrityEn, ...compareEn, ...tasksEn, ...aichecksEn, ...appEn, ...projectlistEn, ...discoveruiEn },
 } as const;

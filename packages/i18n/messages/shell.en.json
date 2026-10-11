@@ -10,7 +10,7 @@
   "shell.runBar.count": "{status}: {count}",
   "shell.runBar.elapsed": "Elapsed",
   "shell.progress.complete": "{done} of {total} complete",
-  "shell.progress.noTotal": "Total unknown, so no percentage.",
+  "shell.progress.noTotal": "Total not known yet, so no percentage.",
   "shell.banner.needsApproval": "Changes need approval ({count})",
   "shell.banner.showDiff": "Show diff…",
   "shell.banner.engineRestarting": "The engine stopped and is restarting",
