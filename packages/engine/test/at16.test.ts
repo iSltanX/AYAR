@@ -14,6 +14,8 @@ import { installOsvMiniDb, runVariant, systemBin, variantsOf, type VariantOption
 
 const FULL = process.env.AYAR_AT16 === '1';
 const ONLY = process.env.AYAR_AT16_ONLY?.split(',') ?? null;
+/** A subset of the variants while fixing (AYAR_AT16_VARIANTS=manifest-csp|flaky): a pattern over their names. */
+const VARIANTS = process.env.AYAR_AT16_VARIANTS ? new RegExp(process.env.AYAR_AT16_VARIANTS) : null;
 
 /** The guard's effect on an outcome (7.3 rule 8) is DEV-9's: the integrity variants' «يحتاج مراجعة». */
 const guardEffect = (variant: string, e: Expectation) => (variant.startsWith('integrity-') && e.result === 'يحتاج مراجعة' ? 'DEV-9' : null);
@@ -42,7 +44,8 @@ const PROJECTS: Record<string, VariantOptions> = {
   'FX-NOTEST': { patch: () => ({ checks: { 'code.complexity@.': { thresholds: { complexity: 10 } } } }) },
   'FX-PROC': { patch: procPatch },
   'FX-MALICIOUS': {},
-  'FX-WEB-DESIGN': {},
+  // The fonts the design approves, as its owner declares them in the profile (design/design.config.json: Cairo).
+  'FX-WEB-DESIGN': { patch: () => ({ references: { fonts: { approved: ['Cairo'] } } }) },
 };
 
 let root: string;
@@ -57,7 +60,8 @@ beforeAll(async () => {
 }, 60_000);
 afterAll(async () => {
   await engine?.close();
-  cleanup?.();
+  if (process.env.AYAR_KEEP_TMP) console.log(root);
+  else cleanup?.();
 });
 
 describe('AT-16 (outside the probe): planted defects found, none invented', () => {
@@ -65,7 +69,7 @@ describe('AT-16 (outside the probe): planted defects found, none invented', () =
     const rows: Row[] = [];
     for (const [project, o] of Object.entries(PROJECTS)) {
       if (ONLY && !ONLY.includes(project)) continue;
-      for (const v of variantsOf(project)) rows.push(...(await runVariant(engine, root, project, v, o)));
+      for (const v of variantsOf(project).filter((x) => !VARIANTS || VARIANTS.test(x))) rows.push(...(await runVariant(engine, root, project, v, o)));
     }
     console.log(report(rows));
     expect(rows.filter((r) => !r.ok)).toEqual([]);

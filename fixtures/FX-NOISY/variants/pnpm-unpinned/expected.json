@@ -5,12 +5,12 @@
   "expectations": [
     {
       "check": "beh.unit",
-      "result": "اجتاز",
+      "result": "ناقص",
       "rule": null,
       "rule_pending": true,
       "location": null,
       "confidence": null,
-      "reason": "الاختبارات نفسها تنجح؛ والمسألة جاهزية مدير الحزم"
+      "reason": "نقص جاهزية: pnpm 9.15.4 الذي يطلبه packageManager غير مثبت (المثبت 12.8.1)، فلا يُشغَّل الفحص ولا يُنزَّل شيء (AT-31)؛ والاختبارات نفسها تنجح متى جُهّز"
     }
   ],
   "engine_expectations": [

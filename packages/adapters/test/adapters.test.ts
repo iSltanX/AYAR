@@ -158,6 +158,10 @@ describe('Jest, node:test, Playwright, pytest (AT-14)', () => {
     expect(f.report.findings[0]).toMatchObject({ rule: 'test.flaky', location: { path: 'tests/a.spec.js', line: 4 } });
     expect(run(A('playwright'), ctx({ files: { 'playwright.json': JSON.stringify({ suites: [], errors: [{ message: 'Error: No tests found' }] }) } }), 1).exit).toMatchObject({ kind: 'missing' });
     expect(run(A('playwright'), ctx({ stderr: 'SyntaxError: playwright.config.js: Unexpected token (6:13)' }), 1).exit).toMatchObject({ kind: 'tool_error' });
+    // A beforeAll above the test that timed out: shown where it failed; an assertion inside the test: at the test.
+    const hook = (errorLine: number) => JSON.stringify({ config: { rootDir: `${ROOT}/tests` }, suites: [{ title: 'a.spec.js', file: 'a.spec.js', specs: [{ title: 'رحلة', file: 'a.spec.js', line: 23, tests: [{ projectName: '', status: 'unexpected', results: [{ status: 'timedOut', error: { message: 'timeout', location: { file: `${ROOT}/tests/a.spec.js`, line: errorLine, column: 6 } } }] }] }] }], errors: [] });
+    expect(run(A('playwright'), ctx({ files: { 'playwright.json': hook(9) } }), 1).report.findings[0]).toMatchObject({ rule: 'test.failed', location: { path: 'tests/a.spec.js', line: 9 } });
+    expect(run(A('playwright'), ctx({ files: { 'playwright.json': hook(24) } }), 1).report.findings[0]).toMatchObject({ rule: 'test.failed', location: { path: 'tests/a.spec.js', line: 23 } });
   });
   it('pytest: 1 failures, 2 with a collection error the project\'s, 4 and 3 the tool\'s, 5 «ناقص», 0 with a failure a conflict', () => {
     const py = { 'tests/test_add.py': 'from add import add\n\n\ndef test_add() -> None:\n    assert add(2, 3) == 6\n' };

@@ -25,10 +25,15 @@ function walk(suite: Record<string, unknown>, titles: string[], rootDir: string,
       const results = arr(t.results).map(rec);
       const failedResult = results.find((x) => str(x.status) !== 'passed' && str(x.status) !== 'skipped');
       const message = failedResult ? stripAnsi(str(rec(failedResult.error).message)) : '';
+      // A failure outside the test's own body (a beforeAll or beforeEach above it that threw or timed out) is shown
+      // where it happened; a failure inside the test, at the test (its declaration names it, as the other runners do).
+      const at = rec(rec(failedResult?.error).location);
+      const atLine = int(at.line);
+      const inHook = atLine !== undefined && line !== undefined && atLine < line && str(at.file) !== '' && normalizePath(str(at.file), ctx.root, ctx.cwd).path === p.path;
       out.push({
         fullName: [p.path ?? file, ...path, str(spec.title), project ? `[${project}]` : ''].filter(Boolean).join(' › '),
         status: status === 'expected' ? 'passed' : status === 'flaky' ? 'flaky' : status === 'skipped' ? 'skipped' : 'failed',
-        location: { path: p.path, ...(p.outside ? { outside: true } : {}), ...(line ? { line } : {}) },
+        location: { path: p.path, ...(p.outside ? { outside: true } : {}), ...(inHook ? { line: atLine } : line ? { line } : {}) },
         message,
         snapshotMissing: status === 'unexpected' && isSnapshotMissing(message),
       });
