@@ -79,6 +79,8 @@ export function weigh(f: ParsedFinding, i: Pick<ClassifyInput, 'rule' | 'suspect
   const level = proof === 'proven' ? (f.level ?? facts.level) : null;
   let effect: FindingEffect;
   if (excluded) effect = 'excluded';
+  // C-22 (DEV-9): a guard effect attached to the check it touches is a review item, never a warning (7.3 rule 8).
+  else if (f.rule.startsWith('guard.')) effect = 'review';
   else if (proof === 'suggestion') effect = 'note';
   else if (proof === 'suspected') effect = i.suspected === 'needs_review' ? 'review' : 'warning';
   else if (level === 'error') effect = 'violation';

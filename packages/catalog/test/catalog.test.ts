@@ -23,7 +23,7 @@ describe('built-in catalog (10.3, 11.6)', () => {
   const { catalog, stale } = load();
 
   it('loads, with a version and a content hash', () => {
-    expect(catalog.version).toBe('1.2.0');
+    expect(catalog.version).toBe('1.3.0');
     expect(catalog.hash).toMatch(/^[0-9a-f]{64}$/);
     expect(stale).toEqual([]);
   });

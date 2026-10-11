@@ -8,6 +8,7 @@ import { INITIAL_SCHEMA } from './schema/0001-initial.ts';
 import { RUNS_SCHEMA } from './schema/0002-runs.ts';
 import { VERDICTS_SCHEMA } from './schema/0003-verdicts.ts';
 import { PROBE_SCHEMA } from './schema/0004-probe.ts';
+import { REPORTS_SCHEMA } from './schema/0005-reports.ts';
 
 export interface Migration {
   version: number;
@@ -23,6 +24,8 @@ export const MIGRATIONS: readonly Migration[] = [
   { version: 3, name: 'verdicts', sql: VERDICTS_SCHEMA },
   // DEV-7: the snapshot a reference image was approved on (C-14, C-17).
   { version: 4, name: 'probe-baselines', sql: PROBE_SCHEMA },
+  // DEV-9: reports, reviews, the task lifecycle, model checks and the integrity checks (C-21 to C-25).
+  { version: 5, name: 'reports-reviews-claims', sql: REPORTS_SCHEMA },
 ];
 
 export function latestVersion(migrations: readonly Migration[] = MIGRATIONS): number {

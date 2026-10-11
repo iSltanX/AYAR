@@ -145,15 +145,19 @@ export class PlannerService {
     return plan;
   }
 
-  /** 9.5 point 3: the instances of a previous run whose outcome is among those chosen (with the defaults). */
+  /**
+   * 9.5 point 3: the instances of a previous run whose outcome is among those chosen (with the defaults). A run that
+   * belongs to a round is read through the round's current members (DEV-9, D-31): «أعد الفاشل» after a continuation
+   * or a merged retry means what the round holds now, not what that one run saw.
+   */
   #rerunInstances(projectId: string, runId: string, f: RerunFilter): string[] {
-    const run = this.#o.db.get<{ project_id: string }>('SELECT project_id FROM runs WHERE id = ?', runId);
+    const run = this.#o.db.get<{ project_id: string; round_id: string | null }>('SELECT project_id, round_id FROM runs WHERE id = ?', runId);
     if (!run || run.project_id !== projectId) throw new CommandError('not_found', { reason: 'run' });
     const outcomes = new Set<CheckOutcome>(f.outcomes ?? (f.mode === 'failed' ? RERUN_FAILED_DEFAULT : RERUN_INCOMPLETE_DEFAULT));
-    return this.#o.db
-      .all<{ check_id: string; component: string; outcome: string | null }>('SELECT check_id, component, outcome FROM check_runs WHERE run_id = ? ORDER BY rowid', runId)
-      .filter((r) => r.outcome !== null && outcomes.has(r.outcome as CheckOutcome))
-      .map((r) => `${r.check_id}@${r.component}`);
+    const rows = run.round_id
+      ? this.#o.db.all<{ instance: string; outcome: string | null }>('SELECT instance, outcome FROM round_checks WHERE round_id = ? ORDER BY rowid', run.round_id)
+      : this.#o.db.all<{ check_id: string; component: string; outcome: string | null }>('SELECT check_id, component, outcome FROM check_runs WHERE run_id = ? ORDER BY rowid', runId).map((r) => ({ instance: `${r.check_id}@${r.component}`, outcome: r.outcome }));
+    return rows.filter((r) => r.outcome !== null && outcomes.has(r.outcome as CheckOutcome)).map((r) => r.instance);
   }
 
   /** run.rerun: a plan over a previous run's outcomes; the executions it creates link to the old ones. */

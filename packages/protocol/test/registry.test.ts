@@ -48,10 +48,14 @@ describe('command registry (6.5)', () => {
   const DEV5_EXTRA = ['internal.evidencePath', 'internal.prepareQuit', 'run.get', 'runs.list'];
   // D-DEV7-01 (protocol 1.4): what a run captured and how it compares, and the approved references (C-14).
   const DEV7_EXTRA = ['baselines.list', 'captures.list'];
+  // D-DEV9-01 (protocol 1.5): the kept reports and reviews (14.1 has their tables), the instruction preview and the
+  // three groups of the model-checks page (AT-44), and the cards' verification on demand (12.8).
+  const DEV9_EXTRA = ['aiChecks.get', 'aiChecks.list', 'reports.list', 'reviews.list', 'tasks.verify'];
 
-  it('adds only the documented main-process, host-only, DEV-4, DEV-5 and DEV-7 commands', () => {
+  it('adds only the documented main-process, host-only, DEV-4, DEV-5, DEV-7 and DEV-9 commands', () => {
     const extra = COMMAND_NAMES.filter((c) => !PLAN_COMMANDS.includes(c)).sort();
-    expect(extra).toEqual([...DEV3_EXTRA, ...DEV4_EXTRA, ...DEV5_EXTRA, ...DEV7_EXTRA].sort());
+    expect(extra).toEqual([...DEV3_EXTRA, ...DEV4_EXTRA, ...DEV5_EXTRA, ...DEV7_EXTRA, ...DEV9_EXTRA].sort());
+    for (const c of DEV9_EXTRA as (keyof typeof COMMANDS)[]) expect(COMMANDS[c]).toMatchObject({ handler: 'engine', audience: 'renderer', since: '1.5', implementedIn: 'DEV-9', grants: [] });
     for (const c of DEV7_EXTRA as (keyof typeof COMMANDS)[]) expect(COMMANDS[c]).toMatchObject({ handler: 'engine', audience: 'renderer', owner: 'C-14', since: '1.4', implementedIn: 'DEV-7', grants: [] });
     for (const c of extra.filter((c) => c.startsWith('internal.'))) expect(COMMANDS[c].audience).toBe('host');
     for (const c of ['internal.evidencePath', 'internal.prepareQuit'] as const) expect(COMMANDS[c]).toMatchObject({ handler: 'engine', audience: 'host', since: '1.2', implementedIn: 'DEV-5' });

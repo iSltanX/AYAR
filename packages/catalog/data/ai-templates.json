@@ -1,68 +1,93 @@
 [
   {
     "id": "ai.logic-review",
-    "version": "1.0.0",
-    "text": {
-      "title": "catalog.ai.logic-review.title",
-      "role": "catalog.ai.logic-review.role"
-    },
+    "version": "1.1.0",
+    "code": "LOGIC",
+    "text": { "title": "catalog.ai.logic-review.title", "role": "catalog.ai.logic-review.role" },
     "cost": "model",
+    "items": ["unit_logic", "property_logic"],
+    "inputs": [
+      { "key": "logicFiles", "label": "catalog.ai.logic-review.input.logicFiles", "from": "discovery", "optional": false },
+      { "key": "expectedBehavior", "label": "catalog.ai.logic-review.input.expectedBehavior", "from": "user", "optional": true }
+    ],
+    "provableBy": ["beh.unit"],
     "sources": [],
-    "verifiedAt": "2026-10-09"
+    "verifiedAt": "2026-10-11"
   },
   {
     "id": "ai.threat-review",
-    "version": "1.0.0",
-    "text": {
-      "title": "catalog.ai.threat-review.title",
-      "role": "catalog.ai.threat-review.role"
-    },
+    "version": "1.1.0",
+    "code": "THREAT",
+    "text": { "title": "catalog.ai.threat-review.title", "role": "catalog.ai.threat-review.role" },
     "cost": "model",
+    "items": ["security_authz", "security_input"],
+    "inputs": [
+      { "key": "permissionsPolicy", "label": "catalog.ai.threat-review.input.permissionsPolicy", "from": "discovery", "optional": false },
+      { "key": "manifest", "label": "catalog.ai.threat-review.input.manifest", "from": "discovery", "optional": true },
+      { "key": "entryPoints", "label": "catalog.ai.threat-review.input.entryPoints", "from": "discovery", "optional": false }
+    ],
+    "provableBy": ["sec.sast", "sec.ext.permissions"],
     "sources": [],
-    "verifiedAt": "2026-10-09"
+    "verifiedAt": "2026-10-11"
   },
   {
     "id": "ai.docs-consistency",
-    "version": "1.0.0",
-    "text": {
-      "title": "catalog.ai.docs-consistency.title",
-      "role": "catalog.ai.docs-consistency.role"
-    },
+    "version": "1.1.0",
+    "code": "DOCS",
+    "text": { "title": "catalog.ai.docs-consistency.title", "role": "catalog.ai.docs-consistency.role" },
     "cost": "model",
+    "items": ["build_config"],
+    "inputs": [
+      { "key": "readme", "label": "catalog.ai.docs-consistency.input.readme", "from": "discovery", "optional": false },
+      { "key": "scripts", "label": "catalog.ai.docs-consistency.input.scripts", "from": "discovery", "optional": false }
+    ],
+    "provableBy": ["code.refs.local"],
     "sources": [],
-    "verifiedAt": "2026-10-09"
+    "verifiedAt": "2026-10-11"
   },
   {
     "id": "ai.ui-copy",
-    "version": "1.0.0",
-    "text": {
-      "title": "catalog.ai.ui-copy.title",
-      "role": "catalog.ai.ui-copy.role"
-    },
+    "version": "1.1.0",
+    "code": "UICOPY",
+    "text": { "title": "catalog.ai.ui-copy.title", "role": "catalog.ai.ui-copy.role" },
     "cost": "model",
+    "items": ["arabic_rtl"],
+    "inputs": [
+      { "key": "textFiles", "label": "catalog.ai.ui-copy.input.textFiles", "from": "discovery", "optional": false },
+      { "key": "glossary", "label": "catalog.ai.ui-copy.input.glossary", "from": "user", "optional": true }
+    ],
+    "provableBy": [],
     "sources": [],
-    "verifiedAt": "2026-10-09"
+    "verifiedAt": "2026-10-11"
   },
   {
     "id": "ai.test-gaps",
-    "version": "1.0.0",
-    "text": {
-      "title": "catalog.ai.test-gaps.title",
-      "role": "catalog.ai.test-gaps.role"
-    },
+    "version": "1.1.0",
+    "code": "GAPS",
+    "text": { "title": "catalog.ai.test-gaps.title", "role": "catalog.ai.test-gaps.role" },
     "cost": "model",
+    "items": ["acceptance_examples", "characterization"],
+    "inputs": [
+      { "key": "testFiles", "label": "catalog.ai.test-gaps.input.testFiles", "from": "discovery", "optional": false },
+      { "key": "specs", "label": "catalog.ai.test-gaps.input.specs", "from": "discovery", "optional": false }
+    ],
+    "provableBy": ["beh.unit"],
     "sources": [],
-    "verifiedAt": "2026-10-09"
+    "verifiedAt": "2026-10-11"
   },
   {
     "id": "ai.structure-review",
-    "version": "1.0.0",
-    "text": {
-      "title": "catalog.ai.structure-review.title",
-      "role": "catalog.ai.structure-review.role"
-    },
+    "version": "1.1.0",
+    "code": "STRUCT",
+    "text": { "title": "catalog.ai.structure-review.title", "role": "catalog.ai.structure-review.role" },
     "cost": "model",
+    "items": ["risk_inventory"],
+    "inputs": [
+      { "key": "complexFunctions", "label": "catalog.ai.structure-review.input.complexFunctions", "from": "results", "optional": false },
+      { "key": "fileMap", "label": "catalog.ai.structure-review.input.fileMap", "from": "discovery", "optional": false }
+    ],
+    "provableBy": [],
     "sources": [],
-    "verifiedAt": "2026-10-09"
+    "verifiedAt": "2026-10-11"
   }
 ]

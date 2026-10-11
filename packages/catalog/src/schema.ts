@@ -191,14 +191,32 @@ export type Criterion = z.infer<typeof Criterion>;
 
 export const Section = z.strictObject({ id: SectionId, name: TextKey, inIndex: z.boolean(), fullScan: z.boolean() });
 
+/** 12.9 «المدخلات اللازمة»: what a template reads; `optional` ones never block the generation. */
+export const AiTemplateInput = z.strictObject({
+  key: z.string().regex(/^[a-z][a-zA-Z0-9]*$/),
+  /** `catalog.ai.<template>.input.<key>`. */
+  label: TextKey,
+  /** Where it comes from when AYAR can find it: discovery, the results, or the user alone. */
+  from: z.enum(['discovery', 'results', 'user']),
+  optional: z.boolean(),
+});
+
 export const AiTemplate = z.strictObject({
   id: z.string().regex(/^ai\.[a-z][a-z0-9-]*$/),
   version: SemVer,
+  /** D-36: the code of its instruction ids, `AI-{code}-NNN`. */
+  code: z.string().regex(/^[A-Z]{3,8}$/),
   text: z.strictObject({ title: TextKey, role: TextKey }),
   cost: z.literal('model'),
+  /** 12.9 point 1 and 3: the knowledge items whose question templates the instruction specializes (28.4). */
+  items: z.array(z.string().regex(/^[a-z][a-z0-9_]*$/)),
+  inputs: z.array(AiTemplateInput),
+  /** Local checks that could prove a claim of this template (C-25 point 4). */
+  provableBy: z.array(CheckId),
   sources: z.array(SourceId),
   verifiedAt: IsoDate,
 });
+export type AiTemplate = z.infer<typeof AiTemplate>;
 
 export const Source = z.strictObject({ id: SourceId, url: z.url({ protocol: /^https$/ }), verifiedAt: IsoDate });
 

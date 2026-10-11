@@ -43,6 +43,8 @@ export const ERROR_CODES = [
   'network_failed',
   'setup_failed',
   'disk_full',
+  // DEV-9 (protocol 1.5): a report whose second redaction pass still finds a high-confidence secret (12.5 rule 1).
+  'report_blocked',
 ] as const;
 
 export const ErrorCode = z.enum(ERROR_CODES);

@@ -191,11 +191,21 @@ export function loadCatalog(raw: unknown = builtinCatalogData(), opts: { now: Da
   };
   for (const c of checks) visit(c.id, []);
 
-  // AI templates: unique ids, known sources.
+  // AI templates (DEV-9, Q-03): unique ids and codes, text keys derived from the id, known sources, known checks and
+  // knowledge items.
   const aiIds = new Set<string>();
+  const aiCodes = new Set<string>();
+  const kbItemIds = new Set(data.kb.items.items.map((i) => i.id));
   for (const t of data.aiTemplates) {
     if (aiIds.has(t.id)) issues.push(`${t.id}: duplicate template id`);
     aiIds.add(t.id);
+    if (aiCodes.has(t.code)) issues.push(`${t.id}: code ${t.code} is used twice`);
+    aiCodes.add(t.code);
+    const key = t.id.slice('ai.'.length);
+    if (t.text.title !== `catalog.ai.${key}.title` || t.text.role !== `catalog.ai.${key}.role`) issues.push(`${t.id}: text keys must be catalog.ai.${key}.title and .role`);
+    for (const i of t.inputs) if (i.label !== `catalog.ai.${key}.input.${i.key}`) issues.push(`${t.id}: input ${i.key} label must be catalog.ai.${key}.input.${i.key}`);
+    for (const c of t.provableBy) if (!byId.has(c)) issues.push(`${t.id}: provableBy names unknown check ${c}`);
+    for (const i of t.items) if (!kbItemIds.has(i)) issues.push(`${t.id}: unknown knowledge item ${i}`);
     for (const s of t.sources) if (!sourceIds.has(s)) issues.push(`${t.id}: unknown source ${s}`);
   }
 

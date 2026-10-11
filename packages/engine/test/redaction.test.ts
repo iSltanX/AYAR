@@ -34,12 +34,15 @@ const SECRET_GENERATORS: Record<string, fc.Arbitrary<string>> = {
   'private-key-inline': chars(ALNUM, 20, 60).map((s) => join('-----BEGIN ', 'PRIVATE KEY-----', s, '-----END ', 'PRIVATE KEY-----')),
   // A password with 24 distinct characters has an entropy of log2(24) ≈ 4.58 bits per character.
   'password-assignment': fc.shuffledSubarray(ALNUM.split(''), { minLength: 24, maxLength: 24 }).map((a) => join('pass', 'word=', a.join(''))),
+  // DEV-9 (AT-23): a vendor-shaped live key, and a high-entropy token near a sensitive word with no assignment.
+  'live-key': fc.tuple(chars('abcdefghijklmnopqrstuvwxyz', 3, 8), chars(ALNUM, 20, 40)).map(([p, s]) => join(p, '_live_', s)),
+  'keyword-high-entropy': fc.shuffledSubarray(ALNUM.split(''), { minLength: 28, maxLength: 28 }).map((a) => join('with ', 'token ', a.join(''))),
 };
 const anySecret = fc.oneof(...Object.entries(SECRET_GENERATORS).map(([rule, g]) => g.map((value) => ({ rule, value }))));
 /** Surrounding text that cannot itself form a secret: Arabic, spaces and punctuation. */
 const filler = fc.array(fc.constantFrom('نص ', 'سجل ', ' . ', ': ', 'خطأ ', ' (', ') ', '\t'), { maxLength: 30 }).map((a) => a.join(''));
 /** The part of a secret that must not survive: for an assignment, the value after `=`. */
-const secretCore = (s: { rule: string; value: string }) => (s.rule === 'password-assignment' ? s.value.slice('password='.length) : s.value);
+const secretCore = (s: { rule: string; value: string }) => (s.rule === 'password-assignment' ? s.value.slice('password='.length) : s.rule === 'keyword-high-entropy' ? s.value.slice('with token '.length) : s.value);
 
 describe('catalog patterns (layer 2)', () => {
   it('has a generator for every high-confidence pattern, and each generated secret is caught', () => {

@@ -1,0 +1,15 @@
+{
+  "integrity.reason.allExcluded": "Passed: all its effects ({count}) were excluded by your review as false alarms",
+  "integrity.reason.guardBaseLost": "Needs review: a base existed but its snapshot is gone, so integrity could not be verified",
+  "integrity.reason.guardNoBaseline": "Passed (no base to compare): the first round records an inventory only ({markers} existing suppression or skip markers)",
+  "integrity.reason.guardFindings": "Needs review: {count, plural, one {# effect} other {# effects}} across {files} files changed since the base",
+  "integrity.reason.guardClean": "Passed: no suppression, skip or reference change across {files} files changed since the base",
+  "integrity.reason.stateChanged": "Needs review: the state changed during the scan ({count} files outside the declared outputs)",
+  "integrity.reason.stateStable": "Passed: no source file changed during the scan",
+  "integrity.reason.noReviews": "Not applicable: no recorded reviews",
+  "integrity.reason.reviewsExpired": "Needs review: {count} of {total} reviews expired because files in their scope changed",
+  "integrity.reason.reviewsValid": "Passed: the recorded reviews ({count}) still hold",
+  "integrity.reason.noClaims": "Not applicable: no imported model reports",
+  "integrity.reason.claimsOpen": "Needs review: {count} model claims neither proven locally nor decided ({proven} proven by a local check)",
+  "integrity.reason.claimsSettled": "Passed: every claim was proven locally or decided ({proven} proven)"
+}

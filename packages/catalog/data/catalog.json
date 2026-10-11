@@ -1,9 +1,14 @@
 {
   "schema": "ayar-catalog/1",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "purityFormula": "purity/1",
   "staleAfterDays": 180,
-  "timeouts": { "light": 2, "medium": 10, "heavy": 30, "very_heavy": 60 },
+  "timeouts": {
+    "light": 2,
+    "medium": 10,
+    "heavy": 30,
+    "very_heavy": 60
+  },
   "nextSteps": {
     "passed": "none",
     "passed_reviewed": "none",

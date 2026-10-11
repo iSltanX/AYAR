@@ -1,6 +1,5 @@
-// Comparison (C-22) and managed tools (C-11). Implemented in DEV-9 and DEV-5 (protocol 1.2 gives the tool
-// commands their contracts: the register of FR-49, the install preview and its outcome, FR-50).
-import { Id } from '../common.ts';
+// Managed tools (C-11). Implemented in DEV-5 (protocol 1.2 gives the tool commands their contracts: the register of
+// FR-49, the install preview and its outcome, FR-50). compare.runs (C-22) moved to reports.ts with its contract (DEV-9).
 import { DataAssetView, ToolInstallResult, ToolView } from '../domain/tools.ts';
 import { ConfirmationToken } from '../tokens.ts';
 import { z } from '../zod.ts';
@@ -13,15 +12,6 @@ const tools = { owner: 'C-11', handler: 'engine', audience: 'renderer', since: '
 export const ToolKey = z.string().regex(/^[a-z][a-z0-9-]*$/).max(64);
 
 export const toolCommands = {
-  'compare.runs': defineCommand({
-    owner: 'C-22',
-    handler: 'engine',
-    audience: 'renderer',
-    since: '1.0',
-    implementedIn: 'DEV-9',
-    payload: z.strictObject({ a: Id, b: Id }),
-    result: z.unknown(),
-  }),
   'tools.list': defineCommand({ ...tools, payload: z.strictObject({}), result: z.strictObject({ tools: z.array(ToolView), dataAssets: z.array(DataAssetView) }) }),
   'tools.preview': defineCommand({
     ...tools,

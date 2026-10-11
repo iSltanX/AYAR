@@ -59,8 +59,21 @@ export const TaskSource = z.discriminatedUnion('kind', [
     outcome: z.enum(['missing', 'missing_configuration', 'missing_tests']),
     location: CardText.optional(),
   }),
+  /** C-20 source 2 (DEV-9, G-DEV8-03): a unit of logic with no test file, from the test inventory's gaps. */
+  z.strictObject({ kind: z.literal('testGap'), checkId: z.string().min(1).max(200), file: CardText, symbol: CardText.optional() }),
+  /** C-20 source 3: a surviving mutant (beh.mutation): a card to strengthen the assertions. */
+  z.strictObject({ kind: z.literal('survivingMutant'), findingId: Id }),
+  /** C-20 source 4: a UI state with no expectation or no story (design.states). */
+  z.strictObject({ kind: z.literal('uiState'), findingId: Id }),
+  /** C-20 source 5: a maintenance indicator over the threshold (code.complexity): a suggestion, never a change. */
+  z.strictObject({ kind: z.literal('maintenance'), findingId: Id }),
+  /** 12.6 «وأنشئ بطاقة تحقق»: a fix-verification card for one finding, closed by its disappearance alone (12.8). */
+  z.strictObject({ kind: z.literal('fixVerification'), findingId: Id, reportId: Id.optional() }),
+  /** 12.7: a model claim the owner turned into a card («حوّل إلى بطاقة»). */
+  z.strictObject({ kind: z.literal('modelClaim'), claimId: Id }),
 ]);
 export type TaskSource = z.infer<typeof TaskSource>;
+export const TASK_SOURCE_KINDS = ['advisorItem', 'check', 'testGap', 'survivingMutant', 'uiState', 'maintenance', 'fixVerification', 'modelClaim'] as const;
 
 export const TaskCard = z.strictObject({
   template: z.literal('card/1'),
@@ -68,7 +81,7 @@ export const TaskCard = z.strictObject({
   priority: z.union([z.literal(1), z.literal(2), z.literal(3)]),
   /** 12.7: تعالجها مباشرة (direct)، تحتاج نموذجًا (model)، تحتاج مراجعتك (review). */
   nextStep: z.enum(['direct', 'model', 'review']),
-  source: z.strictObject({ kind: z.enum(['advisorItem', 'check']), ref: z.string() }),
+  source: z.strictObject({ kind: z.enum(TASK_SOURCE_KINDS), ref: z.string() }),
   /** `{النوع}: {السلوك} — {الموضع}`. */
   name: z.string(),
   /** The «السلوك أو الفعل المطلوب» part of the name. */
@@ -92,6 +105,27 @@ export const TaskCard = z.strictObject({
 });
 export type TaskCard = z.infer<typeof TaskCard>;
 
+/** 12.8 «ما يثبته عِيَار عند الإغلاق»: what the verifying run proved, condition by condition (DEV-9). */
+export const TaskVerification = z.strictObject({
+  runId: Id,
+  checkedAt: IsoTimestamp,
+  /** The count of executed tests rose since the card was made (null: not a test card). */
+  testsIncreased: z.boolean().nullable(),
+  /** The related check passed (a setup card: its gap is gone). */
+  checkPassed: z.boolean().nullable(),
+  /** A new or changed test file names the target symbol or file (null: not a test card). */
+  targetMentioned: z.boolean().nullable(),
+  /** No integrity finding of the run touches the card's checks. */
+  noIntegrityFinding: z.boolean().nullable(),
+  /** A fix-verification card: the linked finding is gone («زال») without an integrity finding on its check. */
+  findingResolved: z.boolean().nullable(),
+  /** «قوة الاختبار غير مثبتة» until a new test kills a mutant in beh.mutation (per-test coverage, no bail, S-30). */
+  strength: z.enum(['unproven', 'proven', 'not_applicable']),
+  /** Why the card stayed «بانتظار التحقق»: message keys (`tasks.verify.*`). */
+  reasons: z.array(z.string()),
+});
+export type TaskVerification = z.infer<typeof TaskVerification>;
+
 export const TaskRecord = z.strictObject({
   id: Id,
   /** D-36: TASK-NNNN, unique within the project. */
@@ -101,5 +135,19 @@ export const TaskRecord = z.strictObject({
   card: TaskCard,
   createdAt: IsoTimestamp,
   updatedAt: IsoTimestamp,
+  /** DEV-9: the last verification attempt, when the card went through one. */
+  verification: TaskVerification.nullable(),
+  /** DEV-9: a card closed by decision carries its reason (12.8). */
+  closeReason: z.string().nullable(),
+  /** DEV-9: the finding a fix-verification card follows (by display id), or the claim a model-claim card came from. */
+  follows: z.string().nullable(),
 });
 export type TaskRecord = z.infer<typeof TaskRecord>;
+
+/** task.update's patch (12.8 «دورة البطاقة»): the user's own transitions; «متحققة» is the engine's alone. */
+export const TaskPatch = z.strictObject({
+  /** `copied` (copied by hand), `awaiting_verification`, `closed` with a reason, or back to `open`. Never `verified`. */
+  status: z.enum(['copied', 'awaiting_verification', 'closed', 'open']).optional(),
+  closeReason: z.string().max(2000).optional(),
+});
+export type TaskPatch = z.infer<typeof TaskPatch>;

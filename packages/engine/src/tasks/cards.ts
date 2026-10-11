@@ -162,5 +162,8 @@ export function cardFromCheck(source: Extract<TaskSource, { kind: 'check' }>, ca
 
 /** tasks.generate: the card for a source. */
 export function generateCard(source: TaskSource, catalog: Catalog, facts: AdvisorFacts = {}, project: CardProjectContext = {}): TaskCard {
-  return source.kind === 'advisorItem' ? cardFromAdvisorItem(source, catalog.kb, facts, project) : cardFromCheck(source, catalog, project);
+  if (source.kind === 'advisorItem') return cardFromAdvisorItem(source, catalog.kb, facts, project);
+  if (source.kind === 'check') return cardFromCheck(source, catalog, project);
+  // The sources that read the results are the service's (DEV-9, sources.ts): they need the rows.
+  throw new CardSourceError('unknown_check', source.kind);
 }

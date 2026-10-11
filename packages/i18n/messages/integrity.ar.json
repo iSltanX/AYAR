@@ -1,0 +1,15 @@
+{
+  "integrity.reason.allExcluded": "اجتاز: كل آثاره ({count}) استُبعدت بمراجعتك إنذارًا كاذبًا",
+  "integrity.reason.guardBaseLost": "يحتاج مراجعة: كان للمقارنة أساس ثم فُقدت لقطته، فتعذّر التحقق من النزاهة",
+  "integrity.reason.guardNoBaseline": "اجتاز (لا أساس للمقارنة): الجولة الأولى تسجل جردة فقط ({markers} علامة إسكات أو تخطٍّ قائمة)",
+  "integrity.reason.guardFindings": "يحتاج مراجعة: {count, plural, one {أثر واحد} two {أثران} few {# آثار} many {# أثرًا} other {# أثر}} في {files} ملفًا متغيرًا منذ الأساس",
+  "integrity.reason.guardClean": "اجتاز: لا إسكات ولا تخطٍّ ولا تعديل مرجع في {files} ملفًا متغيرًا منذ الأساس",
+  "integrity.reason.stateChanged": "يحتاج مراجعة: تغيرت الحالة أثناء الفحص ({count} ملف خارج المخرجات المعلنة)",
+  "integrity.reason.stateStable": "اجتاز: لم يتغير ملف مصدر أثناء الفحص",
+  "integrity.reason.noReviews": "غير منطبق: لا مراجعات مسجلة",
+  "integrity.reason.reviewsExpired": "يحتاج مراجعة: {count} من {total} مراجعة انتهت صلاحيتها بتغيّر ملفات نطاقها",
+  "integrity.reason.reviewsValid": "اجتاز: المراجعات المسجلة ({count}) سارية",
+  "integrity.reason.noClaims": "غير منطبق: لا تقارير نموذج مستوردة",
+  "integrity.reason.claimsOpen": "يحتاج مراجعة: {count} ادعاء نموذج لم يثبت محليًا ولا قرار فيه ({proven} أثبته فحص محلي)",
+  "integrity.reason.claimsSettled": "اجتاز: كل الادعاءات أُثبتت محليًا أو سُجّل فيها قرار ({proven} مثبت)"
+}

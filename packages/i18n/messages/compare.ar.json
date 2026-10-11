@@ -1,0 +1,9 @@
+{
+  "compare.note.profileDiffers": "ملف المعايير مختلف (الإصدار {from} ← {to})؛ المقارنة غير مباشرة",
+  "compare.note.catalogDiffers": "الكتالوج مختلف ({from} ← {to})؛ المقارنة غير مباشرة",
+  "compare.note.formulaDiffers": "صيغة المؤشر مختلفة ({from} ← {to})؛ الرقمان لا يُقارنان",
+  "compare.note.toolsDiffer": "نسخ الأدوات مختلفة: {tools} ({count})",
+  "compare.note.environmentDiffers": "بيئة التشغيل أو مصدرها مختلف",
+  "compare.note.scopeDiffers": "النطاق مختلف ({from} ← {to} معيار/فحص)؛ المقارنة غير مباشرة",
+  "compare.note.blockingGrew": "زادت الإخفاقات الحاجبة ({from} ← {to})؛ لا يُوصف تغيّر العيار تحسنًا"
+}

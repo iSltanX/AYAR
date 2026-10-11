@@ -52,6 +52,7 @@ import type { BaselineService, Capture } from '../probe/baselines.ts';
 import { buildJob, cellMeta } from '../probe/job.ts';
 import type { ProbeService } from '../probe/service.ts';
 import type { ProbeOutcome, VisualComparison } from '@ayar/probe';
+import type { GuardContext, IntegrityService } from '../integrity/service.ts';
 
 /** At most this many provisional findings are sent per execution (9.6 point 5: the final reading decides). */
 const PROVISIONAL_MAX = 200;
@@ -83,6 +84,10 @@ export interface RunServiceOptions {
   probe: ProbeService;
   browsers: BrowserService;
   baselines: BaselineService;
+  /** C-22 (DEV-9): the integrity guard at the start, and the four integrity checks at the end. */
+  integrity: IntegrityService;
+  /** DEV-9: what follows a finished run (the cards' verification, 12.8), after its index and its events. */
+  afterRun?: (runId: string, projectId: string) => Promise<void>;
 }
 
 interface RunRow {
@@ -164,6 +169,8 @@ interface CheckContext {
   inventory: string[];
   /** The specs as the project's files said at the start of the run (a shared or covered execution is judged by them). */
   specs: Map<string, CheckSpec>;
+  /** C-22 (DEV-9): the guard's comparison at the start of the run, and its effects by instance. */
+  guard: GuardContext | null;
 }
 
 interface Active {
@@ -408,19 +415,29 @@ export class RunService {
     active.services = new CompanionServices({ ports, supervisor: this.#o.supervisor, redaction: this.#o.redaction, projectRoot: root, env: serviceEnv, runId, tmpDir: posix.join(this.#o.layout.tmp, runId) });
     const parallel = readSettings(db, ['run.parallel'])['run.parallel'] ?? 2;
     const sideEffects = readSettings(db, ['run.sideEffects'])['run.sideEffects'] ?? true;
+    const declared = this.#declared(projectId, plan);
+    // 9.12 point 2 (C-22, DEV-9): the guard compares the state with its bases before anything is judged, so its
+    // effects reach the checks they touch (7.3 rule 8). It never stops the run: a failure reads as a lost base.
+    const guard = await this.#o.integrity.prepare({ projectId, runId, plan, startManifest, declared }).catch((e: unknown) => {
+      this.#o.logger.log('error', 'the integrity guard could not run', { runId, error: e instanceof Error ? e.message.slice(0, 300) : String(e) });
+      return null;
+    });
     const ctx: CheckContext = {
       projectId,
       root,
       sideEffects,
-      declared: this.#declared(projectId, plan),
+      declared,
       outputs: this.#outputs(projectId),
       lastManifest: startManifest,
       inventory: startManifest.files.filter((f) => f[6] !== 'link').map((f) => f[0]),
       specs: fresh,
+      guard,
     };
 
-    // The scheduler: order, dependencies, locks, concurrency.
-    const order = plan.order.filter((x) => execs.get(x)?.state === 'pending');
+    // The scheduler: order, dependencies, locks, concurrency. The integrity checks (C-22) wait for the end of the
+    // run: the state check needs the final snapshot, and the others read what the run found.
+    const integrity = plan.order.filter((x) => execs.get(x)?.state === 'pending' && this.#o.integrity.isIntegrity(execs.get(x)!.item));
+    const order = plan.order.filter((x) => execs.get(x)?.state === 'pending' && !integrity.includes(x));
     const pending = [...order];
     const running = new Map<string, Promise<void>>();
     while (pending.length || running.size) {
@@ -519,11 +536,26 @@ export class RunService {
     const changed = [...change.created, ...change.modified, ...change.deleted].some((p) => !ctx.declared(p));
     await ports.fs.remove(posix.join(this.#o.layout.tmp, runId));
     db.run('UPDATE runs SET snapshot_end_id = ?, state_changed = ?, cancel_reason = ? WHERE id = ?', endId, changed ? 1 : 0, active.cancel, runId);
+    // C-22 (DEV-9): the four integrity checks, from what the run found and how the state moved (10.3 «النزاهة»).
+    for (const inst of integrity) {
+      const e = execs.get(inst)!;
+      if (e.state !== 'pending') continue;
+      if (active.cancel) {
+        this.#finishCheck(e, 'cancelled', { key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }, null, []);
+        continue;
+      }
+      await this.#runIntegrity(active, e, ctx, endManifest, [...change.created, ...change.modified, ...change.deleted].filter((p) => !ctx.declared(p))).catch((err: unknown) => {
+        this.#o.logger.log('error', 'an integrity check failed unexpectedly', { instance: inst, error: err instanceof Error ? (err.stack ?? err.message).slice(0, 800) : String(err) });
+        if (e.state !== 'done') this.#finishCheck(e, 'unavailable', { key: 'run.reason.internal' }, null, []);
+      });
+    }
     // 9.10: the index of the round or the section (a cancelled check counts for nothing: «غير مكتمل» says why).
     const purity = await this.#o.purity.afterRun(runId, ctx.declared).catch((e: unknown) => {
       this.#o.logger.log('error', 'the purity index could not be computed', { runId, error: e instanceof Error ? e.message.slice(0, 300) : String(e) });
       return null;
     });
+    // DEV-9 (12.8): the open cards are verified against this run, by evidence alone, before it is announced finished.
+    if (active.cancel !== 'app_quit' && this.#o.afterRun) await this.#o.afterRun(runId, projectId).catch((e: unknown) => this.#o.logger.log('error', 'after-run step failed', { error: e instanceof Error ? e.message.slice(0, 300) : String(e) }));
     db.transaction(() => {
       db.run("UPDATE runs SET state = 'finished', finished_at = ?, counts_json = ? WHERE id = ?", this.#now(), JSON.stringify(this.#counts(runId)), runId);
       if (active.cancel) recordAudit(db, { id: newId(ports.random, 'aud'), at: ports.clock.now(), action: 'run.cancelled', projectId, details: { runId, reason: active.cancel } });
@@ -532,6 +564,70 @@ export class RunService {
     this.#o.events.emit('run.summary', { runId, purity: purity ? this.#o.purity.summaryOf(runId) : null, counts: this.#counts(runId), findings: db.get<{ n: number }>('SELECT count(*) AS n FROM findings f JOIN check_runs c ON c.id = f.check_run_id WHERE c.run_id = ?', runId)?.n ?? 0 });
     // Retention waits for the next run (or the weekly pass) when the app is quitting: the quit stays short.
     if (active.cancel !== 'app_quit') await evidence.retain(projectId).catch((e: unknown) => this.#o.logger.log('error', 'retention failed', { error: e instanceof Error ? e.message : String(e) }));
+  }
+
+  /**
+   * C-22 (DEV-9): one integrity check at the end of the run — the guard's effects (all of them), the state's
+   * movement, the reviews' validity, or the model claims' matching — judged by the integrity service and kept like
+   * any execution, with its evidence.
+   */
+  async #runIntegrity(active: Active, e: Exec, ctx: CheckContext, endManifest: Manifest, changedOutsideDeclared: readonly string[]): Promise<void> {
+    const { db, ports, evidence } = this.#o;
+    const runId = active.runId;
+    db.run("UPDATE check_runs SET state = 'running', started_at = ? WHERE id = ?", this.#now(), e.checkRunId);
+    this.#o.events.emit('check.state', this.#checkView(this.#checkRow(e.checkRunId)));
+    const spec = ctx.specs.get(e.instance);
+    if (!spec) return this.#finishCheck(e, 'unavailable', { key: 'run.reason.specMissing' }, null, []);
+    const started = ports.clock.now();
+    const t0 = ports.clock.monotonicMs();
+    const integ = this.#o.integrity;
+    let judgement: Judgement;
+    let extra: Record<string, unknown> | null = null;
+    if (spec.checkId === 'integ.guard') {
+      const g = integ.guardJudgement(spec, ctx.projectId, ctx.guard ?? { baseSnapshotIds: [], baseLost: true, result: null, markers: [], byInstance: new Map(), unattributed: [], expiredReviews: new Map() });
+      judgement = g.judgement;
+      extra = g.evidence;
+    } else if (spec.checkId === 'integ.state') {
+      judgement = integ.stateJudgement(spec, ctx.projectId, changedOutsideDeclared);
+      extra = { changed: changedOutsideDeclared };
+    } else if (spec.checkId === 'integ.reviews') judgement = await integ.reviewsJudgement(spec, ctx.projectId, endManifest);
+    else if (spec.checkId === 'integ.model-claims') judgement = integ.claimsJudgement(spec, ctx.projectId, runId);
+    else return this.#finishCheck(e, 'unavailable', { key: 'run.reason.runnerUnavailable', params: { runner: spec.runner.ids.join(',') || spec.runner.kind } }, null, []);
+    const raw: RawCheckResult = {
+      checkRunId: e.checkRunId,
+      runId,
+      instance: e.instance,
+      checkId: spec.checkId,
+      component: spec.component,
+      attempt: this.#checkRow(e.checkRunId).attempt,
+      ended: 'exited',
+      exitCode: null,
+      signal: null,
+      spawnError: null,
+      startedAt: started.toISOString(),
+      finishedAt: ports.clock.now().toISOString(),
+      durationMs: Math.max(0, Math.round(ports.clock.monotonicMs() - t0)),
+      command: null,
+      envKeys: [],
+      toolVersions: { [`integrity:${spec.runner.ids[0] ?? spec.checkId}`]: judgement.report?.readerVersion ?? '' },
+      logs: { stdout: null, stderr: null },
+      reports: [],
+      tail: [],
+      lastActivityAt: null,
+      sideEffects: null,
+      resources: { samples: 0, peakRssKb: 0, maxCpuPercent: 0, lastCpuPercent: 0 },
+      sleepGaps: [],
+      leftovers: { groupKilled: 0, tokenKilled: 0, escapeSuspected: [] },
+      notes: [],
+      sharedFrom: null,
+      internal: { runner: spec.runner.ids[0] ?? spec.checkId, version: judgement.report?.readerVersion ?? '' },
+    };
+    const evidenceIds: string[] = [];
+    const redactor = this.#o.redaction.redactor();
+    await evidence.store.open(ctx.projectId, runId, e.checkRunId);
+    if (judgement.report) evidenceIds.push((await evidence.store.add({ projectId: ctx.projectId, runId, checkRunId: e.checkRunId, name: 'parsed.json', kind: 'parsed', data: reportEvidence(redactor.redactJson(judgement.report)), redacted: true })).id);
+    if (extra) evidenceIds.push((await evidence.store.add({ projectId: ctx.projectId, runId, checkRunId: e.checkRunId, name: 'integrity.json', kind: 'integrity', data: new TextEncoder().encode(JSON.stringify(redactor.redactJson(extra as JsonValue), null, 2)), redacted: true })).id);
+    this.#finishCheck(e, judgement.outcome, judgement.reason, raw, [], undefined, undefined, { judgement, evidenceIds, reader: judgement.report ? { id: judgement.report.reader, version: judgement.report.readerVersion, formats: judgement.report.formats } : null });
   }
 
   /** The specs as the project's files say now, or null when they cannot be read (the caller fails closed). */
@@ -877,7 +973,7 @@ export class RunService {
       outputs: ctx.outputs,
       startedAt: startedWall.getTime(),
     };
-    const judgement = await this.#o.verdict.judge(spec, { projectId: ctx.projectId, root: ctx.root, req, signal: active.quit.signal });
+    const judgement = await this.#o.verdict.judge(spec, { projectId: ctx.projectId, root: ctx.root, req, signal: active.quit.signal, guard: this.#o.integrity.effectsOn(ctx.guard, e.instance) });
     if (judgement.outcome === 'cancelled') return this.#finishCheck(e, 'cancelled', { key: 'run.reason.appQuit' }, raw, notes, r);
     const evidenceIds = refs.filter((x) => x.kind === 'report').map((x) => x.id);
     if (judgement.report) evidenceIds.push((await add('parsed.json', 'parsed', reportEvidence(redactor.redactJson(judgement.report)))).id);
@@ -1063,7 +1159,7 @@ export class RunService {
     if (run.failure && ['unavailable', 'probe_failed', 'not_ready', 'probe_exited'].includes(run.failure.code)) return this.#finishCheck(e, 'unavailable', { key: 'probe.reason.processFailed', params: { detail: run.failure.detail.slice(0, 300) } }, raw, notes);
 
     const req: JudgeRequest = { kind: 'probe', outcomePath: evidence.store.absolute(outcomeRef.relPath), files: ctx.inventory, facts };
-    const judgement = await this.#o.verdict.judge(spec, { projectId: ctx.projectId, root: ctx.root, req, signal: active.quit.signal });
+    const judgement = await this.#o.verdict.judge(spec, { projectId: ctx.projectId, root: ctx.root, req, signal: active.quit.signal, guard: this.#o.integrity.effectsOn(ctx.guard, e.instance) });
     if (judgement.outcome === 'cancelled') return this.#finishCheck(e, 'cancelled', { key: 'run.reason.appQuit' }, raw, notes);
     const evidenceIds = refs.filter((r) => r.kind === 'probe' || r.kind === 'probe_log').map((r) => r.id);
     if (judgement.report) evidenceIds.push((await evidence.store.add({ projectId: ctx.projectId, runId, checkRunId: e.checkRunId, name: 'parsed.json', kind: 'parsed', data: reportEvidence(redactor.redactJson(judgement.report)), redacted: true })).id);
@@ -1097,11 +1193,11 @@ export class RunService {
       const now = new Map(ctx.lastManifest.files.map((f) => [f[0], f[5]]));
       const before = new Map((then?.files ?? []).map((f) => [f[0], f[5]]));
       const changed = !then || files.some((f) => before.get(f) !== now.get(f));
-      why = changed ? 'expired' : row.decision === 'passed' ? null : `decision:${row.decision}`;
+      why = changed ? 'expired' : row.decision === 'accept' || row.decision === 'passed' ? null : `decision:${row.decision}`;
     }
     const report = { reader: 'human-review', readerVersion: '1.0.0', formats: [], tests: null, findings: [] as ParsedReport['findings'], findingsDropped: 0, signals: { noInputs: false, collectionError: false, configError: false, flaky: false, unresolved: 0 }, problems: [], info: { review: row?.id ?? null, recordedAt: row?.created_at ?? null } } satisfies ParsedReport;
     if (why) report.findings.push({ rule: 'review.pending', toolRule: null, severity: null, proof: null, level: null, origin: 'project', message: why === 'none' ? 'no human accessibility review is recorded for this interface' : why === 'expired' ? 'the recorded review no longer holds: files of its scope changed since' : `the recorded review decided ${why.slice('decision:'.length)}`, location: null, anchor: { kind: 'text', value: `review|${e.instance}` }, expected: null, actual: null });
-    const judgement = this.#o.verdict.classifyReport(spec, { projectId: ctx.projectId, report, exit: { kind: 'ok' }, anchors: report.findings.map(() => createHash('sha256').update(`text\nreview|${e.instance}`).digest('hex')), guardTouches: false });
+    const judgement = this.#o.verdict.classifyReport(spec, { projectId: ctx.projectId, report, exit: { kind: 'ok' }, anchors: report.findings.map(() => createHash('sha256').update(`text\nreview|${e.instance}`).digest('hex')), guard: this.#o.integrity.effectsOn(ctx.guard, e.instance) });
     this.#finishCheck(e, judgement.outcome, judgement.reason, null, [], undefined, undefined, { judgement, evidenceIds: [], reader: { id: 'human-review', version: '1.0.0', formats: [] } });
   }
 
@@ -1158,7 +1254,7 @@ export class RunService {
     if (active.cancel || active.cancelledChecks.has(e.checkRunId)) ctrl.abort();
     const started = ports.clock.now();
     const t0 = ports.clock.monotonicMs();
-    const judgement = await this.#o.verdict.judge(spec, { projectId: ctx.projectId, root: ctx.root, req: { kind: 'analyze', analyzer, files, facts }, signal: AbortSignal.any([ctrl.signal, active.quit.signal]) }).finally(() => active.waiting.delete(e.checkRunId));
+    const judgement = await this.#o.verdict.judge(spec, { projectId: ctx.projectId, root: ctx.root, req: { kind: 'analyze', analyzer, files, facts }, signal: AbortSignal.any([ctrl.signal, active.quit.signal]), guard: this.#o.integrity.effectsOn(ctx.guard, e.instance) }).finally(() => active.waiting.delete(e.checkRunId));
     active.collecting.add(e.checkRunId);
     if (judgement.outcome === 'cancelled') return this.#finishCheck(e, 'cancelled', { key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }, null, []);
     const raw: RawCheckResult = {
@@ -1236,7 +1332,7 @@ export class RunService {
     const reason: Reason = { key: 'plan.reason.sharesExecution', params: { with: source.instance } };
     const spec = ctx.specs.get(e.instance);
     if (!source.judged || !spec) return this.#finishCheck(e, source.outcome, source.outcome === null ? null : reason, raw, raw?.notes ?? [], undefined, source.ok);
-    const judgement = await this.#o.verdict.judge(spec, { projectId: ctx.projectId, root: ctx.root, req: source.judged.req, signal: active.quit.signal });
+    const judgement = await this.#o.verdict.judge(spec, { projectId: ctx.projectId, root: ctx.root, req: source.judged.req, signal: active.quit.signal, guard: this.#o.integrity.effectsOn(ctx.guard, e.instance) });
     if (judgement.outcome === 'cancelled') return this.#finishCheck(e, 'cancelled', { key: 'run.reason.appQuit' }, raw, raw?.notes ?? []);
     this.#finishCheck(e, judgement.outcome, judgement.reason, raw, raw?.notes ?? [], undefined, undefined, { judgement, evidenceIds: source.judged.evidenceIds, reader: judgement.report ? { id: judgement.report.reader, version: judgement.report.readerVersion, formats: judgement.report.formats } : null });
   }
@@ -1273,7 +1369,7 @@ export class RunService {
     db.transaction(() => {
       if (verdict) this.#o.verdict.persist({ projectId: this.#projectOf(row.run_id), runId: row.run_id, checkRunId: e.checkRunId, spec: { checkId: e.item.checkId, component: e.item.component, section: e.item.section }, judgement: verdict.judgement, evidenceIds: verdict.evidenceIds });
       db.run(
-        'UPDATE check_runs SET state = ?, outcome = ?, auto_outcome = ?, outcome_reason = ?, origin = ?, findings_json = ?, reader_json = ?, finished_at = ?, duration_ms = ?, exit_code = ?, signal = ?, env_keys_json = ?, tool_versions_json = ?, resource_json = ?, sleep_gaps_json = ?, last_activity_at = coalesce(?, last_activity_at), raw_json = ?, notes_json = ? WHERE id = ?',
+        'UPDATE check_runs SET state = ?, outcome = ?, auto_outcome = ?, outcome_reason = ?, origin = ?, findings_json = ?, reader_json = ?, tests_json = ?, finished_at = ?, duration_ms = ?, exit_code = ?, signal = ?, env_keys_json = ?, tool_versions_json = ?, resource_json = ?, sleep_gaps_json = ?, last_activity_at = coalesce(?, last_activity_at), raw_json = ?, notes_json = ? WHERE id = ?',
         'finished',
         outcome,
         outcome,
@@ -1281,6 +1377,7 @@ export class RunService {
         origin,
         verdict ? JSON.stringify(verdict.judgement.counts) : null,
         verdict?.reader ? JSON.stringify({ ...verdict.reader, dropped: verdict.judgement.report?.findingsDropped ?? 0 }) : null,
+        verdict?.judgement.report?.tests ? JSON.stringify(this.#o.redaction.redactor().redactJson(verdict.judgement.report.tests)) : null,
         this.#now(),
         r?.durationMs ?? raw?.durationMs ?? null,
         raw?.exitCode ?? null,
@@ -1431,6 +1528,13 @@ export class RunService {
     }
     await Promise.all([...this.#queued.values()].map((p) => p.catch(() => {})));
     return { cancelledRuns: runs.length, cancelledChecks: checks };
+  }
+
+  /** DEV-9 (FR-34): a review changed an execution's outcome; the UI hears it as a state change. */
+  emitAfterReview(runId: string, checkRunId: string): void {
+    const row = this.#o.db.get<CheckRunRow>('SELECT * FROM check_runs WHERE id = ?', checkRunId);
+    if (row) this.#o.events.emit('check.state', this.#checkView(row));
+    if (this.#o.db.get('SELECT id FROM runs WHERE id = ?', runId)) this.#emitRun(runId);
   }
 
   // ── views ────────────────────────────────────────────────────────────────────────────────────────────────
