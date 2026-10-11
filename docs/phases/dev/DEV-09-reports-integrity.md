@@ -10,9 +10,9 @@ depends_on: [DEV-6, DEV-7, DEV-8]
 design_gates: []
 owner_gates: [Q-03]
 owner_inputs: [Q-06]
-model: Claude Fable 5.1
+model: Claude Opus 5.5
 effort: xhigh
-model_reason: التقارير والنزاهة والادعاءات: خطأ واحد يحوّل ادعاءً إلى اجتياز
+model_reason: التقارير والنزاهة والادعاءات: خطأ واحد يحوّل ادعاءً إلى اجتياز. وكانت لـ Fable 5.1، فتُنفَّذ بـ Opus 5.5 مع جولة فحص قبل الدمج (ORG-17، ORG-15)
 scope: [packages/engine/, packages/catalog/, packages/protocol/, packages/i18n/, apps/desktop/src/main/, apps/desktop/test/, tools/cli/, package-lock.json]
 goal: إكمال الدورة في المحرك — تقرير report/1 بصيغتي «لك» و«للنموذج» مع تحقق التطابق، وتوجيه الإصلاح، وحارس النزاهة وإعادة الفحص واستكمال الجولة والمقارنة، وتحقق البطاقات، وفحوص النموذج بملفات تعليماتها وادعاءاتها، والتصدير دون أسرار.
 start:

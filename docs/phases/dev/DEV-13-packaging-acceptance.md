@@ -10,9 +10,9 @@ depends_on: [DEV-12]
 design_gates: []
 owner_gates: []
 owner_inputs: [Q-07]
-model: Claude Fable 5.1
+model: Claude Opus 5.5
 effort: xhigh
-model_reason: قبول شامل ومعايرة وتشخيص إخفاقات عبر النظام كله
+model_reason: قبول شامل ومعايرة وتشخيص إخفاقات عبر النظام كله. وكانت لـ Fable 5.1، فتُنفَّذ بـ Opus 5.5 مع جولة فحص قبل الدمج (ORG-17، ORG-15)
 scope: [apps/, packages/, tools/, fixtures/, docs/acceptance/, package.json, package-lock.json]
 goal: تحقيق تعريف اكتمال الإصدار الأول (الخطة 25) — حزمة .app موقعة محليًا قابلة لإعادة البناء، ومعايرة الأداء والتوازي والتخزين، ونجاح اختبارات القبول الثمانية والأربعين كلها ومنها اختبارات جهاز المالك والقارئ البشري، وفحص عِيَار لمستودعه نفسه.
 start:
