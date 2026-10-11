@@ -2,7 +2,7 @@
 // Protocol 1.3 (DEV-6) gives results.query and finding.get their contracts: the filters, the page of unified
 // findings with what is gone since the previous comparable execution («زال»), and one finding with its history.
 import { Id, IsoTimestamp } from '../common.ts';
-import { FindingDetail, ResultsFilter, ResultsPage } from '../domain/findings.ts';
+import { CheckReport, FindingDetail, ResultsFilter, ResultsPage } from '../domain/findings.ts';
 import { z } from '../zod.ts';
 import { defineCommand } from './define.ts';
 
@@ -27,6 +27,12 @@ export const resultCommands = {
     payload: z.strictObject({ checkRunId: Id, maxLines: z.int().min(1).max(200).optional() }),
     result: z.strictObject({ lines: z.array(z.string().max(20_000)), totalLines: z.int().nonnegative(), live: z.boolean() }),
   }),
+  /**
+   * Protocol 1.7 (DEV-12, D-DEV12-01): a check execution's unified report without its findings (test counts, signals,
+   * the reader's facts) and the declared outputs it wrote with their sizes, for the section pages' panels (13.3).
+   * Null when the execution kept no unified report (it never ran, or nothing was read).
+   */
+  'check.report': defineCommand({ ...base, since: '1.7', implementedIn: 'DEV-12', payload: z.strictObject({ checkRunId: Id }), result: CheckReport.nullable() }),
   // A short-lived token for ayar-evidence:// (C-01); an invalid token answers "not found" without a path.
   'evidence.token': defineCommand({
     ...base,

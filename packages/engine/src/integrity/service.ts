@@ -17,7 +17,7 @@
 // Nothing here changes the outcome of another check except by the guard's attached findings (7.3 rule 8) and the
 // reviews' expiry (11.4 rule 6); a model claim never changes a result (D-41).
 import type { Catalog } from '@ayar/catalog';
-import type { CheckOutcome, CheckSpec, FindingLocation, ParsedFinding, ParsedReport, PlanItem, Reason } from '@ayar/protocol';
+import type { CheckOutcome, CheckSpec, FindingLocation, JsonValue, ParsedFinding, ParsedReport, PlanItem, Reason } from '@ayar/protocol';
 import { createHash } from 'node:crypto';
 import type { WeighedFinding } from '../classifier/classify.ts';
 import type { EvidenceService } from '../evidence/service.ts';
@@ -208,7 +208,7 @@ export class IntegrityService {
   // ── the four checks at the end of the run ─────────────────────────────────────────────────────────────────
 
   /** A judgement for an integrity check: every finding «review» (suspected), the outcome given, no classifier. */
-  judgement(spec: CheckSpec, projectId: string, pairs: readonly { finding: ParsedFinding; anchor: string }[], outcome: CheckOutcome, reason: Reason, info: Record<string, string | number | boolean | null> = {}): Judgement {
+  judgement(spec: CheckSpec, projectId: string, pairs: readonly { finding: ParsedFinding; anchor: string }[], outcome: CheckOutcome, reason: Reason, info: Record<string, JsonValue> = {}): Judgement {
     const book = this.#o.catalog.rules;
     const prints = pairs.map((p) => fingerprintOf(spec.checkId, p.finding, p.anchor));
     const excluded = this.#o.verdict.falseAlarms(projectId, prints);
@@ -239,7 +239,9 @@ export class IntegrityService {
     if (ctx.baseLost && !n) return { judgement: this.judgement(spec, projectId, [], 'needs_review', { key: 'integrity.reason.guardBaseLost' }, { bases: ctx.baseSnapshotIds.length }), evidence };
     const outcome: CheckOutcome = n ? 'needs_review' : 'passed';
     const reason: Reason = n ? { key: 'integrity.reason.guardFindings', params: { count: n, files: ctx.result?.changed.length ?? 0 } } : { key: 'integrity.reason.guardClean', params: { files: ctx.result?.changed.length ?? 0 } };
-    return { judgement: this.judgement(spec, projectId, pairs, outcome, reason, { bases: ctx.baseSnapshotIds.length, compared: ctx.result?.compared ?? 0 }), evidence };
+    // The check each effect touches (C-22 «الربط»), for the page, even when that check did not run this time (DEV-12).
+    const links = (ctx.result?.findings ?? []).slice(0, MAX_FINDINGS).map((f) => ({ rule: f.rule, path: f.path, line: f.line ?? null, check: f.check }));
+    return { judgement: this.judgement(spec, projectId, pairs, outcome, reason, { bases: ctx.baseSnapshotIds.length, compared: ctx.result?.compared ?? 0, links }), evidence };
   }
 
   /** integ.state at the end (9.9, 11.4 rule 8): the files that changed outside the declared outputs. */

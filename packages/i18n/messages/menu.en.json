@@ -15,5 +15,17 @@
   "menu.window.minimize": "Minimize",
   "menu.window.zoom": "Zoom",
   "menu.window.close": "Close Window",
-  "menu.window.front": "Bring All to Front"
+  "menu.window.front": "Bring All to Front",
+  "menu.about.credits": "Designed and developed by Sultan",
+  "menu.link.title": "Open the link in your browser?",
+  "menu.link.detail": "Your browser will open {address}. AYAR sends nothing with it.",
+  "menu.link.open": "Open",
+  "menu.link.cancel": "Cancel",
+  "menu.editor.title": "Open the file with the editor command?",
+  "menu.editor.detail": "AYAR will run this command from the settings, without a shell: {command}",
+  "menu.editor.open": "Open",
+  "menu.notify.finished": "{kind} finished",
+  "menu.notify.verdict": "{kind} finished: {verdict}",
+  "menu.notify.cancelled": "{kind} cancelled",
+  "menu.notify.body": "Open AYAR to read the results."
 }

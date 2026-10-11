@@ -1,0 +1,20 @@
+{
+  "runsui.subtitle": "The last {count} runs of this project are kept, and a run kept forever is never deleted. Choose two runs to compare them.",
+  "runsui.compare": "Compare the selected ({count})",
+  "runsui.run": "Run and date",
+  "runsui.kind": "Kind",
+  "runsui.verdict": "Verdict and karat",
+  "runsui.counts": "Counts",
+  "runsui.duration": "Duration",
+  "runsui.commit": "Commit and profile",
+  "runsui.choose": "Select {run} to compare",
+  "runsui.cancelled": "cancelled",
+  "runsui.karat": "Karat {karat}",
+  "runsui.notFull": "— not a full scan",
+  "runsui.profile": "Profile {version}",
+  "runsui.keep": "Keep forever",
+  "runsui.kept": "Kept forever",
+  "runsui.delete": "Delete",
+  "runsui.footer": "The karat and the verdict belong to a full scan alone, and a cancelled run has no karat. «Delete» asks to confirm.",
+  "runsui.empty": "No runs yet. Start the full scan from the title bar."
+}

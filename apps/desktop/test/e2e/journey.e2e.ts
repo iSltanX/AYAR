@@ -102,6 +102,8 @@ beforeAll(async () => {
   run = await launch(t.dataDir);
   await invoke('settings.set', { key: 'ui.language', value: 'ar' });
   await invoke('settings.set', { key: 'environment.shell', value: loginShell(t.root) });
+  // No system notification from the test runs (13.3 «الإشعارات», DEV-12).
+  await invoke('settings.set', { key: 'run.notify', value: false });
   await run.app.evaluate(({ clipboard: c }) => c.writeText(''));
   await run.page.reload();
   await run.page.waitForLoadState('load');

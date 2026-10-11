@@ -19,7 +19,9 @@
   import { bySection, checkTitle, clockMs, costOf, readinessOf, reasonText, sectionTitle } from '../app/format.ts';
   import { argvText, commandOf } from '../app/specs.ts';
   import { useApp } from '../app/state.svelte.ts';
+  import PlanMissing from './parts/PlanMissing.svelte';
   import SetupFlow from './parts/SetupFlow.svelte';
+  import NoApplicableState from './states/NoApplicableState.svelte';
 
   let { projectId }: { projectId: string } = $props();
   const app = useApp();
@@ -95,6 +97,14 @@
     app.navigate({ name: 'scan', projectId, runId: r.result.runId });
   }
 
+  /**
+   * 22.4: the checks that run on any folder (secrets, local references, the integrity checks): a plan with nothing
+   * else found nothing to measure the project by, and AYAR does not invent a criterion for what it does not know.
+   */
+  const GENERIC = new Set(['sec.secrets.files', 'sec.secrets.history', 'code.refs.local', 'integ.guard', 'integ.state', 'integ.model-claims', 'integ.reviews']);
+  const nothingApplies = $derived(!!plan && rows.every((i) => GENERIC.has(i.checkId)));
+  const stillRuns = $derived((plan?.items ?? []).filter((i) => RUNS.has(i.status) && GENERIC.has(i.checkId) && !i.checkId.startsWith('integ.')).map((i) => i.checkId));
+
   const toggle = (instance: string) => (expanded = expanded.includes(instance) ? expanded.filter((x) => x !== instance) : [...expanded, instance]);
 </script>
 
@@ -108,7 +118,10 @@
     <Banner kind="needs-approval" count={needsApproval.length} message={t('scanplan.approvalAlert', { count: needsApproval.length })} actionLabel={t('ui.action.approveNow')} onshowdiff={() => app.navigate({ name: 'profile', projectId })} />
   {/if}
 
-  {#if plan}
+  {#if plan && nothingApplies}
+    <NoApplicableState {projectId} running={stillRuns} onreread={() => void load()} />
+  {:else if plan}
+    {#if missingItems.length}<PlanMissing {projectId} items={missingItems} {profile} onsetup={() => (setupOpen = true)} onchanged={() => void load()} />{/if}
     <section class="card summary" aria-label={t('scanplan.title')}>
       <div class="summary-row">
         <p class="summary-text">{summary}</p>

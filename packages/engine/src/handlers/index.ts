@@ -1,15 +1,16 @@
 // The engine's handler table. Each phase adds the handlers of its commands here, one line per command.
 import type { HandlerTable } from '../host/dispatcher.ts';
-import { advisorSuggest, taskCreate, tasksList } from './advisor.ts';
+import { advisorSuggest, taskCreate, tasksGaps, tasksList } from './advisor.ts';
+import { dataPurge } from './data.ts';
 import { environmentResolve } from './environment.ts';
 import { evidenceToken, internalEvidencePath } from './evidence.ts';
-import { profileApprove, profileExport, profileExportPreview, profileGet, profileImport, profileImportFromRepo, profilePropose, profileUpdate } from './profile.ts';
+import { profileApprove, profileExport, profileExportPreview, profileGet, profileImport, profileImportFromRepo, profilePropose, profileUpdate, profileVersionsList } from './profile.ts';
 import { projectAdd, projectCancelDiscovery, projectConfirm, projectGet, projectList, projectRelocate, projectRemove, projectRename, projectRescan, projectSetTrust } from './projects.ts';
-import { checkTail, groupsDelete, groupsList, groupsSave, internalPrepareQuit, runCancel, runContinueRound, runGet, runPlan, runRerun, runsDelete, runsKeep, runsList, runStart } from './runs.ts';
+import { checkReport, checkTail, groupsDelete, groupsList, groupsSave, internalPrepareQuit, runCancel, runContinueRound, runGet, runPlan, runRerun, runsDelete, runsKeep, runsList, runStart } from './runs.ts';
 import { findingGet, resultsQuery } from './results.ts';
 import { baselineApprove, baselinesList, capturesList } from './probe.ts';
 import { settingsGet, settingsSet } from './settings.ts';
-import { compareRuns, internalClipboardText, internalRecordCopy, reportBuild, reportExport, reportsList, tasksVerify, taskUpdate } from './reports.ts';
+import { compareRuns, internalClipboardText, internalRecordCopy, reportBuild, reportExport, reportsCopies, reportsList, tasksVerify, taskUpdate } from './reports.ts';
 import { reviewRecord, reviewsList } from './reviews.ts';
 import { aiChecksGenerate, aiChecksGet, aiChecksImportResults, aiChecksList, aiChecksNeeds, aiChecksProvideInput, aiChecksSave } from './ai-checks.ts';
 import { readinessEvaluate, setupExecute, setupPreview, toolsInstall, toolsList, toolsPreview, toolsRemove, toolsVerify } from './setup.ts';
@@ -39,6 +40,7 @@ export const HANDLERS: HandlerTable = {
   'advisor.suggest': advisorSuggest,
   'task.create': taskCreate,
   'tasks.list': tasksList,
+  'tasks.gaps': tasksGaps,
   // DEV-5
   'readiness.evaluate': readinessEvaluate,
   'setup.preview': setupPreview,
@@ -56,6 +58,11 @@ export const HANDLERS: HandlerTable = {
   'runs.list': runsList,
   'run.get': runGet,
   'check.tail': checkTail,
+  // DEV-12 (protocol 1.7)
+  'check.report': checkReport,
+  'profile.versions': profileVersionsList,
+  'data.purge': dataPurge,
+  'reports.copies': reportsCopies,
   'runs.keep': runsKeep,
   'runs.delete': runsDelete,
   'groups.save': groupsSave,

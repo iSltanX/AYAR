@@ -1,5 +1,6 @@
 {
   "run.reason.cancelledByUser": "Cancelled at your request",
+  "run.reason.diskFull": "Cancelled because the disk was almost full: AYAR stopped the run safely before a write could fail",
   "run.reason.appQuit": "Cancelled because the app quit",
   "run.reason.engineStopped": "Interrupted: the engine stopped during the check",
   "run.reason.runInterrupted": "Not started: the run was interrupted before it",

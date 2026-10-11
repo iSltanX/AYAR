@@ -11,6 +11,7 @@
   "aichecks.reason.manyComponents": "بنية واسعة: {count} مجلدًا علويًا",
   "aichecks.notApplicable.testsCover": "لا ينطبق: لكل وحدة منطق ملف اختبار، وbeh.unit يعمل",
   "aichecks.notApplicable.noLogic": "لا ينطبق: لا ملفات منطق في المشروع",
+  "aichecks.notApplicable.notRead": "لا يُحسم بعد: لم يقرأ عِيَار ملفات المشروع؛ شغّل فحصًا أولًا",
   "aichecks.notApplicable.noThreatSurface": "لا ينطبق: لا جمهور عام ولا صلاحيات واسعة ولا مدخلات غير موثوقة مكتشفة",
   "aichecks.notApplicable.noScripts": "لا ينطبق: لا سكربتات مكتشفة لمقارنتها بالتوثيق",
   "aichecks.notApplicable.noReadme": "لا ينطبق: لا README في المشروع",

@@ -11,6 +11,7 @@
   "aichecks.reason.manyComponents": "A wide structure: {count} top-level folders",
   "aichecks.notApplicable.testsCover": "Not applicable: every logic unit has a test file, and beh.unit runs",
   "aichecks.notApplicable.noLogic": "Not applicable: no logic files in the project",
+  "aichecks.notApplicable.notRead": "Not decided yet: AYAR has not read the project files; run a check first",
   "aichecks.notApplicable.noThreatSurface": "Not applicable: no public audience, no broad permissions, no untrusted input detected",
   "aichecks.notApplicable.noScripts": "Not applicable: no scripts detected to compare with the documentation",
   "aichecks.notApplicable.noReadme": "Not applicable: no README in the project",

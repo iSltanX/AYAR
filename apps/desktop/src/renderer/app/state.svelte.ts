@@ -3,12 +3,12 @@
 // primary action, its inspector, its search). Screens read and set it; the engine stays the source of truth.
 import { getContext, setContext, type Snippet } from 'svelte';
 import { createTranslator, resolveLanguage, type Lang, type Translate } from '@ayar/i18n';
-import type { EngineHealth, PendingConfirmation, Project, ProtectedLocation } from '@ayar/protocol';
-import type { ToastMessage, WindowControls } from '../lib/shell.ts';
+import type { AdvisorContext, AdvisorResult, EngineHealth, PendingConfirmation, Project, ProtectedLocation } from '@ayar/protocol';
+import type { NAV_SECTIONS, ToastMessage, WindowControls } from '../lib/shell.ts';
 import { attempt, on } from './client.ts';
 import { RunTracker } from './runs.svelte.ts';
 
-/** The pages of DEV-11 (13.1): the project list, adding and discovery, and one project's journey. */
+/** The pages (13.1): the project list, adding and discovery, one project's journey (DEV-11), and the rest (DEV-12). */
 export type Route =
   | { name: 'projects' }
   | {
@@ -25,7 +25,23 @@ export type Route =
   | { name: 'profile'; projectId: string }
   | { name: 'overview'; projectId: string }
   /** «الفحص الكامل»: the plan, or a run's monitor while it runs and its results after (13.3, three modes). */
-  | { name: 'scan'; projectId: string; runId: string | null };
+  | { name: 'scan'; projectId: string; runId: string | null }
+  // DEV-12 (13.3, screens 9–22): the seven sections, the model checks, the tasks and the advisor, the runs and the
+  // comparison, the project's configuration by tab, and at the app level the tools and the settings.
+  | { name: 'section'; projectId: string; section: SectionId }
+  | { name: 'modelChecks'; projectId: string }
+  | { name: 'tasks'; projectId: string; advisor: 'inputs' | 'outputs' | null }
+  | { name: 'runs'; projectId: string }
+  | { name: 'compare'; projectId: string; fromRunId: string; toRunId: string }
+  | { name: 'config'; projectId: string; tab: ConfigTab }
+  | { name: 'tools' }
+  | { name: 'settings' };
+
+/** The seven sections of the sidebar (13.3 «صفحة القسم»), as the protocol names them. */
+export type SectionId = (typeof NAV_SECTIONS)[number];
+/** Screen 19's tabs, in the design's order. */
+export const CONFIG_TABS = ['file', 'checks', 'environment', 'references', 'context', 'approval', 'services', 'trust'] as const;
+export type ConfigTab = (typeof CONFIG_TABS)[number];
 
 export interface PrimaryAction {
   label: string;
@@ -36,6 +52,14 @@ export interface PrimaryAction {
 export type ThemeSetting = 'system' | 'light' | 'dark';
 
 const KEY = Symbol('ayar.app');
+
+export interface RunContext {
+  /** The section's id in the sidebar (custom checks included), for the menu's «القسم الحالي». */
+  section: string;
+  selected: number;
+  runSection: () => void;
+  runSelected: () => void;
+}
 
 export class AppState {
   lang = $state<Lang>('ar');
@@ -60,6 +84,15 @@ export class AppState {
   announcement = $state('');
   /** The cancel confirmation (13.4 «ألغِ التشغيل»), opened from the run bar, the monitor or ⌘. */
   confirmCancel = $state(false);
+  /**
+   * What the Run menu (C-23) runs on this page: a section page names its section and how many checks are selected,
+   * and runs them itself (it holds the selection). Null elsewhere.
+   */
+  runContext = $state<RunContext | null>(null);
+  /** 17.3–17.4: the advisor's last context and advice, kept while the app is open («عدّل المدخلات» returns to it). */
+  advisor = $state<{ projectId: string; context: AdvisorContext; result: AdvisorResult } | null>(null);
+  /** «أعد الفاشل»/«أعد غير المكتمل» chosen away from the results: the results page opens its sheet once it shows. */
+  pendingRerun = $state<'failed' | 'incomplete' | null>(null);
 
   #toastTimer: ReturnType<typeof setTimeout> | null = null;
   #unsubscribe: (() => void)[] = [];
@@ -99,6 +132,19 @@ export class AppState {
   destroy(): void {
     for (const u of this.#unsubscribe.splice(0)) u();
     this.runs.stop();
+  }
+
+  /** 21 «عام»: the language and the appearance read again after the settings changed them, applied at once. */
+  async applySettings(): Promise<void> {
+    const settings = await attempt('settings.get', { keys: ['ui.language', 'ui.theme'] });
+    if (!settings.ok) return;
+    this.languageSetting = settings.result.values['ui.language'] ?? 'system';
+    this.themeSetting = settings.result.values['ui.theme'] ?? 'system';
+    const lang = resolveLanguage(this.languageSetting, navigator.languages);
+    // An announcement said in the other language is not repeated in this one (AT-28: the whole interface switches).
+    if (lang !== this.lang) this.announcement = '';
+    this.lang = lang;
+    this.applyTheme();
   }
 
   applyTheme(): void {

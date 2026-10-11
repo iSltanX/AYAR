@@ -173,6 +173,7 @@ export type CaptureView = z.infer<typeof CaptureView>;
 
 /** A state with no image (G-29): shown in the gallery with its reason, never captured. */
 export const UncapturedView = z.strictObject({ state: Name, viewport: Name, theme: z.string(), lang: z.string(), reason: z.string() });
+export type UncapturedView = z.infer<typeof UncapturedView>;
 
 export const BaselineView = z.strictObject({
   id: Id,

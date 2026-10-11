@@ -393,6 +393,12 @@ function judgeExtension(i: ProbeJudgeInput, r: ParsedReport): ExitSignal {
       pushFinding(r, finding({ rule: 'ext.console-error', message: `${metas.get(res.index)?.path}: ${text}`, location: stateLocation(metas.get(res.index), place), anchor: { kind: 'state', value: k }, actual: text.slice(0, 500) }));
     }
   }
+  // DEV-12 (13.3 «نتائج المضيف»): the declared pages and whether each opened, with its console errors (facts for the panel).
+  r.info.pages = [...new Set(o.results.map((x) => metas.get(x.index)?.path).filter((p): p is string => !!p))].slice(0, 50).map((path) => {
+    const of = o.results.filter((x) => metas.get(x.index)?.path === path);
+    return { path, opened: of.every((x) => !x.error), consoleErrors: of.reduce((n, x) => n + x.console.filter((c) => c.level !== 'warning').length, 0) };
+  });
+  r.info.workerErrors = ext.workerConsole.filter((c) => c.level !== 'warning').length;
   for (const c of ext.workerConsole) {
     if (c.level === 'warning') continue;
     const k = `worker|${c.text.slice(0, 300)}`;

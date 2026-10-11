@@ -2,6 +2,7 @@
 // the system dialogs that mint path tokens, for a confirmation token after it showed a destructive action,
 // and for the supervisor's state. None of them returns a path.
 import { Id } from '../common.ts';
+import { RelPath } from '../domain/discovery.ts';
 import { DestinationToken, SelectionToken, SourceToken, ConfirmationToken } from '../tokens.ts';
 import { z } from '../zod.ts';
 import { defineCommand } from './define.ts';
@@ -10,6 +11,8 @@ import { EngineHealth } from '../events/engine.ts';
 const base = { owner: 'C-01', handler: 'main', audience: 'renderer', since: '1.0', implementedIn: 'DEV-3' } as const;
 /** Protocol 1.6 (DEV-11, D-DEV11-02): what the screens need from the main process and macOS itself. */
 const shell = { ...base, since: '1.6', implementedIn: 'DEV-11' } as const;
+/** Protocol 1.7 (DEV-12): the settings' «حول» (D-DEV12-02) and the privacy guide's «افتح الإعدادات» (13.5, 22.1). */
+const later = { ...base, since: '1.7', implementedIn: 'DEV-12' } as const;
 
 /**
  * One entry of a native menu the renderer asks for (D-DES3-07: context menus are macOS menus). The renderer sends
@@ -71,8 +74,11 @@ export const systemCommands = {
    * (never from the app's own language), so the title bar reserves that corner.
    */
   'window.layout': defineCommand({ ...shell, payload: z.strictObject({}), result: z.strictObject({ controls: z.enum(['left', 'right']) }) }),
-  /** 13.3 «أظهر في Finder»: the main process reads the project's folder from the engine; the UI sends its id only. */
-  'project.reveal': defineCommand({ ...shell, payload: z.strictObject({ projectId: Id }), result: z.strictObject({ revealed: z.literal(true) }) }),
+  /**
+   * 13.3 «أظهر في Finder»: the main process reads the project's folder from the engine; the UI sends its id only, and
+   * (protocol 1.7, DEV-12: 16.3) a file inside it, resolved inside the real root (one outside is never revealed).
+   */
+  'project.reveal': defineCommand({ ...shell, payload: z.strictObject({ projectId: Id, path: RelPath.optional() }), result: z.strictObject({ revealed: z.literal(true) }) }),
   /**
    * 13.3 «افتح في المحرر» (E-17): the file of a finding, resolved inside its project's real root by the main process,
    * opened with the default of E-17 (`open -t`). The editor template setting is DEV-12's.
@@ -95,4 +101,13 @@ export const systemCommands = {
     result: z.strictObject({ copied: z.literal(true) }),
   }),
   'engine.restart': defineCommand({ ...base, payload: z.strictObject({}), result: z.strictObject({ accepted: z.boolean() }) }),
+  /** D-DEV12-02: the app's version, its maker, and its repository's address, as the settings' «حول» shows them. */
+  'about.get': defineCommand({ ...later, payload: z.strictObject({}), result: z.strictObject({ version: z.string(), repository: z.string() }) }),
+  /**
+   * D-DEV12-02: opens the repository in the default browser after the user confirmed it in the main process's own
+   * alert (15.2); the address is the main process's, never the page's. `opened` is false when the user declined.
+   */
+  'about.openRepository': defineCommand({ ...later, payload: z.strictObject({}), result: z.strictObject({ opened: z.boolean() }) }),
+  /** 13.5 «إذن macOS مرفوض» (22.1): System Settings at Privacy & Security › Files and Folders. Nothing is granted by it. */
+  'system.openPrivacySettings': defineCommand({ ...later, payload: z.strictObject({}), result: z.strictObject({ opened: z.literal(true) }) }),
 };

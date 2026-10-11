@@ -12,8 +12,8 @@
 // (9.10). Every state change is saved before its event is sent.
 import type { Catalog } from '@ayar/catalog';
 import { adapterById } from '@ayar/adapters';
-import type { CheckOutcome, CheckRunDetail, CheckRunView, CheckSpec, EvidenceRef, JsonValue, ParsedReport, PlanItem, RawCheckResult, Reason, RunCounts, RunDetail, RunList, RunPlan, RunView, SideEffects, VerdictCounts } from '@ayar/protocol';
-import { RawCheckResult as RawSchema, RunPlan as PlanSchema } from '@ayar/protocol';
+import type { CheckOutcome, CheckReport, CheckRunDetail, CheckRunView, CheckSpec, EvidenceRef, JsonValue, ParsedReport, PlanItem, RawCheckResult, Reason, RunCounts, RunDetail, RunList, RunPlan, RunView, SideEffects, VerdictCounts } from '@ayar/protocol';
+import { A11Y_REVIEW_ITEMS, RawCheckResult as RawSchema, RunPlan as PlanSchema } from '@ayar/protocol';
 import { createHash } from 'node:crypto';
 import { posix } from 'node:path';
 import { computeChildEnv } from '../environment/child-env.ts';
@@ -29,6 +29,7 @@ import type { EnginePorts, FileWriter, Logger } from '../ports/index.ts';
 import { latestSnapshot } from '../profile/service.ts';
 import { approvalsOf, latestProfile } from '../profile/store.ts';
 import { stateSinceRound } from '../purity/since-round.ts';
+import { reviewItems } from '../reviews/service.ts';
 import type { PlannerService } from '../planner/service.ts';
 import type { ProjectsService } from '../projects/service.ts';
 import type { PurityService } from '../purity/service.ts';
@@ -54,6 +55,18 @@ import { buildJob, cellMeta } from '../probe/job.ts';
 import type { ProbeService } from '../probe/service.ts';
 import type { ProbeOutcome, VisualComparison } from '@ayar/probe';
 import type { GuardContext, IntegrityService } from '../integrity/service.ts';
+
+/** 13.5 «القرص ممتلئ» (DEV-12): the free space the data volume keeps; below it no further check starts. */
+export const DISK_RESERVE_BYTES = 300 * 1000 * 1000;
+
+/** Why a check ended «أُلغي» with its run: by the user, because the app quits, or because the disk ran low (DEV-12). */
+function cancelReasonOf(cancel: 'user' | 'app_quit' | 'disk_full' | null): Reason {
+  return { key: cancel === 'app_quit' ? 'run.reason.appQuit' : cancel === 'disk_full' ? 'run.reason.diskFull' : 'run.reason.cancelledByUser' };
+}
+
+/** A build's output inventory (DEV-12): at most this many files, this many folder levels deep. */
+const OUTPUT_INVENTORY_MAX = 200;
+const OUTPUT_INVENTORY_DEPTH = 4;
 
 /** check.tail's longest line (protocol 1.6): a longer one is cut and marked. */
 const TAIL_LINE_CHARS = 20_000;
@@ -93,6 +106,17 @@ export interface RunServiceOptions {
   afterRun?: (runId: string, projectId: string) => Promise<void>;
 }
 
+/** The commit of a run's `git_json` (18.1), or null outside a repository or before it was read. */
+function commitOf(json: string | null): string | null {
+  if (!json) return null;
+  try {
+    const c = (JSON.parse(json) as { commit?: unknown }).commit;
+    return typeof c === 'string' && /^[0-9a-f]{7,64}$/.test(c) ? c : null;
+  } catch {
+    return null;
+  }
+}
+
 interface RunRow {
   id: string;
   display_id: string;
@@ -111,6 +135,8 @@ interface RunRow {
   cancel_reason: string | null;
   prevent_sleep: number | null;
   state_changed: number | null;
+  profile_version: number | null;
+  git_json: string | null;
 }
 
 interface CheckRunRow {
@@ -180,7 +206,7 @@ interface Active {
   runId: string;
   projectId: string;
   plan: RunPlan;
-  cancel: 'user' | 'app_quit' | null;
+  cancel: 'user' | 'app_quit' | 'disk_full' | null;
   procs: Map<string, RunningProcess>;
   cancelledChecks: Set<string>;
   services: CompanionServices | null;
@@ -384,6 +410,9 @@ export class RunService {
     // 9.5 point 5 and C-12 point 3: every spec checked again against its approval, from the files as they are now.
     const approvals = approvalsOf(db, projectId);
     const fresh = await this.#freshSpecs(projectId);
+    // 18.1 «الالتزام»: the commit the run started on, as the same reading of the files found it.
+    const git = fresh ? this.#o.projects.lastGit(projectId) : null;
+    if (git) db.run('UPDATE runs SET git_json = ? WHERE id = ?', JSON.stringify(git), runId);
     const execs = new Map<string, Exec>();
     for (const c of this.#checkRows(runId)) {
       const instance = `${c.check_id}@${c.component}`;
@@ -447,7 +476,7 @@ export class RunService {
     const running = new Map<string, Promise<void>>();
     while (pending.length || running.size) {
       if (active.cancel) {
-        for (const x of pending.splice(0)) this.#finishCheck(execs.get(x)!, 'cancelled', { key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }, null, []);
+        for (const x of pending.splice(0)) this.#finishCheck(execs.get(x)!, 'cancelled', cancelReasonOf(active.cancel), null, []);
       }
       let progressed = false;
       for (let n = 0; n < pending.length; n++) {
@@ -504,6 +533,13 @@ export class RunService {
           if (heavy) break; // a heavy check waits for the others to drain, and nothing overtakes it (G-34)
           continue;
         }
+        // 13.5 «القرص ممتلئ» (DEV-12): before another check writes its logs and evidence, the data volume keeps its
+        // reserve; otherwise the run stops safely, its partial results kept, before a write can fail.
+        if (await this.#diskLow()) {
+          this.#o.logger.log('warn', 'the data volume is low: the run stops safely', { runId });
+          this.#requestCancel(active, 'disk_full');
+          break;
+        }
         e.state = 'running';
         pending.splice(n--, 1);
         progressed = true;
@@ -546,7 +582,7 @@ export class RunService {
       const e = execs.get(inst)!;
       if (e.state !== 'pending') continue;
       if (active.cancel) {
-        this.#finishCheck(e, 'cancelled', { key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }, null, []);
+        this.#finishCheck(e, 'cancelled', cancelReasonOf(active.cancel), null, []);
         continue;
       }
       await this.#runIntegrity(active, e, ctx, endManifest, [...change.created, ...change.modified, ...change.deleted].filter((p) => !ctx.declared(p))).catch((err: unknown) => {
@@ -668,6 +704,39 @@ export class RunService {
     return underAny([...this.#outputs(projectId), ...outputDirs]);
   }
 
+  /**
+   * The regular files under the declared output folders (the profile's `outputs` and the output folders discovery
+   * found), with their sizes: no link followed, at most OUTPUT_INVENTORY_MAX files, OUTPUT_INVENTORY_DEPTH levels deep.
+   */
+  async #outputInventory(ctx: CheckContext): Promise<{ path: string; size: number }[]> {
+    const { fs } = this.#o.ports;
+    const dirs = [...new Set([...ctx.outputs, ...(latestSnapshot(this.#o.db, ctx.projectId)?.inventory.outputDirs.map((d) => d.path) ?? [])])]
+      .map((d) => d.replace(/^\.\//, '').replace(/\/+$/, ''))
+      .filter((d) => d && d !== '.' && !d.startsWith('/') && !d.split('/').includes('..'));
+    const out: { path: string; size: number }[] = [];
+    const walk = async (rel: string, depth: number): Promise<void> => {
+      if (out.length >= OUTPUT_INVENTORY_MAX || depth > OUTPUT_INVENTORY_DEPTH) return;
+      const entries = await fs.readdirEntries(posix.join(ctx.root, rel)).catch(() => []);
+      for (const e of [...entries].sort((a, b) => (a.name < b.name ? -1 : 1))) {
+        if (out.length >= OUTPUT_INVENTORY_MAX) return;
+        const child = posix.join(rel, e.name);
+        if (e.kind === 'directory') await walk(child, depth + 1);
+        else if (e.kind === 'file') {
+          const st = await fs.lstat(posix.join(ctx.root, child));
+          if (st?.isFile) out.push({ path: child, size: st.size });
+        }
+      }
+    };
+    for (const d of dirs) await walk(d, 1);
+    return out;
+  }
+
+  /** The data volume's free space is under its reserve (an unknown free space is not low). */
+  async #diskLow(): Promise<boolean> {
+    const free = await this.#o.ports.fs.freeBytes(this.#o.layout.root).catch(() => null);
+    return free !== null && free < DISK_RESERVE_BYTES;
+  }
+
   /** FR-36: the outputs the profile declares. */
   #outputs(projectId: string): string[] {
     const raw = latestProfile(this.#o.db, projectId)?.content.references.outputs;
@@ -730,7 +799,7 @@ export class RunService {
     if (waiting.signal.aborted || active.cancel || active.cancelledChecks.has(e.checkRunId)) {
       await active.services!.release(held);
       await ports.fs.remove(tmpRoot);
-      return this.#finishCheck(e, 'cancelled', { key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }, null, []);
+      return this.#finishCheck(e, 'cancelled', cancelReasonOf(active.cancel), null, []);
     }
     if (failedService) {
       await active.services!.release(held);
@@ -777,7 +846,7 @@ export class RunService {
       for (const name of ['stdout.log', 'stderr.log']) await ports.fs.remove(posix.join(evDir, name));
       await active.services!.release(held);
       await ports.fs.remove(tmpRoot);
-      return this.#finishCheck(e, 'cancelled', { key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }, null, []);
+      return this.#finishCheck(e, 'cancelled', cancelReasonOf(active.cancel), null, []);
     }
     // The steps, one after the other, as one execution: one token, one ledger row (the next step reopens it), one
     // timeout for them all. A step that did not end on its own (cancelled, timed out, killed) ends the execution.
@@ -984,7 +1053,10 @@ export class RunService {
     const judgement = await this.#o.verdict.judge(spec, { projectId: ctx.projectId, root: ctx.root, req, signal: active.quit.signal, guard: this.#o.integrity.effectsOn(ctx.guard, e.instance) });
     if (judgement.outcome === 'cancelled') return this.#finishCheck(e, 'cancelled', { key: 'run.reason.appQuit' }, raw, notes, r);
     const evidenceIds = refs.filter((x) => x.kind === 'report').map((x) => x.id);
-    if (judgement.report) evidenceIds.push((await add('parsed.json', 'parsed', reportEvidence(redactor.redactJson(judgement.report)))).id);
+    // DEV-12 (13.3 «جرد المخرجات المعلنة بأحجامها»): a build keeps the files of the declared output folders with their
+    // sizes beside its report; those folders are usually ignored by Git, so no state snapshot holds them.
+    const inventory = spec.checkId === 'code.build' ? await this.#outputInventory(ctx) : null;
+    if (judgement.report) evidenceIds.push((await add('parsed.json', 'parsed', reportEvidence(redactor.redactJson(judgement.report), inventory ? { outputInventory: redactor.redactJson(inventory) } : {}))).id);
     e.judged = { req, evidenceIds };
     this.#finishCheck(e, judgement.outcome, judgement.reason, raw, notes, r, undefined, { judgement, evidenceIds, reader: judgement.report ? { id: judgement.report.reader, version: judgement.report.readerVersion, formats: judgement.report.formats } : null });
   }
@@ -1014,7 +1086,7 @@ export class RunService {
   async #runProbe(active: Active, e: Exec, ctx: CheckContext, spec: CheckSpec): Promise<void> {
     const { db, ports, evidence, layout } = this.#o;
     const runId = active.runId;
-    const cancelledReason = (): Reason => ({ key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' });
+    const cancelledReason = (): Reason => cancelReasonOf(active.cancel);
     if (!this.#o.probe.available) return this.#finishCheck(e, 'unavailable', { key: 'probe.reason.noHost' }, null, []);
     const browser = await this.#o.browsers.located();
     if (!browser) return this.#finishCheck(e, 'missing', { key: 'setup.reason.probeBrowserMissing' }, null, []);
@@ -1189,22 +1261,32 @@ export class RunService {
       e.instance,
     );
     let why: string | null = 'none';
-    if (row) {
+    // DEV-12 (10.3): reviewed item by item: all four accepted and holding, or why not.
+    const items = reviewItems(db, ctx.projectId, e.instance);
+    const now = new Map(ctx.lastManifest.files.map((f) => [f[0], f[5]]));
+    const holds = async (r: { scope_json: string; snapshot_id: string | null }): Promise<boolean> => {
       let files: string[] = [];
       try {
-        const scoped = (JSON.parse(row.scope_json) as { files?: unknown }).files;
+        const scoped = (JSON.parse(r.scope_json) as { files?: unknown }).files;
         files = Array.isArray(scoped) ? scoped.filter((x): x is string => typeof x === 'string') : [];
       } catch {
         files = [];
       }
-      const then = row.snapshot_id ? await this.#o.evidence.snapshots.load(row.snapshot_id).catch(() => null) : null;
-      const now = new Map(ctx.lastManifest.files.map((f) => [f[0], f[5]]));
+      const then = r.snapshot_id ? await this.#o.evidence.snapshots.load(r.snapshot_id).catch(() => null) : null;
       const before = new Map((then?.files ?? []).map((f) => [f[0], f[5]]));
-      const changed = !then || files.some((f) => before.get(f) !== now.get(f));
-      why = changed ? 'expired' : row.decision === 'accept' || row.decision === 'passed' ? null : `decision:${row.decision}`;
+      return !!then && files.every((f) => before.get(f) === now.get(f));
+    };
+    if (items.size) {
+      const missing = A11Y_REVIEW_ITEMS.filter((i) => !items.has(i));
+      const rejected = [...items.entries()].filter(([, r]) => r.decision === 'reject').map(([i]) => i);
+      const expired: string[] = [];
+      for (const [i, r] of items) if (!(await holds(r))) expired.push(i);
+      why = rejected.length ? `items-rejected:${rejected.join(',')}` : expired.length ? `items-expired:${expired.join(',')}` : missing.length ? `items-missing:${missing.join(',')}` : null;
+    } else if (row) {
+      why = !(await holds(row)) ? 'expired' : row.decision === 'accept' || row.decision === 'passed' ? null : `decision:${row.decision}`;
     }
-    const report = { reader: 'human-review', readerVersion: '1.0.0', formats: [], tests: null, findings: [] as ParsedReport['findings'], findingsDropped: 0, signals: { noInputs: false, collectionError: false, configError: false, flaky: false, unresolved: 0 }, problems: [], info: { review: row?.id ?? null, recordedAt: row?.created_at ?? null } } satisfies ParsedReport;
-    if (why) report.findings.push({ rule: 'review.pending', toolRule: null, severity: null, proof: null, level: null, origin: 'project', message: why === 'none' ? 'no human accessibility review is recorded for this interface' : why === 'expired' ? 'the recorded review no longer holds: files of its scope changed since' : `the recorded review decided ${why.slice('decision:'.length)}`, location: null, anchor: { kind: 'text', value: `review|${e.instance}` }, expected: null, actual: null });
+    const report = { reader: 'human-review', readerVersion: '1.0.0', formats: [], tests: null, findings: [] as ParsedReport['findings'], findingsDropped: 0, signals: { noInputs: false, collectionError: false, configError: false, flaky: false, unresolved: 0 }, problems: [], info: { review: row?.id ?? null, recordedAt: row?.created_at ?? null, items: Object.fromEntries([...items.entries()].map(([i, r]) => [i, r.decision])) } } satisfies ParsedReport;
+    if (why) report.findings.push({ rule: 'review.pending', toolRule: null, severity: null, proof: null, level: null, origin: 'project', message: why === 'none' ? 'no human accessibility review is recorded for this interface' : why === 'expired' ? 'the recorded review no longer holds: files of its scope changed since' : why.startsWith('items-missing:') ? `the human review of ${why.slice('items-missing:'.length)} is not recorded yet` : why.startsWith('items-expired:') ? `the review of ${why.slice('items-expired:'.length)} no longer holds: files of its scope changed since` : why.startsWith('items-rejected:') ? `the review of ${why.slice('items-rejected:'.length)} was rejected` : `the recorded review decided ${why.slice('decision:'.length)}`, location: null, anchor: { kind: 'text', value: `review|${e.instance}` }, expected: null, actual: null });
     const judgement = this.#o.verdict.classifyReport(spec, { projectId: ctx.projectId, report, exit: { kind: 'ok' }, anchors: report.findings.map(() => createHash('sha256').update(`text\nreview|${e.instance}`).digest('hex')), guard: this.#o.integrity.effectsOn(ctx.guard, e.instance) });
     this.#finishCheck(e, judgement.outcome, judgement.reason, null, [], undefined, undefined, { judgement, evidenceIds: [], reader: { id: 'human-review', version: '1.0.0', formats: [] } });
   }
@@ -1264,7 +1346,7 @@ export class RunService {
     const t0 = ports.clock.monotonicMs();
     const judgement = await this.#o.verdict.judge(spec, { projectId: ctx.projectId, root: ctx.root, req: { kind: 'analyze', analyzer, files, facts }, signal: AbortSignal.any([ctrl.signal, active.quit.signal]), guard: this.#o.integrity.effectsOn(ctx.guard, e.instance) }).finally(() => active.waiting.delete(e.checkRunId));
     active.collecting.add(e.checkRunId);
-    if (judgement.outcome === 'cancelled') return this.#finishCheck(e, 'cancelled', { key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }, null, []);
+    if (judgement.outcome === 'cancelled') return this.#finishCheck(e, 'cancelled', cancelReasonOf(active.cancel), null, []);
     const raw: RawCheckResult = {
       checkRunId: e.checkRunId,
       runId,
@@ -1312,7 +1394,7 @@ export class RunService {
         if (r.spawnError === 'EACCES') return ['unavailable', { key: 'run.reason.permissionDenied' }];
         return ['unavailable', { key: 'run.reason.spawnFailed', params: { error: r.spawnError ?? 'unknown' } }];
       case 'cancelled':
-        return ['cancelled', { key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }];
+        return ['cancelled', cancelReasonOf(active.cancel)];
       case 'timed_out':
         return ['timed_out', { key: 'run.reason.timeout', params: { minutes: spec.timeoutMin } }];
       case 'idle_timed_out':
@@ -1387,7 +1469,9 @@ export class RunService {
         verdict?.reader ? JSON.stringify({ ...verdict.reader, dropped: verdict.judgement.report?.findingsDropped ?? 0 }) : null,
         verdict?.judgement.report?.tests ? JSON.stringify(this.#o.redaction.redactor().redactJson(verdict.judgement.report.tests)) : null,
         this.#now(),
-        r?.durationMs ?? raw?.durationMs ?? null,
+        // A check judged without a process (the human review, the integrity checks) keeps its elapsed time too, so it
+        // has the history the remaining-time estimate needs (C-10 point 8, AT-10).
+        r?.durationMs ?? raw?.durationMs ?? (verdict && row.started_at ? Math.max(0, Date.parse(this.#now()) - Date.parse(row.started_at)) : null),
         raw?.exitCode ?? null,
         raw?.signal ?? null,
         raw ? JSON.stringify(raw.envKeys) : null,
@@ -1501,7 +1585,7 @@ export class RunService {
     this.#emitRun(runId);
   }
 
-  #requestCancel(a: Active, reason: 'user' | 'app_quit'): void {
+  #requestCancel(a: Active, reason: 'user' | 'app_quit' | 'disk_full'): void {
     if (a.cancel === 'app_quit') return;
     a.cancel = reason;
     // The app quits: a report still being read is dropped (the run ends the short way).
@@ -1618,8 +1702,10 @@ export class RunService {
       verdict: TERMINAL_RUN.includes(r.state) ? ((r.verdict as RunView['verdict']) ?? null) : null,
       purity: TERMINAL_RUN.includes(r.state) ? this.#o.purity.summaryOf(runId) : null,
       keepForever: r.keep_forever === 1,
-      cancelReason: r.cancel_reason === 'user' || r.cancel_reason === 'app_quit' ? r.cancel_reason : null,
+      cancelReason: r.cancel_reason === 'user' || r.cancel_reason === 'app_quit' || r.cancel_reason === 'disk_full' ? r.cancel_reason : null,
       preventSleep: r.prevent_sleep === 1,
+      profileVersion: r.profile_version ?? null,
+      commit: commitOf(r.git_json),
     };
   }
 
@@ -1643,6 +1729,97 @@ export class RunService {
     if (!row) throw new CommandError('not_found', { reason: 'check_run' });
     const tail = row.raw_json ? RawSchema.parse(JSON.parse(row.raw_json)).tail : [];
     return { lines: cut(tail.slice(-n)), totalLines: tail.length, live: false };
+  }
+
+  /**
+   * check.report (protocol 1.7, DEV-12): the unified report kept with an execution's evidence (redacted on its way in),
+   * without its findings, and the declared outputs the execution wrote with their sizes at the end of its run and at
+   * the end of the previous complete round. A report whose file no longer matches its hash is «دليل تالف»: not read.
+   */
+  async report(checkRunId: string): Promise<CheckReport | null> {
+    const row = this.#o.db.get<{ run_id: string; raw_json: string | null }>('SELECT run_id, raw_json FROM check_runs WHERE id = ?', checkRunId);
+    if (!row) throw new CommandError('not_found', { reason: 'check_run' });
+    const ref = this.#o.evidence.store.refsOf(checkRunId).find((e) => e.kind === 'parsed');
+    if (!ref || ref.size > REPORT_READ_LIMIT) return null;
+    let parsed: ParsedReport;
+    try {
+      const data = await this.#o.ports.fs.readFile(this.#o.evidence.store.absolute(ref.relPath));
+      if (createHash('sha256').update(data).digest('hex') !== ref.sha256) return null;
+      parsed = JSON.parse(new TextDecoder().decode(data)) as ParsedReport;
+    } catch {
+      return null;
+    }
+    // The kept JSON may carry more than the report (reportEvidence's extra keys): only the contract's fields leave.
+    return {
+      reader: parsed.reader,
+      readerVersion: parsed.readerVersion,
+      formats: parsed.formats,
+      tests: parsed.tests,
+      findingsDropped: parsed.findingsDropped,
+      signals: parsed.signals,
+      problems: parsed.problems,
+      info: parsed.info,
+      findingsCount: parsed.findings.length,
+      outputs: Array.isArray((parsed as { outputInventory?: unknown }).outputInventory)
+        ? await this.#inventoryOutputs(checkRunId, (parsed as unknown as { outputInventory: { path: string; size: number }[] }).outputInventory)
+        : await this.#writtenOutputs(row.run_id, row.raw_json),
+    };
+  }
+
+  /** A build's kept output inventory, each file beside its size in the same instance's build of the previous complete round. */
+  async #inventoryOutputs(checkRunId: string, now: { path: string; size: number }[]): Promise<CheckReport['outputs']> {
+    const db = this.#o.db;
+    const me = db.get<{ run_id: string; check_id: string; component: string; started_at: string | null; project_id: string }>(
+      'SELECT c.run_id, c.check_id, c.component, r.started_at, r.project_id FROM check_runs c JOIN runs r ON r.id = c.run_id WHERE c.id = ?',
+      checkRunId,
+    );
+    const prev = me
+      ? db.get<{ id: string }>(
+          "SELECT c.id FROM check_runs c JOIN runs r ON r.id = c.run_id WHERE r.project_id = ? AND r.id <> ? AND r.kind = 'full' AND r.state = 'finished' AND r.cancel_reason IS NULL AND r.started_at < ? AND c.check_id = ? AND c.component = ? AND c.state = 'finished' ORDER BY r.started_at DESC LIMIT 1",
+          me.project_id,
+          me.run_id,
+          me.started_at ?? '9999',
+          me.check_id,
+          me.component,
+        )
+      : undefined;
+    let before = new Map<string, number>();
+    const ref = prev ? this.#o.evidence.store.refsOf(prev.id).find((e) => e.kind === 'parsed') : undefined;
+    if (ref && ref.size <= REPORT_READ_LIMIT) {
+      try {
+        const data = await this.#o.ports.fs.readFile(this.#o.evidence.store.absolute(ref.relPath));
+        if (createHash('sha256').update(data).digest('hex') === ref.sha256) {
+          const inv = (JSON.parse(new TextDecoder().decode(data)) as { outputInventory?: { path: string; size: number }[] }).outputInventory;
+          if (Array.isArray(inv)) before = new Map(inv.map((x) => [x.path, x.size]));
+        }
+      } catch {
+        // A previous report that cannot be read leaves the column empty, never a guess.
+      }
+    }
+    return now.slice(0, 200).map((x) => ({ path: x.path, sizeBytes: x.size, previousBytes: before.get(x.path) ?? null }));
+  }
+
+  /** The declared outputs an execution created or modified, sized from its run's end snapshot and the round before. */
+  async #writtenOutputs(runId: string, rawJson: string | null): Promise<CheckReport['outputs']> {
+    const effects = rawJson ? RawSchema.parse(JSON.parse(rawJson)).sideEffects : null;
+    if (!effects) return [];
+    const written = new Set([...effects.created, ...effects.modified]);
+    const paths = effects.declared.filter((p) => written.has(p)).slice(0, 200);
+    if (!paths.length) return [];
+    const run = this.#o.db.get<{ project_id: string; snapshot_end_id: string | null; started_at: string | null }>('SELECT project_id, snapshot_end_id, started_at FROM runs WHERE id = ?', runId);
+    if (!run) return paths.map((path) => ({ path, sizeBytes: null, previousBytes: null }));
+    const previous = this.#o.db.get<{ snapshot_end_id: string }>(
+      "SELECT snapshot_end_id FROM runs WHERE project_id = ? AND id <> ? AND kind = 'full' AND state = 'finished' AND cancel_reason IS NULL AND snapshot_end_id IS NOT NULL AND started_at < ? ORDER BY started_at DESC LIMIT 1",
+      run.project_id,
+      runId,
+      run.started_at ?? '9999',
+    );
+    const sizes = async (snapshotId: string | null | undefined) => {
+      const m = snapshotId ? await this.#o.evidence.snapshots.load(snapshotId) : null;
+      return new Map((m?.files ?? []).map((f) => [f[0], f[1]] as const));
+    };
+    const [now, before] = await Promise.all([sizes(run.snapshot_end_id), sizes(previous?.snapshot_end_id)]);
+    return paths.map((path) => ({ path, sizeBytes: now.get(path) ?? null, previousBytes: before.get(path) ?? null }));
   }
 
   list(projectId: string): RunList {

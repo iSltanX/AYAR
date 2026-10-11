@@ -19,6 +19,7 @@ import type { EnginePorts, Logger } from '../ports/index.ts';
 import { latestSnapshot } from '../profile/service.ts';
 import { profileAt } from '../profile/store.ts';
 import type { Db } from '../storage/db.ts';
+import { readSettings } from '../storage/settings.ts';
 import { computePurity, DEFAULT_NARROW_THRESHOLD, puritySummary, type PurityCheckInput } from './compute.ts';
 
 /** The outcomes a retry may replace in a continued round (D-31: «غير حاسمة»). */
@@ -238,7 +239,9 @@ export class PurityService {
     const git = latestSnapshot(db, run.project_id)?.facts.find((f) => f.key === 'git.repository')?.value;
     const commit = git && typeof git === 'object' && !Array.isArray(git) && typeof (git as Record<string, unknown>).commit === 'string' ? ((git as Record<string, unknown>).commit as string) : null;
     const meta: PurityMeta = { profileVersion: run.profile_version, profileHash: run.profile_hash, catalogVersion: run.catalog_version ?? catalog.version, toolVersions, environmentSource: null, snapshotId, commit, computedAt: ports.clock.now().toISOString() };
-    return computePurity({ scope, checks, integrity, narrowThreshold: DEFAULT_NARROW_THRESHOLD, meta });
+    // 11.4 rule 4: the threshold of «نطاق ضيق» is a setting (DEV-12, screen 21 «الحدود»).
+    const narrowThreshold = readSettings(db, ['purity.narrowThreshold'])['purity.narrowThreshold'] ?? DEFAULT_NARROW_THRESHOLD;
+    return computePurity({ scope, checks, integrity, narrowThreshold, meta });
   }
 }
 

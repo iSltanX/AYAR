@@ -216,11 +216,18 @@
     if (p.ok) await startPlan(p.result.id);
   }
   const instanceOfFinding = (id: string) => checks.find((c) => c.checkRunId === findings.find((f) => f.id === id)?.checkRunId)?.instance;
-  // ⇧⌘R (13.7): «أعد الفاشل» on this page.
+  // ⇧⌘R (13.7) and the Run menu (C-23): «أعد الفاشل» or «أعد غير المكتمل» on this page, or chosen on another
+  // page before the frame brought the latest finished run here (app.pendingRerun).
   $effect(() => {
-    const handler = () => void openRerun('failed');
-    window.addEventListener('ayar:rerun-failed', handler);
-    return () => window.removeEventListener('ayar:rerun-failed', handler);
+    const handler = (e: Event) => void openRerun((e as CustomEvent<RerunVariant>).detail);
+    window.addEventListener('ayar:rerun', handler);
+    return () => window.removeEventListener('ayar:rerun', handler);
+  });
+  $effect(() => {
+    const pending = app.pendingRerun;
+    if (!pending || !checks.length) return;
+    app.pendingRerun = null;
+    void openRerun(pending);
   });
 
   // ── export (C-23) ─────────────────────────────────────────────────────────────────────────────────────────
@@ -537,6 +544,10 @@
             view = 'evidence';
           }}
           onreview={reviewCheck}
+          onrerun={(id: string) => {
+            const instance = checks.find((c) => c.checkRunId === id)?.instance;
+            if (instance) void recheck([instance]);
+          }}
         />
       {:else if view === 'evidence'}
         <EvidenceTab rows={evidenceRows(checks)} checkId={evidenceCheck} />

@@ -1,5 +1,6 @@
 {
   "run.reason.cancelledByUser": "أُلغي بطلبك",
+  "run.reason.diskFull": "أُلغي لأن القرص كاد يمتلئ: أوقف عِيَار التشغيل بأمان قبل أن تفشل الكتابة",
   "run.reason.appQuit": "أُلغي لأن التطبيق أُغلق",
   "run.reason.engineStopped": "انقطع: توقف المحرك أثناء الفحص",
   "run.reason.runInterrupted": "لم يبدأ: انقطع التشغيل قبل وصوله",

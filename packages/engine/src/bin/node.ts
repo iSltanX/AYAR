@@ -22,7 +22,11 @@ function main(): void {
   // C-14 under Node (G-47): the engine forks the probe's own entry, and axe-core is the probe package's copy.
   const probeEntry = fileURLToPath(import.meta.resolve('@ayar/probe/bin/node'));
   const probe = nodeProbeHost({ entry: probeEntry, axePath: createRequire(probeEntry).resolve('axe-core/axe.min.js') });
-  const ports = { ...nodePortsWith({ network: { allowLoopbackHttp: process.env.AYAR_TEST_ALLOW_LOOPBACK_HTTP === '1' } }), probe };
+  const base = nodePortsWith({ network: { allowLoopbackHttp: process.env.AYAR_TEST_ALLOW_LOOPBACK_HTTP === '1' } });
+  // AYAR_TEST_FREE_BYTES (DEV-12): the data volume's free space as the executor reads it, for the safe stop of 13.5
+  // («القرص ممتلئ»). Chosen by the host process in tests, never in the app's entry.
+  const free = process.env.AYAR_TEST_FREE_BYTES;
+  const ports = { ...base, ...(free ? { fs: { ...base.fs, freeBytes: () => Promise.resolve(Number(free)) } } : {}), probe };
   // AYAR_TEST_BROWSER_BUILD (a JSON file): the probe browser's build served by a loopback server (DEV-7's install test).
   const testBrowserBuild = process.env.AYAR_TEST_BROWSER_BUILD ? (JSON.parse(readFileSync(process.env.AYAR_TEST_BROWSER_BUILD, 'utf8')) as BrowserBuild) : null;
   const engine = startEngine({ ports, channel: nodeIpcChannel(), testLoginShell: process.env.AYAR_TEST_LOGIN_SHELL ?? null, testToolRegistry, testBrowserBuild, workerEntry: import.meta.url });

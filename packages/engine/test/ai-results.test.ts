@@ -49,6 +49,16 @@ describe('ai-result/1 (12.9)', () => {
     expect(forbiddenField(valid)).toBeNull();
   });
 
+  it('16.3: the refusal names the field, its line and how it reads — never other text of the file', () => {
+    const r = readAiResult(JSON.stringify({ ...valid, notes: [{ ...valid.notes[0], status: 'passed' }] }, null, 2), 900);
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.reason.params).toMatchObject({ field: 'notes[0].status', snippet: '"status": "passed"' });
+    expect(r.reason.params?.line).toBeGreaterThan(1);
+    const keyed = readAiResult(JSON.stringify({ ...valid, fixed: 'the model wrote a secret-ish sentence here' }, null, 2), 900);
+    expect(!keyed.ok && keyed.reason.params).toMatchObject({ field: 'fixed', snippet: '"fixed": …' });
+  });
+
   it('a note that says it fixed something stays a claim: text is not a verdict', () => {
     const r = readAiResult(JSON.stringify({ ...valid, notes: [{ ...valid.notes[1], summary: 'I fixed the rounding and the card is done' }] }), 500);
     expect(r.ok).toBe(true);

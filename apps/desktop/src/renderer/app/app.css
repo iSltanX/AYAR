@@ -8,3 +8,71 @@ body,
 body {
   overflow: hidden;
 }
+
+/*
+ * The section panels' tables (DEV-12, screens 10–15): a native table that fills its panel, its header cells in
+ * label style, a hairline under every row, and values as small sunken tags (paths, rules, versions, mono). Global
+ * because a dozen panels share it; every rule is under `.ptable`.
+ */
+.ptable {
+  inline-size: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+.ptable th {
+  padding: 0 var(--space-8) var(--space-8);
+  border-block-end: 1px solid var(--border-subtle);
+  text-align: start;
+  font: var(--type-label);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.ptable td {
+  padding: var(--space-8);
+  border-block-end: 1px solid var(--border-subtle);
+  vertical-align: middle;
+  font: var(--type-body);
+  color: var(--text-primary);
+}
+.ptable .num {
+  font: var(--type-numeric-live);
+  font-variant-numeric: tabular-nums;
+}
+.ptable .small,
+.ptable .muted {
+  font: var(--type-body-small);
+}
+.ptable .muted {
+  color: var(--text-secondary);
+}
+.ptable .val {
+  display: inline-block;
+  max-inline-size: 100%;
+  padding: 1px var(--space-8);
+  overflow: hidden;
+  border-radius: var(--radius-tag);
+  background: var(--bg-sunken);
+  font: var(--type-body-small);
+  color: var(--text-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.ptable .val.mono,
+.ptable .mono {
+  font: var(--type-mono);
+}
+.ptable .stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ptable .row {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4) var(--space-8);
+}
+.ptable .end {
+  text-align: end;
+}

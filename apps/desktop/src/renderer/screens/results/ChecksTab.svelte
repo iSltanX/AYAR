@@ -1,10 +1,13 @@
 <script lang="ts">
   // «الفحوص» (13.3; Figma 7.4 153:30726): each execution of the run as a Check row with its result, then its reason
   // line — why it came out so (a reviewed result names the automatic one, G-17) — with «الدليل» and, for a result
-  // that needs a decision, «سجّل مراجعة».
+  // that needs a decision, «سجّل مراجعة». 22.6: a companion service that was not ready offers «أعد» beside the log,
+  // and what the executor noted on a check (a process left behind, a sleep, a cut output) shows under it — a note
+  // never changes the result.
   import type { CheckRunDetail, PlanItem } from '@ayar/protocol';
   import Button from '../../components/Button.svelte';
   import CheckRow from '../../components/CheckRow.svelte';
+  import Icon from '../../components/Icon.svelte';
   import { useLocale } from '../../lib/locale.ts';
   import { badgeOf, checkTitle, clockMs, costOf, reasonText, resultOf, sectionOfCheck, sectionRank } from '../../app/format.ts';
 
@@ -16,8 +19,12 @@
     onlog?: (checkRunId: string) => void;
     onevidence?: (checkRunId: string) => void;
     onreview?: (checkRunId: string) => void;
+    /** 22.6 «أعد»: the check run again (a companion service that was not ready). */
+    onrerun?: (checkRunId: string) => void;
   }
-  let { checks, items, order, onopen, onlog, onevidence, onreview }: Props = $props();
+  let { checks, items, order, onopen, onlog, onevidence, onreview, onrerun }: Props = $props();
+  /** The executor's notes shown under a check: what happened around it, never its result. */
+  const SHOWN_NOTES = new Set(['run.note.escapeSuspected', 'run.note.leftoversEnded', 'run.note.sleepGap', 'run.note.outputTruncated', 'adapter.note.untestedVersion']);
   const { t, lang } = useLocale();
 
   const rows = $derived(
@@ -51,8 +58,12 @@
       <div class="reason">
         <p class="text">{reasonOf(c)}</p>
         {#if c.outcome === 'needs_review'}<Button kind="secondary" onclick={() => onreview?.(c.checkRunId)}>{t('ui.action.recordReview')}</Button>{/if}
+        {#if c.outcomeReason?.key === 'run.reason.serviceNotReady'}<Button kind="primary" icon="redo-2" onclick={() => onrerun?.(c.checkRunId)}>{t('resultsui.check.rerun')}</Button>{/if}
         {#if c.evidence.length || c.raw?.logs.stdout || c.raw?.reports.length}<Button kind="quiet" onclick={() => onevidence?.(c.checkRunId)}>{t('resultsui.check.evidence')}</Button>{/if}
       </div>
+      {#each c.notes.filter((n) => SHOWN_NOTES.has(n)) as n (n)}
+        <div class="note"><Icon name="info" size={16} /><span class="text">{t(n as Parameters<typeof t>[0])}</span><Button kind="quiet" onclick={() => onlog?.(c.checkRunId)}>{t('resultsui.check.openLog')}</Button></div>
+      {/each}
     </div>
   {/each}
 </div>
@@ -72,6 +83,16 @@
     align-items: flex-start;
     gap: var(--space-8);
     padding: 0 var(--space-48) 10px;
+  }
+  .note {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    margin: 0 var(--space-48) 10px;
+    padding: var(--space-8) var(--space-12);
+    border-radius: var(--radius-control);
+    background: var(--bg-sunken);
+    color: var(--text-primary);
   }
   .text {
     flex: 1;

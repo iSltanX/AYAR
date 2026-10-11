@@ -251,6 +251,19 @@ export function suggest(raw: unknown, kb: Kb, facts: AdvisorFacts = {}): Advisor
 
   const pr = facts.priorRun;
   const depthKb = kb.data.depths.depths.find((d) => d.id === c.depth.id)!;
+  // 17.4: the knowledge base's text of what the page names (the rule C-20.5 reads as R16, the rule it replaced).
+  const itemText = Object.fromEntries(
+    [...new Set([...items.flatMap((i) => [i.id, ...i.includes]), ...omitted.map((o) => o.id)])].flatMap((id) => {
+      const k = kb.item(id);
+      return k ? [[id, { title: k.title, proves: k.proves }]] : [];
+    }),
+  );
+  const ruleText = Object.fromEntries(
+    [...new Set(items.flatMap((i) => [...i.contributions, ...i.includedContributions].map((x) => x.rule)))].flatMap((id) => {
+      const k = kb.rule(id === 'C-20.5' ? 'R16' : id);
+      return k ? [[id, k.reason]] : [];
+    }),
+  );
   return {
     kind: 'recommendation',
     executed: false,
@@ -286,5 +299,6 @@ export function suggest(raw: unknown, kb: Kb, facts: AdvisorFacts = {}): Advisor
     noNewTests: c.risk.level === 'low' && e.evidence === 'good' && !e.assumedKeys.has('evidence') && e.automation === 'auto' && !items.some((i) => i.priority === 1),
     evidenceReuse: pr && pr.sameState && pr.sameTools && pr.sameScope && pr.passed ? { runId: pr.runId } : null,
     ecosystems,
+    text: { items: itemText, rules: ruleText, depth: { name: depthKb.name, description: depthKb.description } },
   };
 }

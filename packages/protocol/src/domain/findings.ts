@@ -113,6 +113,29 @@ export const ParsedReport = z.strictObject({
 export type ParsedReport = z.infer<typeof ParsedReport>;
 
 /**
+ * check.report (protocol 1.7, DEV-12): what a section page's panel reads of one check execution besides its
+ * findings (those come from results.query): the unified report as kept with the evidence (redacted on its way in),
+ * without its findings, and — for an execution that wrote declared outputs — those outputs with their size at the
+ * end of the run and at the end of the previous complete round (13.3 «جرد المخرجات المعلنة بأحجامها»).
+ */
+export const CheckReport = ParsedReport.omit({ findings: true }).extend({
+  /** The findings the report carried (the findings themselves are results.query's). */
+  findingsCount: z.int().nonnegative(),
+  outputs: z
+    .array(
+      z.strictObject({
+        path: z.string().max(4096),
+        /** Its size in the run's end snapshot; null when it was gone by then. */
+        sizeBytes: z.int().nonnegative().nullable(),
+        /** Its size at the end of the previous complete round; null when that round had no such file, or there is none. */
+        previousBytes: z.int().nonnegative().nullable(),
+      }),
+    )
+    .max(200),
+});
+export type CheckReport = z.infer<typeof CheckReport>;
+
+/**
  * The adapter's exit map (C-15 `exitMap`): the process's end with the reports, as one signal for 7.3 rules 3 to
  * 5. `ok` hands the decision to the findings (rules 6 to 10). Rule 1 (the process did not complete) is the
  * executor's and the classifier's, before any adapter is asked.

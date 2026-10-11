@@ -74,13 +74,16 @@
     });
   });
 
-  /** What is left, from the estimates of what has not finished (marked «تقديري»); none when any lacks history. */
+  /** What is left, from the estimates of what has not finished (marked «تقديري»); none when any that runs lacks history. */
   const remainingMs = $derived.by<number | null>(() => {
     if (!plan || cycle === 'cancelling') return null;
     let left = 0;
     for (const c of checks) {
       if (c.state === 'finished') continue;
-      const est = items.get(c.instance)?.estimateMs;
+      const item = items.get(c.instance);
+      // A check that shares another's invocation, or is covered by it, takes no time of its own: it is in that one's.
+      if (item?.status === 'shared' || item?.status === 'covered') continue;
+      const est = item?.estimateMs;
       if (est === null || est === undefined) return null;
       left += c.state === 'running' && c.startedAt ? Math.max(0, est - (app.runs.now - Date.parse(c.startedAt))) : est;
     }

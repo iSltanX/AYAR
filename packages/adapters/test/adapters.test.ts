@@ -179,6 +179,35 @@ describe('Jest, node:test, Playwright, pytest (AT-14)', () => {
     expect(run(A('playwright'), ctx({ files: { 'playwright.json': hook(9) } }), 1).report.findings[0]).toMatchObject({ rule: 'test.failed', location: { path: 'tests/a.spec.js', line: 9 } });
     expect(run(A('playwright'), ctx({ files: { 'playwright.json': hook(24) } }), 1).report.findings[0]).toMatchObject({ rule: 'test.failed', location: { path: 'tests/a.spec.js', line: 23 } });
   });
+  it('Playwright: the compatibility matrix by project (a browser) and test title; a changed result is flaky', () => {
+    const t = (projectName: string, status: string) => ({ projectName, status, results: [{ status: status === 'expected' ? 'passed' : 'failed', retry: 0 }] });
+    const report = (worker: string) =>
+      JSON.stringify({
+        config: { rootDir: `${ROOT}/tests` },
+        suites: [
+          {
+            title: 'c.spec.js',
+            file: 'c.spec.js',
+            specs: [
+              { title: 'النافذة المنبثقة', file: 'c.spec.js', line: 3, tests: [t('Chromium 140', 'expected'), t('Firefox 131', 'expected'), t('__proto__', 'expected')] },
+              { title: 'عامل الخدمة', file: 'c.spec.js', line: 9, tests: [t('Chromium 140', 'expected'), t('Firefox 131', worker), t('__proto__', 'expected')] },
+            ],
+          },
+        ],
+        errors: [],
+      });
+    const one = run(A('playwright'), ctx({ files: { 'playwright.json': report('unexpected') } }), 1).report.info.byProject as Record<string, Record<string, string>>;
+    expect(one['Firefox 131']).toEqual({ 'النافذة المنبثقة': 'passed', 'عامل الخدمة': 'failed' });
+    expect(one['Chromium 140']!['عامل الخدمة']).toBe('passed');
+    // A project of any name is a row of its own, never the prototype.
+    expect(Object.hasOwn(one, '__proto__')).toBe(true);
+    expect(({} as Record<string, unknown>)['النافذة المنبثقة']).toBeUndefined();
+    const both = run(A('playwright'), ctx({ checkId: 'beh.stability', files: { '1/playwright.json': report('unexpected'), '2/playwright.json': report('expected') } }), 1, [1, 0]).report.info.byProject as Record<string, Record<string, string>>;
+    expect(both['Firefox 131']!['عامل الخدمة']).toBe('flaky');
+    // One unnamed project (a single browser): no matrix.
+    const single = JSON.stringify({ config: { rootDir: `${ROOT}/tests` }, suites: [{ title: 'a.spec.js', file: 'a.spec.js', specs: [{ title: 'رحلة', file: 'a.spec.js', line: 4, tests: [t('', 'expected')] }] }], errors: [] });
+    expect(run(A('playwright'), ctx({ files: { 'playwright.json': single } }), 0).report.info.byProject).toBeUndefined();
+  });
   it('pytest: 1 failures, 2 with a collection error the project\'s, 4 and 3 the tool\'s, 5 «ناقص», 0 with a failure a conflict', () => {
     const py = { 'tests/test_add.py': 'from add import add\n\n\ndef test_add() -> None:\n    assert add(2, 3) == 6\n' };
     const fail = '<testsuites><testsuite name="pytest" tests="1"><testcase classname="tests.test_add" name="test_add"><failure message="assert 5 == 6">tests/test_add.py:5: AssertionError</failure></testcase></testsuite></testsuites>';

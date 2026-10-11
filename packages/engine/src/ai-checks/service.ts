@@ -97,9 +97,9 @@ export class AiChecksService {
   }
 
   /** The project's files as its latest state snapshot lists them (the discovery inventory keeps counts, not paths). */
-  async #files(projectId: string): Promise<string[]> {
+  async #files(projectId: string): Promise<string[] | null> {
     const snap = this.#o.db.get<{ id: string }>('SELECT id FROM snapshots WHERE project_id = ? ORDER BY created_at DESC, rowid DESC LIMIT 1', projectId);
-    if (!snap) return [];
+    if (!snap) return null;
     const m = await this.#o.evidence.snapshots.load(snap.id).catch(() => null);
     return m ? m.files.filter((f) => f[6] !== 'link').map((f) => f[0]) : [];
   }
@@ -134,9 +134,13 @@ export class AiChecksService {
 
   async #computed(projectId: string): Promise<{ needs: ComputedNeed[]; files: string[] }> {
     const snapshot = latestSnapshot(this.#o.db, projectId);
-    const files = await this.#files(projectId);
+    const read = await this.#files(projectId);
+    const files = read ?? [];
     const audience = this.#o.profiles.settingsOf(projectId).context.audience;
-    return { needs: computeNeeds({ catalog: this.#o.catalog, facts: snapshot?.facts ?? [], files, audience: audience ?? null, lastRun: this.#lastRun(projectId), userInputs: this.#userInputs(projectId) }), files };
+    const needs = computeNeeds({ catalog: this.#o.catalog, facts: snapshot?.facts ?? [], files, audience: audience ?? null, lastRun: this.#lastRun(projectId), userInputs: this.#userInputs(projectId) });
+    // Before AYAR has read the project's files (no run yet), no need is decided: «لا ملفات منطق» would be false.
+    if (read === null) return { needs: needs.map((n) => ({ ...n, applies: false, reasons: [], notApplicableReason: { key: 'aichecks.notApplicable.notRead' }, files: [] })), files };
+    return { needs, files };
   }
 
   #latestCheckOf(projectId: string, templateId: string): AiCheckRow | null {
@@ -152,6 +156,7 @@ export class AiChecksService {
     return {
       needId: needIdOf(c.template.id, projectId),
       template: c.template.id,
+      code: c.template.code,
       templateVersion: c.template.version,
       titleKey: c.template.text.title,
       roleKey: c.template.text.role,
@@ -470,7 +475,7 @@ export class AiChecksService {
       projectId,
       instructions: rows.map((r) => {
         const { text: _text, ...rest } = this.#view(r, false);
-        return rest;
+        return { ...rest, savedPath: r.saved_path, importedAt: r.imported_at, rejectReason: r.reject_reason ? (JSON.parse(r.reject_reason) as Reason) : null };
       }),
       claims,
       proven,

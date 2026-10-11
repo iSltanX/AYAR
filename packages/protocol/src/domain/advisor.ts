@@ -178,5 +178,15 @@ export const AdvisorResult = z.strictObject({
   /** C-20 rule 7: reuse is suggested only from an AYAR run with the same state, tools and scope, which passed. */
   evidenceReuse: z.strictObject({ runId: Id }).nullable(),
   ecosystems: z.strictObject({ ids: z.array(z.string()), from: z.enum(['discovery', 'stack', 'both', 'none']) }),
+  /**
+   * Protocol 1.7 (DEV-12, 17.4): the knowledge base's own text the page shows beside the ids (Arabic, D-DEV8-10):
+   * each recommended or left-out item's title and what it proves, the reason of each rule that weighed in, and the
+   * depth's name and description.
+   */
+  text: z.strictObject({
+    items: z.record(ItemId, z.strictObject({ title: z.string(), proves: z.string() })),
+    rules: z.record(z.string(), z.string()),
+    depth: z.strictObject({ name: z.string(), description: z.string() }),
+  }),
 });
 export type AdvisorResult = z.infer<typeof AdvisorResult>;

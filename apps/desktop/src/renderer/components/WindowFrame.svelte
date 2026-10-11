@@ -21,7 +21,7 @@
     /** The page title, last in the title bar's breadcrumb. */
     title: string;
     breadcrumb?: readonly Crumb[];
-    primary?: { label: string; onclick?: () => void; disabled?: boolean };
+    primary?: { label: string; onclick?: () => void; disabled?: boolean; menu?: { label: string; onopen: (anchor: DOMRect) => void } };
     /** The title bar's search field. */
     search?: Snippet;
     /** The inspector is shown (Figma property Inspector); the title bar's toggle calls oninspectortoggle. */

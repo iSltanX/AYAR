@@ -31,6 +31,7 @@
   "controls.runMenu.currentSection": "القسم الحالي: {section}",
   "controls.runMenu.selected": "المحدد ({count})",
   "controls.runMenu.savedGroups": "المجموعات المحفوظة",
+  "controls.runMenu.open": "قائمة «شغّل»",
   "controls.dropZone.label": "أو اسحب المجلد هنا",
   "controls.risk.title": "أمر خطر: قد يحذف ملفات أو يكتب خارج المشروع",
   "controls.risk.detail": "لا يدخل في «اعتمد الكل». اقرأ الأمر، ثم اعتمده وحده.",

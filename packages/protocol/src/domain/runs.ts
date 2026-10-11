@@ -252,13 +252,20 @@ export const RunView = z.strictObject({
   /** C-19 (protocol 1.3): never the number alone (11.5); null for a run that computes no index. */
   purity: PuritySummary.nullable(),
   keepForever: z.boolean(),
-  /** A cancelled run: the reason (user, app quit). */
-  cancelReason: z.enum(['user', 'app_quit']).nullable(),
+  /**
+   * A cancelled run: the reason (user, app quit). Protocol 1.7 (DEV-12, 13.5 «القرص ممتلئ»): `disk_full`, a run the
+   * executor stopped safely because the data volume ran low, before a write could fail.
+   */
+  cancelReason: z.enum(['user', 'app_quit', 'disk_full']).nullable(),
   /**
    * FR-26: while the run is running, it asks the main process to keep the system awake (the setting
    * run.preventSleep). The main process follows run.state and holds a power-save blocker for such runs.
    */
   preventSleep: z.boolean(),
+  /** Protocol 1.7 (DEV-12, 18.1 «الالتزام والملف»): the profile version the run was planned on. */
+  profileVersion: z.int().positive().nullable(),
+  /** Protocol 1.7 (DEV-12, 18.1): the Git commit the run started on, read from the files (E-16); null outside a repository. */
+  commit: z.string().regex(/^[0-9a-f]{7,64}$/).nullable(),
 });
 export type RunView = z.infer<typeof RunView>;
 

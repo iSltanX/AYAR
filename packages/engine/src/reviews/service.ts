@@ -13,8 +13,8 @@
 // A review expires when a file of its scope changes (11.4 rule 6): integ.reviews says so at the next run, and the
 // check goes back to «يحتاج مراجعة». Nothing here writes into the repository.
 import type { Catalog } from '@ayar/catalog';
-import type { CheckOutcome, CheckSpec, FindingLocation, ParsedReport, ReviewDecision, ReviewRecord, ReviewRecorded, ReviewTarget, VerdictCounts } from '@ayar/protocol';
-import { ParsedReport as ReportSchema } from '@ayar/protocol';
+import type { A11yReviewItem, CheckOutcome, CheckSpec, FindingLocation, ParsedReport, ReviewDecision, ReviewRecord, ReviewRecorded, ReviewTarget, VerdictCounts } from '@ayar/protocol';
+import { A11Y_REVIEW_ITEMS, ParsedReport as ReportSchema } from '@ayar/protocol';
 import type { EvidenceService } from '../evidence/service.ts';
 import { CommandError } from '../host/errors.ts';
 import { newId } from '../host/ids.ts';
@@ -63,6 +63,27 @@ export interface ReviewsServiceOptions {
   runs?: RunService;
 }
 
+/** The latest review of each item of a design.a11y.review instance (DEV-12, 10.3). */
+export function reviewItems(db: Db, projectId: string, instance: string): Map<A11yReviewItem, { id: string; decision: string; scope_json: string; snapshot_id: string | null; created_at: string }> {
+  const out = new Map<A11yReviewItem, { id: string; decision: string; scope_json: string; snapshot_id: string | null; created_at: string }>();
+  for (const item of A11Y_REVIEW_ITEMS) {
+    const row = db.get<{ id: string; decision: string; scope_json: string; snapshot_id: string | null; created_at: string }>(
+      "SELECT id, decision, scope_json, snapshot_id, created_at FROM reviews WHERE project_id = ? AND target_type = 'check' AND target_ref = ? ORDER BY created_at DESC, rowid DESC LIMIT 1",
+      projectId,
+      `${instance}#${item}`,
+    );
+    if (row) out.set(item, row);
+  }
+  return out;
+}
+
+/** The item a check review was recorded for, from its ref (`<instance>#<item>`). */
+function itemOf(r: { target_type: string; target_ref: string }): { item?: A11yReviewItem } {
+  if (r.target_type !== 'check') return {};
+  const item = r.target_ref.split('#')[1];
+  return item && (A11Y_REVIEW_ITEMS as readonly string[]).includes(item) ? { item: item as A11yReviewItem } : {};
+}
+
 export class ReviewsService {
   readonly #o: ReviewsServiceOptions;
 
@@ -76,6 +97,7 @@ export class ReviewsService {
 
   async record(target: ReviewTarget, decision: ReviewDecision, note: string): Promise<ReviewRecorded> {
     if (!ALLOWED[target.type].includes(decision)) throw new CommandError('invalid_payload', { path: 'decision', reason: `not_for_${target.type}` });
+    if (target.type === 'check' && target.item) return this.#onReviewItem(target.id, target.item, decision, note);
     if (target.type === 'check') return this.#onCheck(target.id, decision, note);
     if (target.type === 'finding') return this.#onFinding(target.id, decision, note);
     return this.#onClaim(target.id, decision, note);
@@ -135,6 +157,43 @@ export class ReviewsService {
     this.#o.runs?.emitAfterReview(c.run_id, checkRunId);
     const auto = db.get<{ auto_outcome: string | null }>('SELECT auto_outcome FROM check_runs WHERE id = ?', checkRunId)?.auto_outcome ?? null;
     return { review: await this.#view(row), check: { checkRunId, instance, outcome, autoOutcome: (auto as CheckOutcome | null) ?? null, roundRecomputed: recomputed }, finding: null, claim: null };
+  }
+
+  /**
+   * DEV-12 (10.3): one item of design.a11y.review, remembered as `<instance>#<item>` with the component's files as its
+   * scope. Once all four items are decided, the execution takes their decision as a review would (G-17): a rejected
+   * item fails it, four accepted pass it; until then it stays «يحتاج مراجعة».
+   */
+  async #onReviewItem(checkRunId: string, item: A11yReviewItem, decision: ReviewDecision, note: string): Promise<ReviewRecorded> {
+    const { db } = this.#o;
+    const c = db.get<{ id: string; run_id: string; check_id: string; component: string; state: string; project_id: string }>('SELECT c.id, c.run_id, c.check_id, c.component, c.state, r.project_id FROM check_runs c JOIN runs r ON r.id = c.run_id WHERE c.id = ?', checkRunId);
+    if (!c) throw new CommandError('not_found', { reason: 'check_run' });
+    if (c.check_id !== 'design.a11y.review') throw new CommandError('invalid_payload', { path: 'target.item', reason: 'not_a_review_check' });
+    if (c.state !== 'finished') throw new CommandError('busy', { reason: 'check_running' });
+    const instance = `${c.check_id}@${c.component}`;
+    const snapshotId = this.#snapshotOf(c.project_id, c.run_id);
+    const files = await this.#componentFiles(c.project_id, snapshotId, c.component);
+    const row = this.#insert({ projectId: c.project_id, targetType: 'check', targetRef: `${instance}#${item}`, decision, note, files, fingerprint: null, snapshotId });
+    const latest = reviewItems(db, c.project_id, instance);
+    let outcome: CheckOutcome | null = null;
+    if (A11Y_REVIEW_ITEMS.every((i) => latest.has(i))) {
+      outcome = [...latest.values()].some((r) => r.decision === 'reject') ? 'failed' : 'passed';
+      db.transaction(() => {
+        db.run('UPDATE check_runs SET outcome = ?, review_id = ?, auto_outcome = coalesce(auto_outcome, outcome) WHERE id = ?', outcome, row.id, checkRunId);
+        db.run('UPDATE round_checks SET outcome = ?, reviewed = 1 WHERE check_run_id = ?', outcome, checkRunId);
+      });
+    }
+    let recomputed = false;
+    if (outcome) {
+      try {
+        recomputed = this.#o.purity.recomputeFor(checkRunId) !== null;
+      } catch (e) {
+        this.#o.logger.log('error', 'the round could not be computed again after a review', { error: e instanceof Error ? e.message.slice(0, 300) : String(e) });
+      }
+    }
+    this.#o.runs?.emitAfterReview(c.run_id, checkRunId);
+    const now = db.get<{ outcome: string | null; auto_outcome: string | null }>('SELECT outcome, auto_outcome FROM check_runs WHERE id = ?', checkRunId);
+    return { review: await this.#view(row), check: { checkRunId, instance, outcome: (now?.outcome as CheckOutcome | null) ?? null, autoOutcome: (now?.auto_outcome as CheckOutcome | null) ?? null, roundRecomputed: recomputed }, finding: null, claim: null };
   }
 
   async #onFinding(findingId: string, decision: ReviewDecision, note: string): Promise<ReviewRecorded> {
@@ -247,7 +306,7 @@ export class ReviewsService {
     return {
       id: r.id,
       projectId: r.project_id,
-      target: { type: r.target_type === 'model_claim' ? 'modelClaim' : r.target_type, id: this.#targetId(r) },
+      target: { type: r.target_type === 'model_claim' ? 'modelClaim' : r.target_type, id: this.#targetId(r), ...itemOf(r) },
       targetRef: r.target_ref,
       decision: (['accept', 'reject', 'false_positive', 'card', 'not_issue'].includes(r.decision) ? r.decision : r.decision === 'passed' ? 'accept' : 'reject') as ReviewDecision,
       note: r.note ?? '',

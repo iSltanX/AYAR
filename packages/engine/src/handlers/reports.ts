@@ -54,3 +54,12 @@ export const tasksVerify: CommandHandler = async (payload, ctx) => {
     throw e;
   }
 };
+
+/** reports.copies (protocol 1.7, DEV-12): the project's «انسخ للنموذج» in the last days, from the audit records (G-21). */
+export const reportsCopies: CommandHandler = (payload, ctx) => {
+  const { projectId, days } = payload as CommandPayload<'reports.copies'>;
+  if (!ctx.db.get('SELECT id FROM projects WHERE id = ?', projectId)) throw new CommandError('not_found', { reason: 'project' });
+  const since = new Date(ctx.clock.now().getTime() - days * 24 * 60 * 60 * 1000).toISOString();
+  const row = ctx.db.get<{ n: number }>("SELECT count(*) AS n FROM audit_log WHERE action = 'report.copied' AND project_id = ? AND at >= ?", projectId, since);
+  return { count: row?.n ?? 0 };
+};

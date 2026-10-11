@@ -55,10 +55,16 @@ describe('command registry (6.5)', () => {
   // side, Finder, the editor, native menus) and the live log tail of a running check.
   const DEV11_MAIN = ['clipboard.copyText', 'editor.open', 'menu.popup', 'project.reveal', 'window.layout'];
   const DEV11_EXTRA = [...DEV11_MAIN, 'check.tail'];
+  // D-DEV12-01, D-DEV12-02 and D-DEV12-05 (protocol 1.7): the section panels' report, the profile's versions and the
+  // units with no test (engine), and the settings' «حول» and the privacy guide's «افتح الإعدادات» (main).
+  const DEV12_MAIN = ['about.get', 'about.openRepository', 'system.openPrivacySettings'];
+  const DEV12_ENGINE = ['check.report', 'profile.versions', 'reports.copies', 'tasks.gaps'];
 
-  it('adds only the documented main-process, host-only, DEV-4, DEV-5, DEV-7, DEV-9 and DEV-11 commands', () => {
+  it('adds only the documented main-process, host-only, DEV-4, DEV-5, DEV-7, DEV-9, DEV-11 and DEV-12 commands', () => {
     const extra = COMMAND_NAMES.filter((c) => !PLAN_COMMANDS.includes(c)).sort();
-    expect(extra).toEqual([...DEV3_EXTRA, ...DEV4_EXTRA, ...DEV5_EXTRA, ...DEV7_EXTRA, ...DEV9_EXTRA, ...DEV11_EXTRA].sort());
+    expect(extra).toEqual([...DEV3_EXTRA, ...DEV4_EXTRA, ...DEV5_EXTRA, ...DEV7_EXTRA, ...DEV9_EXTRA, ...DEV11_EXTRA, ...DEV12_MAIN, ...DEV12_ENGINE].sort());
+    for (const c of DEV12_MAIN as (keyof typeof COMMANDS)[]) expect(COMMANDS[c]).toMatchObject({ handler: 'main', audience: 'renderer', owner: 'C-01', since: '1.7', implementedIn: 'DEV-12', grants: [] });
+    for (const c of DEV12_ENGINE as (keyof typeof COMMANDS)[]) expect(COMMANDS[c]).toMatchObject({ handler: 'engine', audience: 'renderer', since: '1.7', implementedIn: 'DEV-12', grants: [] });
     for (const c of DEV11_MAIN as (keyof typeof COMMANDS)[]) expect(COMMANDS[c]).toMatchObject({ handler: 'main', audience: 'renderer', owner: 'C-01', since: '1.6', implementedIn: 'DEV-11', grants: [] });
     expect(COMMANDS['check.tail']).toMatchObject({ handler: 'engine', audience: 'renderer', owner: 'C-17', since: '1.6', implementedIn: 'DEV-11', grants: [] });
     for (const c of DEV9_EXTRA as (keyof typeof COMMANDS)[]) expect(COMMANDS[c]).toMatchObject({ handler: 'engine', audience: 'renderer', since: '1.5', implementedIn: 'DEV-9', grants: [] });

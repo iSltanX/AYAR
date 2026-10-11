@@ -5,7 +5,8 @@
   // nothing is drawn for them here. Toolbar from the start side (gap 16): breadcrumb ending in the page title
   // (title/sub; crumbs are 28 high, the chevron follows the language) · drag space · primary action · search ·
   // inspector toggle (panel-left in Arabic, panel-right in English, D-DES3-09). The bar is a window drag
-  // region; its controls are not.
+  // region; its controls are not. A primary action may carry the Run menu (C-23, D-DES3-07: a native menu): a
+  // chevron beside it opens the menu under itself (D-DEV12-04).
   import type { Snippet } from 'svelte';
   import { useLocale } from '../lib/locale.ts';
   import type { WindowControls } from '../lib/shell.ts';
@@ -24,8 +25,8 @@
     title: string;
     /** The crumbs before the title, from the start (e.g. Projects › Texts library). */
     breadcrumb?: readonly Crumb[];
-    /** The page's primary action (ink button). */
-    primary?: { label: string; onclick?: () => void; disabled?: boolean };
+    /** The page's primary action (ink button), and the Run menu beside it: called with the chevron's box. */
+    primary?: { label: string; onclick?: () => void; disabled?: boolean; menu?: { label: string; onopen: (anchor: DOMRect) => void } };
     /** The search field (C-18 Search field, 200 wide). */
     search?: Snippet;
     inspectorOpen?: boolean;
@@ -52,6 +53,10 @@
     <div class="actions">
       {#if primary}
         <Button kind="primary" disabled={primary.disabled} onclick={() => primary.onclick?.()}>{primary.label}</Button>
+        {#if primary.menu}
+          {@const menu = primary.menu}
+          <IconButton icon="chevron-down" label={menu.label} aria-haspopup="menu" onclick={(e: MouseEvent) => menu.onopen((e.currentTarget as HTMLElement).getBoundingClientRect())} />
+        {/if}
       {/if}
       {#if search}{@render search()}{/if}
       <IconButton

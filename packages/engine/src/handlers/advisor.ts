@@ -1,4 +1,4 @@
-// advisor.suggest, task.create and tasks.list (C-20, FR-46, FR-45, FR-18). The advisor reads the project's last
+// advisor.suggest, task.create, tasks.list and tasks.gaps (C-20, FR-46, FR-45, FR-18). The advisor reads the project's last
 // discovery (ecosystems, migration folders), never the files themselves, and runs nothing.
 import type { CommandPayload } from '@ayar/protocol';
 import { AdvisorInputError, suggest } from '../advisor/advisor.ts';
@@ -41,4 +41,10 @@ export const tasksList: CommandHandler = (payload, ctx) => {
   const { projectId } = payload as CommandPayload<'tasks.list'>;
   knownProject(ctx, projectId);
   return { tasks: ctx.services.tasks.list(projectId) };
+};
+
+export const tasksGaps: CommandHandler = async (payload, ctx) => {
+  const { projectId } = payload as CommandPayload<'tasks.gaps'>;
+  knownProject(ctx, projectId);
+  return ctx.services.tasks.gaps(projectId);
 };

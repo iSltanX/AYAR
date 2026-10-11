@@ -12,15 +12,17 @@
     size?: 'sm' | 'md';
     /** A count after the label, as a summary writes it (DES-4 6.1: «اجتاز 5»); Latin digits. */
     count?: number;
+    /** A qualifier in parentheses after the label (15.2: «اجتاز (لا أساس للمقارنة)»), already translated. */
+    qualifier?: string;
   }
-  let { result, size = 'md', count }: Props = $props();
+  let { result, size = 'md', count, qualifier }: Props = $props();
   const { t } = useLocale();
   const parts = $derived(badgeParts(result));
 </script>
 
 <span class="badge {size} status-{parts.family}" data-result={result}>
   <StatusSymbol symbol={parts.family} size={size === 'md' ? 16 : 12} />
-  <span class="label">{t(`status.result.${result}`)}{#if count !== undefined}&nbsp;<span class="count">{count}</span>{/if}</span>
+  <span class="label">{t(`status.result.${result}`)}{#if qualifier}&nbsp;({qualifier}){/if}{#if count !== undefined}&nbsp;<span class="count">{count}</span>{/if}</span>
   {#if parts.reviewed}<span class="eye"><Icon name="eye" size={12} /></span>{/if}
 </span>
 

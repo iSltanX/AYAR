@@ -11,7 +11,7 @@
 //   into the same round with the karat updated; a source change then «أعد الفاشل» as a targeted run with the karat
 //   unchanged; and on the unchanged state a failure then a pass merged as «متذبذب», both attempts kept;
 // - compare.runs between two of these runs (AT-22), and the integrity panel of the report (AT-46).
-import type { ReportBuilt, ResultsPage, ReviewRecorded, RunComparison, RunDetail, RunPlan } from '@ayar/protocol';
+import type { CheckReport, ReportBuilt, ResultsPage, ReviewRecorded, RunComparison, RunDetail, RunPlan } from '@ayar/protocol';
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -96,6 +96,10 @@ describe.runIf(existsSync(PNPM))('AT-24: the fix cycle and the integrity guard (
     expect(onUnit!.displayId).toMatch(/^AYR-BEH-UNIT-\d{4}$/);
     expect(r.findings.find((f) => f.checkId === 'integ.guard')).toMatchObject({ ruleId: 'guard.skipped-test', location: { path: 'src/lib/stats.test.ts', line: 11 }, proof: 'suspected' });
     expect(r.findings.find((f) => f.checkId === 'integ.guard')!.displayId).toMatch(/^AYR-INT-GRD-\d{4}$/);
+    // DEV-12: the guard's report names the check each effect touches, for the integrity page (C-22 «الربط»).
+    const guardRun = execOf(skipRun, 'integ.guard@.');
+    const report = ok<CheckReport>(await engine.invoke('check.report', { checkRunId: guardRun.checkRunId }));
+    expect(report.info.links).toEqual([{ rule: 'guard.skipped-test', path: 'src/lib/stats.test.ts', line: 11, check: 'beh.unit' }]);
     // A group run computes no index; the guard's effect still counts for nothing until a review (D-12).
     expect(skipRun.run.purity).toBeNull();
   }, 600_000);

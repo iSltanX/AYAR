@@ -1,6 +1,6 @@
 // The system interactions the UI may ask for (C-01): folder and file dialogs and the clipboard, as an
 // interface the gateway calls. No screens here: these are macOS's own dialogs.
-import { clipboard, dialog, Menu, shell, type BrowserWindow, type MenuItemConstructorOptions, type MessageBoxOptions } from 'electron';
+import { app, clipboard, dialog, Menu, shell, type BrowserWindow, type MenuItemConstructorOptions, type MessageBoxOptions } from 'electron';
 import { execFile } from 'node:child_process';
 import { lstat, realpath } from 'node:fs/promises';
 import { promisify } from 'node:util';
@@ -10,6 +10,10 @@ import { fileInside } from './file-inside.ts';
 import { controlsFromAppleLanguages } from './window-controls.ts';
 
 const run = promisify(execFile);
+/** Where an editor's command-line tool is looked for (E-17): Homebrew, /usr/local, then the system. */
+const EDITOR_PATH = '/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin';
+/** 13.5 (22.1): Privacy & Security › Files and Folders in System Settings. */
+const PRIVACY_FILES_PANE = 'x-apple.systempreferences:com.apple.preference.security?Privacy_FilesAndFolders';
 
 let controls: Promise<'left' | 'right'> | null = null;
 
@@ -63,8 +67,24 @@ export function electronSystemServices(parent: () => BrowserWindow | null): Syst
       return Promise.resolve();
     },
     fileInside,
-    async openInEditor(path) {
-      await run('/usr/bin/open', ['-t', path], { timeout: 10_000 });
+    async openInEditor(command) {
+      // GUI apps start with a short PATH: the editors' command-line tools usually live in Homebrew's or /usr/local's.
+      await run(command.program, command.args, { timeout: 10_000, env: { PATH: EDITOR_PATH, HOME: process.env.HOME ?? '' } });
+    },
+    appVersion() {
+      return app.getVersion();
+    },
+    async openExternal(url, confirm) {
+      if (!/^https:\/\/[^\s]+$/.test(url)) return false;
+      const opts: MessageBoxOptions = { type: 'question', message: confirm.title, detail: confirm.detail, buttons: [confirm.cancel, confirm.open], defaultId: 1, cancelId: 0, noLink: true };
+      const w = owner();
+      const r = w ? await dialog.showMessageBox(w, opts) : await dialog.showMessageBox(opts);
+      if (r.response !== 1) return false;
+      await shell.openExternal(url);
+      return true;
+    },
+    async openPrivacySettings() {
+      await shell.openExternal(PRIVACY_FILES_PANE);
     },
     popupMenu(entries, at) {
       return new Promise((resolve) => {
