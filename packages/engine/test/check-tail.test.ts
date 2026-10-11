@@ -1,7 +1,7 @@
 // check.tail (protocol 1.6, D-DEV11-03): the live row's «ذيل السجل» (9.6 point 3). While a check runs, its last
 // lines come from the executor's redacted counters (never the log file's path); after it, from its raw result. A
 // secret printed by the check reaches the tail already redacted; an unknown execution is not_found.
-import type { CheckRunView, RunDetail } from '@ayar/protocol';
+import type { RunDetail } from '@ayar/protocol';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -38,8 +38,8 @@ describe('check.tail', () => {
     await approveAll(engine, projectId);
     const p = await plan(engine, projectId, { kind: 'check', instance: 'custom.slow@.' });
     const run = await startRun(engine, p.id);
-    const running = await engine.waitForEvent('check.state', (e) => (e.payload as CheckRunView).instance === 'custom.slow@.' && (e.payload as CheckRunView).state === 'running', 30_000);
-    const checkRunId = (running.payload as CheckRunView).checkRunId;
+    const running = await engine.waitForEvent('check.state', (e) => (e.payload).instance === 'custom.slow@.' && (e.payload).state === 'running', 30_000);
+    const checkRunId = (running.payload).checkRunId;
 
     let live: Tail | null = null;
     for (let i = 0; i < 60 && !live; i++) {
