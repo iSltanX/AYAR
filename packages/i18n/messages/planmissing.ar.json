@@ -1,0 +1,20 @@
+{
+  "planmissing.versionTag": "ناقص: نسخة {tool} غير مطابقة",
+  "planmissing.versionReason": "السبب: المشروع يطلب {tool} {spec}، والطرفية تعطي {version}.",
+  "planmissing.none": "لا نسخة",
+  "planmissing.required": "المطلوبة",
+  "planmissing.from": "من",
+  "planmissing.available": "المتاحة في الطرفية",
+  "planmissing.installed": "مثبتة على الجهاز",
+  "planmissing.via": "عبر",
+  "planmissing.use": "استخدم {version}",
+  "planmissing.orInstall": "أو ثبّت النسخة المطلوبة خارج عِيَار ثم أعد القراءة.",
+  "planmissing.setupReason": "يحتاج تجهيزًا: {what}.",
+  "planmissing.preview": "معاينة الأمر قبل التنفيذ:",
+  "planmissing.install": "ثبّت…",
+  "planmissing.changedTag": "ناقص: تغيرت المواصفة بعد الاعتماد",
+  "planmissing.changedReason": "تحتاج اعتمادًا: تغيّر أمر الفحص في ملف المعايير بعد اعتماده، فلا يُشغَّل حتى تعتمد الأمر الجديد.",
+  "planmissing.approve": "اعتمد",
+  "planmissing.fullDiff": "اعرض الفرق كاملًا",
+  "planmissing.unknown": "ناقص لسبب لم يُسمَّ"
+}

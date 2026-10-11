@@ -544,6 +544,10 @@
             view = 'evidence';
           }}
           onreview={reviewCheck}
+          onrerun={(id: string) => {
+            const instance = checks.find((c) => c.checkRunId === id)?.instance;
+            if (instance) void recheck([instance]);
+          }}
         />
       {:else if view === 'evidence'}
         <EvidenceTab rows={evidenceRows(checks)} checkId={evidenceCheck} />

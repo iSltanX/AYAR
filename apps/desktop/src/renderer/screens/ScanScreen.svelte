@@ -7,6 +7,7 @@
   import MonitorView from './MonitorView.svelte';
   import PlanView from './PlanView.svelte';
   import ResultsView from './ResultsView.svelte';
+  import DiskFullState from './states/DiskFullState.svelte';
 
   let { projectId, runId }: { projectId: string; runId: string | null } = $props();
   const app = useApp();
@@ -21,6 +22,8 @@
   <PlanView {projectId} />
 {:else if run && isActive(run)}
   <MonitorView {projectId} runId={runId} />
+{:else if run && run.cancelReason === 'disk_full'}
+  <DiskFullState {projectId} {run} />
 {:else if run}
   {#key run.state}<ResultsView {projectId} runId={runId} />{/key}
 {/if}

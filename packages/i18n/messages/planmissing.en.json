@@ -1,0 +1,20 @@
+{
+  "planmissing.versionTag": "Missing: {tool} version does not match",
+  "planmissing.versionReason": "Reason: the project asks for {tool} {spec}, and the terminal gives {version}.",
+  "planmissing.none": "no version",
+  "planmissing.required": "Required",
+  "planmissing.from": "from",
+  "planmissing.available": "In the terminal",
+  "planmissing.installed": "Installed on the computer",
+  "planmissing.via": "via",
+  "planmissing.use": "Use {version}",
+  "planmissing.orInstall": "Or install the required version outside AYAR, then read again.",
+  "planmissing.setupReason": "Needs setup: {what}.",
+  "planmissing.preview": "The command, previewed before it runs:",
+  "planmissing.install": "Install…",
+  "planmissing.changedTag": "Missing: changed since approval",
+  "planmissing.changedReason": "Needs approval: the check’s command changed in the profile after its approval, so it does not run until you approve the new one.",
+  "planmissing.approve": "Approve",
+  "planmissing.fullDiff": "Show the whole difference",
+  "planmissing.unknown": "Missing for a reason not named"
+}

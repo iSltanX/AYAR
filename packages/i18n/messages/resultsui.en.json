@@ -77,5 +77,7 @@
   "resultsui.reportFailed": "The report could not be built ({code}).",
   "resultsui.crumb": "Results",
   "resultsui.meta.date": "{day}, {time}",
-  "resultsui.next.stopped": "Re-run incomplete: {count, plural, one {# check was} other {# checks were}} cancelled before ending"
+  "resultsui.next.stopped": "Re-run incomplete: {count, plural, one {# check was} other {# checks were}} cancelled before ending",
+  "resultsui.check.rerun": "Run again",
+  "resultsui.check.openLog": "Open the log"
 }
