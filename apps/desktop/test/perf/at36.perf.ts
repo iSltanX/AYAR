@@ -11,13 +11,15 @@
 //   engine command) every 100 ms during a full scan of the journey project; the median and the p95, in the page.
 // - Updates per check: check.progress/check.state events per running check per second, from the engine's events
 //   seen by the page's bridge subscription, never more than 10 a second.
-// - Memory and idle processor: every 500 ms, the RSS of AYAR's whole process tree (main, helpers, engine; the
+// - Memory and idle processor: every 500 ms during the scan, AYAR's whole process tree (main, helpers, engine; the
 //   project's own processes are children of the engine and are excluded by their AYAR_CHECK_TOKEN environment, read
-//   with ps -E) during the scan, and the processor share of the tree over 30 idle seconds afterwards.
+//   with ps -E): the physical footprint the system charges each process (/usr/bin/footprint, what Activity Monitor
+//   shows as Memory) and, beside it, the RSS sum (which counts shared framework pages once per process); then the
+//   processor share of the tree over 20 idle seconds afterwards.
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { cpus, loadavg, totalmem } from 'node:os';
-import { dirname } from 'node:path';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpus, loadavg, tmpdir, totalmem } from 'node:os';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { PACKAGED_APP, launch, tempDataDir, until, type Launched } from '../e2e/support.ts';
@@ -89,6 +91,21 @@ function tree(rootPid: number): { pid: number; rssMb: number; cpu: number; comm:
   if (root) out.push({ pid: root.pid, rssMb: root.rssMb, cpu: root.cpu, comm: root.comm });
   walk(rootPid);
   return out;
+}
+
+/** The physical footprint of a set of processes in MB (/usr/bin/footprint -j), or null when the tool refuses. */
+function footprintMb(pids: number[]): number | null {
+  if (!pids.length) return null;
+  const dir = mkdtempSync(join(tmpdir(), 'ayar-perf-fp-'));
+  try {
+    execFileSync('/usr/bin/footprint', ['-j', join(dir, 'fp.json'), ...pids.map(String)], { stdio: 'ignore' });
+    const j = JSON.parse(readFileSync(join(dir, 'fp.json'), 'utf8')) as { processes: { footprint: number }[] };
+    return j.processes.reduce((s, p) => s + p.footprint, 0) / 2 ** 20;
+  } catch {
+    return null;
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 }
 
 const report: Record<string, unknown> = { test: 'AT-36 (app)', targets: TARGETS, repeat: REPEAT };
@@ -165,12 +182,21 @@ describe('AT-36 (app): cold start, UI response, update rate, memory, idle proces
       const pid = app.process().pid!;
       const latencies: number[] = [];
       const rss: number[] = [];
+      const footprint: number[] = [];
       let state = 'running';
+      let sampling = false;
       const sampler = setInterval(() => {
+        if (sampling) return;
+        sampling = true;
         try {
-          rss.push(tree(pid).reduce((s, r) => s + r.rssMb, 0));
+          const procs = tree(pid);
+          rss.push(procs.reduce((s, r) => s + r.rssMb, 0));
+          const fp = footprintMb(procs.map((p) => p.pid));
+          if (fp !== null) footprint.push(fp);
         } catch {
           /* a process vanished between ps calls */
+        } finally {
+          sampling = false;
         }
       }, 500);
       try {
@@ -209,14 +235,14 @@ describe('AT-36 (app): cold start, UI response, update rate, memory, idle proces
       }
       report['uiResponse'] = { samples: latencies.length, medianMs: Math.round(median(latencies) * 10) / 10, p95Ms: Math.round(p95(latencies) * 10) / 10, maxMs: Math.round(Math.max(...latencies) * 10) / 10 };
       report['updatesPerCheck'] = { checks: Object.keys(events).length, busiestSecond: busiest };
-      report['memory'] = { samples: rss.length, peakRssMb: Math.round(Math.max(...rss)), medianRssMb: Math.round(median(rss)) };
+      report['memory'] = { samples: rss.length, peakFootprintMb: footprint.length ? Math.round(Math.max(...footprint)) : null, medianFootprintMb: footprint.length ? Math.round(median(footprint)) : null, peakRssMb: Math.round(Math.max(...rss)), medianRssMb: Math.round(median(rss)) };
       report['idleCpu'] = { samples: idle.length, medianPercent: Math.round(median(idle) * 10) / 10, maxPercent: Math.max(...idle) };
       process.stderr.write(`${JSON.stringify({ uiResponse: report['uiResponse'], updatesPerCheck: report['updatesPerCheck'], memory: report['memory'], idleCpu: report['idleCpu'] })}\n`);
       expect(state).toBe('finished');
       if (JUDGE) {
         expect(p95(latencies)).toBeLessThanOrEqual(TARGETS.uiResponseP95Ms);
         expect(busiest).toBeLessThanOrEqual(TARGETS.updatesPerCheckPerSecond);
-        expect(Math.max(...rss)).toBeLessThanOrEqual(TARGETS.peakRssMb);
+        expect(footprint.length ? Math.max(...footprint) : Math.max(...rss)).toBeLessThanOrEqual(TARGETS.peakRssMb);
         expect(median(idle)).toBeLessThanOrEqual(TARGETS.idleCpuPercent);
       }
       await until(() => Promise.resolve(true), () => true, 1);
