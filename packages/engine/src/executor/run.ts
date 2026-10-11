@@ -63,6 +63,10 @@ function cancelReasonOf(cancel: 'user' | 'app_quit' | 'disk_full' | null): Reaso
   return { key: cancel === 'app_quit' ? 'run.reason.appQuit' : cancel === 'disk_full' ? 'run.reason.diskFull' : 'run.reason.cancelledByUser' };
 }
 
+/** A build's output inventory (DEV-12): at most this many files, this many folder levels deep. */
+const OUTPUT_INVENTORY_MAX = 200;
+const OUTPUT_INVENTORY_DEPTH = 4;
+
 /** check.tail's longest line (protocol 1.6): a longer one is cut and marked. */
 const TAIL_LINE_CHARS = 20_000;
 /** At most this many provisional findings are sent per execution (9.6 point 5: the final reading decides). */
@@ -683,6 +687,33 @@ export class RunService {
     return underAny([...this.#outputs(projectId), ...outputDirs]);
   }
 
+  /**
+   * The regular files under the declared output folders (the profile's `outputs` and the output folders discovery
+   * found), with their sizes: no link followed, at most OUTPUT_INVENTORY_MAX files, OUTPUT_INVENTORY_DEPTH levels deep.
+   */
+  async #outputInventory(ctx: CheckContext): Promise<{ path: string; size: number }[]> {
+    const { fs } = this.#o.ports;
+    const dirs = [...new Set([...ctx.outputs, ...(latestSnapshot(this.#o.db, ctx.projectId)?.inventory.outputDirs.map((d) => d.path) ?? [])])]
+      .map((d) => d.replace(/^\.\//, '').replace(/\/+$/, ''))
+      .filter((d) => d && d !== '.' && !d.startsWith('..') && !d.startsWith('/'));
+    const out: { path: string; size: number }[] = [];
+    const walk = async (rel: string, depth: number): Promise<void> => {
+      if (out.length >= OUTPUT_INVENTORY_MAX || depth > OUTPUT_INVENTORY_DEPTH) return;
+      const entries = await fs.readdirEntries(posix.join(ctx.root, rel)).catch(() => []);
+      for (const e of [...entries].sort((a, b) => (a.name < b.name ? -1 : 1))) {
+        if (out.length >= OUTPUT_INVENTORY_MAX) return;
+        const child = posix.join(rel, e.name);
+        if (e.kind === 'directory') await walk(child, depth + 1);
+        else if (e.kind === 'file') {
+          const st = await fs.lstat(posix.join(ctx.root, child));
+          if (st?.isFile) out.push({ path: child, size: st.size });
+        }
+      }
+    };
+    for (const d of dirs) await walk(d, 1);
+    return out;
+  }
+
   /** The data volume's free space is under its reserve (an unknown free space is not low). */
   async #diskLow(): Promise<boolean> {
     const free = await this.#o.ports.fs.freeBytes(this.#o.layout.root).catch(() => null);
@@ -1005,7 +1036,10 @@ export class RunService {
     const judgement = await this.#o.verdict.judge(spec, { projectId: ctx.projectId, root: ctx.root, req, signal: active.quit.signal, guard: this.#o.integrity.effectsOn(ctx.guard, e.instance) });
     if (judgement.outcome === 'cancelled') return this.#finishCheck(e, 'cancelled', { key: 'run.reason.appQuit' }, raw, notes, r);
     const evidenceIds = refs.filter((x) => x.kind === 'report').map((x) => x.id);
-    if (judgement.report) evidenceIds.push((await add('parsed.json', 'parsed', reportEvidence(redactor.redactJson(judgement.report)))).id);
+    // DEV-12 (13.3 «جرد المخرجات المعلنة بأحجامها»): a build keeps the files of the declared output folders with their
+    // sizes beside its report; those folders are usually ignored by Git, so no state snapshot holds them.
+    const inventory = spec.checkId === 'code.build' ? await this.#outputInventory(ctx) : null;
+    if (judgement.report) evidenceIds.push((await add('parsed.json', 'parsed', reportEvidence(redactor.redactJson(judgement.report), inventory ? { outputInventory: redactor.redactJson(inventory) } : {}))).id);
     e.judged = { req, evidenceIds };
     this.#finishCheck(e, judgement.outcome, judgement.reason, raw, notes, r, undefined, { judgement, evidenceIds, reader: judgement.report ? { id: judgement.report.reader, version: judgement.report.readerVersion, formats: judgement.report.formats } : null });
   }
@@ -1695,8 +1729,43 @@ export class RunService {
       problems: parsed.problems,
       info: parsed.info,
       findingsCount: parsed.findings.length,
-      outputs: await this.#writtenOutputs(row.run_id, row.raw_json),
+      outputs: Array.isArray((parsed as { outputInventory?: unknown }).outputInventory)
+        ? await this.#inventoryOutputs(checkRunId, (parsed as unknown as { outputInventory: { path: string; size: number }[] }).outputInventory)
+        : await this.#writtenOutputs(row.run_id, row.raw_json),
     };
+  }
+
+  /** A build's kept output inventory, each file beside its size in the same instance's build of the previous complete round. */
+  async #inventoryOutputs(checkRunId: string, now: { path: string; size: number }[]): Promise<CheckReport['outputs']> {
+    const db = this.#o.db;
+    const me = db.get<{ run_id: string; check_id: string; component: string; started_at: string | null; project_id: string }>(
+      'SELECT c.run_id, c.check_id, c.component, r.started_at, r.project_id FROM check_runs c JOIN runs r ON r.id = c.run_id WHERE c.id = ?',
+      checkRunId,
+    );
+    const prev = me
+      ? db.get<{ id: string }>(
+          "SELECT c.id FROM check_runs c JOIN runs r ON r.id = c.run_id WHERE r.project_id = ? AND r.id <> ? AND r.kind = 'full' AND r.state = 'finished' AND r.cancel_reason IS NULL AND r.started_at < ? AND c.check_id = ? AND c.component = ? AND c.state = 'finished' ORDER BY r.started_at DESC LIMIT 1",
+          me.project_id,
+          me.run_id,
+          me.started_at ?? '9999',
+          me.check_id,
+          me.component,
+        )
+      : undefined;
+    let before = new Map<string, number>();
+    const ref = prev ? this.#o.evidence.store.refsOf(prev.id).find((e) => e.kind === 'parsed') : undefined;
+    if (ref && ref.size <= REPORT_READ_LIMIT) {
+      try {
+        const data = await this.#o.ports.fs.readFile(this.#o.evidence.store.absolute(ref.relPath));
+        if (createHash('sha256').update(data).digest('hex') === ref.sha256) {
+          const inv = (JSON.parse(new TextDecoder().decode(data)) as { outputInventory?: { path: string; size: number }[] }).outputInventory;
+          if (Array.isArray(inv)) before = new Map(inv.map((x) => [x.path, x.size]));
+        }
+      } catch {
+        // A previous report that cannot be read leaves the column empty, never a guess.
+      }
+    }
+    return now.slice(0, 200).map((x) => ({ path: x.path, sizeBytes: x.size, previousBytes: before.get(x.path) ?? null }));
   }
 
   /** The declared outputs an execution created or modified, sized from its run's end snapshot and the round before. */

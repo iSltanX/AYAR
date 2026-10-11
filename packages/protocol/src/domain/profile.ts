@@ -103,6 +103,17 @@ export const CustomCheck = z.strictObject({
   }),
   network: z.boolean().optional(),
   writesRepo: z.boolean().optional(),
+  /**
+   * Protocol 1.7 (DEV-12, screen 9.2 «الاسم»): the name the user gives it, shown in place of its id. One line, no
+   * control or direction character; it names the check and is not part of its spec (no new approval).
+   */
+  title: z
+    .string()
+    .trim()
+    .min(1)
+    .max(120)
+    .refine((s) => !/[\u0000-\u001f\u007f-\u009f\u2028\u2029\u202a-\u202e\u2066-\u2069]/.test(s), 'control or bidi character')
+    .optional(),
 });
 export type CustomCheck = z.infer<typeof CustomCheck>;
 export const CustomName = z.string().regex(/^[a-z][a-z0-9-]{0,39}$/);

@@ -1,0 +1,17 @@
+{
+  "statesui.denied.title": "macOS refused permission to read the folder",
+  "statesui.denied.reasonIn": "Why: the folder is inside «{location}», and AYAR's permission to read it was refused. AYAR reads nothing from it until you allow it in System Settings, and reading runs nothing.",
+  "statesui.denied.reason": "Why: AYAR's permission to read this folder was refused. AYAR reads nothing from it until you allow it in System Settings, and reading runs nothing.",
+  "statesui.denied.folder": "Folder:",
+  "statesui.denied.step1": "Open System Settings › Privacy & Security › Files and Folders.",
+  "statesui.denied.step2": "Turn on «{location}» under AYAR.",
+  "statesui.denied.step2Folder": "Turn on the folder under AYAR.",
+  "statesui.denied.step3": "Come back to AYAR and press «Try again».",
+  "statesui.denied.openSettings": "Open Settings",
+  "statesui.denied.retry": "Try again",
+  "statesui.missing.title": "The path is missing",
+  "statesui.missing.reason": "Why: the folder is no longer where it was registered; it may have been moved, renamed or deleted. The earlier runs and evidence are kept in AYAR.",
+  "statesui.missing.reasonLastRead": "Why: the folder is no longer where it was registered; it may have been moved, renamed or deleted. Last good reading: {date}. The earlier runs and evidence are kept in AYAR.",
+  "statesui.missing.path": "Registered path:",
+  "statesui.missing.relocate": "Locate the new folder"
+}

@@ -9,7 +9,7 @@ import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { confirmationGrant } from '../../../tools/cli/src/grants.ts';
-import { addProject, approveAll, plan, startRun, waitRun } from '../../../tools/cli/test/support/fixtures.ts';
+import { addProject, approveAll, plan, rescan, startRun, waitRun } from '../../../tools/cli/test/support/fixtures.ts';
 import { engineFor, LOGIN_PATH, ok, tempDir, type EngineConnection } from './support/scan.ts';
 
 let root: string;
@@ -87,6 +87,37 @@ describe('check.report', () => {
     const report = ok<CheckReport | null>(await engine.invoke('check.report', { checkRunId: c.checkRunId }));
     expect(report?.outputs).toEqual([{ path: 'dist/app.js', sizeBytes: 3000, previousBytes: 1000 }]);
   }, 180_000);
+});
+
+describe('check.report on a build', () => {
+  it('keeps the files of the ignored output folder with their sizes, against the previous complete round', async () => {
+    const { dir, cleanup: done } = tempDir('ayar-DEV-12-build-');
+    const e = await engineFor(dir, { path: LOGIN_PATH });
+    try {
+      const p = join(dir, 'app');
+      mkdirSync(p);
+      const pkg = (bytes: number) => JSON.stringify({ name: 'app', version: '1.0.0', private: true, scripts: { build: `mkdir -p dist && head -c ${bytes} /dev/zero > dist/app.js` } });
+      writeFileSync(join(p, 'package.json'), pkg(1000));
+      writeFileSync(join(p, '.gitignore'), 'dist/\n');
+      const { projectId: id } = await addProject(e, p);
+      ok(await e.invoke('profile.update', { projectId: id, patch: { references: { outputs: ['dist'] } } }));
+      await approveAll(e, id);
+      const round = await plan(e, id, { kind: 'full' });
+      const first = await waitRun(e, (await startRun(e, round.id)).runId, 120_000);
+      expect(first.checks.find((c) => c.checkId === 'code.build')?.outcome).toBe('passed');
+      writeFileSync(join(p, 'package.json'), pkg(2500));
+      await rescan(e, id);
+      await approveAll(e, id);
+      const again = await plan(e, id, { kind: 'check', instance: 'code.build@.' });
+      const d = await waitRun(e, (await startRun(e, again.id)).runId, 120_000);
+      const c = d.checks.find((x) => x.instance === 'code.build@.')!;
+      const report = ok<CheckReport | null>(await e.invoke('check.report', { checkRunId: c.checkRunId }));
+      expect(report?.outputs).toEqual([{ path: 'dist/app.js', sizeBytes: 2500, previousBytes: 1000 }]);
+    } finally {
+      await e.close();
+      done();
+    }
+  }, 300_000);
 });
 
 describe('reports.copies', () => {

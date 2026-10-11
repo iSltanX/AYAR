@@ -1,7 +1,7 @@
 // The flows more than one page starts (13.4 J1): adding a project from the folder dialog (⌘O, the empty state,
 // the title bar) or by dropping a folder, with the steps C-05 may stop at (a broad folder, a privacy permission).
 // The UI holds tokens only; the path stays in the main process (D-29).
-import type { BridgeDrop } from '@ayar/protocol';
+import type { BridgeDrop, RunSelection } from '@ayar/protocol';
 import { attempt } from './client.ts';
 import type { AppState } from './state.svelte.ts';
 
@@ -43,4 +43,18 @@ export async function addDroppedProject(app: AppState, drop: BridgeDrop): Promis
     return;
   }
   await addProject(app, drop.selectionToken);
+}
+
+/**
+ * Plans a selection and starts it (FR-18: a section, one check, a selection, a saved group, the advisor's checks),
+ * then shows its monitor. The plan is the engine's (G-24); a plan that cannot start leaves the page as it is.
+ */
+export async function runSelection(app: AppState, projectId: string, selection: RunSelection): Promise<boolean> {
+  const p = await attempt('run.plan', { projectId, selection });
+  if (!p.ok) return false;
+  const s = await attempt('run.start', { planId: p.result.id });
+  if (!s.ok) return false;
+  await app.runs.load(s.result.runId);
+  app.navigate({ name: 'scan', projectId, runId: s.result.runId });
+  return true;
 }

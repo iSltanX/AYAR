@@ -39,12 +39,27 @@ export function verdictOf(v: PurityVerdict): Verdict {
   return v;
 }
 
+/**
+ * The names users gave their custom checks (screen 9.2 «الاسم», protocol 1.7), from the profile of the project shown:
+ * every page that reads the profile hands them over, and the next project's replace them.
+ */
+const customTitles = new Map<string, string>();
+export function rememberCustomTitles(custom: Readonly<Record<string, { title?: string | undefined }>>): void {
+  customTitles.clear();
+  for (const [name, c] of Object.entries(custom)) if (c.title) customTitles.set(`custom.${name}`, c.title);
+}
+
 /** The check's title in the UI language (catalog), its custom name, or its id. */
 export function checkTitle(t: Translate, lang: Lang, checkId: string): string {
   const key = `catalog.check.${checkId}.title`;
   if (hasMessage(lang, key)) return t(key);
-  if (checkId.startsWith('custom.')) return checkId.slice('custom.'.length);
+  if (checkId.startsWith('custom.')) return customTitles.get(checkId) ?? checkId.slice('custom.'.length);
   return checkId;
+}
+
+/** «9 أكتوبر»: the day and the month (C-24). */
+export function dayMonth(iso: string | Date, lang: Lang): string {
+  return formatDate(new Date(iso), lang, { day: 'numeric', month: 'long' });
 }
 
 /** What the inspector says a check measures and cannot prove: the catalog's texts, or a custom check's general ones. */
