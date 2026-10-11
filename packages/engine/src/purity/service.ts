@@ -125,7 +125,11 @@ export class PurityService {
 
   summaryOf(runId: string): PuritySummary | null {
     const r = this.resultOf(runId);
-    return r ? puritySummary(r) : null;
+    if (!r) return null;
+    const summary = puritySummary(r);
+    // Protocol 1.6 (DEV-11): the round's display id (`ROUND-007`), which the purity card names beside its date.
+    const roundDisplayId = summary.roundId ? (this.#o.db.get<{ display_id: string }>('SELECT display_id FROM rounds WHERE id = ?', summary.roundId)?.display_id ?? null) : null;
+    return { ...summary, roundDisplayId };
   }
 
   #membersOfRun(runId: string): Map<string, Member> {

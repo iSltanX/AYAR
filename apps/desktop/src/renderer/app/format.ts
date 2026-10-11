@@ -1,6 +1,6 @@
 // From the protocol's data to what the components draw (C-24): outcome and readiness ids, check and section
 // names, reasons as sentences, dates and durations. Pure functions; no markup, no engine call.
-import { formatDate, MESSAGES, type Lang, type MessageKey, type Translate } from '@ayar/i18n';
+import { formatDate, LOCALES, MESSAGES, type Lang, type MessageKey, type Translate } from '@ayar/i18n';
 import type { CheckOutcome, PurityVerdict, Readiness as WireReadiness, Reason } from '@ayar/protocol';
 import type { BadgeResult, Readiness, Result, Verdict } from '../lib/status.ts';
 import type { Cost } from '../lib/tags.ts';
@@ -113,6 +113,17 @@ export function dayTime(iso: string | Date, lang: Lang): string {
 /** «14:32». */
 export function time(iso: string | Date, lang: Lang): string {
   return formatDate(new Date(iso), lang, { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+}
+
+/** «قبل 4 دقائق» / "4 minutes ago" (Latin digits, C-24). */
+export function ago(iso: string, lang: Lang, now = Date.now()): string {
+  const s = Math.round((Date.parse(iso) - now) / 1000);
+  const f = new Intl.RelativeTimeFormat(LOCALES[lang], { numeric: 'auto' });
+  const a = Math.abs(s);
+  if (a < 60) return f.format(Math.round(s), 'second');
+  if (a < 3600) return f.format(Math.round(s / 60), 'minute');
+  if (a < 86400) return f.format(Math.round(s / 3600), 'hour');
+  return f.format(Math.round(s / 86400), 'day');
 }
 
 /** m:ss (or h:mm:ss) from milliseconds; never negative. */
