@@ -14,6 +14,18 @@ export const EvidenceToken = z.string().regex(/^evt_[A-Za-z0-9_-]{43}$/);
 export const resultCommands = {
   'results.query': defineCommand({ ...base, implementedIn: 'DEV-6', payload: z.strictObject({ projectId: Id, filters: ResultsFilter }), result: ResultsPage }),
   'finding.get': defineCommand({ ...base, implementedIn: 'DEV-6', payload: z.strictObject({ findingId: Id }), result: FindingDetail }),
+  /**
+   * Protocol 1.6 (DEV-11, D-DEV11-03): the last lines of a check's log — while it runs, from the executor's redacted
+   * tail (9.7 keeps the last 200), after it, from its raw result — for the live row's «ذيل السجل» (9.6 point 3, 13.3).
+   * Text only, redacted before it was kept; the UI draws it as text (C-03).
+   */
+  'check.tail': defineCommand({
+    ...base,
+    since: '1.6',
+    implementedIn: 'DEV-11',
+    payload: z.strictObject({ checkRunId: Id, maxLines: z.int().min(1).max(200).optional() }),
+    result: z.strictObject({ lines: z.array(z.string().max(20_000)), totalLines: z.int().nonnegative(), live: z.boolean() }),
+  }),
   // A short-lived token for ayar-evidence:// (C-01); an invalid token answers "not found" without a path.
   'evidence.token': defineCommand({
     ...base,

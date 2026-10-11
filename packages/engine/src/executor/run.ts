@@ -188,6 +188,8 @@ interface Active {
   /** Aborted when the app quits: a report still being read is dropped, and the run ends the short way. */
   quit: AbortController;
   wake: () => void;
+  /** The redacted output counters and last lines of each running check (check.tail, protocol 1.6). */
+  tails: Map<string, OutputTotals>;
 }
 
 /**
@@ -367,7 +369,7 @@ export class RunService {
     const plan = PlanSchema.parse(JSON.parse(row.plan_json));
     const projectId = plan.projectId;
     let wake = () => {};
-    const active: Active = { runId, projectId, plan, cancel: null, procs: new Map(), cancelledChecks: new Set(), services: null, waiting: new Map(), collecting: new Set(), quit: new AbortController(), wake: () => wake() };
+    const active: Active = { runId, projectId, plan, cancel: null, procs: new Map(), cancelledChecks: new Set(), services: null, waiting: new Map(), collecting: new Set(), quit: new AbortController(), wake: () => wake(), tails: new Map() };
     this.#active.set(runId, active);
     // A run cancelled while it waited in the queue never starts.
     if (db.get<{ state: string }>('SELECT state FROM runs WHERE id = ?', runId)!.state !== 'queued') return;
@@ -742,6 +744,7 @@ export class RunService {
     const child = childFor(inv.plan.steps[0]!.env);
     const evDir = await evidence.store.open(ctx.projectId, runId, e.checkRunId);
     const totals: OutputTotals = { lines: 0, tail: [] };
+    active.tails.set(e.checkRunId, totals);
     const redactor = this.#o.redaction.redactor();
     const onSegment = (stream: 'stdout' | 'stderr', offset: number, length: number) => this.#o.events.log(runId, e.checkRunId, { stream, offset, length });
     // 9.6 point 5: the adapter's live parser turns a line into a provisional finding, confirmed or dropped by the
@@ -1617,6 +1620,22 @@ export class RunService {
 
   #emitRun(runId: string): void {
     this.#o.events.emit('run.state', this.view(runId));
+  }
+
+  /**
+   * check.tail (protocol 1.6): the last lines of a check's output. While it runs, from the executor's redacted
+   * counters (9.7 keeps the last 200 lines); afterwards, from its raw result. Never the log file's path.
+   */
+  tail(checkRunId: string, maxLines = 200): { lines: string[]; totalLines: number; live: boolean } {
+    const n = Math.max(1, Math.min(200, maxLines));
+    for (const a of this.#active.values()) {
+      const t = a.tails.get(checkRunId);
+      if (t) return { lines: t.tail.slice(-n), totalLines: t.lines, live: true };
+    }
+    const row = this.#o.db.get<{ raw_json: string | null }>('SELECT raw_json FROM check_runs WHERE id = ?', checkRunId);
+    if (!row) throw new CommandError('not_found', { reason: 'check_run' });
+    const tail = row.raw_json ? RawSchema.parse(JSON.parse(row.raw_json)).tail : [];
+    return { lines: tail.slice(-n), totalLines: tail.length, live: false };
   }
 
   list(projectId: string): RunList {

@@ -10,7 +10,7 @@
 - **الرموز والمنح:** الواجهة لا ترسل مسارًا أبدًا. ترسل رمزًا (`sel_` و`dst_` و`src_` و`cfm_`) تصدره العملية الرئيسية بعد نافذة نظام، أو بعد معاينة (`setup.preview` و`tools.preview`)، أو بعد تأكيد الواجهة لإجراء مدمّر (`confirm.issue`). وعند تمرير الأمر إلى المحرك تستبدل العملية الرئيسية بالرمز «منحة» (`grants`) تحمل المسار أو ربط التأكيد بالأمر وهدفه. والمحرك يرفض الأمر دون منحه (`checkGrants`).
 - **الأحداث:** مرقمة في «مجرى» (`stream`) لكل جلسة محرك، وللمشرف مجراه. الفجوة في الترقيم أو تبدّل المجرى تطلق إعادة المزامنة في الجسر (`bridge.resync`).
 - **`report.copied`** سجل تدقيق في `audit_log`، لا حدث (G-21). والأحداث الناقصة (تقدم التجهيز، وحالات فحوص النموذج والبطاقات) تضيفها مراحلها بإصدار ثانوي.
-- **عقود المجال** في `src/domain/` ملفًا لكل مجال: `DiscoverySnapshot` و`ResolvedEnv` وملف المعايير (`ProfileView` و`ExportedProfile` بصيغة `ayar-profile/1`) وعقود المشاريع من DEV-4 (الإصدار 1.1)، وسياق التغيير ونتيجة المستشار (`AdvisorContext` و`AdvisorResult`) والبطاقة (`TaskCard` و`TaskRecord` و`TaskSource`) من DEV-8، و`RunPlan` و`RunView` و`RunDetail` و`SavedGroup` وعقود الأدوات والتجهيز من DEV-5. والمرحلتان أضافتا عقودهما بالتوازي في الإصدار 1.2 نفسه، فجُمعتا فيه عند الدمج (G-WAVE4-03)، ومراحل التشغيل تضيف ما بعدها. ومن DEV-6 (الإصدار 1.3): عقود الأحكام في `domain/terms.ts` (النتائج والشدة والثبوت والمنشأ والحالة عبر التشغيلات) و`domain/findings.ts` (`ParsedReport` و`ParsedFinding` و`ExitSignal` و`Finding` وصفحة `results.query` وتفصيل `finding.get`) و`domain/purity.ts` (`PurityResult` و`PuritySummary` ومدخلات النزاهة)، واستدعاء المحول `InvocationTemplate` في `CheckSpec`، وحمولات `run.summary` و`finding.provisional` و`finding.final`. ومن DEV-7 (الإصدار 1.4): عقود المسبار في `domain/probe.ts` (هدف العرض ومصفوفته `RenderTarget`، والحالات `ProbeStates` بخطواتها ومحاكاة شبكتها وتوقعاتها، وميزانيات الويب `WebBudgets`، ومفتاح الصورة المرجعية `CaptureKey` واللقطة `CaptureView` والمرجع `BaselineView`)، والأمران `captures.list` و`baselines.list`، وعقد `baseline.approve`، ونوع التجهيز `install_browser`. ونتيجة `z.unknown()` تعني أن عقد النتيجة لم يُعرَّف بعد.
+- **عقود المجال** في `src/domain/` ملفًا لكل مجال: `DiscoverySnapshot` و`ResolvedEnv` وملف المعايير (`ProfileView` و`ExportedProfile` بصيغة `ayar-profile/1`) وعقود المشاريع من DEV-4 (الإصدار 1.1)، وسياق التغيير ونتيجة المستشار (`AdvisorContext` و`AdvisorResult`) والبطاقة (`TaskCard` و`TaskRecord` و`TaskSource`) من DEV-8، و`RunPlan` و`RunView` و`RunDetail` و`SavedGroup` وعقود الأدوات والتجهيز من DEV-5. والمرحلتان أضافتا عقودهما بالتوازي في الإصدار 1.2 نفسه، فجُمعتا فيه عند الدمج (G-WAVE4-03)، ومراحل التشغيل تضيف ما بعدها. ومن DEV-6 (الإصدار 1.3): عقود الأحكام في `domain/terms.ts` (النتائج والشدة والثبوت والمنشأ والحالة عبر التشغيلات) و`domain/findings.ts` (`ParsedReport` و`ParsedFinding` و`ExitSignal` و`Finding` وصفحة `results.query` وتفصيل `finding.get`) و`domain/purity.ts` (`PurityResult` و`PuritySummary` ومدخلات النزاهة)، واستدعاء المحول `InvocationTemplate` في `CheckSpec`، وحمولات `run.summary` و`finding.provisional` و`finding.final`. ومن DEV-7 (الإصدار 1.4): عقود المسبار في `domain/probe.ts` (هدف العرض ومصفوفته `RenderTarget`، والحالات `ProbeStates` بخطواتها ومحاكاة شبكتها وتوقعاتها، وميزانيات الويب `WebBudgets`، ومفتاح الصورة المرجعية `CaptureKey` واللقطة `CaptureView` والمرجع `BaselineView`)، والأمران `captures.list` و`baselines.list`، وعقد `baseline.approve`، ونوع التجهيز `install_browser`. ومن DEV-11 (الإصدار 1.6): أوامر العملية الرئيسية التي تحتاجها الشاشات (`window.layout` لموضع أزرار النافذة D-54، و`project.reveal` و`editor.open` و`menu.popup`)، و`check.tail` لذيل سجل الفحص الحي، وموضوع الجسر `bridge.drop` لرمز اختيار المجلد المُفلت (D-DEV11-02، D-DEV11-03). ونتيجة `z.unknown()` تعني أن عقد النتيجة لم يُعرَّف بعد.
 
 ## ملكية الأوامر (G-19)
 
@@ -54,6 +54,7 @@
 | `groups.delete` | C-10 | engine | renderer | — | DEV-5 |
 | `results.query` | C-17 | engine | renderer | — | DEV-6 |
 | `finding.get` | C-17 | engine | renderer | — | DEV-6 |
+| `check.tail` | C-17 | engine | renderer | — | DEV-11 |
 | `evidence.token` | C-17 | engine | renderer | — | DEV-5 |
 | `review.record` | C-16 | engine | renderer | — | DEV-9 |
 | `reviews.list` | C-16 | engine | renderer | — | DEV-9 |
@@ -90,6 +91,10 @@
 | `dialog.pickSource` | C-01 | main | renderer | — | DEV-3 |
 | `confirm.issue` | C-01 | main | renderer | — | DEV-5 |
 | `engine.status` | C-01 | main | renderer | — | DEV-3 |
+| `window.layout` | C-01 | main | renderer | — | DEV-11 |
+| `project.reveal` | C-01 | main | renderer | — | DEV-11 |
+| `editor.open` | C-01 | main | renderer | — | DEV-11 |
+| `menu.popup` | C-01 | main | renderer | — | DEV-11 |
 | `engine.restart` | C-01 | main | renderer | — | DEV-3 |
 | `internal.clipboardText` | C-21 | engine | host | — | DEV-9 |
 | `internal.recordCopy` | C-17 | engine | host | — | DEV-9 |

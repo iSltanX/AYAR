@@ -20,6 +20,11 @@ export const runContinueRound: CommandHandler = (payload, ctx) => ctx.services.p
 
 export const runsList: CommandHandler = (payload, ctx) => ctx.services.runs.list((payload as CommandPayload<'runs.list'>).projectId);
 
+export const checkTail: CommandHandler = (payload, ctx) => {
+  const { checkRunId, maxLines } = payload as CommandPayload<'check.tail'>;
+  return ctx.services.runs.tail(checkRunId, maxLines);
+};
+
 export const runGet: CommandHandler = (payload, ctx) => ctx.services.runs.get((payload as CommandPayload<'run.get'>).runId);
 
 export const runsKeep: CommandHandler = (payload, ctx) => {

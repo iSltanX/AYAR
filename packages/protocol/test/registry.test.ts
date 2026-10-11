@@ -51,10 +51,16 @@ describe('command registry (6.5)', () => {
   // D-DEV9-01 (protocol 1.5): the kept reports and reviews (14.1 has their tables), the instruction preview and the
   // three groups of the model-checks page (AT-44), and the cards' verification on demand (12.8).
   const DEV9_EXTRA = ['aiChecks.get', 'aiChecks.list', 'reports.list', 'reviews.list', 'tasks.verify'];
+  // D-DEV11-02 and D-DEV11-03 (protocol 1.6): what the screens need from the main process (the window buttons'
+  // side, Finder, the editor, native menus) and the live log tail of a running check.
+  const DEV11_MAIN = ['editor.open', 'menu.popup', 'project.reveal', 'window.layout'];
+  const DEV11_EXTRA = [...DEV11_MAIN, 'check.tail'];
 
-  it('adds only the documented main-process, host-only, DEV-4, DEV-5, DEV-7 and DEV-9 commands', () => {
+  it('adds only the documented main-process, host-only, DEV-4, DEV-5, DEV-7, DEV-9 and DEV-11 commands', () => {
     const extra = COMMAND_NAMES.filter((c) => !PLAN_COMMANDS.includes(c)).sort();
-    expect(extra).toEqual([...DEV3_EXTRA, ...DEV4_EXTRA, ...DEV5_EXTRA, ...DEV7_EXTRA, ...DEV9_EXTRA].sort());
+    expect(extra).toEqual([...DEV3_EXTRA, ...DEV4_EXTRA, ...DEV5_EXTRA, ...DEV7_EXTRA, ...DEV9_EXTRA, ...DEV11_EXTRA].sort());
+    for (const c of DEV11_MAIN as (keyof typeof COMMANDS)[]) expect(COMMANDS[c]).toMatchObject({ handler: 'main', audience: 'renderer', owner: 'C-01', since: '1.6', implementedIn: 'DEV-11', grants: [] });
+    expect(COMMANDS['check.tail']).toMatchObject({ handler: 'engine', audience: 'renderer', owner: 'C-17', since: '1.6', implementedIn: 'DEV-11', grants: [] });
     for (const c of DEV9_EXTRA as (keyof typeof COMMANDS)[]) expect(COMMANDS[c]).toMatchObject({ handler: 'engine', audience: 'renderer', since: '1.5', implementedIn: 'DEV-9', grants: [] });
     for (const c of DEV7_EXTRA as (keyof typeof COMMANDS)[]) expect(COMMANDS[c]).toMatchObject({ handler: 'engine', audience: 'renderer', owner: 'C-14', since: '1.4', implementedIn: 'DEV-7', grants: [] });
     for (const c of extra.filter((c) => c.startsWith('internal.'))) expect(COMMANDS[c].audience).toBe('host');

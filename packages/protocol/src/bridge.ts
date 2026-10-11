@@ -7,12 +7,18 @@ import type { EventPayload, EventTopic } from './events/index.ts';
 export type InvokeResult<T> = { ok: true; result: T } | { ok: false; error: ProtocolError };
 
 /** Signals the bridge itself raises: the UI must re-read its state (C-02, C-03). */
-export const BRIDGE_TOPICS = ['bridge.resync'] as const;
+export const BRIDGE_TOPICS = ['bridge.resync', 'bridge.drop'] as const;
 export type BridgeTopic = (typeof BRIDGE_TOPICS)[number];
 export type ResyncReason = 'port_replaced' | 'sequence_gap' | 'stream_changed';
 export interface BridgeResync {
   reason: ResyncReason;
 }
+/**
+ * A folder dropped on the window or on the Dock icon (C-01, plan C-01 «السحب والإفلات»; protocol 1.6): the preload
+ * takes its path from the drop event and hands it to the main process alone, which checks it and mints a selection
+ * token for project.add. The page receives the token, never the path.
+ */
+export type BridgeDrop = { ok: true; selectionToken: string } | { ok: false; reason: 'not_a_directory' | 'multiple' | 'no_path' };
 
 export interface DeliveredEvent<T extends EventTopic = EventTopic> {
   topic: T;
@@ -23,7 +29,7 @@ export interface DeliveredEvent<T extends EventTopic = EventTopic> {
 }
 
 export type SubscribableTopic = EventTopic | BridgeTopic;
-export type TopicMessage<T extends SubscribableTopic> = T extends EventTopic ? DeliveredEvent<T> : BridgeResync;
+export type TopicMessage<T extends SubscribableTopic> = T extends EventTopic ? DeliveredEvent<T> : T extends 'bridge.drop' ? BridgeDrop : BridgeResync;
 
 export interface AyarBridge {
   invoke<C extends RendererCommandName>(command: C, payload: CommandPayload<C>): Promise<InvokeResult<RendererResult<C>>>;
@@ -36,4 +42,8 @@ export const IPC = {
   eventsPortRequest: 'ayar:events-port-request',
   eventsPort: 'ayar:events-port',
   cspViolation: 'ayar:csp-violation',
+  /** preload → main: the path of a dropped folder (protocol 1.6). */
+  dropResolve: 'ayar:drop-resolve',
+  /** main → preload: the outcome of a drop, delivered to the page as `bridge.drop`. */
+  dropResult: 'ayar:drop-result',
 } as const;
