@@ -132,13 +132,13 @@
     <div class="sections">
       <section class="card" id="settings-general">
         <h2 class="card-title">{t('settingsui.group.general')}</h2>
-        <div class="row"><span class="key">{t('settingsui.language')}</span><span class="spacer"></span><Select width={200} value={values['ui.language'] ?? 'system'} options={[{ value: 'system', label: t('settingsui.system') }, { value: 'ar', label: t('approval.context.languages.ar') }, { value: 'en', label: t('approval.context.languages.en') }]} onchange={(e: Event & { currentTarget: HTMLSelectElement }) => void set('ui.language', e.currentTarget.value as Values['ui.language'])} /></div>
+        <div class="row"><span class="key">{t('settingsui.language')}</span><span class="spacer"></span><Select width={200} label={t('settingsui.language')} value={values['ui.language'] ?? 'system'} options={[{ value: 'system', label: t('settingsui.system') }, { value: 'ar', label: t('approval.context.languages.ar') }, { value: 'en', label: t('approval.context.languages.en') }]} onchange={(e: Event & { currentTarget: HTMLSelectElement }) => void set('ui.language', e.currentTarget.value as Values['ui.language'])} /></div>
         <div class="row"><span class="key">{t('settingsui.appearance')}</span><span class="spacer"></span><SegmentedControl label={t('settingsui.appearance')} value={values['ui.theme'] ?? 'system'} options={[{ value: 'system', label: t('settingsui.system') }, { value: 'dark', label: t('settingsui.dark') }, { value: 'light', label: t('settingsui.light') }]} onchange={(v: string) => void set('ui.theme', v as Values['ui.theme'])} /></div>
       </section>
 
       <section class="card" id="settings-running">
         <h2 class="card-title">{t('settingsui.group.running')}</h2>
-        <div class="row"><span class="key">{t('settingsui.parallel')}</span><span class="spacer"></span><Select width={240} value={String(values['run.parallel'] ?? 2)} options={[1, 2, 3, 4].map((n) => ({ value: String(n), label: t('settingsui.parallelValue', { count: n }) }))} onchange={(e: Event & { currentTarget: HTMLSelectElement }) => void set('run.parallel', Number(e.currentTarget.value))} /></div>
+        <div class="row"><span class="key">{t('settingsui.parallel')}</span><span class="spacer"></span><Select width={240} label={t('settingsui.parallel')} value={String(values['run.parallel'] ?? 2)} options={[1, 2, 3, 4].map((n) => ({ value: String(n), label: t('settingsui.parallelValue', { count: n }) }))} onchange={(e: Event & { currentTarget: HTMLSelectElement }) => void set('run.parallel', Number(e.currentTarget.value))} /></div>
         <div class="row"><span class="stack"><span class="key">{t('settingsui.timeouts')}</span><span class="small muted">{t('settingsui.timeoutsNote')}</span></span></div>
         <div class="row"><span class="stack"><span class="key">{t('settingsui.preventSleep')}</span><span class="small muted">{t('settingsui.preventSleepNote')}</span></span><span class="spacer"></span><Switch label={t('settingsui.preventSleep')} showLabel={false} checked={values['run.preventSleep'] ?? true} onchange={(on: boolean) => void set('run.preventSleep', on)} /></div>
         <div class="row"><span class="stack"><span class="key">{t('settingsui.notify')}</span><span class="small muted">{t('settingsui.notifyNote')}</span></span><span class="spacer"></span><Switch label={t('settingsui.notify')} showLabel={false} checked={values['run.notify'] ?? true} onchange={(on: boolean) => void set('run.notify', on)} /></div>
@@ -147,7 +147,7 @@
       <section class="card" id="settings-data">
         <h2 class="card-title">{t('settingsui.group.data')}</h2>
         <div class="row"><span class="key">{t('settingsui.location')}</span><span class="spacer"></span><span class="small muted">{t('settingsui.locationText')}</span></div>
-        <div class="row"><span class="stack"><span class="key">{t('settingsui.retention')}</span><span class="small muted">{t('settingsui.retentionNote')}</span></span><span class="spacer"></span><Select width={240} value={String(values['evidence.retainRuns'] ?? 20)} options={[5, 10, 20, 50, 100].map((n) => ({ value: String(n), label: t('settingsui.retentionValue', { count: n }) }))} onchange={(e: Event & { currentTarget: HTMLSelectElement }) => void set('evidence.retainRuns', Number(e.currentTarget.value))} /></div>
+        <div class="row"><span class="stack"><span class="key">{t('settingsui.retention')}</span><span class="small muted">{t('settingsui.retentionNote')}</span></span><span class="spacer"></span><Select width={240} label={t('settingsui.retention')} value={String(values['evidence.retainRuns'] ?? 20)} options={[5, 10, 20, 50, 100].map((n) => ({ value: String(n), label: t('settingsui.retentionValue', { count: n }) }))} onchange={(e: Event & { currentTarget: HTMLSelectElement }) => void set('evidence.retainRuns', Number(e.currentTarget.value))} /></div>
         <div class="row"><span class="key">{t('settingsui.space')}</span><span class="spacer"></span><span class="chips">{#each spaces as s (s.project.id)}<span class="val">{t('settingsui.spaceOf', { project: s.project.displayName, size: sizeText(s.bytes) })}</span>{:else}<span class="small muted">—</span>{/each}</span></div>
         <div class="row"><span class="stack"><span class="key">{t('settingsui.purge')}</span><span class="small muted">{t('settingsui.purgeNote')}</span></span><span class="spacer"></span><Button kind="destructive" onclick={() => void purge()}>{t('settingsui.purgeButton')}</Button></div>
       </section>
@@ -181,7 +181,7 @@
       <section class="card" id="settings-environment">
         <h2 class="card-title">{t('settingsui.group.environment')}</h2>
         <div class="row"><span class="key">{t('settingsui.shell')}</span><span class="spacer"></span><span class="small"><bdi dir="ltr">{values['environment.shell'] ?? t('settingsui.shellDefault')}</bdi></span></div>
-        <div class="row"><span class="key">{t('settingsui.readTimeout')}</span><span class="spacer"></span><Select width={160} value={String(values['environment.timeoutSeconds'] ?? 10)} options={[5, 10, 20, 30, 60].map((n) => ({ value: String(n), label: t('settingsui.seconds', { count: n }) }))} onchange={(e: Event & { currentTarget: HTMLSelectElement }) => void set('environment.timeoutSeconds', Number(e.currentTarget.value))} /></div>
+        <div class="row"><span class="key">{t('settingsui.readTimeout')}</span><span class="spacer"></span><Select width={160} label={t('settingsui.readTimeout')} value={String(values['environment.timeoutSeconds'] ?? 10)} options={[5, 10, 20, 30, 60].map((n) => ({ value: String(n), label: t('settingsui.seconds', { count: n }) }))} onchange={(e: Event & { currentTarget: HTMLSelectElement }) => void set('environment.timeoutSeconds', Number(e.currentTarget.value))} /></div>
         <div class="row"><span class="key">{t('settingsui.path')}</span><span class="spacer"></span><span class="path mono" dir="ltr">{#each path as p, i (i)}<span>{p}</span>{:else}<span>—</span>{/each}</span></div>
       </section>
 
@@ -206,7 +206,7 @@
 
       <section class="card" id="settings-limits">
         <h2 class="card-title">{t('settingsui.group.limits')}</h2>
-        <div class="row"><span class="stack"><span class="key">{t('settingsui.narrow')}</span><span class="small muted">{t('settingsui.narrowNote')}</span></span><span class="spacer"></span><Select width={200} value={String(values['purity.narrowThreshold'] ?? 3)} options={[1, 2, 3, 4, 5].map((n) => ({ value: String(n), label: t('settingsui.narrowValue', { count: n }) }))} onchange={(e: Event & { currentTarget: HTMLSelectElement }) => void set('purity.narrowThreshold', Number(e.currentTarget.value))} /></div>
+        <div class="row"><span class="stack"><span class="key">{t('settingsui.narrow')}</span><span class="small muted">{t('settingsui.narrowNote')}</span></span><span class="spacer"></span><Select width={200} label={t('settingsui.narrow')} value={String(values['purity.narrowThreshold'] ?? 3)} options={[1, 2, 3, 4, 5].map((n) => ({ value: String(n), label: t('settingsui.narrowValue', { count: n }) }))} onchange={(e: Event & { currentTarget: HTMLSelectElement }) => void set('purity.narrowThreshold', Number(e.currentTarget.value))} /></div>
         <div class="row"><span class="stack"><span class="key">{t('settingsui.logLimit')}</span><span class="small muted">{t('settingsui.logLimitNote')}</span></span></div>
       </section>
 
