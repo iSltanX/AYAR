@@ -55,10 +55,10 @@ describe('command registry (6.5)', () => {
   // side, Finder, the editor, native menus) and the live log tail of a running check.
   const DEV11_MAIN = ['clipboard.copyText', 'editor.open', 'menu.popup', 'project.reveal', 'window.layout'];
   const DEV11_EXTRA = [...DEV11_MAIN, 'check.tail'];
-  // D-DEV12-01 and D-DEV12-02 (protocol 1.7): the section panels' report and the profile's versions (engine), and the
-  // settings' «حول» and the privacy guide's «افتح الإعدادات» (main).
+  // D-DEV12-01, D-DEV12-02 and D-DEV12-05 (protocol 1.7): the section panels' report, the profile's versions and the
+  // units with no test (engine), and the settings' «حول» and the privacy guide's «افتح الإعدادات» (main).
   const DEV12_MAIN = ['about.get', 'about.openRepository', 'system.openPrivacySettings'];
-  const DEV12_ENGINE = ['check.report', 'profile.versions', 'reports.copies'];
+  const DEV12_ENGINE = ['check.report', 'profile.versions', 'reports.copies', 'tasks.gaps'];
 
   it('adds only the documented main-process, host-only, DEV-4, DEV-5, DEV-7, DEV-9, DEV-11 and DEV-12 commands', () => {
     const extra = COMMAND_NAMES.filter((c) => !PLAN_COMMANDS.includes(c)).sort();
