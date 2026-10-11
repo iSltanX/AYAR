@@ -6,8 +6,8 @@
 //        by the integrity page; three groups that never mix, and no pass said of a model's item anywhere on the page.
 //   J4: the plan's «اختبارات الوحدة: ناقص», the run «غير مكتمل», a «اختبار وحدة: …» card from a unit with no test
 //        (D-DEV12-05), copied, the test added outside, the card «متحققة» with «قوة الاختبار غير مثبتة».
-//   AT-18 (UI, with the probe's browser): the design page with no reference — the board first with what is missing,
-//        the folded group with what each check lacks, design.a11y judged by axe.
+//   AT-18 (UI, with the probe's browser): the design page with no reference — the board with what is missing, the
+//        folded group with what each check lacks and a «تجهيز فحص» card from it (D-DEV12-09), design.a11y by axe.
 // axe on the screens visited in both themes, and zero CSP violations.
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -25,7 +25,7 @@ type RunRow = { runId: string; kind: string; state: string; displayId: string; p
 type CheckRow = { instance: string; outcome: string | null };
 type Summary = { aiCheckId: string; displayId: string; template: string; templateVersion: string; status: string };
 type Claim = { id: string; displayId: string; status: string; matchedCheckId: string | null };
-type Task = { id: string; displayId: string; status: string; card: { location: string | null }; verification: { strength?: string } | null };
+type Task = { id: string; displayId: string; status: string; card: { type: string; location: string | null }; verification: { strength?: string } | null };
 
 const BROWSER = join(homedir(), 'Library/Caches/ms-playwright/chromium-1248/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing');
 const PROBE_READY = existsSync(BROWSER);
@@ -364,6 +364,10 @@ describe.runIf(PROBE_READY)('AT-18 (UI): the design page with no reference', () 
     const lacking = folded.filter((x) => /design\.(tokens|fonts|states|visual)/.test(x));
     if (!lacking.length) console.log('design folded groups', folded);
     expect(lacking.length).toBeGreaterThan(0);
+    // A check that lacks its reference makes a «تجهيز فحص» card (D-DEV12-09).
+    await run.page.locator('[data-testid="section-optional"] tr[data-instance^="design.tokens.static@"]').getByRole('button', { name: 'أنشئ بطاقة' }).click();
+    const setup = await until(tasks, (ts) => ts.some((x) => x.card.type === 'check_setup'), 10_000);
+    expect(setup.some((x) => x.card.type === 'check_setup')).toBe(true);
     await axeBoth('10 · التصميم بعد التشغيل');
   }, 300_000);
 });

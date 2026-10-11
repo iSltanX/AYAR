@@ -125,6 +125,15 @@
     }
   }
 
+  // AT-18 (D-DEV12-09, the owner's choice): a check that lacks its reference makes a «تجهيز فحص» card (C-20 source 1).
+  let carded = $state<string[]>([]);
+  async function setupCard(spec: CheckSpec): Promise<void> {
+    const r = await attempt('task.create', { projectId, source: { kind: 'check', checkId: spec.checkId, outcome: 'missing_configuration' } });
+    if (!r.ok) return;
+    carded = [...carded, spec.instance];
+    app.showToast({ kind: 'created', id: r.result.task.displayId });
+  }
+
   // ── the inspector: the inspected check's spec, its latest execution and its log ──────────────────────────
   let checkLog = $state<{ lines: ReturnType<typeof logLines>; totalLines: number } | null>(null);
   $effect(() => {
@@ -311,7 +320,10 @@
                   <td class="o-reason"><span class="reason">{a.kind === 'define' ? t('sectionui.optional.needsRef', { ref: refLabel(a.ref) }) : reasonsOf(t, lang, spec.reasons).text}</span></td>
                   <td class="o-action">
                     {#if a.kind === 'define'}
-                      <Button kind="secondary" onclick={() => void act(spec)}>{a.ref === 'budgets' ? t('ui.action.defineBudget') : t('ui.action.define')}</Button>
+                      <span class="row-actions">
+                        <Button kind="secondary" onclick={() => void act(spec)}>{a.ref === 'budgets' ? t('ui.action.defineBudget') : t('ui.action.define')}</Button>
+                        <Button kind="secondary" disabled={carded.includes(spec.instance)} onclick={() => void setupCard(spec)}>{t('ui.action.createCard')}</Button>
+                      </span>
                     {:else if a.kind === 'approve'}
                       <Button kind="secondary" onclick={() => void act(spec)}>{t('ui.action.approve')}</Button>
                     {:else if a.kind === 'include'}
@@ -494,7 +506,7 @@
     inline-size: 46%;
   }
   .o-action {
-    inline-size: 150px;
+    inline-size: 220px;
   }
   .check {
     display: flex;
