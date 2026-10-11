@@ -212,9 +212,13 @@ export class Gateway {
       case 'window.layout':
         return { ok: true, result: { controls: await system.windowControls() } };
       case 'project.reveal': {
-        const root = await this.#projectRoot((payload as CommandPayload<'project.reveal'>).projectId);
+        const { projectId, path } = payload as CommandPayload<'project.reveal'>;
+        const root = await this.#projectRoot(projectId);
         if (!root.ok) return root;
-        await system.reveal(root.result);
+        // A file of the project (16.3: the model's result file) only inside its real root, through no link out.
+        const target = path ? await system.fileInside(root.result, path) : root.result;
+        if (!target) return fail(protocolError('not_found', { reason: 'no_file' }));
+        await system.reveal(target);
         return { ok: true, result: { revealed: true } };
       }
       case 'editor.open': {

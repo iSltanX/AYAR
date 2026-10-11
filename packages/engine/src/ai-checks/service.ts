@@ -152,6 +152,7 @@ export class AiChecksService {
     return {
       needId: needIdOf(c.template.id, projectId),
       template: c.template.id,
+      code: c.template.code,
       templateVersion: c.template.version,
       titleKey: c.template.text.title,
       roleKey: c.template.text.role,
@@ -470,7 +471,7 @@ export class AiChecksService {
       projectId,
       instructions: rows.map((r) => {
         const { text: _text, ...rest } = this.#view(r, false);
-        return rest;
+        return { ...rest, savedPath: r.saved_path, importedAt: r.imported_at, rejectReason: r.reject_reason ? (JSON.parse(r.reject_reason) as Reason) : null };
       }),
       claims,
       proven,

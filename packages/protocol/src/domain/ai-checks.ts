@@ -38,6 +38,8 @@ export type AiNeedInput = z.infer<typeof AiNeedInput>;
 export const AiNeed = z.strictObject({
   needId: Id,
   template: z.string(),
+  /** The template's code, as its instructions are numbered (`AI-{code}-NNN`, D-36); protocol 1.7 (DEV-12: 16.1). */
+  code: z.string().regex(/^[A-Z]{3,8}$/),
   templateVersion: z.string(),
   titleKey: z.string(),
   roleKey: z.string(),
@@ -159,10 +161,21 @@ export const AiImportItem = z.strictObject({
 export const AiImportResult = z.strictObject({ projectId: Id, items: z.array(AiImportItem), claims: z.array(ModelClaim) });
 export type AiImportResult = z.infer<typeof AiImportResult>;
 
+/**
+ * An instruction as aiChecks.list shows it, without its text; and (protocol 1.7, DEV-12: 16.1–16.3) where the owner
+ * saved it, when the model's result file was last read, and why it was refused («مرفوض» with its field and line).
+ */
+export const AiInstructionSummary = AiInstruction.omit({ text: true }).extend({
+  savedPath: z.string().nullable(),
+  importedAt: IsoTimestamp.nullable(),
+  rejectReason: Reason.nullable(),
+});
+export type AiInstructionSummary = z.infer<typeof AiInstructionSummary>;
+
 /** aiChecks.list: everything of a project in three groups that never mix (AT-44). */
 export const AiChecksView = z.strictObject({
   projectId: Id,
-  instructions: z.array(AiInstruction.omit({ text: true })),
+  instructions: z.array(AiInstructionSummary),
   claims: z.array(ModelClaim),
   proven: z.array(z.strictObject({ claimDisplayId: z.string(), findingId: Id, findingDisplayId: z.string(), checkId: z.string() })),
 });

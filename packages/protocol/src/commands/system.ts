@@ -2,6 +2,7 @@
 // the system dialogs that mint path tokens, for a confirmation token after it showed a destructive action,
 // and for the supervisor's state. None of them returns a path.
 import { Id } from '../common.ts';
+import { RelPath } from '../domain/discovery.ts';
 import { DestinationToken, SelectionToken, SourceToken, ConfirmationToken } from '../tokens.ts';
 import { z } from '../zod.ts';
 import { defineCommand } from './define.ts';
@@ -73,8 +74,11 @@ export const systemCommands = {
    * (never from the app's own language), so the title bar reserves that corner.
    */
   'window.layout': defineCommand({ ...shell, payload: z.strictObject({}), result: z.strictObject({ controls: z.enum(['left', 'right']) }) }),
-  /** 13.3 «أظهر في Finder»: the main process reads the project's folder from the engine; the UI sends its id only. */
-  'project.reveal': defineCommand({ ...shell, payload: z.strictObject({ projectId: Id }), result: z.strictObject({ revealed: z.literal(true) }) }),
+  /**
+   * 13.3 «أظهر في Finder»: the main process reads the project's folder from the engine; the UI sends its id only, and
+   * (protocol 1.7, DEV-12: 16.3) a file inside it, resolved inside the real root (one outside is never revealed).
+   */
+  'project.reveal': defineCommand({ ...shell, payload: z.strictObject({ projectId: Id, path: RelPath.optional() }), result: z.strictObject({ revealed: z.literal(true) }) }),
   /**
    * 13.3 «افتح في المحرر» (E-17): the file of a finding, resolved inside its project's real root by the main process,
    * opened with the default of E-17 (`open -t`). The editor template setting is DEV-12's.

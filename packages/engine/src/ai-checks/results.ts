@@ -50,11 +50,30 @@ export function readAiResult(text: string, bytes: number): ReadResult {
   }
   if (depthOf(raw) > MAX_DEPTH) return { ok: false, reason: { key: 'aichecks.rejected.tooDeep', params: { depth: MAX_DEPTH } } };
   const forbidden = forbiddenField(raw);
-  if (forbidden) return { ok: false, reason: { key: 'aichecks.rejected.claimsPass', params: { field: forbidden } } };
+  if (forbidden) return { ok: false, reason: { key: 'aichecks.rejected.claimsPass', params: { field: forbidden, ...whereIn(text, raw, forbidden) } } };
   const parsed = AiResult.safeParse(raw);
   if (!parsed.success) {
     const issue = parsed.error.issues[0];
     return { ok: false, reason: { key: 'aichecks.rejected.schema', params: { path: issue?.path.join('.') ?? '', detail: issue?.message.slice(0, 120) ?? '' } } };
   }
   return { ok: true, result: parsed.data };
+}
+
+/**
+ * Where the refused field is (16.3 «الحقل المرفوض في الملف»): the line of its key in the file, and the field as it
+ * reads — its key, and its value only when it is a literal (a pass word, a boolean, a number); any other text of the
+ * model's file is never repeated.
+ */
+export function whereIn(text: string, raw: unknown, path: string): { line: number; snippet: string } | Record<string, never> {
+  const segments = path.split(/\.|\[\d+\]/).filter(Boolean);
+  const key = segments.at(-1);
+  if (!key) return {};
+  let v: unknown = raw;
+  for (const part of path.match(/[^.[\]]+|\[\d+\]/g) ?? []) v = part.startsWith('[') ? (v as unknown[])[Number(part.slice(1, -1))] : (v as Record<string, unknown>)?.[part];
+  const literal = typeof v === 'boolean' || typeof v === 'number' || (typeof v === 'string' && FORBIDDEN_VALUES.has(v.trim().toLowerCase()));
+  const shown = literal ? JSON.stringify(v) : '…';
+  const quoted = JSON.stringify(key);
+  const lines = text.split('\n');
+  const at = lines.findIndex((l) => l.includes(`${quoted}:`) || l.includes(`${quoted} :`));
+  return { line: at < 0 ? 1 : at + 1, snippet: `${quoted}: ${shown}`.slice(0, 120) };
 }

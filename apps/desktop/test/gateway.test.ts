@@ -269,6 +269,16 @@ describe('gateway: the screens\u2019 main-process commands (protocol 1.6)', () =
     expect(await gw.invoke({ command: 'project.reveal', payload: { projectId: 'prj_1', path: '/etc' } })).toMatchObject({ ok: false, error: { code: 'invalid_payload' } });
   });
 
+  it('project.reveal shows a file of the project (16.3) only when it resolves inside the real root', async () => {
+    const inside = setup({ engine });
+    expect(await inside.gw.invoke({ command: 'project.reveal', payload: { projectId: 'prj_1', path: '.ayar/ai-results/AI-LOGIC-001.json' } })).toEqual({ ok: true, result: { revealed: true } });
+    expect(inside.asked).toEqual([{ root: project.rootPath, rel: '.ayar/ai-results/AI-LOGIC-001.json' }]);
+    expect(inside.revealed).toEqual([`${project.rootPath}/.ayar/ai-results/AI-LOGIC-001.json`]);
+    const outside = setup({ engine, file: null });
+    expect(await outside.gw.invoke({ command: 'project.reveal', payload: { projectId: 'prj_1', path: 'link-out/x.json' } })).toMatchObject({ ok: false, error: { code: 'not_found' } });
+    expect(outside.revealed).toEqual([]);
+  });
+
   it('editor.open resolves the finding\u2019s file inside its project\u2019s root, and refuses one outside it', async () => {
     const good = setup({ engine });
     expect(await good.gw.invoke({ command: 'editor.open', payload: { findingId: 'fnd_1' } })).toEqual({ ok: true, result: { opened: true } });
