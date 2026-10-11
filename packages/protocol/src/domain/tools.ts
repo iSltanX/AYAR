@@ -95,6 +95,8 @@ export const SETUP_ACTION_KINDS = [
   'accept_tool_version',
   /** C-11 point 3: the offline OSV database of an ecosystem (E-09). */
   'download_osv_db',
+  /** C-11 and C-14 (protocol 1.4, DEV-7): the probe's browser (Playwright's Chromium), an explicit action with its size. */
+  'install_browser',
 ] as const;
 export const SetupActionKind = z.enum(SETUP_ACTION_KINDS);
 export type SetupActionKind = z.infer<typeof SetupActionKind>;

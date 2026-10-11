@@ -46,10 +46,13 @@ describe('command registry (6.5)', () => {
   // D-DEV5-01 (protocol 1.2): the host-only resolution of an evidence token for ayar-evidence:// and the short
   // cancellation before quitting, and the run list and run detail 6.5 leaves out.
   const DEV5_EXTRA = ['internal.evidencePath', 'internal.prepareQuit', 'run.get', 'runs.list'];
+  // D-DEV7-01 (protocol 1.4): what a run captured and how it compares, and the approved references (C-14).
+  const DEV7_EXTRA = ['baselines.list', 'captures.list'];
 
-  it('adds only the documented main-process, host-only, DEV-4 and DEV-5 commands', () => {
+  it('adds only the documented main-process, host-only, DEV-4, DEV-5 and DEV-7 commands', () => {
     const extra = COMMAND_NAMES.filter((c) => !PLAN_COMMANDS.includes(c)).sort();
-    expect(extra).toEqual([...DEV3_EXTRA, ...DEV4_EXTRA, ...DEV5_EXTRA].sort());
+    expect(extra).toEqual([...DEV3_EXTRA, ...DEV4_EXTRA, ...DEV5_EXTRA, ...DEV7_EXTRA].sort());
+    for (const c of DEV7_EXTRA as (keyof typeof COMMANDS)[]) expect(COMMANDS[c]).toMatchObject({ handler: 'engine', audience: 'renderer', owner: 'C-14', since: '1.4', implementedIn: 'DEV-7', grants: [] });
     for (const c of extra.filter((c) => c.startsWith('internal.'))) expect(COMMANDS[c].audience).toBe('host');
     for (const c of ['internal.evidencePath', 'internal.prepareQuit'] as const) expect(COMMANDS[c]).toMatchObject({ handler: 'engine', audience: 'host', since: '1.2', implementedIn: 'DEV-5' });
     for (const c of ['run.get', 'runs.list'] as const) expect(COMMANDS[c]).toMatchObject({ handler: 'engine', audience: 'renderer', owner: 'C-17', since: '1.2', implementedIn: 'DEV-5', grants: [] });

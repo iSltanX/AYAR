@@ -96,23 +96,30 @@ for (const state of states) {
         await page.route('**/*', async (route) => {
           const url = new URL(route.request().url());
           if (url.hostname !== '127.0.0.1') { blocked.add(`${route.request().method()} ${url.origin}${url.pathname}`); await route.abort('blockedbyclient'); return; }
-          const mock = state.mock?.[url.pathname];
+          // design/states.json بصيغة مرجع «الحالات» (DEV-7): mock مصفوفة بمسار الطلب، وexpect مصفوفة توقعات.
+          const mock = (state.mock ?? []).find((m) => m.url === url.pathname);
           if (mock) {
-            if (mock.delay_ms) await new Promise((r) => setTimeout(r, Math.min(mock.delay_ms, 1500)));
-            const body = mock.body_file ? fs.readFileSync(path.join(root, mock.body_file), 'utf8') : JSON.stringify(mock.body ?? {});
-            await route.fulfill({ status: mock.status, contentType: 'application/json', body });
+            if (mock.delayMs) await new Promise((r) => setTimeout(r, Math.min(mock.delayMs, 1500)));
+            const body = mock.bodyFile ? fs.readFileSync(path.join(root, mock.bodyFile), 'utf8') : JSON.stringify(mock.body ?? {});
+            await route.fulfill({ status: mock.status ?? 200, contentType: 'application/json', body });
             return;
           }
           await route.continue();
         });
-        const sep = state.url.includes('?') ? '&' : '?';
-        await page.goto(`${base}${state.url}${sep}lang=${lang}&theme=${theme}`, { waitUntil: 'domcontentloaded' });
+        const sep = state.path.includes('?') ? '&' : '?';
+        await page.goto(`${base}${state.path}${sep}lang=${lang}&theme=${theme}`, { waitUntil: 'domcontentloaded' });
         let status = 'ok';
-        try {
-          await page.waitForSelector(state.expect.selector, { timeout: 4000 });
-          const wanted = state.expect.text?.[lang];
-          if (wanted && !(await page.getByText(wanted, { exact: false }).first().isVisible().catch(() => false))) status = 'MISSING_TEXT';
-        } catch { status = 'MISSING_SELECTOR'; }
+        for (const ex of state.expect ?? []) {
+          if (status !== 'ok') break;
+          try {
+            if (ex.visible) await page.waitForSelector(ex.visible, { timeout: 4000 });
+            if (ex.text) {
+              const wanted = typeof ex.text === 'string' ? ex.text : ex.text[lang];
+              const scope = page.locator(ex.within ?? 'body').first();
+              if (wanted && !(await scope.getByText(wanted, { exact: false }).first().isVisible().catch(() => false))) status = 'MISSING_TEXT';
+            }
+          } catch { status = 'MISSING_SELECTOR'; }
+        }
         if (status !== 'ok') problems++;
         out(`STATE ${state.id} ${theme} ${lang} ${vp.name} ${status}`);
         if (state.sensitive) sensitiveSkipped++; else shots++;
