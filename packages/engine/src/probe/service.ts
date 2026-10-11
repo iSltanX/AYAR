@@ -14,6 +14,8 @@ export interface ProbeRun {
   failure: { code: string; detail: string } | null;
   /** How the process went: its pid, and why it ended. */
   pid: number | null;
+  /** The playwright-core the probe said it runs (its `ready`), for the result's tool versions. */
+  playwright: string | null;
 }
 
 export class ProbeService {
@@ -34,7 +36,7 @@ export class ProbeService {
   }
 
   async execute(job: ProbeJob, o: { signal: AbortSignal; timeoutMs: number; onCell: (done: number, total: number, r: CellResult) => void }): Promise<ProbeRun> {
-    const out: ProbeRun = { results: [], summary: null, failure: null, pid: null };
+    const out: ProbeRun = { results: [], summary: null, failure: null, pid: null, playwright: null };
     if (!this.#host) return { ...out, failure: { code: 'unavailable', detail: 'no probe host' } };
     let proc;
     try {
@@ -77,6 +79,7 @@ export class ProbeService {
         switch (msg.type) {
           case 'ready':
             clearTimeout(ready);
+            out.playwright = msg.playwright;
             if (!o.signal.aborted) proc.send({ type: 'run', job });
             break;
           case 'started':

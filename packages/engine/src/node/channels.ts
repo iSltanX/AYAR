@@ -58,6 +58,12 @@ export function utilityProbeHost(axePath: string | null): ProbeHost {
     if (m.ayarHost === 'probe.exited') {
       exits.get(m.id)?.(m.code);
       exits.delete(m.id);
+      // One that ended before it was joined to the engine: said at once, not after the start's limit.
+      const early = pending.get(m.id);
+      if (early) {
+        pending.delete(m.id);
+        early.reject(new Error(`the probe ended before it started (${m.code})`));
+      }
       return;
     }
     const wait = pending.get(m.id);

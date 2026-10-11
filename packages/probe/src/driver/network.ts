@@ -2,8 +2,9 @@
 // (127.0.0.1, localhost, [::1]), the extension's own pages and inline data are let through; a host the user allowed by
 // name is let through and logged; anything else is refused and logged — the page is checked as it shows without it.
 // A declared simulation answers instead of the network (a status, a delay, a body, or a failed connection).
-// Beneath the handler, the browser itself is started with a proxy that does not exist for every address outside this
-// machine and the allowed hosts, so a request the handler does not see (a WebSocket, a worker) cannot leave either.
+// Beneath the handler, the browser itself resolves no name outside this machine and the allowed hosts, and is started
+// with a proxy that does not exist for every other address, so a request the handler does not see (a WebSocket, a
+// worker, the browser's own) cannot leave either (networkArgs, D-DEV7-20).
 import type { ProbeCell } from '../contract.ts';
 
 export interface NetworkLog {

@@ -189,7 +189,7 @@ async function routeFor(route: Route, job: ProbeJob, cell: ProbeCell | null, log
   if (mock) {
     log.simulated?.(url);
     const delay = mock.delayMs ?? 0;
-    log.mocked.push({ url: shownUrl(req.method(), url), status: mock.abort ? null : (mock.status ?? 200), delayMs: delay, aborted: mock.abort === true });
+    if (log.mocked.length < 200) log.mocked.push({ url: shownUrl(req.method(), url), status: mock.abort ? null : (mock.status ?? 200), delayMs: delay, aborted: mock.abort === true });
     if (delay) await new Promise((r) => setTimeout(r, delay));
     if (mock.abort) {
       await route.abort('connectionfailed').catch(() => {});
@@ -262,7 +262,8 @@ async function pageCell(job: ProbeJob, cell: ProbeCell, base: string, browser: B
       // browser's own line about it is not the page's error.
       if (/^Failed to load resource/.test(m.text()) && loc.url && (simulated.has(loc.url) || judgeUrl(loc.url, job.allowHosts).kind === 'blocked')) return;
       if (/net::ERR_BLOCKED_BY_CLIENT/.test(m.text()) && net.blocked.length) return;
-      consoleLog.push(consoleEntry(type === 'error' ? 'error' : 'warning', m.text(), loc));
+      // A cell keeps the first 200 lines (the contract's bound): a noisy page is judged on them, not refused whole.
+      if (consoleLog.length < 200) consoleLog.push(consoleEntry(type === 'error' ? 'error' : 'warning', m.text(), loc));
     });
     page.on('pageerror', (e) => {
       if (consoleLog.length < 200) consoleLog.push(consoleEntry('pageerror', `${e.name}: ${e.message}`, firstFrame(e.stack)));

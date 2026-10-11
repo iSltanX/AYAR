@@ -6,17 +6,22 @@
 import type { ReadinessReport, SetupExecuteResult } from '@ayar/protocol';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { createRequire } from 'node:module';
 import { chmodSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { confirmationGrant } from '../../../tools/cli/src/grants.ts';
 import { addProject, approveAll, connectEngine, loginShell, materialize } from '../../../tools/cli/test/support/fixtures.ts';
+import { PLAYWRIGHT_VERSION } from '@ayar/probe/driver';
 import { BROWSER_BUILD } from '../src/probe/browser.ts';
 import { LOGIN_PATH, ok, tempDir, type EngineConnection } from './support/scan.ts';
 
 const BIN = 'chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing';
+/** The playwright-core the probe imports (its own dependency). */
+const PLAYWRIGHT_CORE = dirname(createRequire(fileURLToPath(import.meta.resolve('@ayar/probe/driver'))).resolve('playwright-core/package.json'));
 let root: string;
 let cleanup: () => void;
 let server: Server;
@@ -75,6 +80,12 @@ async function installAction(engine: EngineConnection, projectRoot: string): Pro
 }
 
 describe('«ثبّت متصفح المسبار» (C-11, C-14)', () => {
+  it('pins the build playwright-core drives: an update of one without the other fails here (G-DEV7-08)', () => {
+    const pinned = (JSON.parse(readFileSync(join(PLAYWRIGHT_CORE, 'browsers.json'), 'utf8')) as { browsers: { name: string; revision: string; browserVersion: string }[] }).browsers.find((b) => b.name === 'chromium')!;
+    expect([BROWSER_BUILD.revision, BROWSER_BUILD.version]).toEqual([pinned.revision, pinned.browserVersion]);
+    expect(PLAYWRIGHT_VERSION).toBe((JSON.parse(readFileSync(join(PLAYWRIGHT_CORE, 'package.json'), 'utf8')) as { version: string }).version);
+  });
+
   it('shows its source and size, installs the pinned build only after a confirmation, and makes the probe checks ready', async () => {
     const engine = await engineWith('ok', '/browser.zip', createHash('sha256').update(files.get('/browser.zip')!).digest('hex'));
     try {
