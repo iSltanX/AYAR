@@ -283,7 +283,8 @@ export class ProcessSupervisor {
         result.resources.lastCpuPercent = sample.cpuPercent;
         if (sample.cpuPercent >= BUSY_CPU_PERCENT) lastBusy = nowMono;
         try {
-          spec.onSample?.({ ...sample, silentMs: Math.round(nowMono - lastOutputOf()) });
+          // Output that came while the sample was taken is later than its clock reading: silence is never negative.
+          spec.onSample?.({ ...sample, silentMs: Math.max(0, Math.round(nowMono - lastOutputOf())) });
         } catch (e) {
           // A sample that could not be recorded never stops the watch: timeouts and cancel go on.
           this.#logger.log('warn', 'sample not recorded', { error: e instanceof Error ? e.message.slice(0, 200) : String(e) });
