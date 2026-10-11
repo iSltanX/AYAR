@@ -68,5 +68,16 @@
   "settingsui.version": "الإصدار",
   "settingsui.madeBy": "تصميم وتطوير",
   "settingsui.maker": "سلطان",
-  "settingsui.repository": "المستودع"
+  "settingsui.repository": "المستودع",
+  "settingsui.guide": "دليل الاستخدام",
+  "settingsui.guideNote": "خطوات العمل التسع من إضافة المشروع إلى إعادة الفحص.",
+  "settingsui.guideOpen": "افتح الدليل",
+  "settingsui.licenses": "التراخيص",
+  "settingsui.licensesNote": "الخطان والمكتبات المضمّنة في التطبيق بتراخيصها.",
+  "settingsui.licensesOpen": "اعرض التراخيص",
+  "settingsui.licensesTitle": "تراخيص الخطوط والمكتبات المضمّنة",
+  "settingsui.licensesIntro": "{fonts, plural, one {خط واحد} two {خطان} other {# خطوط}} و{packages, plural, one {مكتبة واحدة} two {مكتبتان} few {# مكتبات} many {# مكتبة} other {# مكتبة}} تُشحن داخل عِيَار. اختر عنصرًا لقراءة نص ترخيصه.",
+  "settingsui.licensesFonts": "الخطوط",
+  "settingsui.licensesPackages": "المكتبات",
+  "settingsui.close": "أغلق"
 }

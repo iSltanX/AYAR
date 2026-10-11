@@ -461,6 +461,29 @@ describe('the settings (21) and «حول» (D-DEV12-02)', () => {
     await axeBoth('21 · الإعدادات');
   });
 
+  it('plan 25 (DEV-13): opens the user guide and the licences of the bundled fonts and libraries from «حول»', async () => {
+    await run.page.locator('[data-testid="settings-about"] button', { hasText: 'افتح الدليل' }).click();
+    await run.page.waitForSelector('dialog[open] [data-testid="guide"]', { timeout: 10_000 });
+    const guide = await textOf('dialog[open] [data-testid="guide"]');
+    for (const step of ['1. أضف مشروعًا', '5. اقرأ النتائج والعيار', '6. «لك» و«للنموذج»', '9. الخصوصية']) expect(guide).toContain(step);
+    await axeBoth('21 · دليل الاستخدام');
+    await run.page.keyboard.press('Escape');
+    await until(() => run.page.locator('dialog[open]').count(), (n) => n === 0, 5_000);
+    await run.page.locator('[data-testid="settings-about"] button', { hasText: 'اعرض التراخيص' }).click();
+    await run.page.waitForSelector('dialog[open] [data-testid="licenses"]', { timeout: 10_000 });
+    const options = await run.page.locator('dialog[open] [data-testid="licenses"] select option').allTextContents();
+    expect(options.some((o) => o.startsWith('Cairo'))).toBe(true);
+    expect(options.some((o) => o.startsWith('Almarai'))).toBe(true);
+    for (const name of ['electron 44.7.0', 'svelte 5.57.2', 'playwright-core 1.64.0', 'axe-core 4.14.0'])
+      expect(options.some((o) => o.startsWith(name)), name).toBe(true);
+    expect(await textOf('dialog[open] [data-testid="licenses"] pre')).toContain('SIL OPEN FONT LICENSE');
+    await run.page.locator('dialog[open] [data-testid="licenses"] select').selectOption({ label: options.find((o) => o.startsWith('axe-core'))! });
+    await until(() => textOf('dialog[open] [data-testid="licenses"] pre'), (x) => /Mozilla Public License/.test(x), 5_000);
+    await axeBoth('21 · التراخيص');
+    await run.page.keyboard.press('Escape');
+    await until(() => run.page.locator('dialog[open]').count(), (n) => n === 0, 5_000);
+  });
+
   it('AT-28 part: switches the whole interface to English at once, and keeps it after a reload', async () => {
     try {
       await run.page.locator('[data-testid="settings"] select').first().selectOption('en');

@@ -96,6 +96,8 @@ import settingsuiAr from './settingsui.ar.json' with { type: 'json' };
 import settingsuiEn from './settingsui.en.json' with { type: 'json' };
 import planmissingAr from './planmissing.ar.json' with { type: 'json' };
 import planmissingEn from './planmissing.en.json' with { type: 'json' };
+import guideAr from './guide.ar.json' with { type: 'json' };
+import guideEn from './guide.en.json' with { type: 'json' };
 
 export const MESSAGE_FILES = {
   adapter: { ar: adapterAr, en: adapterEn },
@@ -141,6 +143,8 @@ export const MESSAGE_FILES = {
   // DEV-12: the remaining screens (one scope per screen family).
   planmissing: { ar: planmissingAr, en: planmissingEn },
   settingsui: { ar: settingsuiAr, en: settingsuiEn },
+  // DEV-13: the user guide inside the app (plan 25), shown from the settings' «حول».
+  guide: { ar: guideAr, en: guideEn },
   toolsui: { ar: toolsuiAr, en: toolsuiEn },
   configui: { ar: configuiAr, en: configuiEn },
   compareui: { ar: compareuiAr, en: compareuiEn },
@@ -154,6 +158,6 @@ export const MESSAGE_FILES = {
 export type Scope = keyof typeof MESSAGE_FILES;
 
 export const MESSAGES = {
-  ar: { ...adapterAr, ...advisorAr, ...alertsAr, ...analyzerAr, ...catalogAr, ...commonAr, ...controlsAr, ...discoveryAr, ...environmentAr, ...errorsAr, ...glossaryAr, ...menuAr, ...planAr, ...probeAr, ...profileAr, ...projectsAr, ...purityAr, ...resultsAr, ...runAr, ...setupAr, ...sheetsAr, ...shellAr, ...statusAr, ...uiAr, ...verdictAr, ...reportAr, ...integrityAr, ...compareAr, ...tasksAr, ...aichecksAr, ...appAr, ...projectlistAr, ...discoveruiAr, ...approvalAr, ...overviewAr, ...scanplanAr, ...monitorAr, ...resultsuiAr, ...sectionuiAr, ...statesuiAr, ...modeluiAr, ...tasksuiAr, ...runsuiAr, ...compareuiAr, ...configuiAr, ...toolsuiAr, ...settingsuiAr, ...planmissingAr },
-  en: { ...adapterEn, ...advisorEn, ...alertsEn, ...analyzerEn, ...catalogEn, ...commonEn, ...controlsEn, ...discoveryEn, ...environmentEn, ...errorsEn, ...glossaryEn, ...menuEn, ...planEn, ...probeEn, ...profileEn, ...projectsEn, ...purityEn, ...resultsEn, ...runEn, ...setupEn, ...sheetsEn, ...shellEn, ...statusEn, ...uiEn, ...verdictEn, ...reportEn, ...integrityEn, ...compareEn, ...tasksEn, ...aichecksEn, ...appEn, ...projectlistEn, ...discoveruiEn, ...approvalEn, ...overviewEn, ...scanplanEn, ...monitorEn, ...resultsuiEn, ...sectionuiEn, ...statesuiEn, ...modeluiEn, ...tasksuiEn, ...runsuiEn, ...compareuiEn, ...configuiEn, ...toolsuiEn, ...settingsuiEn, ...planmissingEn },
+  ar: { ...adapterAr, ...advisorAr, ...alertsAr, ...analyzerAr, ...catalogAr, ...commonAr, ...controlsAr, ...discoveryAr, ...environmentAr, ...errorsAr, ...glossaryAr, ...menuAr, ...planAr, ...probeAr, ...profileAr, ...projectsAr, ...purityAr, ...resultsAr, ...runAr, ...setupAr, ...sheetsAr, ...shellAr, ...statusAr, ...uiAr, ...verdictAr, ...reportAr, ...integrityAr, ...compareAr, ...tasksAr, ...aichecksAr, ...appAr, ...projectlistAr, ...discoveruiAr, ...approvalAr, ...overviewAr, ...scanplanAr, ...monitorAr, ...resultsuiAr, ...sectionuiAr, ...statesuiAr, ...modeluiAr, ...tasksuiAr, ...runsuiAr, ...compareuiAr, ...configuiAr, ...toolsuiAr, ...settingsuiAr, ...planmissingAr, ...guideAr },
+  en: { ...adapterEn, ...advisorEn, ...alertsEn, ...analyzerEn, ...catalogEn, ...commonEn, ...controlsEn, ...discoveryEn, ...environmentEn, ...errorsEn, ...glossaryEn, ...menuEn, ...planEn, ...probeEn, ...profileEn, ...projectsEn, ...purityEn, ...resultsEn, ...runEn, ...setupEn, ...sheetsEn, ...shellEn, ...statusEn, ...uiEn, ...verdictEn, ...reportEn, ...integrityEn, ...compareEn, ...tasksEn, ...aichecksEn, ...appEn, ...projectlistEn, ...discoveruiEn, ...approvalEn, ...overviewEn, ...scanplanEn, ...monitorEn, ...resultsuiEn, ...sectionuiEn, ...statesuiEn, ...modeluiEn, ...tasksuiEn, ...runsuiEn, ...compareuiEn, ...configuiEn, ...toolsuiEn, ...settingsuiEn, ...planmissingEn, ...guideEn },
 } as const;

@@ -5,13 +5,16 @@
   // alert), network and privacy (every download asks; no usage measurements), secret redaction (the user's patterns,
   // tried live), the environment (the shell, its timeout, the computed PATH), the editor template, the cost (AYAR is
   // local and free; what needs the network or the user's model), the limits; and who made AYAR and where its
-  // repository is.
+  // repository is. DEV-13 (plan 25): «حول» also opens the user guide and the licences of the bundled fonts and
+  // libraries, each in a sheet (D-DEV13-02: two rows added to the approved group with its own row pattern).
   import type { Project, UserRedactionPattern } from '@ayar/protocol';
   import Button from '../components/Button.svelte';
   import CostTag from '../components/CostTag.svelte';
   import Icon from '../components/Icon.svelte';
   import SegmentedControl from '../components/SegmentedControl.svelte';
   import Select from '../components/Select.svelte';
+  import Sheet from '../components/Sheet.svelte';
+  import { SHIPPED_FONTS, SHIPPED_PACKAGES } from '../app/licenses.generated.ts';
   import Switch from '../components/Switch.svelte';
   import { useLocale } from '../lib/locale.ts';
   import { attempt } from '../app/client.ts';
@@ -40,6 +43,16 @@
   let spaces = $state<{ project: Project; bytes: number }[]>([]);
   let path = $state<string[]>([]);
   let copies = $state<number | null>(null);
+  // DEV-13: the guide and the licences (plan 25), from «حول».
+  let guideOpen = $state(false);
+  let licensesOpen = $state(false);
+  let licenseKey = $state('font:0');
+  const GUIDE_SECTIONS = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9'] as const;
+  const LICENSE_OPTIONS = [...SHIPPED_FONTS.map((f, i) => ({ value: `font:${i}`, label: `${f.name} · ${f.license}` })), ...SHIPPED_PACKAGES.map((f, i) => ({ value: `pkg:${i}`, label: `${f.name} ${f.version ?? ''} · ${f.license}` }))];
+  const selectedLicense = $derived.by(() => {
+    const [kind, n] = licenseKey.split(':');
+    return (kind === 'font' ? SHIPPED_FONTS : SHIPPED_PACKAGES)[Number(n)] ?? SHIPPED_FONTS[0] ?? { name: '', license: '', text: '' };
+  });
   async function load(): Promise<void> {
     const [s, a] = await Promise.all([attempt('settings.get', { keys: [...KEYS] }), attempt('about.get', {})]);
     if (s.ok) values = s.result.values;
@@ -215,12 +228,77 @@
         <div class="row"><span class="key">{t('settingsui.version')}</span><span class="spacer"></span><span class="val"><bdi dir="ltr">{about?.version ?? '—'}</bdi></span></div>
         <div class="row"><span class="key">{t('settingsui.madeBy')}</span><span class="spacer"></span><span class="strong">{t('settingsui.maker')}</span></div>
         <div class="row"><span class="key">{t('settingsui.repository')}</span><span class="spacer"></span><Button kind="secondary" icon="external-link" onclick={() => void attempt('about.openRepository', {})}><bdi dir="ltr">{about?.repository.replace(/^https:\/\//, '') ?? ''}</bdi></Button></div>
+        <div class="row"><span class="stack"><span class="key">{t('settingsui.guide')}</span><span class="small muted">{t('settingsui.guideNote')}</span></span><span class="spacer"></span><Button kind="secondary" icon="file-text" onclick={() => (guideOpen = true)}>{t('settingsui.guideOpen')}</Button></div>
+        <div class="row"><span class="stack"><span class="key">{t('settingsui.licenses')}</span><span class="small muted">{t('settingsui.licensesNote')}</span></span><span class="spacer"></span><Button kind="secondary" icon="scale" onclick={() => (licensesOpen = true)}>{t('settingsui.licensesOpen')}</Button></div>
       </section>
     </div>
   </div>
 </div>
 
+<Sheet title={t('guide.title')} width="wide" open={guideOpen} oncancel={() => (guideOpen = false)}>
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+  <div class="guide" data-testid="guide" role="region" aria-label={t('guide.title')} tabindex="0">
+    <p class="small">{t('guide.intro')}</p>
+    {#each GUIDE_SECTIONS as s (s)}
+      <section class="guide-section">
+        <h3 class="guide-title">{t(`guide.${s}.title`)}</h3>
+        <p class="small">{t(`guide.${s}.body`)}</p>
+      </section>
+    {/each}
+  </div>
+  {#snippet footer()}
+    <Button kind="primary" data-initial-focus onclick={() => (guideOpen = false)}>{t('settingsui.close')}</Button>
+  {/snippet}
+</Sheet>
+
+<Sheet title={t('settingsui.licensesTitle')} width="wide" open={licensesOpen} oncancel={() => (licensesOpen = false)}>
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+  <div class="licenses" data-testid="licenses" role="region" aria-label={t('settingsui.licensesTitle')} tabindex="0">
+    <p class="small">{t('settingsui.licensesIntro', { fonts: SHIPPED_FONTS.length, packages: SHIPPED_PACKAGES.length })}</p>
+    <div class="row"><span class="key">{t('settingsui.licenses')}</span><span class="spacer"></span><Select width={320} label={t('settingsui.licenses')} value={licenseKey} options={LICENSE_OPTIONS} onchange={(e: Event & { currentTarget: HTMLSelectElement }) => (licenseKey = e.currentTarget.value)} /></div>
+    <p class="strong"><bdi dir="ltr">{selectedLicense.name}{selectedLicense.version ? ` ${selectedLicense.version}` : ''}</bdi> · <bdi dir="ltr">{selectedLicense.license}</bdi></p>
+    <pre class="license-text" dir="ltr" lang="en">{selectedLicense.text}</pre>
+  </div>
+  {#snippet footer()}
+    <Button kind="primary" data-initial-focus onclick={() => (licensesOpen = false)}>{t('settingsui.close')}</Button>
+  {/snippet}
+</Sheet>
+
 <style>
+  .guide,
+  .licenses {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+    max-height: 60vh;
+    overflow: auto;
+    outline-offset: 2px;
+  }
+  .guide:focus-visible,
+  .licenses:focus-visible {
+    outline: 2px solid var(--focus-ring);
+  }
+  .guide-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .guide-title {
+    margin: 0;
+    font: var(--type-title-sub);
+    color: var(--text-primary);
+  }
+  .license-text {
+    margin: 0;
+    padding: var(--space-12);
+    border-radius: var(--radius-tag);
+    background: var(--bg-sunken);
+    font: var(--type-mono);
+    color: var(--text-primary);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    text-align: start;
+  }
   .page {
     display: flex;
     flex-direction: column;
