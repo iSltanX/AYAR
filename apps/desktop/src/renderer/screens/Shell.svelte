@@ -33,6 +33,8 @@
   import RunsScreen from './RunsScreen.svelte';
   import CompareScreen from './CompareScreen.svelte';
   import ConfigScreen from './ConfigScreen.svelte';
+  import ToolsScreen from './ToolsScreen.svelte';
+  import SettingsScreen from './SettingsScreen.svelte';
   import AccessState from './states/AccessState.svelte';
 
   const app = useApp();
@@ -46,8 +48,6 @@
   /** 22.2: the folder is gone: «المسار غير موجود» on its overview, the project's other pages keep what AYAR kept. */
   const missing = $derived(!!project && project.pathStatus === 'missing' && route.name === 'overview');
 
-  /** Destinations whose page is not built yet keep the approved disabled state. */
-  const LATER: readonly NavId[] = ['tools', 'settings'];
 
   const isSection = (id: NavId): id is SectionId => (NAV_SECTIONS as readonly string[]).includes(id);
 
@@ -260,13 +260,13 @@
     } else if (k === 'c' && e.shiftKey && !e.altKey) {
       e.preventDefault();
       window.dispatchEvent(new CustomEvent('ayar:copy-for-model'));
-    } else if (e.key === ',' && !e.shiftKey && !e.altKey && !LATER.includes('settings')) {
+    } else if (e.key === ',' && !e.shiftKey && !e.altKey) {
       e.preventDefault();
       navigate('settings');
     } else if (/^[1-9]$/.test(e.key) && project && !e.shiftKey && !e.altKey) {
       e.preventDefault();
       const id = NUMBERED[Number(e.key) - 1];
-      if (id && !LATER.includes(id)) navigate(id);
+      if (id) navigate(id);
     }
   }
 </script>
@@ -281,7 +281,6 @@
   <Sidebar
     project={project && route.name !== 'discovery' && !denied ? { name: project.displayName, path: project.rootPath } : undefined}
     {current}
-    disabled={LATER}
     onnavigate={navigate}
     onprojectmenu={projectMenu}
   />
@@ -329,6 +328,10 @@
     {#key route.projectId}<RunsScreen projectId={route.projectId} />{/key}
   {:else if route.name === 'config'}
     {#key `${route.projectId}:${route.tab}`}<ConfigScreen projectId={route.projectId} tab={route.tab} />{/key}
+  {:else if route.name === 'tools'}
+    <ToolsScreen />
+  {:else if route.name === 'settings'}
+    <SettingsScreen />
   {:else if route.name === 'compare'}
     {#key `${route.fromRunId}:${route.toRunId}`}<CompareScreen projectId={route.projectId} fromRunId={route.fromRunId} toRunId={route.toRunId} />{/key}
   {/if}

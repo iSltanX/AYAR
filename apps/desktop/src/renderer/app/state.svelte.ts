@@ -134,6 +134,16 @@ export class AppState {
     this.runs.stop();
   }
 
+  /** 21 «عام»: the language and the appearance read again after the settings changed them, applied at once. */
+  async applySettings(): Promise<void> {
+    const settings = await attempt('settings.get', { keys: ['ui.language', 'ui.theme'] });
+    if (!settings.ok) return;
+    this.languageSetting = settings.result.values['ui.language'] ?? 'system';
+    this.themeSetting = settings.result.values['ui.theme'] ?? 'system';
+    this.lang = resolveLanguage(this.languageSetting, navigator.languages);
+    this.applyTheme();
+  }
+
   applyTheme(): void {
     const root = document.documentElement;
     if (this.themeSetting === 'system') delete root.dataset.theme;
