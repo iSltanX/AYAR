@@ -169,6 +169,17 @@ describe('the human accessibility review, item by item (10.3)', () => {
   }, 300_000);
 });
 
+describe('the first review makes integ.reviews apply (AT-46)', () => {
+  it('proposes the profile again once the project has a review, so the next round runs the reviews check', async () => {
+    const applies = async () => ok<{ checks: { checkId: string; applicable: boolean }[] }>(await engine.invoke('profile.get', { projectId })).checks.find((c) => c.checkId === 'integ.reviews')?.applicable;
+    expect(await applies()).toBe(false);
+    const d = await runCheck('code.refs.local@.');
+    const c = d.checks.find((x) => x.instance === 'code.refs.local@.')!;
+    ok(await engine.invoke('review.record', { target: { type: 'check', id: c.checkRunId }, decision: 'accept', note: 'reviewed by hand' }));
+    expect(await applies()).toBe(true);
+  }, 120_000);
+});
+
 describe('reports.copies', () => {
   it('counts «انسخ للنموذج» of the project from the audit records', async () => {
     expect(ok<{ count: number }>(await engine.invoke('reports.copies', { projectId, days: 30 })).count).toBe(0);
