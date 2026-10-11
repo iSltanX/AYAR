@@ -1,0 +1,323 @@
+// C-22 in the engine (D-12, D-42, 10.3 «النزاهة», 11.4 rules 6 to 9): the four integrity checks of a run, outside the
+// index, each able to keep the verdict away from «نقي»:
+//
+// - integ.guard runs at the start of every run that has a base — the last full round's snapshot, and the start
+//   snapshot of the run each instance's previous comparable execution belongs to — and compares the project's state
+//   with it (guard.ts). Its effects are attached to the checks they touch before those checks are judged (7.3 rule 8),
+//   and all of them are the guard's own findings. A first round has no base: «اجتاز (لا أساس للمقارنة)», with the
+//   markers that exist recorded as evidence. A base that existed and is gone is «يحتاج مراجعة» (C-22 «الأخطاء»).
+// - integ.state compares the run's two snapshots (C-17): a source file changed outside the declared outputs is a
+//   finding per file, and the check «يحتاج مراجعة»; the verdict then cannot be «نقي» (11.4 rule 8).
+// - integ.reviews reads the project's recorded reviews and checks that the files of each one's scope are as they were
+//   when it was recorded (11.4 rule 6); an expired review is a finding, and its check goes back to «يحتاج مراجعة».
+// - integ.model-claims matches the open model claims (C-25) with this run's findings: a claim a local check proved
+//   becomes a normal finding's source and the claim «proven»; what no check proved stays an open claim, a finding of
+//   this check, and «يحتاج مراجعة» until the owner decides («حوّل إلى بطاقة» or «ليس مشكلة», 12.7).
+//
+// Nothing here changes the outcome of another check except by the guard's attached findings (7.3 rule 8) and the
+// reviews' expiry (11.4 rule 6); a model claim never changes a result (D-41).
+import type { Catalog } from '@ayar/catalog';
+import type { CheckOutcome, CheckSpec, FindingLocation, ParsedFinding, ParsedReport, PlanItem, Reason } from '@ayar/protocol';
+import { createHash } from 'node:crypto';
+import type { WeighedFinding } from '../classifier/classify.ts';
+import type { EvidenceService } from '../evidence/service.ts';
+import type { Manifest, ManifestEntry } from '../evidence/snapshot.ts';
+import type { Logger } from '../ports/index.ts';
+import type { Db } from '../storage/db.ts';
+import { fingerprintOf, type JudgedFinding, type Judgement, type VerdictService } from '../verdict/service.ts';
+import { guard, markersIn, type GuardFinding, type GuardMarker, type GuardResult } from './guard.ts';
+
+export const INTEGRITY_RUNNERS = ['integrity-guard', 'state-snapshot', 'model-claims', 'reviews'] as const;
+export const INTEGRITY_VERSION = '1.0.0';
+/** At most this many findings per integrity check are kept as rows. */
+const MAX_FINDINGS = 500;
+
+export interface GuardContext {
+  /** The snapshots compared against (the round's, the previous executions' runs'), or none for a first round. */
+  baseSnapshotIds: string[];
+  /** A base existed (a round or a previous execution) but its snapshot could not be loaded. */
+  baseLost: boolean;
+  result: GuardResult | null;
+  /** The markers that exist now (the first round's inventory, 10.3). */
+  markers: GuardMarker[];
+  /** The guard's effects by the instance they touch (C-22 «الربط»). */
+  byInstance: Map<string, GuardFinding[]>;
+  /** Effects whose check is unknown: the round's summary («ما لا يُعرف فحصه»). */
+  unattributed: GuardFinding[];
+}
+
+export interface IntegrityOptions {
+  db: Db;
+  catalog: Catalog;
+  logger: Logger;
+  evidence: EvidenceService;
+  verdict: VerdictService;
+}
+
+/** The anchor of an integrity finding: a text anchor, as jobs.ts hashes one (C-15). */
+export const integrityAnchor = (value: string): string => createHash('sha256').update(`text\n${value}`).digest('hex');
+
+/** A guard effect as a finding of the check it touches, or of integ.guard itself. */
+export function guardAsFinding(f: GuardFinding): { finding: ParsedFinding; anchor: string } {
+  const location: FindingLocation = { path: f.path, ...(f.line ? { line: f.line } : {}) };
+  const value = `guard|${f.rule}|${f.path}|${f.line ?? ''}|${f.anchor}`;
+  return {
+    finding: { rule: f.rule, toolRule: null, severity: null, proof: null, level: null, origin: 'project', message: f.message.slice(0, 4000), location, anchor: { kind: 'text', value }, expected: f.before?.slice(0, 2000) ?? null, actual: f.after?.slice(0, 2000) ?? null },
+    anchor: integrityAnchor(value),
+  };
+}
+
+export class IntegrityService {
+  readonly #o: IntegrityOptions;
+
+  constructor(o: IntegrityOptions) {
+    this.#o = o;
+  }
+
+  isIntegrity(item: { checkId: string; runner?: { kind: string; ids: readonly string[] } }): boolean {
+    return item.checkId.startsWith('integ.') || (item.runner?.kind === 'internal' && item.runner.ids.some((id) => (INTEGRITY_RUNNERS as readonly string[]).includes(id))) === true;
+  }
+
+  /**
+   * The guard, at the start of a run (9.12 point 2): the bases, the comparison, and the effects by instance. Never
+   * throws for the run's sake: a failure is logged and read as a lost base.
+   */
+  async prepare(o: { projectId: string; runId: string; plan: { items: PlanItem[] }; startManifest: Manifest; declared: (p: string) => boolean }): Promise<GuardContext> {
+    const { db, evidence } = this.#o;
+    const ctx: GuardContext = { baseSnapshotIds: [], baseLost: false, result: null, markers: [], byInstance: new Map(), unattributed: [] };
+    const bases = new Set<string>();
+    let hadBase = false;
+    const round = db.get<{ snapshot_id: string | null }>('SELECT snapshot_id FROM rounds WHERE project_id = ? ORDER BY updated_at DESC, rowid DESC LIMIT 1', o.projectId);
+    if (round) {
+      hadBase = true;
+      if (round.snapshot_id) bases.add(round.snapshot_id);
+    }
+    // The run each instance's previous comparable execution belongs to (a targeted rerun after a fix, 9.12).
+    for (const it of o.plan.items) {
+      if (it.status !== 'run' && it.status !== 'shared' && it.status !== 'covered') continue;
+      const prev = this.#o.verdict.previousComparable('', it.checkId, it.component, o.projectId);
+      if (!prev) continue;
+      hadBase = true;
+      const snap = db.get<{ snapshot_start_id: string | null }>('SELECT r.snapshot_start_id FROM check_runs c JOIN runs r ON r.id = c.run_id WHERE c.id = ?', prev)?.snapshot_start_id;
+      if (snap) bases.add(snap);
+    }
+    ctx.baseSnapshotIds = [...bases];
+    const read = (m: Manifest) => {
+      const byPath = new Map<string, ManifestEntry>(m.files.map((f) => [f[0], f]));
+      return async (path: string): Promise<string | null> => {
+        const e = byPath.get(path);
+        if (!e) return null;
+        try {
+          return await evidence.snapshots.content(e);
+        } catch {
+          return null;
+        }
+      };
+    };
+    const referencePaths = db.all<{ rel_path: string }>("SELECT rel_path FROM baselines WHERE project_id = ? AND status = 'active'", o.projectId).map((r) => r.rel_path);
+    const currentText = read(o.startManifest);
+    if (!bases.size) {
+      // The first round: an inventory of the markers, nothing compared.
+      if (hadBase) ctx.baseLost = true;
+      else {
+        for (const f of o.startManifest.files) {
+          if (f[6] !== 'text' || !f[7]) continue;
+          if (!/\.(test|spec)\.[cm]?[jt]sx?$|test_[^/]*\.py$|_test\.py$|\.(ts|tsx|js|jsx|mjs|cjs|py)$/.test(f[0])) continue;
+          const text = await currentText(f[0]);
+          if (text !== null) ctx.markers.push(...markersIn(f[0], text));
+          if (ctx.markers.length > 2000) break;
+        }
+      }
+      return ctx;
+    }
+    const seen = new Set<string>();
+    const all: GuardFinding[] = [];
+    let compared = 0;
+    const changed = new Set<string>();
+    const deleted = new Set<string>();
+    let truncated = false;
+    for (const id of bases) {
+      let base: Manifest | null = null;
+      try {
+        base = await evidence.snapshots.load(id);
+      } catch {
+        base = null;
+      }
+      if (!base) {
+        ctx.baseLost = true;
+        continue;
+      }
+      try {
+        const r = await guard({ base, current: o.startManifest, baseText: read(base), currentText, declared: o.declared, referencePaths, limit: MAX_FINDINGS });
+        compared += r.compared;
+        r.changed.forEach((p) => changed.add(p));
+        r.deleted.forEach((p) => deleted.add(p));
+        truncated ||= r.truncated;
+        for (const f of r.findings) {
+          const key = `${f.rule}|${f.path}|${f.line ?? ''}|${f.anchor}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          all.push(f);
+        }
+      } catch (e) {
+        this.#o.logger.log('error', 'the integrity guard failed', { error: e instanceof Error ? e.message.slice(0, 300) : String(e) });
+        ctx.baseLost = true;
+      }
+    }
+    ctx.result = { findings: all, compared, changed: [...changed].sort(), deleted: [...deleted].sort(), truncated };
+    // The instance an effect touches: its check, in the component whose folder holds the path (the deepest).
+    const components = [...new Set(o.plan.items.map((i) => i.component))].sort((a, b) => b.length - a.length);
+    for (const f of all) {
+      if (!f.check) {
+        ctx.unattributed.push(f);
+        continue;
+      }
+      const comp = components.find((c) => c !== '.' && (f.path === c || f.path.startsWith(`${c}/`))) ?? '.';
+      const instance = o.plan.items.find((i) => i.checkId === f.check && i.component === comp)?.instance ?? o.plan.items.find((i) => i.checkId === f.check)?.instance ?? `${f.check}@${comp}`;
+      ctx.byInstance.set(instance, [...(ctx.byInstance.get(instance) ?? []), f]);
+    }
+    return ctx;
+  }
+
+  /** The guard's effects on one instance, as findings of that check with their anchors (7.3 rule 8). */
+  effectsOn(ctx: GuardContext | null, instance: string): { findings: ParsedFinding[]; anchors: string[] } {
+    const list = ctx?.byInstance.get(instance) ?? [];
+    const out = list.map(guardAsFinding);
+    return { findings: out.map((x) => x.finding), anchors: out.map((x) => x.anchor) };
+  }
+
+  // ── the four checks at the end of the run ─────────────────────────────────────────────────────────────────
+
+  /** A judgement for an integrity check: every finding «review» (suspected), the outcome given, no classifier. */
+  judgement(spec: CheckSpec, projectId: string, pairs: readonly { finding: ParsedFinding; anchor: string }[], outcome: CheckOutcome, reason: Reason, info: Record<string, string | number | boolean | null> = {}): Judgement {
+    const book = this.#o.catalog.rules;
+    const prints = pairs.map((p) => fingerprintOf(spec.checkId, p.finding, p.anchor));
+    const excluded = this.#o.verdict.falseAlarms(projectId, prints);
+    const findings: JudgedFinding[] = pairs.map((p, i) => {
+      const def = book.rule(p.finding.rule);
+      const isExcluded = excluded.has(prints[i]!);
+      const f: WeighedFinding = { ...p.finding, severity: p.finding.severity ?? def?.severity ?? 'medium', proof: 'suspected', effect: isExcluded ? 'excluded' : 'review' };
+      return { finding: f, origin: 'project', fingerprint: prints[i]!, ruleVersion: def?.version ?? book.version, reviewId: excluded.get(prints[i]!) ?? null };
+    });
+    const live = findings.filter((f) => f.finding.effect !== 'excluded').length;
+    const counts = { violations: 0, warnings: 0, review: live, notes: 0, excludedByReview: findings.length - live };
+    // An integrity check whose every effect a review excluded as a false alarm passes (D-35).
+    const finalOutcome: CheckOutcome = outcome === 'needs_review' && live === 0 ? 'passed' : outcome;
+    const finalReason: Reason = finalOutcome !== outcome ? { key: 'integrity.reason.allExcluded', params: { count: findings.length } } : reason;
+    const report: ParsedReport = { reader: 'integrity', readerVersion: INTEGRITY_VERSION, formats: [], tests: null, findings: pairs.map((p) => p.finding), findingsDropped: 0, signals: { noInputs: false, collectionError: false, configError: false, flaky: false, unresolved: 0 }, problems: [], info: { ...info, check: spec.checkId } };
+    return { outcome: finalOutcome, reason: finalReason, origin: null, counts, findings, report };
+  }
+
+  /** integ.guard at the end: all effects, or the first round's inventory. */
+  guardJudgement(spec: CheckSpec, projectId: string, ctx: GuardContext): { judgement: Judgement; evidence: Record<string, unknown> } {
+    const pairs = (ctx.result?.findings ?? []).map(guardAsFinding);
+    const evidence = { bases: ctx.baseSnapshotIds, baseLost: ctx.baseLost, compared: ctx.result?.compared ?? 0, changed: ctx.result?.changed ?? [], deleted: ctx.result?.deleted ?? [], truncated: ctx.result?.truncated ?? false, markers: ctx.markers, effects: ctx.result?.findings ?? [] };
+    if (!ctx.baseSnapshotIds.length) {
+      if (ctx.baseLost) return { judgement: this.judgement(spec, projectId, [], 'needs_review', { key: 'integrity.reason.guardBaseLost' }, { bases: 0 }), evidence };
+      return { judgement: this.judgement(spec, projectId, [], 'passed', { key: 'integrity.reason.guardNoBaseline', params: { markers: ctx.markers.length } }, { bases: 0, markers: ctx.markers.length }), evidence };
+    }
+    const n = pairs.length;
+    if (ctx.baseLost && !n) return { judgement: this.judgement(spec, projectId, [], 'needs_review', { key: 'integrity.reason.guardBaseLost' }, { bases: ctx.baseSnapshotIds.length }), evidence };
+    const outcome: CheckOutcome = n ? 'needs_review' : 'passed';
+    const reason: Reason = n ? { key: 'integrity.reason.guardFindings', params: { count: n, files: ctx.result?.changed.length ?? 0 } } : { key: 'integrity.reason.guardClean', params: { files: ctx.result?.changed.length ?? 0 } };
+    return { judgement: this.judgement(spec, projectId, pairs, outcome, reason, { bases: ctx.baseSnapshotIds.length, compared: ctx.result?.compared ?? 0 }), evidence };
+  }
+
+  /** integ.state at the end (9.9, 11.4 rule 8): the files that changed outside the declared outputs. */
+  stateJudgement(spec: CheckSpec, projectId: string, changed: readonly string[]): Judgement {
+    const pairs = changed.slice(0, MAX_FINDINGS).map((path) => {
+      const value = `state|${path}`;
+      const finding: ParsedFinding = { rule: 'state.changed', toolRule: null, severity: null, proof: null, level: null, origin: 'project', message: `changed during the run: ${path}`, location: { path }, anchor: { kind: 'text', value }, expected: null, actual: null };
+      return { finding, anchor: integrityAnchor(value) };
+    });
+    return changed.length
+      ? this.judgement(spec, projectId, pairs, 'needs_review', { key: 'integrity.reason.stateChanged', params: { count: changed.length } }, { changed: changed.length })
+      : this.judgement(spec, projectId, [], 'passed', { key: 'integrity.reason.stateStable' }, { changed: 0 });
+  }
+
+  /** integ.reviews at the end (11.4 rule 6): each recorded review against the files of its scope now. */
+  async reviewsJudgement(spec: CheckSpec, projectId: string, current: Manifest): Promise<Judgement> {
+    const rows = this.#o.db.all<{ id: string; target_type: string; target_ref: string; decision: string; scope_json: string; snapshot_id: string | null; created_at: string }>('SELECT id, target_type, target_ref, decision, scope_json, snapshot_id, created_at FROM reviews WHERE project_id = ? ORDER BY created_at, rowid', projectId);
+    if (!rows.length) return this.judgement(spec, projectId, [], 'not_applicable', { key: 'integrity.reason.noReviews' });
+    const now = new Map(current.files.map((f) => [f[0], f[5]]));
+    const pairs: { finding: ParsedFinding; anchor: string }[] = [];
+    let valid = 0;
+    for (const r of rows) {
+      const expired = await this.reviewExpired(r, now);
+      if (!expired.expired) {
+        valid++;
+        continue;
+      }
+      const value = `review|${r.id}`;
+      const path = expired.changed[0] ?? null;
+      pairs.push({
+        finding: { rule: 'review.expired', toolRule: null, severity: null, proof: null, level: null, origin: 'project', message: `review ${r.decision} on ${r.target_type} ${r.target_ref} no longer holds: ${expired.changed.length} file(s) of its scope changed`, location: path ? { path } : null, anchor: { kind: 'text', value }, expected: null, actual: expired.changed.slice(0, 10).join(', ') || null },
+        anchor: integrityAnchor(value),
+      });
+    }
+    return pairs.length
+      ? this.judgement(spec, projectId, pairs, 'needs_review', { key: 'integrity.reason.reviewsExpired', params: { count: pairs.length, total: rows.length } }, { reviews: rows.length, expired: pairs.length })
+      : this.judgement(spec, projectId, [], 'passed', { key: 'integrity.reason.reviewsValid', params: { count: valid } }, { reviews: rows.length, expired: 0 });
+  }
+
+  /** Whether a review still holds: every file of its scope has the hash it had when the review was recorded. */
+  async reviewExpired(r: { scope_json: string; snapshot_id: string | null }, now: ReadonlyMap<string, string>): Promise<{ expired: boolean; changed: string[] }> {
+    let files: string[] = [];
+    try {
+      const scoped = (JSON.parse(r.scope_json) as { files?: unknown }).files;
+      files = Array.isArray(scoped) ? scoped.filter((x): x is string => typeof x === 'string') : [];
+    } catch {
+      files = [];
+    }
+    if (!files.length) return { expired: false, changed: [] };
+    const then = r.snapshot_id ? await this.#o.evidence.snapshots.load(r.snapshot_id).catch(() => null) : null;
+    if (!then) return { expired: true, changed: files.slice(0, 50) };
+    const before = new Map(then.files.map((f) => [f[0], f[5]]));
+    const changed = files.filter((f) => before.get(f) !== now.get(f));
+    return { expired: changed.length > 0, changed };
+  }
+
+  /**
+   * integ.model-claims at the end (12.9, C-25 point 4): the open claims against this run's findings. A claim a
+   * finding of its check (or any check) sits at — the same path, and the same line within three when both have one
+   * — is proven by it: the claim turns `proven`, the finding names the claim as its source. The rest stay open and
+   * become this check's findings.
+   */
+  claimsJudgement(spec: CheckSpec, projectId: string, runId: string): Judgement {
+    const { db } = this.#o;
+    const claims = db.all<{ id: string; display_id: string; location_json: string | null; kind: string | null; matched_check_id: string | null; match_status: string | null; summary_redacted: string | null; severity_suggested: string | null }>(
+      "SELECT m.id, m.display_id, m.location_json, m.kind, m.matched_check_id, m.match_status, m.summary_redacted, m.severity_suggested FROM model_claims m JOIN ai_checks a ON a.id = m.ai_check_id WHERE a.project_id = ? AND coalesce(m.match_status, 'open') IN ('open', 'proven') ORDER BY m.display_id",
+      projectId,
+    );
+    if (!claims.length) return this.judgement(spec, projectId, [], 'not_applicable', { key: 'integrity.reason.noClaims' });
+    const findings = db.all<{ id: string; check_id: string; location_json: string | null; effect: string | null }>("SELECT f.id, f.check_id, f.location_json, f.effect FROM findings f JOIN check_runs c ON c.id = f.check_run_id WHERE c.run_id = ? AND f.check_id NOT LIKE 'integ.%' AND coalesce(f.effect, '') <> 'excluded'", runId);
+    const parsed = findings.map((f) => ({ ...f, loc: f.location_json ? (JSON.parse(f.location_json) as FindingLocation) : null }));
+    const pairs: { finding: ParsedFinding; anchor: string }[] = [];
+    let proven = 0;
+    for (const c of claims) {
+      const loc = c.location_json ? (JSON.parse(c.location_json) as FindingLocation) : null;
+      const match = loc?.path
+        ? parsed.find((f) => f.loc?.path === loc.path && (!c.matched_check_id || f.check_id === c.matched_check_id) && (loc.line === undefined || f.loc?.line === undefined || Math.abs((f.loc.line ?? 0) - loc.line) <= 3)) ?? parsed.find((f) => f.loc?.path === loc.path && (loc.line === undefined || f.loc?.line === undefined || Math.abs((f.loc.line ?? 0) - loc.line) <= 3))
+        : null;
+      if (match) {
+        proven++;
+        if (c.match_status !== 'proven') db.run("UPDATE model_claims SET match_status = 'proven', proven_finding_id = ?, matched_check_id = coalesce(matched_check_id, ?) WHERE id = ?", match.id, match.check_id, c.id);
+        else db.run('UPDATE model_claims SET proven_finding_id = ? WHERE id = ?', match.id, c.id);
+        db.run('UPDATE findings SET from_claim_id = ? WHERE id = ?', c.id, match.id);
+        continue;
+      }
+      if (c.match_status === 'proven') {
+        // Proven before, and the finding is gone now: the claim is settled by the fix the finding's disappearance proves.
+        continue;
+      }
+      const value = `claim|${c.display_id}`;
+      pairs.push({
+        finding: { rule: 'claim.unproven', toolRule: null, severity: null, proof: null, level: null, origin: 'model', message: `${c.display_id}: ${(c.summary_redacted ?? '').slice(0, 500)}`, location: loc, anchor: { kind: 'text', value }, expected: null, actual: null },
+        anchor: integrityAnchor(value),
+      });
+    }
+    return pairs.length
+      ? this.judgement(spec, projectId, pairs, 'needs_review', { key: 'integrity.reason.claimsOpen', params: { count: pairs.length, proven } }, { claims: claims.length, open: pairs.length, proven })
+      : this.judgement(spec, projectId, [], 'passed', { key: 'integrity.reason.claimsSettled', params: { proven } }, { claims: claims.length, open: 0, proven });
+  }
+}

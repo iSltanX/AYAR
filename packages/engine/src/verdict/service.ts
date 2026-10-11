@@ -16,7 +16,7 @@
 // - the message, expected and actual redacted again before they are stored (the reports were redacted on their
 //   way in, D-46; an analyzer's message may quote a project file).
 import type { Catalog } from '@ayar/catalog';
-import type { CheckOutcome, CheckSpec, ExitSignal, Fact, Finding, FindingDetail, FindingLocation, JsonValue, Origin, ParsedReport, Reason, ResultsFilter, ResultsPage, VerdictCounts } from '@ayar/protocol';
+import type { CheckOutcome, CheckSpec, ExitSignal, Fact, Finding, FindingDetail, FindingLocation, JsonValue, Origin, ParsedFinding, ParsedReport, Reason, ResultsFilter, ResultsPage, VerdictCounts } from '@ayar/protocol';
 import { ParsedReport as ReportSchema } from '@ayar/protocol';
 import type { ExitInfo } from '@ayar/adapters';
 import { createHash } from 'node:crypto';
@@ -55,6 +55,12 @@ export type JudgeRequest =
   | { kind: 'analyze'; analyzer: string; files: string[]; facts: Fact[] }
   /** C-14 (DEV-7): the outcome of a probe execution (`probe.json` in the evidence), judged for one check. */
   | { kind: 'probe'; outcomePath: string; files: string[]; facts: Fact[] };
+
+/** C-22 (DEV-9): the guard's effects on a check, as findings of that check with their anchors (7.3 rule 8). */
+export interface GuardEffects {
+  findings: ParsedFinding[];
+  anchors: string[];
+}
 
 export interface JudgedFinding {
   finding: WeighedFinding;
@@ -98,6 +104,7 @@ interface FindingRow {
   review_id: string | null;
   effect: Finding['effect'] | null;
   run_id: string;
+  from_claim_id?: string | null;
 }
 
 const sha = (s: string) => createHash('sha256').update(s).digest('hex');
@@ -137,7 +144,7 @@ export class VerdictService {
   }
 
   /** Reads the reports (or the project's files) in a worker thread, then classifies. Never throws for the tool's sake. */
-  async judge(spec: CheckSpec, o: { projectId: string; root: string; req: JudgeRequest; signal?: AbortSignal; guardTouches?: boolean }): Promise<Judgement> {
+  async judge(spec: CheckSpec, o: { projectId: string; root: string; req: JudgeRequest; signal?: AbortSignal; guard?: GuardEffects }): Promise<Judgement> {
     const base = { root: o.root, component: spec.component, checkId: spec.checkId, thresholds: spec.thresholds, hmacKey: this.#o.hmacKey.key };
     const job: Job =
       o.req.kind === 'parse'
@@ -160,29 +167,34 @@ export class VerdictService {
       this.#o.logger.log('error', 'a report reader returned an invalid report', { checkId: spec.checkId, issue: parsed.success ? 'anchors' : parsed.error.issues[0]?.message ?? '' });
       return { outcome: 'unavailable', reason: { key: 'verdict.reason.readerInvalid' }, origin: 'tool', counts: { ...ZERO }, findings: [], report: null };
     }
-    return this.classifyReport(spec, { projectId: o.projectId, report: parsed.data, exit: result.exit, anchors: result.anchors, guardTouches: o.guardTouches ?? false });
+    return this.classifyReport(spec, { projectId: o.projectId, report: parsed.data, exit: result.exit, anchors: result.anchors, guard: o.guard ?? null });
   }
 
   /** The classification of a report already read (the analyzers' tests and the shared executions use it too). */
-  classifyReport(spec: CheckSpec, o: { projectId: string; report: ParsedReport; exit: ExitSignal; anchors: readonly string[]; guardTouches: boolean }): Judgement {
+  classifyReport(spec: CheckSpec, o: { projectId: string; report: ParsedReport; exit: ExitSignal; anchors: readonly string[]; guard: GuardEffects | null }): Judgement {
     const book = this.#o.catalog.rules;
+    // C-22 (DEV-9): the guard's effects on this check join its findings before the classifier (7.3 rule 8).
+    const all = [...o.report.findings, ...(o.guard?.findings ?? [])];
+    const allAnchors = [...o.anchors, ...(o.guard?.anchors ?? [])];
     // One finding per fingerprint: the same thing reported twice in one execution counts once.
     const seen = new Set<string>();
     const keep: number[] = [];
     const prints: string[] = [];
-    o.report.findings.forEach((f, i) => {
-      const fp = fingerprintOf(spec.checkId, f, o.anchors[i]!);
+    all.forEach((f, i) => {
+      const fp = fingerprintOf(spec.checkId, f, allAnchors[i]!);
       if (seen.has(fp)) return;
       seen.add(fp);
       keep.push(i);
       prints.push(fp);
     });
-    const report: ParsedReport = { ...o.report, findings: keep.map((i) => o.report.findings[i]!), findingsDropped: o.report.findingsDropped + (o.report.findings.length - keep.length) };
-    const reviews = this.#falseAlarms(o.projectId, prints);
+    const report: ParsedReport = { ...o.report, findings: keep.map((i) => all[i]!), findingsDropped: o.report.findingsDropped + (all.length - keep.length) };
+    const reviews = this.falseAlarms(o.projectId, prints);
     const excluded = new Set<number>();
     prints.forEach((fp, i) => {
       if (reviews.has(fp)) excluded.add(i);
     });
+    // A guard effect a review excluded as a false alarm (D-35) no longer touches the check.
+    const guardTouches = report.findings.some((f, i) => f.rule.startsWith('guard.') && !excluded.has(i));
     const c: Classification = classify({
       checkId: spec.checkId,
       exit: o.exit,
@@ -192,7 +204,7 @@ export class VerdictService {
       rule: (id) => this.#facts(id),
       suspectedToolRules: book.suspectedToolRules(spec.checkId),
       excluded,
-      guardTouches: o.guardTouches,
+      guardTouches,
     });
     const findings: JudgedFinding[] = c.findings.map((f, i) => {
       const def = book.rule(f.rule);
@@ -201,8 +213,40 @@ export class VerdictService {
     return { outcome: c.outcome, reason: c.reason, origin: c.origin, counts: c.counts, findings, report };
   }
 
-  /** Fingerprints a still-valid review excluded as a false alarm, with the review's id. */
-  #falseAlarms(projectId: string, prints: readonly string[]): Map<string, string> {
+  /**
+   * D-35 (DEV-9, review.record `false_positive`): an execution judged again from its kept report, with the fingerprints
+   * its rows carry (in the report's order), after a review excluded one of them. The exit is read as `ok`: only an
+   * execution whose outcome came from its findings (warning, needs review, or a failure by violations) is judged
+   * again; the caller checks that. Returns the new classification without saving anything.
+   */
+  reclassify(spec: CheckSpec, o: { projectId: string; report: ParsedReport; fingerprints: readonly string[] }): Judgement {
+    const book = this.#o.catalog.rules;
+    const reviews = this.falseAlarms(o.projectId, o.fingerprints);
+    const excluded = new Set<number>();
+    o.fingerprints.forEach((fp, i) => {
+      if (reviews.has(fp)) excluded.add(i);
+    });
+    const guardTouches = o.report.findings.some((f, i) => f.rule.startsWith('guard.') && !excluded.has(i));
+    const c: Classification = classify({
+      checkId: spec.checkId,
+      exit: { kind: 'ok' },
+      report: o.report,
+      policy: { warnings: spec.warningsPolicy, flaky: spec.flakyPolicy },
+      suspected: book.forCheck(spec.checkId)?.suspected ?? 'needs_review',
+      rule: (id) => this.#facts(id),
+      suspectedToolRules: book.suspectedToolRules(spec.checkId),
+      excluded,
+      guardTouches,
+    });
+    const findings: JudgedFinding[] = c.findings.map((f, i) => {
+      const def = book.rule(f.rule);
+      return { finding: f, origin: f.origin !== 'project' ? f.origin : (def?.origin ?? 'project'), fingerprint: o.fingerprints[i] ?? '', ruleVersion: def?.version ?? book.version, reviewId: reviews.get(o.fingerprints[i] ?? '') ?? null };
+    });
+    return { outcome: c.outcome, reason: c.reason, origin: c.origin, counts: c.counts, findings, report: o.report };
+  }
+
+  /** Fingerprints a still-valid review excluded as a false alarm, with the review's id (D-35; the integrity checks ask too). */
+  falseAlarms(projectId: string, prints: readonly string[]): Map<string, string> {
     const out = new Map<string, string>();
     if (!prints.length) return out;
     // Every review of a finding, oldest first: the latest decision on a fingerprint is the one that holds. The

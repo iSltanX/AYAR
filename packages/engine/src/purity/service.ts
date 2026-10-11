@@ -84,6 +84,31 @@ export class PurityService {
     return result;
   }
 
+  /**
+   * DEV-9 (FR-34, G-17): after a review changed the outcome of an execution, the round it belongs to is computed again
+   * from its members as they are now (the member's outcome and `reviewed` updated first by the caller). Returns the
+   * new result, or null when the execution belongs to no round.
+   */
+  recomputeFor(checkRunId: string): PurityResult | null {
+    const { db, ports } = this.#o;
+    const rc = db.get<{ round_id: string }>('SELECT round_id FROM round_checks WHERE check_run_id = ?', checkRunId);
+    if (!rc) return null;
+    const round = db.get<{ id: string; project_id: string; base_run_id: string | null; snapshot_id: string | null }>('SELECT id, project_id, base_run_id, snapshot_id FROM rounds WHERE id = ?', rc.round_id);
+    if (!round?.base_run_id) return null;
+    const run = db.get<RunRow>('SELECT id, project_id, kind, plan_json, profile_version, profile_hash, catalog_version, snapshot_start_id, state_changed, round_id FROM runs WHERE id = ?', round.base_run_id);
+    if (!run) return null;
+    const members = new Map<string, Member>(
+      db.all<{ instance: string; check_run_id: string | null; outcome: string | null; reviewed: number; attempts_json: string }>('SELECT instance, check_run_id, outcome, reviewed, attempts_json FROM round_checks WHERE round_id = ?', round.id).map((r) => [r.instance, { instance: r.instance, checkRunId: r.check_run_id, outcome: (r.outcome as CheckOutcome | null) ?? null, reviewed: r.reviewed === 1, attempts: JSON.parse(r.attempts_json) as string[] }]),
+    );
+    const previous = this.resultOf(run.id);
+    const result = { ...this.#compute(run, { kind: 'round', roundId: round.id }, members, run.state_changed === 1, round.snapshot_id), notes: previous?.notes ?? [] };
+    db.transaction(() => {
+      db.run('UPDATE rounds SET verdict = ?, purity_json = ?, updated_at = ? WHERE id = ?', result.verdict, JSON.stringify(result), ports.clock.now().toISOString(), round.id);
+      for (const id of db.all<{ id: string }>('SELECT id FROM runs WHERE round_id = ?', round.id)) db.run('UPDATE runs SET purity_json = ?, verdict = ? WHERE id = ?', JSON.stringify(result), result.verdict, id.id);
+    });
+    return result;
+  }
+
   /** The index kept with a run (RunView, RunDetail). */
   resultOf(runId: string): PurityResult | null {
     const r = this.#o.db.get<{ purity_json: string | null }>('SELECT purity_json FROM runs WHERE id = ?', runId);
@@ -183,11 +208,14 @@ export class PurityService {
       const c = counts(m.checkRunId);
       checks.push({ instance: m.instance, checkId, component, section: def.section, criterion: def.criterion, inIndex: def.inIndex, required: false, applicable: true, blocking: false, outcome: m.outcome, reviewed: m.reviewed, violations: c.violations, excludedByReview: c.excluded, checkRunId: m.checkRunId });
     }
+    // DEV-9 (C-22): what each integrity check found and no review excluded (11.4 rules 6 to 9).
+    const live = (checkRunId: string | null, rulePrefix: string): number => (checkRunId ? (db.get<{ n: number }>("SELECT count(*) AS n FROM findings WHERE check_run_id = ? AND rule_id LIKE ? AND coalesce(effect, '') <> 'excluded'", checkRunId, `${rulePrefix}%`)?.n ?? 0) : 0);
+    const integ = (checkId: string) => [...members.values()].find((m) => m.instance.startsWith(`${checkId}@`)) ?? null;
     const integrity: IntegrityInputs = {
       stateChanged,
-      guardUnreviewed: 0,
-      modelClaimsOpen: 0,
-      reviewsExpired: 0,
+      guardUnreviewed: live(integ('integ.guard')?.checkRunId ?? null, 'guard.'),
+      modelClaimsOpen: live(integ('integ.model-claims')?.checkRunId ?? null, 'claim.'),
+      reviewsExpired: live(integ('integ.reviews')?.checkRunId ?? null, 'review.expired'),
       checks: [...members.values()].filter((m) => m.instance.startsWith('integ.')).map((m) => ({ checkId: m.instance.slice(0, m.instance.indexOf('@')), outcome: m.outcome })),
     };
     const toolVersions: Record<string, string> = {};
