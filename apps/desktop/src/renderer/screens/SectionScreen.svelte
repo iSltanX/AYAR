@@ -32,6 +32,7 @@
   import CodePanels from './section/CodePanels.svelte';
   import DesignPanels from './section/DesignPanels.svelte';
   import DesignReference from './section/DesignReference.svelte';
+  import IntegrityPanels from './section/IntegrityPanels.svelte';
   import CustomChecks from './section/CustomChecks.svelte';
   import PerformancePanels from './section/PerformancePanels.svelte';
   import SecurityPanels from './section/SecurityPanels.svelte';
@@ -49,6 +50,8 @@
   let notApplicableOpen = $state(false);
   let savingGroup = $state(false);
   let starting = $state(false);
+  /** 15: no karat on the integrity page; the open items that keep the verdict from «نقي» instead. */
+  let integrityBlockers = $state<number | null>(null);
   /** 10.2: the reference board, folded once nothing is missing, opened by the header's «المرجع». */
   let showReference = $state(false);
 
@@ -186,21 +189,26 @@
         {#if lastRun?.purity?.roundDisplayId}<span class="pill"><LtrText text={lastRun.purity.roundDisplayId} mono /></span>{/if}
       </p>
       <div class="header-row">
-        {#if karat && karat.criteria > 0}
+        {#if section === 'integrity'}
+          <p class="blockers" data-testid="integrity-blockers"><Icon name="scale" size={16} />{integrityBlockers ? t('sectionui.integrity.blocking', { count: integrityBlockers }) : t('sectionui.integrity.noBlocking')}</p>
+        {:else if karat && karat.criteria > 0}
           <SectionKarat value={karat.karat} criteria={karat.criteria} />
         {:else}
           <p class="no-karat">{t('sectionui.noCriteria')}</p>
         {/if}
         <span class="spacer"></span>
         {#if section === 'design' && !designRefMissing}<Button kind="quiet" icon="sliders-horizontal" aria-pressed={showReference} onclick={() => (showReference = !showReference)}>{t('sectionui.design.refToggle')}</Button>{/if}
-        <Button kind="secondary" icon="play" disabled={!selected.length || starting} onclick={() => void runSelected()}>{selected.length ? t('shell.selectionBar.runSelected', { count: selected.length }) : t('ui.action.runSelected')}</Button>
+        {#if section !== 'integrity'}<Button kind="secondary" icon="play" disabled={!selected.length || starting} onclick={() => void runSelected()}>{selected.length ? t('shell.selectionBar.runSelected', { count: selected.length }) : t('ui.action.runSelected')}</Button>{/if}
         <Button kind="primary" icon="play" disabled={!included.length || starting} onclick={() => void run({ kind: 'section', section })}>{t('ui.action.runSection')}</Button>
       </div>
+      {#if section === 'integrity'}<p class="no-karat">{t('sectionui.integrity.noKarat')}</p>{/if}
     </header>
 
     {#if designRefMissing}<DesignReference {projectId} {model} ondefine={define} onchanged={() => void load()} />{/if}
 
-    {#if section === 'custom'}
+    {#if section === 'integrity'}
+      <IntegrityPanels {projectId} {model} onblockers={(n: number) => (integrityBlockers = n)} onchanged={() => void load()} />
+    {:else if section === 'custom'}
       <CustomChecks {projectId} {model} bind:selected oninspect={(i: string) => (inspected = i)} onchanged={() => void load()} onrun={(i: string) => void runOne(i)} onrunselected={() => void runSelected()} onrungroup={(id: string) => void run({ kind: 'savedGroup', groupId: id })} />
     {:else}
       <section class="card list" aria-labelledby="list-title" data-testid="section-checks">
@@ -318,7 +326,7 @@
       </section>
     {/if}
 
-    {#if model.notApplicable.length}
+    {#if model.notApplicable.length && section !== 'integrity'}
       <section class="card not-applicable" aria-labelledby="na-title" data-testid="section-not-applicable">
         <div class="card-head">
           <button class="fold" type="button" aria-expanded={notApplicableOpen} aria-controls="na-body" onclick={() => (notApplicableOpen = !notApplicableOpen)}>
@@ -384,6 +392,17 @@
     align-items: center;
     gap: var(--space-8);
     margin-block-start: var(--space-8);
+  }
+  .blockers {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+    margin: 0;
+    padding: var(--space-8) var(--space-12);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-control);
+    font: var(--type-body-strong);
+    color: var(--text-primary);
   }
   .no-karat {
     margin: 0;

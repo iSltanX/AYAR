@@ -11,6 +11,8 @@
     /** The check id the panel reads (mono, left to right). */
     checkId?: string;
     result?: BadgeResult;
+    /** A qualifier of the result (15.2: «لا أساس للمقارنة»). */
+    qualifier?: string;
     /** Extra tags beside the result (a cost tag: «يحتاج شبكة»). */
     tags?: Snippet;
     note?: string;
@@ -18,7 +20,7 @@
     testid?: string;
     children: Snippet;
   }
-  let { title, checkId, result, tags, note, actions, testid, children }: Props = $props();
+  let { title, checkId, result, qualifier, tags, note, actions, testid, children }: Props = $props();
   const uid = $props.id();
 </script>
 
@@ -28,7 +30,7 @@
     <span class="spacer"></span>
     {#if actions}{@render actions()}{/if}
     {#if tags}{@render tags()}{/if}
-    {#if result}<ResultBadge {result} size="sm" />{/if}
+    {#if result}<ResultBadge {result} {qualifier} size="sm" />{/if}
     {#if checkId}<bdi class="id" dir="ltr">{checkId}</bdi>{/if}
   </div>
   {#if note}<p class="note">{note}</p>{/if}
