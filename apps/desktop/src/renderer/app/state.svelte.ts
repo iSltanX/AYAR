@@ -3,7 +3,7 @@
 // primary action, its inspector, its search). Screens read and set it; the engine stays the source of truth.
 import { getContext, setContext, type Snippet } from 'svelte';
 import { createTranslator, resolveLanguage, type Lang, type Translate } from '@ayar/i18n';
-import type { EngineHealth, PendingConfirmation, Project, ProtectedLocation } from '@ayar/protocol';
+import type { AdvisorContext, AdvisorResult, EngineHealth, PendingConfirmation, Project, ProtectedLocation } from '@ayar/protocol';
 import type { NAV_SECTIONS, ToastMessage, WindowControls } from '../lib/shell.ts';
 import { attempt, on } from './client.ts';
 import { RunTracker } from './runs.svelte.ts';
@@ -89,6 +89,8 @@ export class AppState {
    * and runs them itself (it holds the selection). Null elsewhere.
    */
   runContext = $state<RunContext | null>(null);
+  /** 17.3–17.4: the advisor's last context and advice, kept while the app is open («عدّل المدخلات» returns to it). */
+  advisor = $state<{ projectId: string; context: AdvisorContext; result: AdvisorResult } | null>(null);
   /** «أعد الفاشل»/«أعد غير المكتمل» chosen away from the results: the results page opens its sheet once it shows. */
   pendingRerun = $state<'failed' | 'incomplete' | null>(null);
 

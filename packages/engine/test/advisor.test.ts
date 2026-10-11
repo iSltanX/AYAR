@@ -53,6 +53,13 @@ describe('28.12: the archive cases on the new contract (15)', () => {
     expect(item(run(archive(2, 'إصلاح الخلل يضع اختبار إعادة الإنتاج في الأولوية العليا')), 'confirm_bug')?.priority).toBe(1);
   });
 
+  it('17.4: the result carries the knowledge base text of every item, rule and depth it names', () => {
+    const r = run(archive(2, 'إصلاح الخلل يضع اختبار إعادة الإنتاج في الأولوية العليا'));
+    for (const id of [...r.items.map((i) => i.id), ...r.omitted.map((o) => o.id)]) expect(r.text.items[id]?.title).toBeTruthy();
+    for (const c of r.items.flatMap((i) => i.contributions)) expect(r.text.rules[c.rule]).toBeTruthy();
+    expect(r.text.depth.name).toBeTruthy();
+  });
+
   it('3. a refactor without evidence starts with characterization', () => {
     expect(item(run(archive(3, 'إعادة الهيكلة دون أدلة تبدأ بالاختبار التوصيفي')), 'characterization')?.priority).toBe(1);
   });
