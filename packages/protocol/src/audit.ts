@@ -33,6 +33,16 @@ export const AUDIT_ACTIONS = [
   'browser.installed',
   'browser.installRejected',
   'baseline.approved',
+  // DEV-9 (protocol 1.5): reviews (FR-34), reports and exports (C-21, C-23), cards (12.8), model checks (C-25).
+  'review.recorded',
+  'report.built',
+  'report.exported',
+  'task.updated',
+  'task.verified',
+  'aiCheck.generated',
+  'aiCheck.saved',
+  'aiResult.imported',
+  'aiResult.rejected',
 ] as const;
 export const AuditAction = z.enum(AUDIT_ACTIONS);
 export type AuditAction = z.infer<typeof AuditAction>;

@@ -248,11 +248,29 @@ describe('migrations (14.1, 14.3, NFR-02, G-11)', () => {
     await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.3.0', migrations: MIGRATIONS.slice(0, 3) });
     db.run("INSERT INTO projects (id, display_name, root_path, root_realpath, created_at) VALUES ('p', 'P', '/p', '/p', 'x')");
     db.run("INSERT INTO baselines (id, project_id, key_json, rel_path, sha256, approved_at, status) VALUES ('b', 'p', '{}', 'baselines/p/b.png', 'x', 'y', 'active')");
-    const r = await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.4.0' });
+    const r = await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.4.0', migrations: MIGRATIONS.slice(0, 4) });
     expect(r).toMatchObject({ from: 3, to: 4, applied: ['4-probe-baselines'] });
     expect(r.backup).toMatch(/pre-v3-to-v4\.db$/);
     expect(db.all<{ name: string; notnull: number }>('PRAGMA table_info(baselines)').find((x) => x.name === 'snapshot_id')).toMatchObject({ notnull: 0 });
     expect(db.get('SELECT snapshot_id, status FROM baselines WHERE id = ?', 'b')).toEqual({ snapshot_id: null, status: 'active' });
+  });
+
+  it('migration 5 (DEV-9) adds the reports, reviews, cards and model-check columns, nullable, and keeps the old rows', async () => {
+    const { db, layout } = await freshStore();
+    const clock = fakeClock();
+    await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.4.0', migrations: MIGRATIONS.slice(0, 4) });
+    db.run("INSERT INTO projects (id, display_name, root_path, root_realpath, created_at) VALUES ('p', 'P', '/p', '/p', 'x')");
+    db.run("INSERT INTO tasks (id, display_id, project_id, kind, title, body_json, status, created_at, updated_at) VALUES ('t', 'TASK-0001', 'p', 'unit_test', 'T', '{}', 'open', 'x', 'x')");
+    db.run("INSERT INTO reports (id, display_id, project_id, target_kind, lang, template_version, created_at) VALUES ('r', 'FIX-20261011-001', 'p', 'findings', 'ar', 'model-report/1', 'x')");
+    const r = await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.5.0' });
+    expect(r).toMatchObject({ from: 4, to: 5, applied: ['5-reports-reviews-claims'] });
+    const cols = (table: string) => db.all<{ name: string; notnull: number }>(`PRAGMA table_info(${table})`);
+    for (const [table, column] of [['check_runs', 'tests_json'], ['findings', 'from_claim_id'], ['reports', 'report_json'], ['tasks', 'verification_json'], ['tasks', 'base_json'], ['ai_checks', 'token'], ['model_claims', 'proven_finding_id']] as const) {
+      expect(cols(table).find((x) => x.name === column), `${table}.${column}`).toMatchObject({ notnull: 0 });
+    }
+    expect(db.get('SELECT status, verification_json, follows FROM tasks WHERE id = ?', 't')).toEqual({ status: 'open', verification_json: null, follows: null });
+    expect(db.get('SELECT display_id, report_json FROM reports WHERE id = ?', 'r')).toEqual({ display_id: 'FIX-20261011-001', report_json: null });
+    expect(db.get("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'ai_need_inputs'")).toEqual({ name: 'ai_need_inputs' });
   });
 
   it('refuses a database written by a newer AYAR, without a backup or any change', async () => {

@@ -32,5 +32,6 @@
   "errors.tool_rejected": "The downloaded tool was rejected: its hash or signature does not match the one pinned in AYAR, and the file was deleted.",
   "errors.network_failed": "The network could not be reached. Try again by hand.",
   "errors.setup_failed": "The setup could not be completed. Its log has the details.",
-  "errors.disk_full": "The disk is full, so work stopped safely."
+  "errors.disk_full": "The disk is full, so work stopped safely.",
+  "errors.report_blocked": "A high-confidence secret survived the second redaction pass, so copying and exporting are refused until it is removed at its source."
 }
