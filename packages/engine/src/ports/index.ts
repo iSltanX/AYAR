@@ -191,6 +191,11 @@ export interface Network {
    * other), the HTTP status or null when nothing answered within the time.
    */
   ping(url: string, timeoutMs: number): Promise<number | null>;
+  /**
+   * DEV-7 (C-12 point 10, AT-19): is a port of this machine taken already (by another program)? A companion service
+   * that declares it would never become ready, and an answer on it would not be the service's.
+   */
+  portInUse?(port: number): Promise<boolean>;
 }
 
 /** The message channel to the host (main process or tools/cli). */
@@ -214,6 +219,27 @@ export interface Logger {
   flush(): void;
 }
 
+/**
+ * C-14 and 6.3 (E-11): the web probe's process. Under Electron it is a second utilityProcess the main process starts
+ * at the engine's request, joined to the engine by a MessagePort; under Node (tools/cli, the tests) a child process
+ * the engine forks itself. Either way the engine speaks to it by messages only, and ends it when its job is over.
+ */
+export interface ProbeProcess {
+  readonly pid: number | null;
+  send(message: unknown): void;
+  onMessage(listener: (message: unknown) => void): void;
+  /** Resolves with why it ended (its exit code or signal, or `closed`). */
+  readonly exited: Promise<string>;
+  /** Ends it now: its browser and its server go with it. */
+  close(): void;
+}
+
+export interface ProbeHost {
+  start(): Promise<ProbeProcess>;
+  /** axe-core's script, as AYAR ships it (the probe reads it from here). */
+  readonly axePath: string | null;
+}
+
 /** The ports the engine receives from its entry point. */
 export interface EnginePorts {
   fs: FileSystem;
@@ -221,6 +247,8 @@ export interface EnginePorts {
   processes: ProcessControl;
   random: Random;
   network: Network;
+  /** C-14: the web probe's process; absent where no probe can run (its checks say so: «تعذّر»). */
+  probe?: ProbeHost;
   /** Ends the engine process with this code. */
   exit(code: number): never;
 }

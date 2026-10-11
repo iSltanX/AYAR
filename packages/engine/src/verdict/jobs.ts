@@ -5,11 +5,12 @@
 // never kept (the value is read from its span, or the tool's own fingerprint stands in when the file is gone), and
 // the value itself for a test, a dependency, a permission, a key, a state. Files are read without following a link,
 // inside the root only, and bounded. A job is plain data in, plain data out (structured clone).
-import { adapterById, REPORT_LIMITS, type ExitInfo, type ReportFile } from '@ayar/adapters';
-import { analyzerById, Cancelled } from '@ayar/analyzers';
+import { adapterById, emptyReport, REPORT_LIMITS, type ExitInfo, type ReportFile } from '@ayar/adapters';
+import { analyzerById, Cancelled, type AnalyzerInput } from '@ayar/analyzers';
+import { compareImages, judgeProbe, ProbeOutcome, PROBE_JUDGE_VERSION } from '@ayar/probe';
 import type { CheckSpec, ExitSignal, Fact, JsonValue, ParsedFinding, ParsedReport } from '@ayar/protocol';
 import { createHash, createHmac } from 'node:crypto';
-import { closeSync, lstatSync, openSync, readdirSync, readFileSync, readSync, realpathSync } from 'node:fs';
+import { closeSync, lstatSync, openSync, readdirSync, readFileSync, readSync, realpathSync, writeFileSync } from 'node:fs';
 import { posix } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
@@ -47,14 +48,41 @@ export interface AnalyzeJob {
   hmacKey: Uint8Array;
 }
 
-export type Job = ParseJob | AnalyzeJob;
+/** C-14 (DEV-7): one check's judgement of a probe execution, from its outcome kept in the evidence (`probe.json`). */
+export interface ProbeJudgeJob {
+  kind: 'probe';
+  root: string;
+  component: string;
+  checkId: string;
+  files: string[];
+  references: Record<string, JsonValue>;
+  thresholds: Record<string, unknown> | null;
+  facts: Fact[];
+  /** Absolute: the outcome's redacted copy in the evidence store. */
+  outcomePath: string;
+  hmacKey: Uint8Array;
+}
+
+/** G-28 (DEV-7): captures against their references, pixel by pixel, off the engine's thread; diff images written. */
+export interface CompareJob {
+  kind: 'compare';
+  root: string;
+  pairs: { reference: string; capture: string; diff: string }[];
+}
+
+export type Job = ParseJob | AnalyzeJob | ProbeJudgeJob | CompareJob;
 
 export interface JobResult {
   report: ParsedReport;
   exit: ExitSignal;
   /** The anchor of each finding, in order: a hex digest (C-15). */
   anchors: string[];
+  /** A compare job's answer, pair by pair: the share of differing pixels, and whether a diff image was written. */
+  compared?: { ratio: number; differs: boolean; sameSize: boolean; diff: boolean; error: string | null }[];
 }
+
+/** The outcome of a probe execution is read with the report limit (it is a report AYAR wrote itself). */
+const MAX_OUTCOME_BYTES = 64 * 1024 * 1024;
 
 const MAX_SOURCE_BYTES = 2 * 1024 * 1024;
 const MAX_LOG_BYTES = 1024 * 1024;
@@ -220,12 +248,63 @@ function listDir(root: string, rel: string): string[] | null {
   return out;
 }
 
+function analyzerInput(job: AnalyzeJob | ProbeJudgeJob, reader: ProjectReader, cancelled: () => boolean): AnalyzerInput {
+  return {
+    root: job.root,
+    component: job.component,
+    checkId: job.checkId,
+    files: job.files,
+    read: reader.read,
+    exists: reader.exists,
+    size: reader.size,
+    listDir: (rel) => listDir(job.root, rel),
+    gzipSize: (rel) => {
+      const t = reader.size(rel);
+      // A file over the report limit is not compressed in memory: its size is enough to exceed a budget.
+      if (t === null || t > REPORT_LIMITS.maxBytes) return t;
+      try {
+        return gzipSync(readFileSync(posix.join(job.root, rel))).length;
+      } catch {
+        return null;
+      }
+    },
+    references: job.references,
+    thresholds: job.thresholds,
+    facts: job.facts,
+    cancelled,
+  };
+}
+
+/** G-28: each pair compared; a pair that cannot be read says why (the capture is then «تعذّر» to compare). */
+function runCompare(job: CompareJob, cancelled: () => boolean): JobResult {
+  const compared: NonNullable<JobResult['compared']> = [];
+  for (const p of job.pairs) {
+    if (cancelled()) throw new Cancelled();
+    try {
+      const r = compareImages(readFileSync(p.reference), readFileSync(p.capture));
+      if (r.diff) writeFileSync(p.diff, r.diff, { mode: 0o600, flag: 'wx' });
+      compared.push({ ratio: r.ratio, differs: r.differs, sameSize: r.sameSize, diff: r.diff !== null, error: null });
+    } catch (e) {
+      compared.push({ ratio: 1, differs: true, sameSize: false, diff: false, error: e instanceof Error ? e.message.slice(0, 300) : String(e) });
+    }
+  }
+  return { report: emptyReport({ id: 'compare', version: PROBE_JUDGE_VERSION }), exit: { kind: 'ok' }, anchors: [], compared };
+}
+
 /** Runs one job; throws Cancelled when told to stop (C-13). */
 export function runJob(job: Job, cancelled: () => boolean = () => false): JobResult {
+  if (job.kind === 'compare') return runCompare(job, cancelled);
   const reader = projectReader(job.root);
   let report: ParsedReport;
   let exit: ExitSignal;
-  if (job.kind === 'parse') {
+  if (job.kind === 'probe') {
+    const st = lstatSync(job.outcomePath);
+    if (!st.isFile() || st.size > MAX_OUTCOME_BYTES) throw new Error('the probe outcome cannot be read');
+    const outcome = ProbeOutcome.parse(JSON.parse(readFileSync(job.outcomePath, 'utf8')) as unknown);
+    const r = judgeProbe({ ...analyzerInput(job, reader, cancelled), outcome });
+    report = r.report;
+    exit = r.exit;
+  } else if (job.kind === 'parse') {
     const adapter = adapterById(job.adapter);
     if (!adapter) throw new Error(`unknown adapter ${job.adapter}`);
     const files: ReportFile[] = job.reports.map((r) => {
@@ -259,30 +338,7 @@ export function runJob(job: Job, cancelled: () => boolean = () => false): JobRes
   } else {
     const analyzer = analyzerById(job.analyzer);
     if (!analyzer) throw new Error(`unknown analyzer ${job.analyzer}`);
-    const r = analyzer.run({
-      root: job.root,
-      component: job.component,
-      checkId: job.checkId,
-      files: job.files,
-      read: reader.read,
-      exists: reader.exists,
-      size: reader.size,
-      listDir: (rel) => listDir(job.root, rel),
-      gzipSize: (rel) => {
-        const t = reader.size(rel);
-        // A file over the report limit is not compressed in memory: its size is enough to exceed a budget.
-        if (t === null || t > REPORT_LIMITS.maxBytes) return t;
-        try {
-          return gzipSync(readFileSync(posix.join(job.root, rel))).length;
-        } catch {
-          return null;
-        }
-      },
-      references: job.references,
-      thresholds: job.thresholds,
-      facts: job.facts,
-      cancelled,
-    });
+    const r = analyzer.run(analyzerInput(job, reader, cancelled));
     report = r.report;
     exit = r.exit;
   }

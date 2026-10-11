@@ -26,6 +26,7 @@ import type { Db } from '../storage/db.ts';
 import { readSettings } from '../storage/settings.ts';
 import type { ProcessSupervisor, RunningProcess } from '../executor/process.ts';
 import type { ToolsService } from '../tools/service.ts';
+import type { BrowserService } from '../probe/browser.ts';
 import type { Catalog } from '@ayar/catalog';
 import { evaluateInstances, type ActionSeed, type InstanceReadiness } from './readiness.ts';
 
@@ -69,6 +70,8 @@ export interface SetupServiceOptions {
   projects: ProjectsService;
   environment: EnvironmentService;
   tools: ToolsService;
+  /** C-11 and C-14 (DEV-7): the probe's browser. */
+  browsers: BrowserService;
   redaction: RedactionService;
   supervisor: ProcessSupervisor;
   /** True while a run of this project is active or queued: a setup action never changes a project under a run. */
@@ -115,6 +118,7 @@ export class SetupService {
       osvDbs,
       accepted,
       projectBrowser: (component) => this.#projectBrowser(project.rootPath, component),
+      probeBrowser: async () => (await this.#o.browsers.located()) !== null,
       packageVersion: (component, name) => packageVersion(this.#o.ports.fs, project.rootPath, component, name),
     });
     return { items, env: { source: env.source, fallbackReason: env.fallbackReason, probed: o.probe }, untrusted };
@@ -234,6 +238,14 @@ export class SetupService {
         title = { key: 'setup.action.acceptToolVersion', params: { tool: seed.tool, required: seed.requiredSpec, found: seed.version } };
         target = { ...target, tool: seed.tool, version: seed.version, requiredSpec: seed.requiredSpec };
         preview = { command: null, cwd: null, network: null, sizeBytes: 0, writes: [{ location: 'ayar', path: 'ayar.db' }], runsScripts: false, warnings: [{ key: 'setup.warning.versionOutsideRange', params: { tool: seed.tool, required: seed.requiredSpec, from: seed.requiredFrom, found: seed.version } }] };
+        break;
+      }
+      case 'install_browser': {
+        const b = this.#o.browsers.build;
+        title = { key: 'setup.action.installBrowser', params: { version: b.version } };
+        target = { ...target, tool: b.key, version: b.version };
+        const url = new URL(b.url);
+        preview = { command: null, cwd: null, network: { host: url.hostname, url: b.url }, sizeBytes: b.size, writes: [{ location: 'ayar', path: `browsers/${b.key}-${b.revision}/` }], runsScripts: false, warnings: [] };
         break;
       }
       case 'download_osv_db': {
@@ -403,6 +415,17 @@ export class SetupService {
             db.run('INSERT INTO tool_version_acceptances (id, project_id, tool, required_spec, required_from, version, path, accepted_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING', newId(ports.random, 'acc'), action.projectId, t.tool, t.requiredSpec, null, t.version, null, now());
             recordAudit(db, { id: newId(ports.random, 'aud'), at: ports.clock.now(), action: 'tool.versionAccepted', projectId: action.projectId, details: { tool: t.tool, required: t.requiredSpec, version: t.version } });
           });
+          break;
+        }
+        case 'install_browser': {
+          const r = await this.#o.browsers.install(actionId);
+          if (r.status === 'rejected') {
+            state = 'rejected';
+            reasons.push({ key: `setup.rejected.${r.reason}` });
+          } else if (r.status === 'failed') {
+            state = 'failed';
+            reasons.push({ key: `setup.failed.${r.reason === 'version' ? 'extract' : r.reason}`, ...(r.detail ? { params: { detail: r.detail } } : {}) });
+          }
           break;
         }
         case 'install_dependencies':
@@ -592,6 +615,8 @@ function seedOf(kind: SetupAction['kind'], t: SetupAction['target'], p: { previe
     }
     case 'download_osv_db':
       return { kind, ecosystem: t.ecosystem as 'npm' | 'PyPI' };
+    case 'install_browser':
+      return { kind };
   }
 }
 

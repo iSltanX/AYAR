@@ -29,6 +29,10 @@ export const AUDIT_ACTIONS = [
   'run.deleted',
   'group.saved',
   'group.deleted',
+  // DEV-7 (protocol 1.4): the probe's browser (C-11) and the reference images approved (FR-35, D-27).
+  'browser.installed',
+  'browser.installRejected',
+  'baseline.approved',
 ] as const;
 export const AuditAction = z.enum(AUDIT_ACTIONS);
 export type AuditAction = z.infer<typeof AuditAction>;

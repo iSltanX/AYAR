@@ -54,6 +54,15 @@ function rec(v: unknown): Record<string, unknown> {
   return v !== null && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
 }
 
+/** The first entry page discovery found (an HTML page of the project, outside a build): its folder and its name. */
+export function entryPage(facts: readonly Fact[]): { dir: string; entry: string } | null {
+  const files = rec(facts.find((f) => f.key === 'ui.entryPages')?.value).files;
+  const first = Array.isArray(files) ? files.find((x): x is string => typeof x === 'string' && x.endsWith('.html')) : undefined;
+  if (!first) return null;
+  const i = first.lastIndexOf('/');
+  return i < 0 ? { dir: '.', entry: first } : { dir: first.slice(0, i), entry: first.slice(i + 1) };
+}
+
 /** The value of a reference as the spec sees it: what the user declared, else what discovery found. */
 function referenceValue(kind: ReferenceKind, declared: ProfileReferences, facts: readonly Fact[]): unknown {
   if (declared[kind] !== undefined && declared[kind] !== null) return { declared: declared[kind] };
@@ -69,7 +78,9 @@ function referenceValue(kind: ReferenceKind, declared: ProfileReferences, facts:
       const out = fact('references.buildOutput');
       if (fact('type.browserExtension') && out) return { discovered: { kind: 'extension', dir: rec(out.value).dir } };
       if (fact('type.staticSite')) return { discovered: { kind: 'static', dir: '.' } };
-      return null;
+      // DEV-7 (AT-18 «صفحة التوثيق الثابتة هدف عرض مقترح»): a page discovery found, served as a static folder.
+      const page = entryPage(facts);
+      return page ? { discovered: { kind: 'static', dir: page.dir, entry: page.entry } } : null;
     }
     default:
       return null;
@@ -242,8 +253,11 @@ function specFor(
   }
 
   // FR-21: the companion services this instance needs, resolved by name (an unknown name is refused at validation).
+  // A probe check whose render target is a service's address needs that service too (C-14, DEV-7).
+  const target = def.runner.kind === 'probe' ? rec(rec(referenceValue('renderTarget', input.settings.references, facts)).declared) : {};
+  const targetService = target.kind === 'service' && typeof target.service === 'string' ? [target.service] : [];
   const services: CompanionService[] = applicable
-    ? [...new Set(override?.services ?? [])].sort().flatMap((id) => {
+    ? [...new Set([...(override?.services ?? []), ...targetService])].sort().flatMap((id) => {
         const d = input.settings.services[id];
         return d ? [{ id, argv: [...d.argv], cwd: d.cwd, readyUrl: d.readyUrl, readyPattern: d.readyPattern, readyTimeoutSec: d.readyTimeoutSec, ports: [...d.ports] }] : [];
       })
@@ -287,8 +301,9 @@ function specFor(
     flakyPolicy: override?.flakyPolicy ?? 'flaky',
     thresholds: override?.thresholds ?? null,
     sideEffects: custom ? { runsProjectCode: true, writesRepo: custom.writesRepo === false ? 'no' : 'maybe' } : { ...def.sideEffects },
-    network: custom ? (custom.network === true ? 'required' : custom.network === false ? 'none' : 'optional') : def.network,
-    cost: custom?.network ? 'network' : def.cost,
+    // C-14: hosts the user allows by name for the probe's pages are a declared network action («يحتاج شبكة»).
+    network: custom ? (custom.network === true ? 'required' : custom.network === false ? 'none' : 'optional') : Array.isArray(target.allowHosts) && target.allowHosts.length ? 'required' : def.network,
+    cost: custom?.network || (Array.isArray(target.allowHosts) && target.allowHosts.length) ? 'network' : def.cost,
     missing,
     danger: verdict.danger,
     refused: verdict.refused,

@@ -71,6 +71,11 @@ function median(xs: readonly number[]): number | null {
  * shares an execution.
  */
 export function invocationKey(spec: CheckSpec): string | null {
+  // D-DEV7-03: the web probe's pages checks of one render target share one execution (their states, matrix and
+  // services are the target's; what each measures is judged by its own rules). perf.web measures apart (E-21).
+  if (spec.runner.kind === 'probe' && spec.runner.ids.includes('web-probe') && spec.checkId !== 'perf.web') {
+    return sha(canonicalJson({ probe: 'web-probe', component: spec.component, target: spec.referenceValues.renderTarget ?? null, services: spec.services }));
+  }
   if (!spec.command) return null;
   return sha(canonicalJson({ argv: spec.command.argv, cwd: spec.command.cwd, component: spec.component, env: spec.env, tool: spec.tool?.path ?? null, services: spec.services, runner: [...spec.runner.ids].sort() }));
 }

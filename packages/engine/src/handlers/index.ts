@@ -7,6 +7,7 @@ import { profileApprove, profileExport, profileExportPreview, profileGet, profil
 import { projectAdd, projectCancelDiscovery, projectConfirm, projectGet, projectList, projectRelocate, projectRemove, projectRename, projectRescan, projectSetTrust } from './projects.ts';
 import { groupsDelete, groupsList, groupsSave, internalPrepareQuit, runCancel, runContinueRound, runGet, runPlan, runRerun, runsDelete, runsKeep, runsList, runStart } from './runs.ts';
 import { findingGet, resultsQuery } from './results.ts';
+import { baselineApprove, baselinesList, capturesList } from './probe.ts';
 import { settingsGet, settingsSet } from './settings.ts';
 import { readinessEvaluate, setupExecute, setupPreview, toolsInstall, toolsList, toolsPreview, toolsRemove, toolsVerify } from './setup.ts';
 
@@ -62,4 +63,8 @@ export const HANDLERS: HandlerTable = {
   // DEV-6
   'results.query': resultsQuery,
   'finding.get': findingGet,
+  // DEV-7
+  'captures.list': capturesList,
+  'baselines.list': baselinesList,
+  'baseline.approve': baselineApprove,
 };
