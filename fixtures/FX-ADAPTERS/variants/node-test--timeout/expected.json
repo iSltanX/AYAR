@@ -8,7 +8,6 @@
       "component": "node-test",
       "result": "انتهت المهلة",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "node-test/test/add.test.js",
         "line": 3,

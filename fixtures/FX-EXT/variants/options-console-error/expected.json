@@ -6,8 +6,7 @@
     {
       "check": "beh.ext.host",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "ext.console-error",
       "location": {
         "path": "src/options.ts",
         "line": 17,
@@ -20,8 +19,7 @@
     {
       "check": "beh.e2e",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "test.failed",
       "location": {
         "path": "e2e/extension.spec.ts",
         "line": 35,
@@ -34,7 +32,6 @@
       "check": "code.build",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -42,7 +39,6 @@
       "check": "code.types",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -50,7 +46,6 @@
       "check": "code.lint",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     }

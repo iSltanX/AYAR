@@ -7,8 +7,7 @@
       "check": "beh.unit",
       "component": "packages/core",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "test.failed",
       "location": {
         "path": "packages/core/test/index.test.js",
         "line": 8,
@@ -23,7 +22,6 @@
       "component": "packages/web",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "reason": "حزمة web تعتمد على core لكن اختبارها لا يمس القيمة الفاشلة؛ لا يسري إخفاق الحزمة الأخرى عليها"

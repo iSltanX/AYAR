@@ -7,7 +7,6 @@
       "check": "beh.unit",
       "result": "تعذّر",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "pyproject.toml",
         "line": 31,

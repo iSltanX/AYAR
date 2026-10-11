@@ -17,6 +17,10 @@ import type { Db } from '../storage/db.ts';
 import type { HmacKey } from '../storage/hmac-key.ts';
 import { readSettings } from '../storage/settings.ts';
 import { TasksService } from '../tasks/service.ts';
+import { PurityService } from '../purity/service.ts';
+import { runJob } from '../verdict/jobs.ts';
+import { workerPool } from '../verdict/pool.ts';
+import { VerdictService } from '../verdict/service.ts';
 import { loadToolRegistry } from '../tools/registry.ts';
 import { ToolsService } from '../tools/service.ts';
 import type { EventBus } from './event-bus.ts';
@@ -43,6 +47,10 @@ export interface EngineServices {
   planner: PlannerService;
   /** C-12: runs, and the run list of C-17. */
   runs: RunService;
+  /** C-15 and C-16 (DEV-6): reading reports in worker threads, the verdict, the findings, results.query. */
+  verdict: VerdictService;
+  /** C-19 (DEV-6): the purity index of rounds and sections. */
+  purity: PurityService;
   /**
    * C-18 after the fact [D-DEV4-07]: redacts the stored rows again with the current rules (new sensitive values,
    * new user patterns), and the backups too (G-DEV4-01). A failure is logged, never fatal (re-review R4).
@@ -65,6 +73,8 @@ export interface ServicesInput {
   testLoginShell?: string | null;
   /** tools/cli's test hook: extra managed-tool entries (AT-35's local server), never shipped. */
   testToolRegistry?: readonly unknown[];
+  /** The module the verdict's worker threads start from (the engine's entry; C-13). */
+  workerEntry?: URL | string;
 }
 
 export function createServices(o: ServicesInput): EngineServices {
@@ -109,6 +119,14 @@ export function createServices(o: ServicesInput): EngineServices {
   let runs: RunService | null = null;
   const setup = new SetupService({ db: o.db, catalog: o.catalog, ports: o.ports, layout: o.layout, logger: o.logger, events: o.events, profiles, projects, environment, tools, redaction, supervisor, runActive: (p) => runs?.busy(p) ?? false });
   const planner = new PlannerService({ db: o.db, catalog: o.catalog, ports: o.ports, profiles, setup });
-  runs = new RunService({ db: o.db, catalog: o.catalog, ports: o.ports, layout: o.layout, logger: o.logger, events: o.events, runGate: o.runGate, planner, projects, environment, redaction, evidence, tools, supervisor, setupActive: (p) => setup.busyFor(p) });
-  return { redaction, profiles, projects, environment, tasks, evidence, tools, setup, planner, runs, rescrubStored };
+  // C-13: the readers run in worker threads (two at a time), started from the engine's own entry module; if none
+  // can start at all (a packaged archive a worker cannot load), in this thread, logged once.
+  const pool = workerPool(o.workerEntry ?? new URL('../verdict/worker-entry.ts', import.meta.url), 2, {
+    run: runJob,
+    onFallback: (error) => o.logger.log('warn', 'worker threads could not start: reports are read in the engine thread', { error: error.slice(0, 300) }),
+  });
+  const verdict = new VerdictService({ db: o.db, catalog: o.catalog, ports: o.ports, logger: o.logger, events: o.events, pool, hmacKey: o.hmacKey, redaction });
+  const purity = new PurityService({ db: o.db, catalog: o.catalog, ports: o.ports, logger: o.logger, evidence });
+  runs = new RunService({ db: o.db, catalog: o.catalog, ports: o.ports, layout: o.layout, logger: o.logger, events: o.events, runGate: o.runGate, planner, projects, environment, redaction, evidence, tools, supervisor, verdict, purity, setupActive: (p) => setup.busyFor(p) });
+  return { redaction, profiles, projects, environment, tasks, evidence, tools, setup, planner, runs, verdict, purity, rescrubStored };
 }

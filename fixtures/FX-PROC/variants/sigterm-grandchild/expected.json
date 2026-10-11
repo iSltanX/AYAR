@@ -7,7 +7,6 @@
       "check": "beh.unit",
       "result": "انتهت المهلة",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "test/sigterm-grandchild.test.js",
         "line": 5,

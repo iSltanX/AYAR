@@ -8,7 +8,6 @@
       "component": "osv",
       "result": "تعذّر",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "osv/package-lock.json",
         "line": 1,

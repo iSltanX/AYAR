@@ -1,7 +1,8 @@
 // Run and check events (C-12). The state vocabularies of 7.5 are fixed with RunPlan in protocol 1.2 (DEV-5,
 // G-DEV3-04); run.state carries the run view, check.state the check execution view, so the UI never guesses.
 import { Id, IsoTimestamp } from '../common.ts';
-import { CheckRunView, RunView } from '../domain/runs.ts';
+import { PuritySummary } from '../domain/purity.ts';
+import { CheckRunView, RunCounts, RunView } from '../domain/runs.ts';
 import { z } from '../zod.ts';
 import { defineEvent } from './define.ts';
 
@@ -36,5 +37,6 @@ export const runEvents = {
       segments: z.array(z.strictObject({ stream: z.enum(['stdout', 'stderr']), offset: z.int().nonnegative(), length: z.int().nonnegative() })),
     }),
   }),
-  'run.summary': defineEvent({ owner: 'C-16', since: '1.0', implementedIn: 'DEV-6', payload: z.looseObject({ runId: Id }) }),
+  // Protocol 1.3 (DEV-6): when a run finished, its index (never the number alone) and its counts.
+  'run.summary': defineEvent({ owner: 'C-16', since: '1.0', implementedIn: 'DEV-6', payload: z.strictObject({ runId: Id, purity: PuritySummary.nullable(), counts: RunCounts, findings: z.int().nonnegative() }) }),
 };

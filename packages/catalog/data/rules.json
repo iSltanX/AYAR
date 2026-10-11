@@ -1,0 +1,1049 @@
+{
+  "$comment": "C-16 and G-38 (DEV-6): AYAR's rules — what a finding is, in AYAR's terms, beside the tool's own rule — with their versions, default severity (C-16 tables), default proof (D-34), the anchor of their fingerprint (C-15), and the level a proven finding has by default (error: breaks the success criterion, 7.3 rule 6; warning: decided by the warnings policy, 7.4). Per check: its short code for display ids (14.2), what a suspected finding gives (D-34: warning or needs review), and the rules it may report. The probe's rules (DEV-7) and the integrity guard's (DEV-9) are named here so that every expected file has a rule; their detection is their phases'. suspectedToolRules: tool rules whose matches are generic (E-08: a placeholder in .env.example matched generic-credential-uri): their findings are «اشتباه» and «يحتاج مراجعة» (10.3 sec.secrets.files).",
+  "version": "1.0.0",
+  "verifiedAt": "2026-10-11",
+  "sectionCodes": {
+    "design": "DSN",
+    "security": "SEC",
+    "code": "COD",
+    "behavior": "BEH",
+    "performance": "PRF",
+    "custom": "CUS",
+    "integrity": "INT",
+    "model": "MDL"
+  },
+  "checks": {
+    "design.tokens.static": {
+      "code": "TOKS",
+      "suspected": "warning",
+      "rules": [
+        "tokens.off-scale",
+        "tokens.undefined-var",
+        "tokens.use-token",
+        "analysis.unparsable-file"
+      ]
+    },
+    "design.tokens.render": {
+      "code": "TOKR",
+      "suspected": "needs_review",
+      "rules": [
+        "tokens.render-off-scale"
+      ]
+    },
+    "design.fonts.static": {
+      "code": "FNTS",
+      "suspected": "warning",
+      "rules": [
+        "fonts.unapproved",
+        "fonts.face-missing",
+        "fonts.remote",
+        "analysis.unparsable-file"
+      ]
+    },
+    "design.fonts.render": {
+      "code": "FNTR",
+      "suspected": "needs_review",
+      "rules": [
+        "fonts.not-loaded"
+      ]
+    },
+    "design.a11y": {
+      "code": "A11Y",
+      "suspected": "needs_review",
+      "rules": [
+        "a11y.violation",
+        "a11y.incomplete"
+      ]
+    },
+    "design.a11y.review": {
+      "code": "A11R",
+      "suspected": "needs_review",
+      "rules": [
+        "review.pending"
+      ]
+    },
+    "design.rtl.static": {
+      "code": "RTLS",
+      "suspected": "warning",
+      "rules": [
+        "rtl.missing-dir",
+        "rtl.missing-lang",
+        "rtl.physical-property",
+        "analysis.unparsable-file"
+      ]
+    },
+    "design.rtl.render": {
+      "code": "RTLR",
+      "suspected": "needs_review",
+      "rules": [
+        "rtl.render"
+      ]
+    },
+    "design.states": {
+      "code": "STAT",
+      "suspected": "needs_review",
+      "rules": [
+        "states.expectation-failed"
+      ]
+    },
+    "design.visual": {
+      "code": "VISL",
+      "suspected": "needs_review",
+      "rules": [
+        "visual.diff"
+      ]
+    },
+    "sec.secrets.files": {
+      "code": "SECR",
+      "suspected": "needs_review",
+      "rules": [
+        "secret.detected",
+        "secret.possible"
+      ]
+    },
+    "sec.secrets.history": {
+      "code": "SECH",
+      "suspected": "needs_review",
+      "rules": [
+        "secret.detected",
+        "secret.possible"
+      ]
+    },
+    "sec.deps": {
+      "code": "DEPS",
+      "suspected": "needs_review",
+      "rules": [
+        "vuln.known"
+      ]
+    },
+    "sec.deps.audit": {
+      "code": "AUDT",
+      "suspected": "needs_review",
+      "rules": [
+        "vuln.known"
+      ]
+    },
+    "sec.sast": {
+      "code": "SAST",
+      "suspected": "needs_review",
+      "rules": [
+        "ayar.js.eval-dynamic",
+        "ayar.js.function-constructor",
+        "ayar.js.html-injection",
+        "ayar.js.react-dangerous-html",
+        "ayar.js.child-process-shell",
+        "ayar.js.tls-reject-unauthorized",
+        "ayar.js.node-tls-env",
+        "ayar.py.eval-dynamic",
+        "ayar.py.subprocess-shell-true",
+        "ayar.py.os-system-dynamic",
+        "ayar.py.tls-verify-disabled",
+        "ayar.py.pickle-load",
+        "ayar.py.yaml-unsafe-load",
+        "sast.project-rule"
+      ]
+    },
+    "sec.ext.manifest": {
+      "code": "MNFT",
+      "suspected": "warning",
+      "rules": [
+        "manifest.missing-key",
+        "manifest.invalid-version",
+        "manifest.missing-file",
+        "manifest.missing-default-locale",
+        "manifest.undefined-message",
+        "manifest.csp-unsafe-eval",
+        "manifest.csp-remote-script",
+        "manifest.comments",
+        "manifest.mv2-chrome"
+      ]
+    },
+    "sec.ext.permissions": {
+      "code": "PERM",
+      "suspected": "warning",
+      "rules": [
+        "permission.outside-policy",
+        "permission.broad-unjustified",
+        "permission.maybe-unused"
+      ]
+    },
+    "code.build": {
+      "code": "BLD",
+      "suspected": "needs_review",
+      "rules": [
+        "build.failed",
+        "build.output-missing"
+      ]
+    },
+    "code.types": {
+      "code": "TYPE",
+      "suspected": "needs_review",
+      "rules": [
+        "types.error"
+      ]
+    },
+    "code.lint": {
+      "code": "LINT",
+      "suspected": "needs_review",
+      "rules": [
+        "lint.error",
+        "lint.warning"
+      ]
+    },
+    "code.unused": {
+      "code": "UNUS",
+      "suspected": "warning",
+      "rules": [
+        "unused.unlisted",
+        "unused.unresolved",
+        "unused.item"
+      ]
+    },
+    "code.refs.local": {
+      "code": "REFL",
+      "suspected": "needs_review",
+      "rules": [
+        "ref.missing-file",
+        "ref.missing-anchor",
+        "analysis.unparsable-file"
+      ]
+    },
+    "code.refs.external": {
+      "code": "REFX",
+      "suspected": "needs_review",
+      "rules": [
+        "link.broken",
+        "link.unverified"
+      ]
+    },
+    "code.size": {
+      "code": "SIZE",
+      "suspected": "warning",
+      "rules": [
+        "size.over-budget",
+        "size.info"
+      ]
+    },
+    "code.complexity": {
+      "code": "CPLX",
+      "suspected": "warning",
+      "rules": [
+        "complexity.cyclomatic",
+        "complexity.length",
+        "analysis.unparsable-file"
+      ]
+    },
+    "beh.unit": {
+      "code": "UNIT",
+      "suspected": "needs_review",
+      "rules": [
+        "test.failed",
+        "test.collection-error",
+        "test.snapshot-missing",
+        "test.flaky",
+        "test.warnings"
+      ]
+    },
+    "beh.integration": {
+      "code": "INTG",
+      "suspected": "needs_review",
+      "rules": [
+        "test.failed",
+        "test.collection-error",
+        "test.snapshot-missing",
+        "test.flaky",
+        "test.warnings"
+      ]
+    },
+    "beh.e2e": {
+      "code": "E2E",
+      "suspected": "needs_review",
+      "rules": [
+        "test.failed",
+        "test.snapshot-missing",
+        "test.flaky"
+      ]
+    },
+    "beh.contract": {
+      "code": "CNTR",
+      "suspected": "needs_review",
+      "rules": [
+        "test.failed",
+        "test.flaky"
+      ]
+    },
+    "beh.ext.host": {
+      "code": "HOST",
+      "suspected": "needs_review",
+      "rules": [
+        "ext.load-failed",
+        "ext.console-error"
+      ]
+    },
+    "beh.stability": {
+      "code": "STAB",
+      "suspected": "needs_review",
+      "rules": [
+        "test.failed",
+        "test.collection-error",
+        "test.flaky",
+        "test.warnings"
+      ]
+    },
+    "beh.mutation": {
+      "code": "MUTN",
+      "suspected": "needs_review",
+      "rules": [
+        "mutant.survived",
+        "mutation.score-below"
+      ]
+    },
+    "perf.web": {
+      "code": "WEB",
+      "suspected": "needs_review",
+      "rules": [
+        "perf.budget-exceeded"
+      ]
+    },
+    "perf.load": {
+      "code": "LOAD",
+      "suspected": "needs_review",
+      "rules": [
+        "load.threshold"
+      ]
+    },
+    "perf.recovery": {
+      "code": "RCVR",
+      "suspected": "needs_review",
+      "rules": [
+        "custom.failed"
+      ]
+    },
+    "perf.compat": {
+      "code": "CMPT",
+      "suspected": "needs_review",
+      "rules": [
+        "test.failed",
+        "test.flaky"
+      ]
+    },
+    "integ.guard": {
+      "code": "GRD",
+      "suspected": "needs_review",
+      "rules": [
+        "guard.silenced-rule",
+        "guard.skipped-test",
+        "guard.snapshot-changed",
+        "guard.threshold-lowered",
+        "guard.reference-changed"
+      ]
+    },
+    "integ.state": {
+      "code": "STE",
+      "suspected": "needs_review",
+      "rules": [
+        "state.changed"
+      ]
+    },
+    "integ.model-claims": {
+      "code": "CLM",
+      "suspected": "needs_review",
+      "rules": [
+        "claim.unproven"
+      ]
+    },
+    "integ.reviews": {
+      "code": "REV",
+      "suspected": "needs_review",
+      "rules": [
+        "review.expired"
+      ]
+    },
+    "custom.*": {
+      "code": "CUST",
+      "suspected": "needs_review",
+      "rules": [
+        "custom.failed",
+        "test.failed",
+        "sast.project-rule"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "id": "analysis.unparsable-file",
+      "version": "1.0.0",
+      "severity": "low",
+      "proof": "suspected",
+      "anchor": "text",
+      "level": null,
+      "origin": "tool"
+    },
+    {
+      "id": "tokens.off-scale",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "tokens.undefined-var",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "tokens.use-token",
+      "version": "1.0.0",
+      "severity": "info",
+      "proof": "suggestion",
+      "anchor": "code",
+      "level": null
+    },
+    {
+      "id": "tokens.render-off-scale",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "state",
+      "level": "error"
+    },
+    {
+      "id": "fonts.unapproved",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "fonts.face-missing",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "fonts.remote",
+      "version": "1.0.0",
+      "severity": "low",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "warning"
+    },
+    {
+      "id": "fonts.not-loaded",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "state",
+      "level": "error"
+    },
+    {
+      "id": "a11y.violation",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "state",
+      "level": "error"
+    },
+    {
+      "id": "a11y.incomplete",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "suspected",
+      "anchor": "state",
+      "level": null
+    },
+    {
+      "id": "review.pending",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "suspected",
+      "anchor": "text",
+      "level": null
+    },
+    {
+      "id": "rtl.missing-dir",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "rtl.missing-lang",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "rtl.physical-property",
+      "version": "1.0.0",
+      "severity": "info",
+      "proof": "suggestion",
+      "anchor": "code",
+      "level": null
+    },
+    {
+      "id": "rtl.render",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "state",
+      "level": "error"
+    },
+    {
+      "id": "states.expectation-failed",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "state",
+      "level": "error"
+    },
+    {
+      "id": "visual.diff",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "suspected",
+      "anchor": "state",
+      "level": null
+    },
+    {
+      "id": "secret.detected",
+      "version": "1.0.0",
+      "severity": "critical",
+      "proof": "proven",
+      "anchor": "secret",
+      "level": "error"
+    },
+    {
+      "id": "secret.possible",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "suspected",
+      "anchor": "secret",
+      "level": null
+    },
+    {
+      "id": "vuln.known",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "dependency",
+      "level": "error"
+    },
+    {
+      "id": "ayar.js.eval-dynamic",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "ayar.js.function-constructor",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "ayar.js.html-injection",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "suspected",
+      "anchor": "code",
+      "level": null
+    },
+    {
+      "id": "ayar.js.react-dangerous-html",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "suspected",
+      "anchor": "code",
+      "level": null
+    },
+    {
+      "id": "ayar.js.child-process-shell",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "ayar.js.tls-reject-unauthorized",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "ayar.js.node-tls-env",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "ayar.py.eval-dynamic",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "ayar.py.subprocess-shell-true",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "ayar.py.os-system-dynamic",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "ayar.py.tls-verify-disabled",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "ayar.py.pickle-load",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "suspected",
+      "anchor": "code",
+      "level": null
+    },
+    {
+      "id": "ayar.py.yaml-unsafe-load",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "suspected",
+      "anchor": "code",
+      "level": null
+    },
+    {
+      "id": "sast.project-rule",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "manifest.missing-key",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "key",
+      "level": "error"
+    },
+    {
+      "id": "manifest.invalid-version",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "key",
+      "level": "error"
+    },
+    {
+      "id": "manifest.missing-file",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "key",
+      "level": "error"
+    },
+    {
+      "id": "manifest.missing-default-locale",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "key",
+      "level": "error"
+    },
+    {
+      "id": "manifest.undefined-message",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "key",
+      "level": "error"
+    },
+    {
+      "id": "manifest.csp-unsafe-eval",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "key",
+      "level": "error"
+    },
+    {
+      "id": "manifest.csp-remote-script",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "key",
+      "level": "error"
+    },
+    {
+      "id": "manifest.comments",
+      "version": "1.0.0",
+      "severity": "low",
+      "proof": "proven",
+      "anchor": "key",
+      "level": "warning"
+    },
+    {
+      "id": "manifest.mv2-chrome",
+      "version": "1.0.0",
+      "severity": "low",
+      "proof": "proven",
+      "anchor": "key",
+      "level": "warning"
+    },
+    {
+      "id": "permission.outside-policy",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "permission",
+      "level": "error"
+    },
+    {
+      "id": "permission.broad-unjustified",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "permission",
+      "level": "warning"
+    },
+    {
+      "id": "permission.maybe-unused",
+      "version": "1.0.0",
+      "severity": "info",
+      "proof": "suggestion",
+      "anchor": "permission",
+      "level": null
+    },
+    {
+      "id": "build.failed",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "text",
+      "level": "error"
+    },
+    {
+      "id": "build.output-missing",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "text",
+      "level": "error"
+    },
+    {
+      "id": "types.error",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "lint.error",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "lint.warning",
+      "version": "1.0.0",
+      "severity": "low",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "warning"
+    },
+    {
+      "id": "unused.unlisted",
+      "version": "1.0.0",
+      "severity": "low",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "unused.unresolved",
+      "version": "1.0.0",
+      "severity": "low",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "unused.item",
+      "version": "1.0.0",
+      "severity": "low",
+      "proof": "suspected",
+      "anchor": "code",
+      "level": null
+    },
+    {
+      "id": "ref.missing-file",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "ref.missing-anchor",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "link.broken",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "link.unverified",
+      "version": "1.0.0",
+      "severity": "low",
+      "proof": "suspected",
+      "anchor": "code",
+      "level": null
+    },
+    {
+      "id": "size.over-budget",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "text",
+      "level": "error"
+    },
+    {
+      "id": "size.info",
+      "version": "1.0.0",
+      "severity": "info",
+      "proof": "suggestion",
+      "anchor": "text",
+      "level": null
+    },
+    {
+      "id": "complexity.cyclomatic",
+      "version": "1.0.0",
+      "severity": "info",
+      "proof": "suggestion",
+      "anchor": "code",
+      "level": null
+    },
+    {
+      "id": "complexity.length",
+      "version": "1.0.0",
+      "severity": "info",
+      "proof": "suggestion",
+      "anchor": "code",
+      "level": null
+    },
+    {
+      "id": "test.failed",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "test",
+      "level": "error"
+    },
+    {
+      "id": "test.collection-error",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "code",
+      "level": "error"
+    },
+    {
+      "id": "test.snapshot-missing",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "test",
+      "level": "error"
+    },
+    {
+      "id": "test.flaky",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "test",
+      "level": null
+    },
+    {
+      "id": "ext.load-failed",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "state",
+      "level": "error"
+    },
+    {
+      "id": "ext.console-error",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "state",
+      "level": "error"
+    },
+    {
+      "id": "mutant.survived",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "suspected",
+      "anchor": "code",
+      "level": null
+    },
+    {
+      "id": "perf.budget-exceeded",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "state",
+      "level": "error"
+    },
+    {
+      "id": "load.threshold",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "text",
+      "level": "error"
+    },
+    {
+      "id": "custom.failed",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "proven",
+      "anchor": "text",
+      "level": "error"
+    },
+    {
+      "id": "guard.silenced-rule",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "suspected",
+      "anchor": "code",
+      "level": null
+    },
+    {
+      "id": "guard.skipped-test",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "suspected",
+      "anchor": "code",
+      "level": null
+    },
+    {
+      "id": "guard.snapshot-changed",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "suspected",
+      "anchor": "code",
+      "level": null
+    },
+    {
+      "id": "guard.threshold-lowered",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "suspected",
+      "anchor": "code",
+      "level": null
+    },
+    {
+      "id": "guard.reference-changed",
+      "version": "1.0.0",
+      "severity": "high",
+      "proof": "suspected",
+      "anchor": "code",
+      "level": null
+    },
+    {
+      "id": "state.changed",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "suspected",
+      "anchor": "text",
+      "level": null
+    },
+    {
+      "id": "claim.unproven",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "suspected",
+      "anchor": "text",
+      "level": null
+    },
+    {
+      "id": "review.expired",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "suspected",
+      "anchor": "text",
+      "level": null
+    },
+    {
+      "id": "test.warnings",
+      "version": "1.0.0",
+      "severity": "low",
+      "proof": "proven",
+      "anchor": "text",
+      "level": "warning"
+    },
+    {
+      "id": "mutation.score-below",
+      "version": "1.0.0",
+      "severity": "medium",
+      "proof": "proven",
+      "anchor": "text",
+      "level": "error"
+    }
+  ],
+  "suspectedToolRules": {
+    "sec.secrets.files": [
+      "generic-credential-uri",
+      "generic-password"
+    ],
+    "sec.secrets.history": [
+      "generic-credential-uri",
+      "generic-password"
+    ]
+  }
+}

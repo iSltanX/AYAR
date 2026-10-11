@@ -186,7 +186,21 @@
       "nextStep": {},
       "relations": {
         "includes": [],
-        "dependsOn": [],
+        "dependsOn": [
+          {
+            "check": "code.build",
+            "when": {
+              "all": [
+                {
+                  "signal": "build.step"
+                },
+                {
+                  "signal": "type.browserExtension"
+                }
+              ]
+            }
+          }
+        ],
         "sharesExecutionWith": [
           "perf.compat"
         ],

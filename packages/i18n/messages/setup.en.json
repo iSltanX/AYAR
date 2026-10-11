@@ -56,5 +56,7 @@
   "setup.reason.matchingInstalled": "{tool} at the required version is installed at {path}",
   "setup.reason.versionAccepted": "{tool} {found} accepted for this project (required: {required})",
   "setup.reason.managerMismatch": "Needs setup: the project requires {tool} {required}",
-  "setup.reason.dependenciesMissing": "Needs setup: dependencies are not installed in {component}"
+  "setup.reason.dependenciesMissing": "Needs setup: dependencies are not installed in {component}",
+  "setup.reason.adapterUntested": "Needs setup: {tool} {version} is outside the range AYAR's adapter was tested with ({tested}); accept it once if you wish",
+  "setup.reason.adapterVersionAccepted": "{tool} {version} accepted for this project outside the tested range ({tested})"
 }

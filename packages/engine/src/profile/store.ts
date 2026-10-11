@@ -42,9 +42,9 @@ interface DbProfile {
   created_at: string;
 }
 
-/** A version saved before protocol 1.2 lacks the fields 1.2 added to the specs: they read as unset. */
+/** A version saved before protocol 1.2 (or 1.3) lacks the fields those versions added to the specs: they read as unset. */
 function upgrade(content: ProfileContent): ProfileContent {
-  return { ...content, services: content.services ?? {}, checks: content.checks.map((c) => ({ ...c, idleTimeoutSec: c.idleTimeoutSec ?? null, services: c.services ?? [] })) };
+  return { ...content, services: content.services ?? {}, checks: content.checks.map((c) => ({ ...c, idleTimeoutSec: c.idleTimeoutSec ?? null, services: c.services ?? [], invocation: c.invocation ?? null })) };
 }
 
 const toRow = (r: DbProfile): ProfileRow => ({

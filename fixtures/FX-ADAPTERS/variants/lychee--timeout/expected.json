@@ -6,17 +6,12 @@
     {
       "check": "code.refs.external",
       "component": "lychee",
-      "result": "يحتاج مراجعة",
+      "result": "ناقص",
       "rule": null,
-      "rule_pending": true,
-      "location": {
-        "path": "lychee/README.md",
-        "line": 3,
-        "anchor": "/hang"
-      },
-      "confidence": "اشتباه",
-      "exit_code": 2,
-      "reason": "المهلة ليست رابطًا مكسورًا: لا تُحتسب 404 (الخطة 10.3)"
+      "location": null,
+      "confidence": null,
+      "exit_code": 0,
+      "reason": "الرابط المعلّق على عنوان محلي لا يطرقه عِيَار (D-DEV6-17)؛ ومهلة الأداة الخام يقرؤها المحول في AT-14"
     }
   ]
 }

@@ -7,8 +7,7 @@
       "check": "code.types",
       "component": "mypy",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "types.error",
       "tool_rule": "syntax",
       "location": {
         "path": "mypy/src/a.py",

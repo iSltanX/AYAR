@@ -12,6 +12,7 @@
   "run.reason.toolNotFound": "Missing: {program} was not found",
   "run.reason.toolMissing": "Missing: {tool} is not installed",
   "run.reason.runnerUnavailable": "Unavailable: the runner {runner} is not available",
+  "run.reason.prepareFailed": "Unavailable: what the check needs could not be prepared before its launch ({detail})",
   "run.reason.macosPermission": "Unavailable: macOS blocked the command; it may need a permission in Privacy settings",
   "run.reason.permissionDenied": "Unavailable: no permission to run the command",
   "run.reason.specChangedSinceApproval": "Missing: the command changed since it was approved and needs approval again",

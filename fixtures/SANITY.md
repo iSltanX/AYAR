@@ -4,9 +4,9 @@
 
 ## FX-ADAPTERS
 
-تاريخ آخر تشغيل: 2026-10-10
+تاريخ آخر تشغيل: 2026-10-11
 
-الأدوات: node `v24.16.0`، pnpm `12.8.1`، uv `uv 0.13.0 (4ecd0eff2 2026-10-09 aarch64-apple-darwin)`، semgrep `1.180.0`، osv-scanner `osv-scanner version: 2.6.0`، lychee `lychee 0.24.2`، gitleaks `8.30.1`
+الأدوات: node `v24.18.1`، pnpm `12.8.1`، uv `uv 0.13.0 (4ecd0eff2 2026-10-09 aarch64-apple-darwin)`، semgrep `1.180.0`، osv-scanner `osv-scanner version: 2.6.0`، lychee `lychee 0.24.2`، gitleaks `8.30.1`
 
 ### good:vitest
 
@@ -1279,12 +1279,12 @@ No package sources found, --help for usage information.
 
 | الفحص | الأمر | الخروج | النتيجة | ما يثبته |
 |---|---|---|---|---|
-| lychee | `lychee --config lychee.toml README.md` | 0 | ✓ | code.refs.external: اجتاز |
+| lychee | `lychee --config lychee.toml README.md` | 0 | ✓ | الأداة الخام تبلغ الخادم المحلي بصيغه السبع؛ وعِيَار لا يطرق أيًّا منها: code.refs.external «ناقص» (D-DEV6-17) |
 
 <details><summary>lychee</summary>
 
 ```text
-🔍 2 Total (in 208ms) 🔗 2 Unique ✅ 2 OK 🚫 0 Errors
+🔍 7 Total (in 218ms) 🔗 7 Unique ✅ 7 OK 🚫 0 Errors
 ```
 
 </details>
@@ -1293,7 +1293,7 @@ No package sources found, --help for usage information.
 
 | الفحص | الأمر | الخروج | النتيجة | ما يثبته |
 |---|---|---|---|---|
-| lychee | `lychee --config lychee.toml README.md` | 2 | ✓ | code.refs.external: أخفق (404) |
+| lychee | `lychee --config lychee.toml README.md` | 2 | ✓ | الأداة الخام: 404 مخالفة مثبتة (يقرؤها المحول، AT-14)؛ وعِيَار لا يطرق العنوان المحلي: «ناقص» (D-DEV6-17) |
 
 <details><summary>lychee</summary>
 
@@ -1303,7 +1303,7 @@ Issues found in 1 input. Find details below.
 [README.md]:
 [404] http://127.0.0.1:18231/gone (at 3:3) | Rejected status code: 404 Not Found
 
-🔍 2 Total (in 203ms) 🔗 2 Unique ✅ 1 OK 🚫 1 Error
+🔍 2 Total (in 204ms) 🔗 2 Unique ✅ 1 OK 🚫 1 Error
 
 Hint: You can configure accepted/rejected response codes with `-a` or `--accept`
 ```
@@ -1314,7 +1314,7 @@ Hint: You can configure accepted/rejected response codes with `-a` or `--accept`
 
 | الفحص | الأمر | الخروج | النتيجة | ما يثبته |
 |---|---|---|---|---|
-| lychee | `lychee --config lychee.toml README.md` | 2 | ✓ | code.refs.external: مهلة (ليست رابطًا مكسورًا) |
+| lychee | `lychee --config lychee.toml README.md` | 2 | ✓ | الأداة الخام: مهلة ليست رابطًا مكسورًا (يقرؤها المحول، AT-14)؛ وعِيَار لا يطرق العنوان المحلي: «ناقص» (D-DEV6-17) |
 
 <details><summary>lychee</summary>
 
@@ -1324,7 +1324,7 @@ Issues found in 1 input. Find details below.
 [README.md]:
 [TIMEOUT] http://127.0.0.1:18231/hang (at 3:3) | Request timed out
 
-🔍 2 Total (in 3s 204ms) 🔗 2 Unique ✅ 1 OK 🚫 0 Errors ⏳ 1 Timeouts
+🔍 2 Total (in 3s 202ms) 🔗 2 Unique ✅ 1 OK 🚫 0 Errors ⏳ 1 Timeouts
 ```
 
 </details>
@@ -1333,7 +1333,7 @@ Issues found in 1 input. Find details below.
 
 | الفحص | الأمر | الخروج | النتيجة | ما يثبته |
 |---|---|---|---|---|
-| lychee | `lychee --config lychee.toml README.md` | 2 | ✓ | code.refs.external: 403 يحتاج مراجعة |
+| lychee | `lychee --config lychee.toml README.md` | 2 | ✓ | الأداة الخام: 403 يحتاج مراجعة (يقرؤها المحول، AT-14)؛ وعِيَار لا يطرق العنوان المحلي: «ناقص» (D-DEV6-17) |
 
 <details><summary>lychee</summary>
 
@@ -1343,7 +1343,7 @@ Issues found in 1 input. Find details below.
 [README.md]:
 [403] http://127.0.0.1:18231/forbidden (at 3:3) | Rejected status code: 403 Forbidden
 
-🔍 2 Total (in 203ms) 🔗 2 Unique ✅ 1 OK 🚫 1 Error
+🔍 2 Total (in 204ms) 🔗 2 Unique ✅ 1 OK 🚫 1 Error
 
 Hint: You can configure accepted/rejected response codes with `-a` or `--accept`
 ```
@@ -1354,7 +1354,7 @@ Hint: You can configure accepted/rejected response codes with `-a` or `--accept`
 
 | الفحص | الأمر | الخروج | النتيجة | ما يثبته |
 |---|---|---|---|---|
-| lychee | `lychee --config lychee.toml README.md` | 3 | ✓ | code.refs.external: تعذّر (رمز 3) |
+| lychee | `lychee --config lychee.toml README.md` | 3 | ✓ | الأداة الخام: lychee.toml غير صالح برمز 3 تعذّر (يقرؤه المحول، AT-14)؛ وعِيَار لا يقرأ lychee.toml المشروع: «ناقص» (D-DEV6-17) |
 
 <details><summary>lychee</summary>
 

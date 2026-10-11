@@ -7,8 +7,7 @@
       "check": "code.types",
       "component": "tsc",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "types.error",
       "tool_rule": "TS6133",
       "location": {
         "path": "tsc/src/index.ts",

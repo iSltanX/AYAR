@@ -6,18 +6,12 @@
     {
       "check": "code.refs.external",
       "component": "lychee",
-      "result": "أخفق",
+      "result": "ناقص",
       "rule": null,
-      "rule_pending": true,
-      "location": {
-        "path": "lychee/README.md",
-        "line": 3,
-        "anchor": "/gone"
-      },
-      "confidence": "مخالفة مثبتة",
-      "origin": "المشروع",
-      "exit_code": 2,
-      "reason": "404: مخالفة مثبتة"
+      "location": null,
+      "confidence": null,
+      "exit_code": 0,
+      "reason": "الرابط المكسور على عنوان محلي لا يطرقه عِيَار (D-DEV6-17)؛ و404 من الأداة الخام يقرؤه المحول في AT-14"
     }
   ]
 }

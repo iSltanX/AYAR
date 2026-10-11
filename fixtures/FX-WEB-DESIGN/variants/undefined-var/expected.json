@@ -6,8 +6,7 @@
     {
       "check": "design.tokens.static",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "tokens.undefined-var",
       "location": {
         "path": "styles/app.css",
         "line": 94,

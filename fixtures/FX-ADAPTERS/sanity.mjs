@@ -15,10 +15,10 @@ const tools = {
   pytest: { setup: UV, cmd: '.venv/bin/python -m pytest -p no:cacheprovider', check: 'beh.unit' },
   ruff: { setup: UV, cmd: '.venv/bin/ruff check --no-cache src', check: 'code.lint' },
   mypy: { setup: UV, cmd: '.venv/bin/python -m mypy --cache-dir=/dev/null', check: 'code.types' },
-  semgrep: { cmd: 'semgrep scan --no-git-ignore --config rules/ayar-eval.yml --metrics=off --disable-version-check --quiet src', check: 'sec.sast' },
+  semgrep: { cmd: 'semgrep scan --no-git-ignore --config .semgrep.yml --metrics=off --disable-version-check --quiet src', check: 'sec.sast' },
   // قاعدة OSV المصغرة (E-09): تُبنى وقت التشغيل من fixtures/tools/osv-mini-db إلى المجلد المؤقت، وتُقرأ دون اتصال
   osv: { cmd: 'node $FX_TOOLS/osv-mini-db/build.mjs --out "$TMPDIR/ayar-osv-mini-db" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY="$TMPDIR/ayar-osv-mini-db" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c', check: 'sec.deps' },
-  gitleaks: { cmd: 'gitleaks dir . --config gitleaks.toml --redact=100 --no-banner --exit-code 42', check: 'sec.secrets.files' },
+  gitleaks: { cmd: 'gitleaks dir . --config .gitleaks.toml --redact=100 --no-banner --exit-code 42', check: 'sec.secrets.files' },
   lychee: { cmd: 'lychee --config lychee.toml README.md', check: 'code.refs.external', bg: 'node server.mjs' },
 };
 
@@ -95,11 +95,11 @@ const matrix = [
   T('gitleaks', 'good', 0, ['no leaks found'], 'sec.secrets.files: اجتاز'),
   T('gitleaks', 'bad', 42, ['leaks found: 1'], 'sec.secrets.files: أخفق (رمز 42)'),
   T('gitleaks', 'config-error', 1, [], 'sec.secrets.files: تعذّر (رمز 1)'),
-  T('lychee', 'good', 0, ['0 Errors'], 'code.refs.external: اجتاز'),
-  T('lychee', 'bad', 2, ['gone', '404'], 'code.refs.external: أخفق (404)'),
-  T('lychee', 'timeout', 2, ['hang', 'imeout'], 'code.refs.external: مهلة (ليست رابطًا مكسورًا)'),
-  T('lychee', 'needs-review', 2, ['forbidden', '403'], 'code.refs.external: 403 يحتاج مراجعة'),
-  T('lychee', 'config-error', 3, ['Failed to parse configuration file'], 'code.refs.external: تعذّر (رمز 3)'),
+  T('lychee', 'good', 0, ['7 OK', '0 Errors'], 'الأداة الخام تبلغ الخادم المحلي بصيغه السبع؛ وعِيَار لا يطرق أيًّا منها: code.refs.external «ناقص» (D-DEV6-17)'),
+  T('lychee', 'bad', 2, ['gone', '404'], 'الأداة الخام: 404 مخالفة مثبتة (يقرؤها المحول، AT-14)؛ وعِيَار لا يطرق العنوان المحلي: «ناقص» (D-DEV6-17)'),
+  T('lychee', 'timeout', 2, ['hang', 'imeout'], 'الأداة الخام: مهلة ليست رابطًا مكسورًا (يقرؤها المحول، AT-14)؛ وعِيَار لا يطرق العنوان المحلي: «ناقص» (D-DEV6-17)'),
+  T('lychee', 'needs-review', 2, ['forbidden', '403'], 'الأداة الخام: 403 يحتاج مراجعة (يقرؤها المحول، AT-14)؛ وعِيَار لا يطرق العنوان المحلي: «ناقص» (D-DEV6-17)'),
+  T('lychee', 'config-error', 3, ['Failed to parse configuration file'], 'الأداة الخام: lychee.toml غير صالح برمز 3 تعذّر (يقرؤه المحول، AT-14)؛ وعِيَار لا يقرأ lychee.toml المشروع: «ناقص» (D-DEV6-17)'),
 ];
 const variants = {};
 for (const m of matrix) {

@@ -8,16 +8,15 @@
       "component": "semgrep",
       "result": "تعذّر",
       "rule": null,
-      "rule_pending": true,
       "location": {
-        "path": "semgrep/rules/ayar-eval.yml",
+        "path": "semgrep/.semgrep.yml",
         "line": 5,
         "anchor": "message:"
       },
       "confidence": null,
       "origin": "الأداة",
       "exit_code": 7,
-      "reason": "Semgrep برمز 2 فأعلى ← تعذّر (الرمز الفعلي 7)"
+      "reason": "Semgrep برمز 2 فأعلى ← تعذّر (الرمز الفعلي 7): قواعد المشروع في .semgrep.yml (يكتشفها عِيَار ويمررها بـ --config) قاعدة بلا نمط"
     }
   ]
 }

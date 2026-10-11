@@ -8,7 +8,6 @@
       "component": "mypy",
       "result": "تعذّر",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "mypy/mypy.ini",
         "line": 1,

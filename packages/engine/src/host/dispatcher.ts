@@ -71,7 +71,9 @@ export class Dispatcher {
       const raw = await handler(cmd.payload, { ...state.context, grants: cmd.grants });
       const checked = def.result.safeParse(raw);
       if (!checked.success) {
-        this.#logger().log('error', 'handler result broke its contract', { command: cmd.command });
+        // Where it broke (a path and the schema's message, never a value): an engine bug to find.
+        const issue = checked.error.issues[0];
+        this.#logger().log('error', 'handler result broke its contract', { command: cmd.command, path: issue?.path.join('.') ?? '', issue: issue?.message.slice(0, 200) ?? '' });
         return fail(protocolError('invalid_result', { command: cmd.command }));
       }
       return { response: { kind: 'response', id: cmd.id, ok: true, result: checked.data }, crash: null };

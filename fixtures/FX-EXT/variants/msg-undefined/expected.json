@@ -6,8 +6,7 @@
     {
       "check": "sec.ext.manifest",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "manifest.undefined-message",
       "location": {
         "path": "public/manifest.json",
         "line": 4,
@@ -20,8 +19,7 @@
     {
       "check": "beh.ext.host",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "ext.load-failed",
       "location": {
         "path": "public/manifest.json",
         "line": 4,

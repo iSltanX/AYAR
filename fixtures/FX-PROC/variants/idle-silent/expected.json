@@ -7,7 +7,6 @@
       "check": "beh.unit",
       "result": "انتهت المهلة",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "test/idle-silent.test.js",
         "line": 7,

@@ -8,7 +8,6 @@
       "check": "design.tokens.static",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -16,7 +15,6 @@
       "check": "design.tokens.render",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -24,7 +22,6 @@
       "check": "design.fonts.static",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -32,7 +29,6 @@
       "check": "design.fonts.render",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -40,7 +36,6 @@
       "check": "design.a11y",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -48,7 +43,6 @@
       "check": "design.rtl.static",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -56,7 +50,6 @@
       "check": "design.rtl.render",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -64,7 +57,6 @@
       "check": "design.states",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -72,7 +64,6 @@
       "check": "design.visual",
       "result": "ناقص إعداد",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "reason": "لا صورة مرجعية معتمدة؛ اللقطات مرشحة للاعتماد (AT-17)"
@@ -81,7 +72,6 @@
       "check": "code.refs.local",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -89,7 +79,6 @@
       "check": "sec.secrets.files",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -97,7 +86,6 @@
       "check": "integ.guard",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "reason": "الجولة الأولى: لا أساس للمقارنة"

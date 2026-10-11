@@ -6,8 +6,7 @@
     {
       "check": "sec.ext.manifest",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "manifest.missing-file",
       "location": {
         "path": "public/manifest.json",
         "line": 10,
@@ -20,8 +19,7 @@
     {
       "check": "beh.ext.host",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "ext.load-failed",
       "location": {
         "path": "public/manifest.json",
         "line": 10,
@@ -35,7 +33,6 @@
       "check": "sec.ext.permissions",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     }

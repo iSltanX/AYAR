@@ -6,8 +6,7 @@
     {
       "check": "beh.unit",
       "result": "يحتاج مراجعة",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "guard.skipped-test",
       "location": {
         "path": "src/lib/stats.test.ts",
         "line": 11,
@@ -22,8 +21,7 @@
     {
       "check": "integ.guard",
       "result": "يحتاج مراجعة",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "guard.skipped-test",
       "location": {
         "path": "src/lib/stats.test.ts",
         "line": 11,

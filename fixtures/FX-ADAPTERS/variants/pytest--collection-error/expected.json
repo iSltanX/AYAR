@@ -7,8 +7,7 @@
       "check": "beh.unit",
       "component": "pytest",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "test.collection-error",
       "location": {
         "path": "pytest/tests/test_add.py",
         "line": 4,

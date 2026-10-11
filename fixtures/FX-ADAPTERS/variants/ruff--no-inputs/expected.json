@@ -8,7 +8,6 @@
       "component": "ruff",
       "result": "ناقص",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "exit_code": 0,

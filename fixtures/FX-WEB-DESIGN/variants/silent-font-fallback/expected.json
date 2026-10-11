@@ -6,8 +6,7 @@
     {
       "check": "design.fonts.static",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "fonts.face-missing",
       "location": {
         "path": "styles/app.css",
         "line": 7,
@@ -20,8 +19,7 @@
     {
       "check": "design.fonts.render",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "fonts.not-loaded",
       "location": {
         "path": "styles/app.css",
         "line": 7,

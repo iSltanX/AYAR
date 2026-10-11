@@ -6,7 +6,7 @@
 //
 // ما يتحقق منه:
 //   1. مطابقة الملف لمخطط fixture-expect/1 (مدقق مخطط مصغر مضمَّن، بلا تبعيات).
-//   2. اتساق: اسم المشروع والنسخة، وقاعدة null تستلزم rule_pending، ومنشأ الإخفاق.
+//   2. اتساق: اسم المشروع والنسخة، وقاعدة عِيَار معرّفة لكل اكتشاف متوقع (DEV-6)، ومنشأ الإخفاق.
 //   3. كل نسخة معلنة في project.json لها مجلد وvariant.json وexpected.json، وكل مجلد معلن.
 //   4. كل موضع (location) حقيقي: الملف موجود في النسخة المركّبة، والسطر يحوي المرساة.
 // يخرج بـ 0 عند النجاح، و1 عند أي مخالفة.
@@ -17,6 +17,9 @@ import os from 'node:os';
 import { FIXTURES_ROOT, readJson, loadProject, resolveFiles, materialize } from './materialize.mjs';
 
 const schema = readJson(path.join(FIXTURES_ROOT, 'schema', 'fixture-expect-1.schema.json'));
+// قواعد عِيَار (G-38، DEV-6): كل قاعدة في ملف توقع معرّفة في الكتالوج.
+const NO_REPORT = ['انتهت المهلة', 'تعذّر', 'ناقص', 'ناقص إعداد', 'غير منطبق', 'غير مضمّن', 'أُلغي'];
+const RULE_IDS = new Set(readJson(path.join(FIXTURES_ROOT, '..', 'packages', 'catalog', 'data', 'rules.json')).rules.map((r) => r.id));
 const errors = [];
 const tmpDirs = [];
 let checked = 0;
@@ -80,8 +83,13 @@ function validateExpected(id, variant, expectedPath, tree, role, manifest = null
   const isClean = role === 'clean';
   doc.expectations.forEach((e, i) => {
     const w = `${where}.expectations[${i}] (${e.check})`;
-    if (e.rule === null && e.rule_pending !== true) fail(`${w}: القاعدة null تستلزم rule_pending: true (ORG-06)`);
-    if (e.rule !== null && e.rule_pending === true) fail(`${w}: rule_pending مع قاعدة معرّفة`);
+    // DEV-6 (المهمة 8): كل اكتشاف متوقع (موضع ودرجة ثبوت) يسمّي قاعدة عِيَار من الكتالوج، وما لا اكتشاف فيه بلا قاعدة؛ ولا rule_pending بعد اليوم.
+    // نتيجة لا تقرأ تقريرًا (مهلة، تعذّر، ناقص، غير منطبق، أُلغي) لا اكتشاف فيها؛ والموضع فيها إرشاد للقارئ.
+    const expectsFinding = e.location !== null && e.confidence !== null && !NO_REPORT.includes(e.result);
+    if (e.rule_pending !== undefined) fail(`${w}: rule_pending لم يعد مقبولًا بعد DEV-6`);
+    if (expectsFinding && e.rule === null) fail(`${w}: اكتشاف متوقع بلا قاعدة عِيَار`);
+    if (!expectsFinding && e.rule !== null) fail(`${w}: قاعدة بلا اكتشاف متوقع (لا موضع أو لا درجة ثبوت)`);
+    if (e.rule !== null && !RULE_IDS.has(e.rule)) fail(`${w}: القاعدة ${e.rule} ليست في packages/catalog/data/rules.json`);
     if (['أخفق', 'تعذّر'].includes(e.result) && !e.origin) fail(`${w}: النتيجة ${e.result} تستلزم origin (المشروع أو الأداة)`);
     if (['أخفق', 'تحذير', 'متذبذب'].includes(e.result) && e.confidence === null && !e.reason) fail(`${w}: ${e.result} بلا درجة ثبوت ولا سبب مكتوب`);
     if (['اجتاز', 'غير منطبق', 'غير مضمّن', 'ناقص', 'ناقص إعداد'].includes(e.result) && e.confidence !== null && !(e.result === 'اجتاز' && e.confidence === 'اقتراح تحسين')) fail(`${w}: ${e.result} لا تحمل درجة ثبوت (عدا ملاحظة «اقتراح تحسين» على اجتاز)`);

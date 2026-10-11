@@ -6,6 +6,7 @@ import { evidenceToken, internalEvidencePath } from './evidence.ts';
 import { profileApprove, profileExport, profileExportPreview, profileGet, profileImport, profileImportFromRepo, profilePropose, profileUpdate } from './profile.ts';
 import { projectAdd, projectCancelDiscovery, projectConfirm, projectGet, projectList, projectRelocate, projectRemove, projectRename, projectRescan, projectSetTrust } from './projects.ts';
 import { groupsDelete, groupsList, groupsSave, internalPrepareQuit, runCancel, runContinueRound, runGet, runPlan, runRerun, runsDelete, runsKeep, runsList, runStart } from './runs.ts';
+import { findingGet, resultsQuery } from './results.ts';
 import { settingsGet, settingsSet } from './settings.ts';
 import { readinessEvaluate, setupExecute, setupPreview, toolsInstall, toolsList, toolsPreview, toolsRemove, toolsVerify } from './setup.ts';
 
@@ -58,4 +59,7 @@ export const HANDLERS: HandlerTable = {
   'evidence.token': evidenceToken,
   'internal.evidencePath': internalEvidencePath,
   'internal.prepareQuit': internalPrepareQuit,
+  // DEV-6
+  'results.query': resultsQuery,
+  'finding.get': findingGet,
 };

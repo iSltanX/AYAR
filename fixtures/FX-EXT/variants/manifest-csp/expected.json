@@ -6,8 +6,7 @@
     {
       "check": "sec.ext.manifest",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "manifest.csp-unsafe-eval",
       "location": {
         "path": "public/manifest.json",
         "line": 28,
@@ -20,8 +19,7 @@
     {
       "check": "beh.ext.host",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "ext.load-failed",
       "location": {
         "path": "public/manifest.json",
         "line": 28,
@@ -34,8 +32,7 @@
     {
       "check": "beh.e2e",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "test.failed",
       "location": {
         "path": "e2e/extension.spec.ts",
         "line": 9,

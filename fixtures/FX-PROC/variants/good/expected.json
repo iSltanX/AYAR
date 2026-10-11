@@ -8,7 +8,6 @@
       "check": "beh.unit",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     }

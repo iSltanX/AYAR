@@ -8,7 +8,6 @@
       "component": "tsc",
       "result": "تعذّر",
       "rule": null,
-      "rule_pending": true,
       "tool_rule": "TS18003",
       "location": {
         "path": "tsc/tsconfig.json",

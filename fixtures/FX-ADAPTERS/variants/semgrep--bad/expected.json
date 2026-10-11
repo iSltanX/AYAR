@@ -7,8 +7,7 @@
       "check": "sec.sast",
       "component": "semgrep",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "sast.project-rule",
       "tool_rule": "ayar-test.no-eval",
       "location": {
         "path": "semgrep/src/a.js",
@@ -18,7 +17,7 @@
       "confidence": "مخالفة مثبتة",
       "origin": "المشروع",
       "exit_code": 0,
-      "reason": "الرمز 0 لا يعني الاجتياز: النتيجة من تقرير JSON وبحسب سياسة قاعدة «محظور»"
+      "reason": "الرمز 0 لا يعني الاجتياز: النتيجة من تقرير JSON. قاعدة المشروع في .semgrep.yml بشدة ERROR مخالفة مثبتة، وتكشف حزمة عِيَار الموضع نفسه أيضًا (ayar.js.eval-dynamic)"
     }
   ]
 }

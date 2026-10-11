@@ -7,6 +7,7 @@
 import { canonicalJson } from '@ayar/catalog';
 import type { ReadinessItem, ReadinessReport, Reason, SetupAction, SetupExecuteResult, SetupPreview } from '@ayar/protocol';
 import { createHash } from 'node:crypto';
+import { createRequire } from 'node:module';
 import { posix } from 'node:path';
 import type { EnvironmentService } from '../environment/service.ts';
 import { computeChildEnv } from '../environment/child-env.ts';
@@ -113,8 +114,53 @@ export class SetupService {
       allowNetwork,
       osvDbs,
       accepted,
+      projectBrowser: (component) => this.#projectBrowser(project.rootPath, component),
+      packageVersion: (component, name) => packageVersion(this.#o.ports.fs, project.rootPath, component, name),
     });
     return { items, env: { source: env.source, fallbackReason: env.fallbackReason, probed: o.probe }, untrusted };
+  }
+
+  /**
+   * The browser of the project's Playwright (DEV-6): the revisions its playwright-core's browsers.json names (found
+   * by Node's resolution from the project, pnpm's links included), present in PLAYWRIGHT_BROWSERS_PATH or in
+   * Playwright's cache in the user's Library. Read from files only; nothing is run or installed.
+   */
+  async #projectBrowser(root: string, component: string): Promise<boolean> {
+    const { fs } = this.#o.ports;
+    const base = await this.#o.environment.base();
+    const home = base.env.HOME ?? '';
+    // PLAYWRIGHT_BROWSERS_PATH=0: the browsers live beside playwright-core in node_modules (.local-browsers).
+    const hermetic = base.env.PLAYWRIGHT_BROWSERS_PATH === '0';
+    const cacheOf = (core: string) => (hermetic ? posix.join(core, '.local-browsers') : base.env.PLAYWRIGHT_BROWSERS_PATH ? base.env.PLAYWRIGHT_BROWSERS_PATH : posix.join(home, 'Library/Caches/ms-playwright'));
+    for (const dir of [...new Set([component, '.'])]) {
+      // Node's own resolution from the project (pnpm's links included): @playwright/test → playwright → its core.
+      let browsers: string | null = null;
+      try {
+        const fromProject = createRequire(posix.join(root, dir, 'package.json'));
+        const test = fromProject.resolve('@playwright/test/package.json');
+        const pw = createRequire(test).resolve('playwright/package.json');
+        browsers = posix.join(posix.dirname(createRequire(pw).resolve('playwright-core/package.json')), 'browsers.json');
+      } catch {
+        browsers = null;
+      }
+      if (!browsers || !browsers.startsWith(`${root}/`)) continue;
+      const st = await fs.lstat(browsers).catch(() => null);
+      if (!st?.isFile || st.size > 64 * 1024) continue;
+      let revisions: Record<string, string> = {};
+      try {
+        const j = JSON.parse(new TextDecoder().decode((await fs.readFilePrefix(browsers, 64 * 1024)).data)) as { browsers?: { name?: string; revision?: string }[] };
+        revisions = Object.fromEntries((j.browsers ?? []).filter((x) => typeof x.name === 'string' && typeof x.revision === 'string').map((x) => [x.name!, x.revision!]));
+      } catch {
+        continue;
+      }
+      const cache = cacheOf(posix.dirname(browsers));
+      if (!cache.startsWith('/')) return false;
+      const wanted = [['chromium-headless-shell', 'chromium_headless_shell'], ['chromium', 'chromium']].filter(([n]) => revisions[n!]).map(([n, d]) => posix.join(cache, `${d}-${revisions[n!]}`));
+      if (!wanted.length) continue;
+      for (const w of wanted) if (!(await fs.lstat(w).catch(() => null))?.isDirectory) return false;
+      return true;
+    }
+    return false;
   }
 
   /** readiness.evaluate: probes the tools' versions (G-DEV4-04), and lists the setup actions (9.4 point 3). */
@@ -478,6 +524,34 @@ export class SetupService {
     );
     return true;
   }
+}
+
+/**
+ * The version of a package installed for a component, read from its files (nothing runs): node_modules (pnpm's
+ * links resolved) in the component or at the root, or a Python distribution's dist-info in its .venv.
+ */
+export async function packageVersion(fs: EnginePorts['fs'], root: string, component: string, name: string): Promise<string | null> {
+  for (const dir of [...new Set([component, '.'])]) {
+    const pkg = posix.join(root, dir, 'node_modules', name, 'package.json');
+    const real = await fs.realpath(pkg).catch(() => null);
+    // pnpm's links stay inside the project; one that leads elsewhere is not the project's package.
+    if (real && real.startsWith(`${root}/`)) {
+      try {
+        const v = (JSON.parse(new TextDecoder().decode((await fs.readFilePrefix(real, 256 * 1024)).data)) as { version?: unknown }).version;
+        if (typeof v === 'string') return v;
+      } catch {
+        /* not a package.json AYAR can read: the next place */
+      }
+    }
+    const lib = posix.join(root, dir, '.venv', 'lib');
+    for (const py of await fs.readdirEntries(lib).catch(() => [])) {
+      if (py.kind !== 'directory' || !py.name.startsWith('python')) continue;
+      const dist = name.toLowerCase().replace(/[-.]/g, '_');
+      const hit = (await fs.readdirEntries(posix.join(lib, py.name, 'site-packages')).catch(() => [])).find((e) => e.name.toLowerCase().startsWith(`${dist}-`) && e.name.endsWith('.dist-info'));
+      if (hit) return hit.name.slice(dist.length + 1, -'.dist-info'.length);
+    }
+  }
+  return null;
 }
 
 /** A setup action's id: stable for the same need — the project, the kind, what it targets (not how it was found). */

@@ -56,5 +56,7 @@
   "setup.reason.matchingInstalled": "{tool} بالإصدار المطلوب موجود في {path}",
   "setup.reason.versionAccepted": "قُبل {tool} {found} لهذا المشروع، والمطلوب {required}",
   "setup.reason.managerMismatch": "يحتاج تجهيزًا: المشروع يطلب {tool} {required}",
-  "setup.reason.dependenciesMissing": "يحتاج تجهيزًا: التبعيات غير مثبّتة في {component}"
+  "setup.reason.dependenciesMissing": "يحتاج تجهيزًا: التبعيات غير مثبّتة في {component}",
+  "setup.reason.adapterUntested": "يحتاج تجهيزًا: {tool} {version} خارج نطاق الإصدارات الذي اختُبر به محوّل عِيَار ({tested})؛ اعتمده مرة إن شئت",
+  "setup.reason.adapterVersionAccepted": "{tool} {version} معتمد لهذا المشروع خارج النطاق المختبر ({tested})"
 }

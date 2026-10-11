@@ -1,8 +1,12 @@
 // Message index (C-24): one file per scope and language, `messages/<scope>.<lang>.json`, merged here so that
 // parallel phases only meet on one import line. Keys are prefixed by their scope.
+import adapterAr from './adapter.ar.json' with { type: 'json' };
+import adapterEn from './adapter.en.json' with { type: 'json' };
 import advisorAr from './advisor.ar.json' with { type: 'json' };
 import advisorEn from './advisor.en.json' with { type: 'json' };
 import alertsAr from './alerts.ar.json' with { type: 'json' };
+import analyzerAr from './analyzer.ar.json' with { type: 'json' };
+import analyzerEn from './analyzer.en.json' with { type: 'json' };
 import alertsEn from './alerts.en.json' with { type: 'json' };
 import catalogAr from './catalog.ar.json' with { type: 'json' };
 import catalogEn from './catalog.en.json' with { type: 'json' };
@@ -23,6 +27,8 @@ import planEn from './plan.en.json' with { type: 'json' };
 import profileAr from './profile.ar.json' with { type: 'json' };
 import profileEn from './profile.en.json' with { type: 'json' };
 import projectsAr from './projects.ar.json' with { type: 'json' };
+import purityAr from './purity.ar.json' with { type: 'json' };
+import purityEn from './purity.en.json' with { type: 'json' };
 import projectsEn from './projects.en.json' with { type: 'json' };
 import controlsAr from './controls.ar.json' with { type: 'json' };
 import controlsEn from './controls.en.json' with { type: 'json' };
@@ -39,11 +45,15 @@ import runEn from './run.en.json' with { type: 'json' };
 import setupAr from './setup.ar.json' with { type: 'json' };
 import setupEn from './setup.en.json' with { type: 'json' };
 import uiAr from './ui.ar.json' with { type: 'json' };
+import verdictAr from './verdict.ar.json' with { type: 'json' };
+import verdictEn from './verdict.en.json' with { type: 'json' };
 import uiEn from './ui.en.json' with { type: 'json' };
 
 export const MESSAGE_FILES = {
+  adapter: { ar: adapterAr, en: adapterEn },
   advisor: { ar: advisorAr, en: advisorEn },
   alerts: { ar: alertsAr, en: alertsEn },
+  analyzer: { ar: analyzerAr, en: analyzerEn },
   catalog: { ar: catalogAr, en: catalogEn },
   common: { ar: commonAr, en: commonEn },
   discovery: { ar: discoveryAr, en: discoveryEn },
@@ -54,9 +64,11 @@ export const MESSAGE_FILES = {
   plan: { ar: planAr, en: planEn },
   profile: { ar: profileAr, en: profileEn },
   projects: { ar: projectsAr, en: projectsEn },
+  purity: { ar: purityAr, en: purityEn },
   run: { ar: runAr, en: runEn },
   setup: { ar: setupAr, en: setupEn },
   ui: { ar: uiAr, en: uiEn },
+  verdict: { ar: verdictAr, en: verdictEn },
   controls: { ar: controlsAr, en: controlsEn },
   results: { ar: resultsAr, en: resultsEn },
   sheets: { ar: sheetsAr, en: sheetsEn },
@@ -67,6 +79,6 @@ export const MESSAGE_FILES = {
 export type Scope = keyof typeof MESSAGE_FILES;
 
 export const MESSAGES = {
-  ar: { ...advisorAr, ...alertsAr, ...catalogAr, ...commonAr, ...controlsAr, ...discoveryAr, ...environmentAr, ...errorsAr, ...glossaryAr, ...menuAr, ...planAr, ...profileAr, ...projectsAr, ...resultsAr, ...runAr, ...setupAr, ...sheetsAr, ...shellAr, ...statusAr, ...uiAr },
-  en: { ...advisorEn, ...alertsEn, ...catalogEn, ...commonEn, ...controlsEn, ...discoveryEn, ...environmentEn, ...errorsEn, ...glossaryEn, ...menuEn, ...planEn, ...profileEn, ...projectsEn, ...resultsEn, ...runEn, ...setupEn, ...sheetsEn, ...shellEn, ...statusEn, ...uiEn },
+  ar: { ...adapterAr, ...advisorAr, ...alertsAr, ...analyzerAr, ...catalogAr, ...commonAr, ...controlsAr, ...discoveryAr, ...environmentAr, ...errorsAr, ...glossaryAr, ...menuAr, ...planAr, ...profileAr, ...projectsAr, ...purityAr, ...resultsAr, ...runAr, ...setupAr, ...sheetsAr, ...shellAr, ...statusAr, ...uiAr, ...verdictAr },
+  en: { ...adapterEn, ...advisorEn, ...alertsEn, ...analyzerEn, ...catalogEn, ...commonEn, ...controlsEn, ...discoveryEn, ...environmentEn, ...errorsEn, ...glossaryEn, ...menuEn, ...planEn, ...profileEn, ...projectsEn, ...purityEn, ...resultsEn, ...runEn, ...setupEn, ...sheetsEn, ...shellEn, ...statusEn, ...uiEn, ...verdictEn },
 } as const;

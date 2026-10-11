@@ -3,7 +3,7 @@
 // discovery signals, its requirements, the runner it binds to (by id), default policies, resource class,
 // side effects, network need, cost tag, next-step class per outcome, relations, and dated sources. The engine
 // evaluates the conditions (C-09); the catalog only names them.
-import { AUDIENCE_VALUES, REFERENCE_KINDS as PROFILE_REFERENCE_KINDS, z } from '@ayar/protocol';
+import { ANCHOR_KINDS, AUDIENCE_VALUES, PROOFS, REFERENCE_KINDS as PROFILE_REFERENCE_KINDS, SEVERITIES, z } from '@ayar/protocol';
 import { CardsData, KbData } from './kb.ts';
 
 export const SECTION_IDS = ['design', 'security', 'code', 'behavior', 'performance', 'custom', 'integrity', 'model'] as const;
@@ -238,6 +238,60 @@ export const CommandPolicy = z.strictObject({
 });
 export type CommandPolicy = z.infer<typeof CommandPolicy>;
 
+/**
+ * C-16 and G-38 (DEV-6): AYAR's rules — what a finding is, in AYAR's terms — with their version, default severity
+ * (C-16 tables), default proof (D-34), the anchor of their fingerprint (C-15), the level of a proven finding (error
+ * breaks the success criterion; warning is the warnings policy's, 7.4), and the origin when it is not the project.
+ */
+export const RuleDef = z.strictObject({
+  id: z.string().regex(/^[a-z][a-z0-9-]*(\.[a-z][a-z0-9-]*)+$/),
+  version: SemVer,
+  severity: z.enum(SEVERITIES),
+  proof: z.enum(PROOFS),
+  anchor: z.enum(ANCHOR_KINDS),
+  level: z.enum(['error', 'warning']).nullable(),
+  origin: z.enum(['project', 'tool']).optional(),
+});
+export type RuleDef = z.infer<typeof RuleDef>;
+
+/** Per check: the short code of its display ids (14.2), what a suspected finding gives (D-34), its rules. */
+export const CheckRules = z.strictObject({
+  code: z.string().regex(/^[A-Z0-9]{2,8}$/),
+  suspected: z.enum(['warning', 'needs_review']),
+  rules: z.array(z.string()).min(1),
+});
+export type CheckRules = z.infer<typeof CheckRules>;
+
+export const RulesData = z.strictObject({
+  $comment: z.string().optional(),
+  version: SemVer,
+  verifiedAt: IsoDate,
+  /** 14.2: DSN, SEC, COD, BEH, PRF, CUS, INT (and MDL for the model section). */
+  sectionCodes: z.record(SectionId, z.string().regex(/^[A-Z]{3}$/)),
+  checks: z.record(z.string(), CheckRules),
+  rules: z.array(RuleDef).min(1),
+  /** Tool rules whose matches are generic: «اشتباه» (10.3: «المطابقات العامة يحتاج مراجعة»). */
+  suspectedToolRules: z.record(z.string(), z.array(z.string())),
+});
+export type RulesData = z.infer<typeof RulesData>;
+
+/** D-13 and 10.3 sec.sast: AYAR's own Semgrep rules, versioned; each has its test project (fixtures/semgrep-rules). */
+export const SemgrepRule = z.looseObject({
+  id: z.string().regex(/^ayar\.(js|py)\.[a-z][a-z0-9-]*$/),
+  languages: z.array(z.string()).min(1),
+  severity: z.enum(['ERROR', 'WARNING', 'INFO']),
+  message: z.string().min(1),
+  metadata: z.looseObject({ ayar: z.strictObject({ category: z.enum(['forbidden', 'suspect']), version: SemVer }) }),
+});
+export const SemgrepData = z.strictObject({
+  $comment: z.string().optional(),
+  version: SemVer,
+  verifiedAt: IsoDate,
+  engine: z.string(),
+  rules: z.array(SemgrepRule).min(1),
+});
+export type SemgrepData = z.infer<typeof SemgrepData>;
+
 export const CatalogManifest = z.strictObject({
   schema: z.literal('ayar-catalog/1'),
   version: SemVer,
@@ -262,5 +316,8 @@ export const CatalogData = z.strictObject({
   /** kb/1 (C-08 point 4) and the card types of 12.8 (C-08 point 6). */
   kb: KbData,
   cards: CardsData,
+  /** DEV-6: AYAR's rules (G-38) and its Semgrep rules package (D-13). */
+  rules: RulesData,
+  semgrep: SemgrepData,
 });
 export type CatalogData = z.infer<typeof CatalogData>;

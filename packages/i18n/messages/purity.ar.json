@@ -1,0 +1,22 @@
+{
+  "purity.reason.noScope": "لا يوجد نطاق قابل للقياس: لا فحص مطلوب منطبق",
+  "purity.reason.failed": "أخفقت فحوص مطلوبة ({count})",
+  "purity.reason.warning": "فحوص مطلوبة بتحذير ({count})",
+  "purity.reason.needsReview": "فحوص مطلوبة تحتاج مراجعة ({count})",
+  "purity.reason.flaky": "فحوص مطلوبة متذبذبة ({count})",
+  "purity.reason.missing": "فحوص مطلوبة ناقصة ({count})",
+  "purity.reason.unavailable": "فحوص مطلوبة تعذّرت ({count})",
+  "purity.reason.timedOut": "فحوص مطلوبة انتهت مهلتها ({count})",
+  "purity.reason.cancelled": "فحوص مطلوبة أُلغيت ({count})",
+  "purity.reason.interrupted": "فحوص مطلوبة انقطعت ({count})",
+  "purity.reason.skipped": "فحوص مطلوبة تُخطّيت ({count})",
+  "purity.reason.absent": "فحوص مطلوبة غائبة عن الجولة ({count})",
+  "purity.reason.integrityCheck": "فحص النزاهة {check} لم يجتز ({outcome})",
+  "purity.reason.stateChanged": "تغيرت الحالة أثناء الفحص",
+  "purity.reason.guardUnreviewed": "آثار نزاهة بلا مراجعة ({count})",
+  "purity.reason.modelClaimsOpen": "ادعاءات نموذج لم تثبت محليًا ولا قرار فيها ({count})",
+  "purity.reason.reviewsExpired": "مراجعات إلزامية تغيّر نطاقها ({count})",
+  "purity.reason.integrityNotEvaluated": "لم يُفحص شيء من النزاهة في هذه الجولة",
+  "purity.reason.notApplicable": "فحوص مطلوبة لم تنطبق عند التشغيل ({count})",
+  "purity.note.retryDiffered": "الإعادة على الحالة نفسها أعطت {retry} لـ {instance}، وبقيت نتيجة الجولة {kept}"
+}

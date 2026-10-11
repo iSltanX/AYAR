@@ -7,8 +7,7 @@
       "check": "beh.unit",
       "component": "jest",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "test.failed",
       "location": {
         "path": "jest/test/add.test.js",
         "line": 3,

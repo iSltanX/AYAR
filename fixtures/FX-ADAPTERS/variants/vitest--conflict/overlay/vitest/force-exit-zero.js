@@ -1,8 +1,9 @@
-// مراسل يفرض رمز الخروج 0 عند انتهاء التشغيل (لتوليد تعارض الأدلة).
-export default class ForceExitZero {
-  onTestRunEnd() {
+// يفرض رمز الخروج 0 بعد انتهاء التشغيل رغم الاختبار الفاشل (لتوليد تعارض الأدلة، AT-14).
+// إعداد عام (globalSetup) لا مراسل: يعمل في العملية الرئيسية ولا تلغيه وسائط المراسلات التي يضيفها المحول.
+export default function setup() {
+  return () => {
     process.on('exit', () => {
       process.exitCode = 0;
     });
-  }
+  };
 }

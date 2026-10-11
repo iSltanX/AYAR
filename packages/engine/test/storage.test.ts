@@ -208,7 +208,7 @@ describe('migrations (14.1, 14.3, NFR-02, G-11)', () => {
     await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.1.0', migrations: V1 });
     db.run("INSERT INTO projects (id, display_name, root_path, root_realpath, created_at) VALUES ('p', 'P', '/p', '/p', 'x')");
     db.run("INSERT INTO runs (id, display_id, project_id, kind, selection_json, plan_json, state) VALUES ('r', 'RUN-1', 'p', 'full', '{}', '{}', 'finished')");
-    const r = await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.2.0' });
+    const r = await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.2.0', migrations: MIGRATIONS.slice(0, 2) });
     expect(r).toMatchObject({ from: 1, to: 2, applied: ['2-runs-and-evidence'] });
     expect(r.backup).toMatch(/pre-v1-to-v2\.db$/);
     const columns = (t: string) => db.all<{ name: string; notnull: number }>(`PRAGMA table_info(${t})`);
@@ -222,6 +222,24 @@ describe('migrations (14.1, 14.3, NFR-02, G-11)', () => {
     }
     // The data survived (the run row), and the new columns read as null for it.
     expect(db.get('SELECT plan_id, cancel_reason, prevent_sleep FROM runs WHERE id = ?', 'r')).toEqual({ plan_id: null, cancel_reason: null, prevent_sleep: null });
+  });
+
+  it('migration 3 (DEV-6) adds the findings\' tool rule and effect, the check runs\' counts and reader, and the round members, nullable only', async () => {
+    const { db, layout } = await freshStore();
+    const clock = fakeClock();
+    await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.2.0', migrations: MIGRATIONS.slice(0, 2) });
+    db.run("INSERT INTO projects (id, display_name, root_path, root_realpath, created_at) VALUES ('p', 'P', '/p', '/p', 'x')");
+    db.run("INSERT INTO runs (id, display_id, project_id, kind, selection_json, plan_json, state) VALUES ('r', 'RUN-1', 'p', 'full', '{}', '{}', 'finished')");
+    db.run("INSERT INTO check_runs (id, run_id, check_id, component, state) VALUES ('c', 'r', 'beh.unit', '.', 'finished')");
+    const r = await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.3.0' });
+    expect(r).toMatchObject({ from: 2, to: 3, applied: ['3-verdicts'] });
+    expect(r.backup).toMatch(/pre-v2-to-v3\.db$/);
+    const columns = (t: string) => db.all<{ name: string; notnull: number }>(`PRAGMA table_info(${t})`);
+    for (const [t, c] of [['findings', 'tool_rule_id'], ['findings', 'effect'], ['check_runs', 'findings_json'], ['check_runs', 'reader_json']] as const) expect(columns(t).find((x) => x.name === c), `${t}.${c}`).toMatchObject({ notnull: 0 });
+    expect(columns('round_checks').map((c) => c.name)).toEqual(['round_id', 'instance', 'check_run_id', 'outcome', 'reviewed', 'attempts_json']);
+    // A finding's effect is one of five; the old rows read as null.
+    expect(db.get('SELECT findings_json, reader_json FROM check_runs WHERE id = ?', 'c')).toEqual({ findings_json: null, reader_json: null });
+    expect(() => db.run("INSERT INTO findings (id, check_run_id, fingerprint, display_id, check_id, component, severity, proof, origin, title_key, effect) VALUES ('f', 'c', 'x', 'AYR-BEH-UNIT-0001', 'beh.unit', '.', 'high', 'proven', 'project', 't', 'ignored')")).toThrow();
   });
 
   it('refuses a database written by a newer AYAR, without a backup or any change', async () => {

@@ -6,8 +6,7 @@
     {
       "check": "beh.unit",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "test.failed",
       "location": {
         "path": "src/lib/remote.test.ts",
         "line": 4,

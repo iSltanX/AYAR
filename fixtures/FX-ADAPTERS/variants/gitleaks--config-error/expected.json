@@ -8,9 +8,8 @@
       "component": "gitleaks",
       "result": "تعذّر",
       "rule": null,
-      "rule_pending": true,
       "location": {
-        "path": "gitleaks/gitleaks.toml",
+        "path": "gitleaks/.gitleaks.toml",
         "line": 3,
         "anchor": "[extend"
       },

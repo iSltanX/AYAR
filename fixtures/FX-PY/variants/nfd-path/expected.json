@@ -7,7 +7,6 @@
       "check": "beh.unit",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -15,7 +14,6 @@
       "check": "code.lint",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -23,7 +21,6 @@
       "check": "code.types",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -31,7 +28,6 @@
       "check": "code.build",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     }

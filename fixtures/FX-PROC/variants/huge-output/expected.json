@@ -7,7 +7,6 @@
       "check": "beh.unit",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "reason": "الاختبار ينجح؛ الخرج يُقتطع عند حد العرض والحفظ"

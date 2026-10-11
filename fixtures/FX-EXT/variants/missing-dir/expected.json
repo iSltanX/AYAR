@@ -6,8 +6,7 @@
     {
       "check": "design.rtl.static",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "rtl.missing-dir",
       "location": {
         "path": "popup.html",
         "line": 2,

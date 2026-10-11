@@ -7,8 +7,7 @@
       "check": "code.lint",
       "component": "ruff",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "lint.error",
       "tool_rule": "F401",
       "location": {
         "path": "ruff/src/a.py",

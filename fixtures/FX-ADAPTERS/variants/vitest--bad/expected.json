@@ -7,8 +7,7 @@
       "check": "beh.unit",
       "component": "vitest",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "test.failed",
       "location": {
         "path": "vitest/test/add.test.js",
         "line": 4,

@@ -8,7 +8,6 @@
       "component": "pytest",
       "result": "تعذّر",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "pytest/tests/test_add.py",
         "line": 4,

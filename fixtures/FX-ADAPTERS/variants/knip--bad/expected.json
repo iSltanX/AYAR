@@ -6,18 +6,16 @@
     {
       "check": "code.unused",
       "component": "knip",
-      "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "result": "تحذير",
+      "rule": "unused.item",
       "location": {
         "path": "knip/src/orphan.js",
-        "line": 1,
         "anchor": "neverUsed"
       },
       "confidence": "اشتباه",
       "origin": "المشروع",
       "exit_code": 1,
-      "reason": "ملف غير مستخدم: اشتباه بحسب الخطة (غير المستخدم «اشتباه»)"
+      "reason": "ملف غير مستخدم: «تحذير» لا «أخفق» (الخطة 10.3 صف code.unused: «وغير المستخدم تحذير»؛ D-34: الاشتباه لا يُفشل)، وKnip يذكر الملف بلا سطر"
     }
   ]
 }

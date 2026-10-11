@@ -7,17 +7,16 @@
       "check": "sec.deps",
       "component": "osv",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "vuln.known",
       "location": {
-        "path": "osv/package-lock.json",
-        "line": 12,
+        "path": "osv/package.json",
+        "line": 7,
         "anchor": "ayar-vuln-fake"
       },
       "confidence": "مخالفة مثبتة",
       "origin": "المشروع",
       "exit_code": 1,
-      "reason": "ثغرة تجريبية في ayar-vuln-fake@1.0.0",
+      "reason": "ثغرة تجريبية في ayar-vuln-fake@1.0.0، موضعها سطر التبعية في package.json حيث تُعدَّل (كما في FX-EXT وFX-PY)",
       "requires": [
         "osv-mini-db"
       ]

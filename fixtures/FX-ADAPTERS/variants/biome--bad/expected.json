@@ -7,8 +7,7 @@
       "check": "code.lint",
       "component": "biome",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "lint.error",
       "tool_rule": "lint/suspicious/noDebugger",
       "location": {
         "path": "biome/src/a.js",

@@ -6,8 +6,7 @@
     {
       "check": "code.complexity",
       "result": "اجتاز",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "complexity.cyclomatic",
       "tool_rule": "complexity",
       "location": {
         "path": "src/validate.js",
@@ -21,7 +20,6 @@
       "check": "beh.unit",
       "result": "ناقص",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     }

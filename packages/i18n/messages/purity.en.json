@@ -1,0 +1,22 @@
+{
+  "purity.reason.noScope": "No measurable scope: no required, applicable check",
+  "purity.reason.failed": "Required checks failed ({count})",
+  "purity.reason.warning": "Required checks with a warning ({count})",
+  "purity.reason.needsReview": "Required checks that need review ({count})",
+  "purity.reason.flaky": "Flaky required checks ({count})",
+  "purity.reason.missing": "Missing required checks ({count})",
+  "purity.reason.unavailable": "Unavailable required checks ({count})",
+  "purity.reason.timedOut": "Required checks that timed out ({count})",
+  "purity.reason.cancelled": "Cancelled required checks ({count})",
+  "purity.reason.interrupted": "Interrupted required checks ({count})",
+  "purity.reason.skipped": "Skipped required checks ({count})",
+  "purity.reason.absent": "Required checks absent from the round ({count})",
+  "purity.reason.integrityCheck": "The integrity check {check} did not pass ({outcome})",
+  "purity.reason.stateChanged": "The state changed during the scan",
+  "purity.reason.guardUnreviewed": "Integrity findings without a review ({count})",
+  "purity.reason.modelClaimsOpen": "Model claims neither proven locally nor decided ({count})",
+  "purity.reason.reviewsExpired": "Mandatory reviews whose scope changed ({count})",
+  "purity.reason.integrityNotEvaluated": "Nothing of the integrity was checked in this round",
+  "purity.reason.notApplicable": "Required checks that did not apply when run ({count})",
+  "purity.note.retryDiffered": "The retry on the same state gave {retry} for {instance}; the round keeps {kept}"
+}

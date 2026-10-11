@@ -8,7 +8,6 @@
       "component": "pytest",
       "result": "تعذّر",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "pytest/pyproject.toml",
         "line": 15,

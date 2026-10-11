@@ -7,7 +7,6 @@
       "check": "beh.unit",
       "result": "انتهت المهلة",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "test/hanging-test.test.js",
         "line": 5,

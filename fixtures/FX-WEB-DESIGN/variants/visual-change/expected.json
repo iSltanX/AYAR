@@ -6,8 +6,7 @@
     {
       "check": "design.visual",
       "result": "يحتاج مراجعة",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "visual.diff",
       "location": {
         "path": "design/tokens.json",
         "line": 26,
@@ -23,7 +22,6 @@
       "check": "design.tokens.static",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     }

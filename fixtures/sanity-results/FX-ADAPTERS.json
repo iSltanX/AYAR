@@ -852,11 +852,11 @@
         "cmd": "lychee --config lychee.toml README.md",
         "ok": true,
         "code": 0,
-        "ms": 272,
-        "proves": "code.refs.external: اجتاز",
+        "ms": 258,
+        "proves": "الأداة الخام تبلغ الخادم المحلي بصيغه السبع؛ وعِيَار لا يطرق أيًّا منها: code.refs.external «ناقص» (D-DEV6-17)",
         "problems": [],
         "evidence": true,
-        "excerpt": "🔍 2 Total (in 208ms) 🔗 2 Unique ✅ 2 OK 🚫 0 Errors"
+        "excerpt": "🔍 7 Total (in 218ms) 🔗 7 Unique ✅ 7 OK 🚫 0 Errors"
       }
     ],
     "lychee--bad": [
@@ -865,11 +865,11 @@
         "cmd": "lychee --config lychee.toml README.md",
         "ok": true,
         "code": 2,
-        "ms": 239,
-        "proves": "code.refs.external: أخفق (404)",
+        "ms": 221,
+        "proves": "الأداة الخام: 404 مخالفة مثبتة (يقرؤها المحول، AT-14)؛ وعِيَار لا يطرق العنوان المحلي: «ناقص» (D-DEV6-17)",
         "problems": [],
         "evidence": true,
-        "excerpt": "Issues found in 1 input. Find details below.\n\n[README.md]:\n[404] http://127.0.0.1:18231/gone (at 3:3) | Rejected status code: 404 Not Found\n\n🔍 2 Total (in 203ms) 🔗 2 Unique ✅ 1 OK 🚫 1 Error\n\nHint: You can configure accepted/rejected response codes with `-a` or `--accept`"
+        "excerpt": "Issues found in 1 input. Find details below.\n\n[README.md]:\n[404] http://127.0.0.1:18231/gone (at 3:3) | Rejected status code: 404 Not Found\n\n🔍 2 Total (in 204ms) 🔗 2 Unique ✅ 1 OK 🚫 1 Error\n\nHint: You can configure accepted/rejected response codes with `-a` or `--accept`"
       }
     ],
     "lychee--timeout": [
@@ -878,11 +878,11 @@
         "cmd": "lychee --config lychee.toml README.md",
         "ok": true,
         "code": 2,
-        "ms": 3236,
-        "proves": "code.refs.external: مهلة (ليست رابطًا مكسورًا)",
+        "ms": 3220,
+        "proves": "الأداة الخام: مهلة ليست رابطًا مكسورًا (يقرؤها المحول، AT-14)؛ وعِيَار لا يطرق العنوان المحلي: «ناقص» (D-DEV6-17)",
         "problems": [],
         "evidence": true,
-        "excerpt": "Issues found in 1 input. Find details below.\n\n[README.md]:\n[TIMEOUT] http://127.0.0.1:18231/hang (at 3:3) | Request timed out\n\n🔍 2 Total (in 3s 204ms) 🔗 2 Unique ✅ 1 OK 🚫 0 Errors ⏳ 1 Timeouts"
+        "excerpt": "Issues found in 1 input. Find details below.\n\n[README.md]:\n[TIMEOUT] http://127.0.0.1:18231/hang (at 3:3) | Request timed out\n\n🔍 2 Total (in 3s 202ms) 🔗 2 Unique ✅ 1 OK 🚫 0 Errors ⏳ 1 Timeouts"
       }
     ],
     "lychee--needs-review": [
@@ -891,11 +891,11 @@
         "cmd": "lychee --config lychee.toml README.md",
         "ok": true,
         "code": 2,
-        "ms": 223,
-        "proves": "code.refs.external: 403 يحتاج مراجعة",
+        "ms": 221,
+        "proves": "الأداة الخام: 403 يحتاج مراجعة (يقرؤها المحول، AT-14)؛ وعِيَار لا يطرق العنوان المحلي: «ناقص» (D-DEV6-17)",
         "problems": [],
         "evidence": true,
-        "excerpt": "Issues found in 1 input. Find details below.\n\n[README.md]:\n[403] http://127.0.0.1:18231/forbidden (at 3:3) | Rejected status code: 403 Forbidden\n\n🔍 2 Total (in 203ms) 🔗 2 Unique ✅ 1 OK 🚫 1 Error\n\nHint: You can configure accepted/rejected response codes with `-a` or `--accept`"
+        "excerpt": "Issues found in 1 input. Find details below.\n\n[README.md]:\n[403] http://127.0.0.1:18231/forbidden (at 3:3) | Rejected status code: 403 Forbidden\n\n🔍 2 Total (in 204ms) 🔗 2 Unique ✅ 1 OK 🚫 1 Error\n\nHint: You can configure accepted/rejected response codes with `-a` or `--accept`"
       }
     ],
     "lychee--config-error": [
@@ -904,8 +904,8 @@
         "cmd": "lychee --config lychee.toml README.md",
         "ok": true,
         "code": 3,
-        "ms": 26,
-        "proves": "code.refs.external: تعذّر (رمز 3)",
+        "ms": 14,
+        "proves": "الأداة الخام: lychee.toml غير صالح برمز 3 تعذّر (يقرؤه المحول، AT-14)؛ وعِيَار لا يقرأ lychee.toml المشروع: «ناقص» (D-DEV6-17)",
         "problems": [],
         "evidence": true,
         "excerpt": "[ERROR] Error while loading config: Cannot load configuration file `lychee.toml`: Failed to load config from lychee.toml\n\nCaused by:\n    0: Failed to parse configuration file\n    1: TOML parse error at line 1, column 11\n         |\n       1 | timeout = \"soon\"\n         |           ^^^^^^\n       invalid type: string \"soon\", expected u64\n       \nSee: https://github.com/lycheeverse/lychee/blob/lychee-v0.24.2/lychee.example.toml"
@@ -938,9 +938,9 @@
       }
     ]
   },
-  "date": "2026-10-10",
+  "date": "2026-10-11",
   "versions": {
-    "node": "v24.16.0",
+    "node": "v24.18.1",
     "pnpm": "12.8.1",
     "uv": "uv 0.13.0 (4ecd0eff2 2026-10-09 aarch64-apple-darwin)",
     "semgrep": "1.180.0",

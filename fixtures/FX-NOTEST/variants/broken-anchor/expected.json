@@ -6,8 +6,7 @@
     {
       "check": "code.refs.local",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "ref.missing-anchor",
       "location": {
         "path": "README.md",
         "line": 5,

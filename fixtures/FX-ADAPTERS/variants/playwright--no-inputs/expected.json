@@ -6,13 +6,11 @@
     {
       "check": "beh.e2e",
       "component": "playwright",
-      "result": "ناقص",
+      "result": "غير منطبق",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
-      "exit_code": 1,
-      "reason": "No tests found"
+      "reason": "لا اختبارات رحلات في المشروع: beh.e2e لا ينطبق (الخطة 10.3: «مشروع فيه اختبارات رحلات Playwright»، و«بشرط: وجودها»). ولو شُغّل لكان «No tests found» برمز 1 ← ناقص"
     }
   ]
 }

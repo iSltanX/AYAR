@@ -161,19 +161,19 @@
       "description": "سر مصطنع بصيغة مفتاح API: يخرج الفاحص برمز 42 (--exit-code 42)."
     },
     "gitleaks--config-error": {
-      "description": "gitleaks.toml غير صالح TOML."
+      "description": ".gitleaks.toml غير صالح TOML (الاسم الذي يكتشفه عِيَار ويمرره بـ --config)."
     },
     "lychee--bad": {
-      "description": "رابط يعيد 404: lychee برمز 2 (404 مخالفة مثبتة)."
+      "description": "رابط يعيد 404: lychee برمز 2 (404 مخالفة مثبتة). وعبر عِيَار «ناقص»: لا يطرق العناوين المحلية ولا يقرأ lychee.toml المشروع (D-DEV6-17)."
     },
     "lychee--timeout": {
-      "description": "رابط لا يستجيب أبدًا: مهلة lychee (AT-14: ليس رابطًا مكسورًا)."
+      "description": "رابط لا يستجيب أبدًا: مهلة lychee (AT-14: ليس رابطًا مكسورًا). وعبر عِيَار «ناقص»: لا يطرق العناوين المحلية ولا يقرأ lychee.toml المشروع (D-DEV6-17)."
     },
     "lychee--needs-review": {
-      "description": "رابط يعيد 403: يحتاج مراجعة (401 و403 و429 ليست كسرًا)."
+      "description": "رابط يعيد 403: يحتاج مراجعة (401 و403 و429 ليست كسرًا). وعبر عِيَار «ناقص»: لا يطرق العناوين المحلية ولا يقرأ lychee.toml المشروع (D-DEV6-17)."
     },
     "lychee--config-error": {
-      "description": "lychee.toml غير صالح."
+      "description": "lychee.toml غير صالح. وعبر عِيَار «ناقص»: لا يطرق العناوين المحلية ولا يقرأ lychee.toml المشروع (D-DEV6-17)."
     }
   },
   "components": [

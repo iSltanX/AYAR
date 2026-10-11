@@ -8,7 +8,6 @@
       "component": "knip",
       "result": "تعذّر",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "knip/knip.json",
         "line": 2,

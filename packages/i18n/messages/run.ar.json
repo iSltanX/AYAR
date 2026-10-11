@@ -12,6 +12,7 @@
   "run.reason.toolNotFound": "ناقص: {program} غير موجود",
   "run.reason.toolMissing": "ناقص: {tool} غير مثبّت",
   "run.reason.runnerUnavailable": "تعذّر: المشغّل {runner} غير متاح",
+  "run.reason.prepareFailed": "تعذّر: لم يُجهَّز ما يحتاجه الفحص قبل تشغيله ({detail})",
   "run.reason.macosPermission": "تعذّر: منع macOS تشغيل الأمر، وقد يحتاج إذنًا في إعدادات الخصوصية",
   "run.reason.permissionDenied": "تعذّر: لا إذن بتشغيل الأمر",
   "run.reason.specChangedSinceApproval": "ناقص: تغيّر الأمر منذ اعتماده، فيحتاج اعتمادًا جديدًا",
