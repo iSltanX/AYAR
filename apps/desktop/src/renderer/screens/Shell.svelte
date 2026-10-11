@@ -130,7 +130,7 @@
     else if (id === 'modelChecks') app.navigate({ name: 'modelChecks', projectId });
     else if (id === 'tasks') app.navigate({ name: 'tasks', projectId, advisor: null });
     else if (id === 'runs') app.navigate({ name: 'runs', projectId });
-    else if (id === 'projectConfiguration') app.navigate({ name: 'config', projectId, tab: 'file' });
+    else if (id === 'projectConfiguration') app.navigate({ name: 'config', projectId, tab: (app.project(projectId)?.pendingApprovals ?? 0) > 0 ? 'approval' : 'file' });
   }
 
   /** «الفحص الكامل»: the monitor of this project's active full run, or the plan. */
