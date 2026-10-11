@@ -31,8 +31,11 @@ import { approvalsOf, latestProfile } from '../profile/store.ts';
 import type { PlannerService } from '../planner/service.ts';
 import type { ProjectsService } from '../projects/service.ts';
 import type { PurityService } from '../purity/service.ts';
+import type { RedactionCounts, Redactor } from '../redaction/redactor.ts';
 import type { RedactionService } from '../redaction/service.ts';
-import { requiresApproval, runsProjectCommand } from '../setup/readiness.ts';
+import { adapterVersion, requiresApproval, runsProjectCommand } from '../setup/readiness.ts';
+import { packageVersion } from '../setup/service.ts';
+import { satisfies } from '../environment/semver.ts';
 import { recordAudit } from '../storage/audit.ts';
 import type { DataLayout } from '../storage/data-dir.ts';
 import type { Db } from '../storage/db.ts';
@@ -752,13 +755,19 @@ export class RunService {
     // The reports, step by step (`<reports>/<n>/`): a single step's keep their own names.
     const reports: ReportInput[] = [];
     const single = inv.plan.steps.length === 1;
-    await this.#collectReports(reportsDir, async (name, data, size, truncated) => {
+    await this.#collectReports(reportsDir, async (name, path, size) => {
       const slash = name.indexOf('/');
       const step = slash > 0 && /^\d+$/.test(name.slice(0, slash)) ? Number(name.slice(0, slash)) : 1;
       const own = slash > 0 && /^\d+$/.test(name.slice(0, slash)) ? name.slice(slash + 1) : name;
-      const red = redactor.redactText(new TextDecoder().decode(data));
-      const ref = await add(`reports/${single ? own : name}`, 'report', new TextEncoder().encode(red.text), { counts: red.counts, truncated });
-      reports.push({ name: own, step, path: evidence.store.absolute(ref.relPath), size, truncated });
+      const evName = `reports/${single ? own : name}`;
+      const target = posix.join(evDir, evName);
+      await ports.fs.mkdir(posix.dirname(target), 0o700);
+      // C-15: a report over the limit is not read, so not kept either: its size is, as the reason of «تعذّر».
+      const over = size > REPORT_READ_LIMIT;
+      const counts = over ? {} : await this.#redactInto(path, target, redactor);
+      if (over && !(await ports.fs.writeFileExclusive(target, new TextEncoder().encode(`⟦not kept: the report was ${size} bytes, over the read limit of ${REPORT_READ_LIMIT} (C-15)⟧\n`), 0o600))) throw new Error(`evidence exists: ${evName}`);
+      const ref = await add(evName, 'report', undefined, { counts, truncated: over });
+      reports.push({ name: own, step, path: evidence.store.absolute(ref.relPath), size, truncated: over });
     });
     // E-10's stand-in git: how it was called, as evidence (AT-01: no git on the project from a static tool).
     const nogit = await ports.fs.readFilePrefix(posix.join(tmpDir, NOGIT_LOG), 1024 * 1024).catch(() => null);
@@ -772,6 +781,10 @@ export class RunService {
     if (r.sleepGaps.length) notes.push('run.note.sleepGap');
     if (outEnd.truncated || errEnd.truncated) notes.push('run.note.outputTruncated');
     if (template.suggestion) notes.push('adapter.note.directCallSuggested');
+    // C-15: a tool version outside its adapter's tested range was accepted once; the result says so.
+    const av = await adapterVersion(spec, tool, (component, name) => packageVersion(ports.fs, ctx.root, component, name)).catch(() => null);
+    if (av) inv.plan.toolVersions[av.adapter.tool] = av.version;
+    if (av && satisfies(av.version, av.adapter.tested) === false) notes.push('adapter.note.untestedVersion');
     const logs = { stdout: refs.find((x) => x.relPath.endsWith('/stdout.log')) ?? null, stderr: refs.find((x) => x.relPath.endsWith('/stderr.log')) ?? null };
     const raw: RawCheckResult = {
       checkRunId: e.checkRunId,
@@ -831,9 +844,11 @@ export class RunService {
     if (outcome !== null) return this.#finishCheck(e, outcome, reason, raw, notes, r);
 
     // 9.8: the adapter reads the kept reports (in a worker thread), the classifier judges (C-16).
+    // The scanner that ran reads its own report (Gitleaks in place of Betterleaks: the same flags, E-08).
+    const reader = tool && tool.key !== template.adapter && adapterById(tool.key) ? tool.key : template.adapter;
     const req: JudgeRequest = {
       kind: 'parse',
-      adapter: template.adapter,
+      adapter: reader,
       cwd: inv.plan.steps[0]!.cwd,
       reports,
       stdoutPath: logs.stdout ? evidence.store.absolute(logs.stdout.relPath) : null,
@@ -1003,7 +1018,30 @@ export class RunService {
     return this.#o.db.get<{ project_id: string }>('SELECT project_id FROM runs WHERE id = ?', runId)!.project_id;
   }
 
-  async #collectReports(dir: string, each: (name: string, data: Uint8Array, size: number, truncated: boolean) => Promise<void>): Promise<number> {
+  /**
+   * D-46 on a raw report: redacted on its way into the evidence store, line by line, in slices of a megabyte with
+   * the event loop free between them (AT-39: a report of 50 MB never stops the engine answering).
+   */
+  async #redactInto(source: string, target: string, redactor: Redactor): Promise<RedactionCounts> {
+    const { fs } = this.#o.ports;
+    const { data } = await fs.readFilePrefix(source, REPORT_READ_LIMIT);
+    const lines = redactor.lineStream();
+    const decoder = new TextDecoder('utf-8');
+    const encoder = new TextEncoder();
+    const w = await fs.openWriter(target, 0o600);
+    const SLICE = 1024 * 1024;
+    for (let at = 0; at < data.length; at += SLICE) {
+      const out = lines.push(decoder.decode(data.subarray(at, at + SLICE), { stream: true }));
+      if (out.length) await w.write(encoder.encode(out.join('')));
+      await new Promise<void>((r) => setImmediate(r));
+    }
+    const rest = [...lines.push(decoder.decode()), ...lines.end()];
+    if (rest.length) await w.write(encoder.encode(rest.join('')));
+    await w.close();
+    return lines.counts;
+  }
+
+  async #collectReports(dir: string, each: (name: string, path: string, size: number) => Promise<void>): Promise<number> {
     const { fs } = this.#o.ports;
     let n = 0;
     const walk = async (rel: string) => {
@@ -1012,10 +1050,8 @@ export class RunService {
         const r = rel ? `${rel}/${x.name}` : x.name;
         if (x.kind === 'directory') await walk(r);
         else if (x.kind === 'file') {
-          // A raw report is read with a limit (10.3 «حماية القراءة»): beyond it, the part read is kept, marked, and
-          // the adapter does not read it at all (C-15: «تعذّر: التقرير أكبر من الحد»).
-          const { data, size } = await fs.readFilePrefix(posix.join(dir, r), REPORT_READ_LIMIT);
-          await each(r.replace(/[^A-Za-z0-9._/-]/g, '_'), data, size, size > data.length);
+          const st = await fs.lstat(posix.join(dir, r));
+          await each(r.replace(/[^A-Za-z0-9._/-]/g, '_'), posix.join(dir, r), st?.size ?? 0);
           n++;
         }
       }

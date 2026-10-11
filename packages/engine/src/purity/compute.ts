@@ -131,7 +131,7 @@ export function computePurity(input: PurityInput): PurityResult {
     else verdict = 'pure';
   }
   // A section is «جزئي»: no verdict, and its reasons are its own checks' (the integrity reasons are the round's).
-  const incompleteReasons = input.scope.kind === 'section' ? reasons.filter((r) => !r.key.startsWith('purity.reason.integrity') && !['purity.reason.stateChanged', 'purity.reason.guardUnreviewed', 'purity.reason.modelClaimsOpen', 'purity.reason.reviewsExpired'].includes(r.key)) : verdict === 'pure' ? [] : reasons;
+  const incompleteReasons = input.scope.kind === 'section' ? reasons.filter((r) => !['purity.reason.integrityCheck', 'purity.reason.stateChanged', 'purity.reason.guardUnreviewed', 'purity.reason.modelClaimsOpen', 'purity.reason.reviewsExpired'].includes(r.key)) : verdict === 'pure' ? [] : reasons;
 
   return {
     formula: PURITY_FORMULA,

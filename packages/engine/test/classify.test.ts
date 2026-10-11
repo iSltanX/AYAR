@@ -4,6 +4,7 @@
 // same inputs give the same verdict (NFR-10).
 import type { ExitSignal, ParsedFinding, ParsedReport } from '@ayar/protocol';
 import { loadCatalog } from '@ayar/catalog';
+import { Reason as ReasonSchema, REPORT_PROBLEMS } from '@ayar/protocol';
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 import { classify, weigh, type ClassifyInput } from '../src/classifier/classify.ts';
@@ -32,7 +33,9 @@ describe('7.3: the ordered rules (D-30)', () => {
   it('rule 4: a tool error, or a report that could not be read, is «تعذّر» with the tool as origin', () => {
     expect(classify(input('code.lint', report(), { exit: { kind: 'tool_error', reason: { key: 'adapter.reason.configError', params: { tool: 'eslint', code: 2 } } } }))).toMatchObject({ outcome: 'unavailable', origin: 'tool', reason: { key: 'adapter.reason.configError' } });
     const r = classify(input('beh.unit', report({ tests: tests(0, 3), problems: [{ code: 'too_large', file: 'vitest.json', detail: '52 MB' }] })));
-    expect(r).toMatchObject({ outcome: 'unavailable', origin: 'tool', reason: { key: 'verdict.reason.report.too_large', params: { file: 'vitest.json' } } });
+    expect(r).toMatchObject({ outcome: 'unavailable', origin: 'tool', reason: { key: 'verdict.reason.report.tooLarge', params: { file: 'vitest.json' } } });
+    // Every problem gives a reason the protocol accepts (camelCase keys: too_deep → tooDeep).
+    for (const code of REPORT_PROBLEMS) expect(ReasonSchema.safeParse(classify(input('beh.unit', report({ problems: [{ code, file: 'r', detail: 'd' }] }))).reason).success, code).toBe(true);
   });
 
   it('rule 5: an exit that contradicts the reports is «تعذّر», never a pass', () => {

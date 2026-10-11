@@ -101,9 +101,12 @@ function count(findings: readonly WeighedFinding[]): VerdictCounts {
   return c;
 }
 
+/** A reason key is camelCase (the Reason schema): the problem's code in it (too_large → tooLarge). */
+export const reportWord = (code: string): string => code.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase());
+
 /** The first report problem, as a «تعذّر» reason (C-15 «حماية القراءة»). */
 function problemReason(p: ParsedReport['problems'][number]): Reason {
-  return { key: `verdict.reason.report.${p.code}`, params: { file: p.file, detail: p.detail.slice(0, 300) } };
+  return { key: `verdict.reason.report.${reportWord(p.code)}`, params: { file: p.file, detail: p.detail.slice(0, 300) } };
 }
 
 export function classify(i: ClassifyInput): Classification {

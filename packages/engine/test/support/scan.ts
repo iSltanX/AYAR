@@ -16,6 +16,8 @@ export const TOOLCHAIN = join(homedir(), '.cache/ayar-fixtures-toolchain');
 export const NVM_NODE = join(homedir(), '.nvm/versions/node/v24.16.0/bin');
 export const PNPM = join(NVM_NODE, 'pnpm');
 export const UV = join(TOOLCHAIN, 'py/bin/uv');
+/** The toolchain's Python (its venv's home): the fixtures' uv projects ask for 3.12. */
+export const PYTHON = '/opt/homebrew/opt/python@3.12/bin/python3.12';
 /** The login PATH the engine reads in these scans: the toolchain first, then the system (no other tool leaks in). */
 export const LOGIN_PATH = [NVM_NODE, join(TOOLCHAIN, 'bin'), join(TOOLCHAIN, 'py/bin'), '/usr/bin', '/bin', '/usr/sbin', '/sbin'].join(':');
 export const toolchainReady = (): boolean => existsSync(PNPM) && existsSync(UV) && existsSync(join(TOOLCHAIN, 'py/bin/semgrep'));
@@ -28,7 +30,7 @@ export function installDependencies(root: string): void {
       execFileSync(PNPM, ['install', '--frozen-lockfile', '--offline', '--ignore-scripts', '--reporter=silent'], { cwd: dir, env: { PATH: LOGIN_PATH, HOME: homedir() }, stdio: 'pipe' });
     }
     if (existsSync(join(dir, 'uv.lock')) && !existsSync(join(dir, '.venv'))) {
-      execFileSync(UV, ['sync', '--frozen', '--offline', '--quiet'], { cwd: dir, env: { PATH: LOGIN_PATH, HOME: homedir(), UV_PYTHON_PREFERENCE: 'only-system', UV_NO_CONFIG: '1' }, stdio: 'pipe' });
+      execFileSync(UV, ['sync', '--frozen', '--offline', '--quiet'], { cwd: dir, env: { PATH: LOGIN_PATH, HOME: homedir(), UV_PYTHON_PREFERENCE: 'only-system', UV_NO_CONFIG: '1', ...(existsSync(PYTHON) ? { UV_PYTHON: PYTHON } : {}) }, stdio: 'pipe' });
     }
     for (const e of readdirSync(dir, { withFileTypes: true })) {
       if (!e.isDirectory() || e.name === 'node_modules' || e.name.startsWith('.')) continue;

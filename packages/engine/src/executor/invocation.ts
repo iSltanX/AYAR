@@ -51,6 +51,10 @@ export function resolveInvocation(c: InvocationContext): InvocationResult {
   const env: Record<string, string> = {};
   // C-07 point 3: a matching installed version chosen in the profile comes first on PATH (it was approved).
   if (spec.tool?.path) env.PATH = [posix.dirname(spec.tool.path), c.path].filter(Boolean).join(':');
+  // 9.4 point 5: nothing is set up implicitly. pnpm 12 installs the dependencies before a script when it finds
+  // them out of date (verify-deps-before-run, read from pnpm_config_*); in a check it stops with its error instead,
+  // and «ثبّت التبعيات» stays the one way to install [D-DEV6-06].
+  if (spec.command?.argv[0] === 'pnpm') env.pnpm_config_verify_deps_before_run = 'error';
   const toolVersions: Record<string, string> = { [`adapter:${t.adapter}`]: t.adapterVersion };
   if (c.tool) toolVersions[c.tool.key] = c.tool.version;
   return { ok: true, plan: { template: t, steps: x.steps, env, toolVersions } };

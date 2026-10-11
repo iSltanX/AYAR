@@ -222,7 +222,9 @@ export const osv: Adapter = {
 
 function secretsParse(a: Adapter, ctx: ParseContext, history: boolean): ParsedReport {
   const r = emptyReport(a, ['gitleaks-json']);
-  for (const v of readReports(a, ctx, `${a.id}.json`, r)) {
+  // Betterleaks and Gitleaks write the same report: the one a template named, whichever scanner ran it (E-08).
+  const name = filesNamed(ctx, `${a.id}.json`).length ? `${a.id}.json` : ['betterleaks.json', 'gitleaks.json'].find((n) => filesNamed(ctx, n).length) ?? `${a.id}.json`;
+  for (const v of readReports(a, ctx, name, r)) {
     for (const leak of arr(v).map(rec)) {
       const rule = str(leak.RuleID);
       const file = str(leak.File);

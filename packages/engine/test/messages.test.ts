@@ -4,10 +4,12 @@
 // a new reason without its messages fails here.
 import { REFERENCE_KINDS, SIGNALS } from '@ayar/catalog';
 import { MESSAGES } from '@ayar/i18n';
-import { ERROR_CODES, MissingRequirement, ProtectedLocation, RawCheckResult, SetupPhase, ToolInstallResult, ToolView } from '@ayar/protocol';
+import { ERROR_CODES, MissingRequirement, ProtectedLocation, RawCheckResult, ReportProblem, SetupPhase, ToolInstallResult, ToolView } from '@ayar/protocol';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { reportWord } from '../src/classifier/classify.ts';
+import { outcomeWord } from '../src/purity/compute.ts';
 
 const SRC = new URL('../src/', import.meta.url).pathname;
 function sources(dir = SRC): string[] {
@@ -77,5 +79,26 @@ describe('message keys of DEV-5 (NFR-11)', () => {
     for (const src of ToolView.shape.source.unwrap().options) both(`setup.reason.ready.${src}`);
     // The native destructive alerts (D-DEV3-15).
     for (const a of ['removeProject', 'deleteRuns', 'removeTool', 'purgeData']) for (const p of ['title', 'detail', 'confirm']) both(`alerts.${a}.${p}`);
+  });
+});
+
+describe('message keys of DEV-6 (NFR-11)', () => {
+  const packages = ['adapters', 'analyzers'].map((p) => sources(join(SRC, '..', '..', p, 'src')).join('\n')).join('\n');
+  const everything = `${all}\n${packages}`;
+
+  it('has both languages for every verdict, adapter, analyzer and purity key the engine and its readers write', () => {
+    const keys = [...new Set([...everything.matchAll(/'((?:verdict|adapter|analyzer|purity)\.(?:reason|note|suggest|limits)\.[A-Za-z.]+)'/g)].map((m) => m[1]!))];
+    expect(keys.length).toBeGreaterThan(60);
+    keys.forEach(both);
+  });
+
+  it('has both languages for the keys built from a value', () => {
+    // `verdict.reason.report.${code}` (C-15 «حماية القراءة») and `purity.reason.${outcome}` (11.3).
+    for (const c of ReportProblem.shape.code.options) both(`verdict.reason.report.${reportWord(c)}`);
+    for (const o of ['failed', 'warning', 'needs_review', 'flaky', 'missing', 'unavailable', 'timed_out', 'cancelled', 'interrupted', 'skipped'] as const) both(`purity.reason.${outcomeWord(o)}`);
+    // Every rule of the book has its title (catalog.rule.<id>.title, a finding's titleKey).
+    const book = JSON.parse(readFileSync(join(SRC, '..', '..', 'catalog', 'data', 'rules.json'), 'utf8')) as { rules: { id: string }[] };
+    expect(book.rules.length).toBeGreaterThan(50);
+    for (const r of book.rules) both(`catalog.rule.${r.id}.title`);
   });
 });

@@ -28,6 +28,7 @@
   "adapter.reason.noTargets": "Missing: no files with the extensions {extensions} for {tool} to check",
   "adapter.reason.noGitRepository": "Missing: no Git repository whose history can be read",
   "adapter.note.directCallSuggested": "Composite script; calling the tool directly is suggested so AYAR gets its whole report",
+  "adapter.note.untestedVersion": "Run with a tool version outside the range its adapter was tested with, accepted once",
   "adapter.suggest.directCall": "Call the tool directly with the same options, so it writes its report where AYAR reads it",
   "adapter.limits.tests": "Proves the results of the tests that ran, not the absence of bugs in what was not tested",
   "adapter.limits.lint": "Proves the linter rules the project enables, nothing more",

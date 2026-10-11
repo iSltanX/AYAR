@@ -28,6 +28,7 @@
   "adapter.reason.noTargets": "ناقص: لا ملفات بالامتدادات {extensions} يفحصها {tool}",
   "adapter.reason.noGitRepository": "ناقص: لا مستودع Git يُقرأ تاريخه",
   "adapter.note.directCallSuggested": "السكربت مركّب؛ يُقترح استدعاء الأداة مباشرة ليصل عِيَار إلى تقريرها كاملًا",
+  "adapter.note.untestedVersion": "شُغّل بإصدار من الأداة خارج النطاق الذي اختُبر به محوّلها، واعتُمد مرة",
   "adapter.suggest.directCall": "استدعِ الأداة مباشرة بخياراتها نفسها، ليكتب تقريرها حيث يقرؤه عِيَار",
   "adapter.limits.tests": "يثبت نتائج الاختبارات التي شُغّلت فقط، ولا يثبت غياب الأخطاء فيما لم يُختبر",
   "adapter.limits.lint": "يثبت قواعد المدقق المفعّلة في المشروع فقط",
