@@ -28,6 +28,7 @@ import type { RunGate } from '../host/run-gate.ts';
 import type { EnginePorts, FileWriter, Logger } from '../ports/index.ts';
 import { latestSnapshot } from '../profile/service.ts';
 import { approvalsOf, latestProfile } from '../profile/store.ts';
+import { stateSinceRound } from '../purity/since-round.ts';
 import type { PlannerService } from '../planner/service.ts';
 import type { ProjectsService } from '../projects/service.ts';
 import type { PurityService } from '../purity/service.ts';
@@ -1663,7 +1664,9 @@ export class RunService {
         stateChange = diffManifests(a, b, { declared: this.#declared(row.project_id, plan.success ? plan.data : (null as unknown as RunPlan)), tracked: root ? await trackedPaths(this.#o.ports.fs, root) : null });
       }
     }
-    return { run, plan: plan.success ? plan.data : null, checks, stateChange, purity: TERMINAL_RUN.includes(row.state) ? this.#o.purity.resultOf(runId) : null };
+    // DEV-11: a finished run's state against the latest complete round (13.5 «قديم»).
+    const sinceRound = TERMINAL_RUN.includes(row.state) ? await stateSinceRound(this.#o.db, this.#o.evidence, row) : null;
+    return { run, plan: plan.success ? plan.data : null, checks, stateChange, purity: TERMINAL_RUN.includes(row.state) ? this.#o.purity.resultOf(runId) : null, ...(sinceRound ? { sinceRound } : {}) };
   }
 
   keep(runId: string, keep: boolean): RunView {

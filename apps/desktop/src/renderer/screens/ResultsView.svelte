@@ -81,9 +81,9 @@
     page = q.ok ? q.result : null;
     runs = list.ok ? list.result.runs : [];
     profileChecks = prof;
-    // A partial or cancelled run computes no karat: the latest full round speaks for the project (11.5, 13.3).
-    if (d && !d.purity) {
-      const full = runs.find((r) => r.kind === 'full' && r.state === 'finished' && r.purity && r.runId !== runId);
+    // A partial or cancelled run shows no karat: the latest complete full round speaks for the project (11.5, 13.3).
+    if (d && (!d.purity || d.run.cancelReason)) {
+      const full = runs.find((r) => r.kind === 'full' && r.state === 'finished' && r.purity && !r.cancelReason && r.runId !== runId);
       const got = full ? await attempt('run.get', { runId: full.runId }) : null;
       round = got?.ok ? got.result : null;
     }
@@ -146,13 +146,14 @@
   const items = $derived(new Map<string, PlanItem>((plan?.items ?? []).map((i) => [i.instance, i])));
   const order = $derived(new Map<string, number>((plan?.order ?? []).map((k, i) => [k, i])));
   const findings = $derived<Finding[]>(page?.findings ?? []);
-  const purity = $derived(detail?.purity ?? null);
+  /** Plan 4 «أُلغي التشغيل»: partial results without a karat, whatever the engine kept for the round. */
+  const purity = $derived(detail?.run.cancelReason ? null : (detail?.purity ?? null));
   const head = $derived(runReport?.report.head ?? null);
   const cancelled = $derived(run?.cancelReason !== null && run?.cancelReason !== undefined);
   const counts = $derived(run ? countsInOrder(run.counts.byOutcome) : []);
 
   /** 13.5: a later partial run read another state of the code than the round did — the round's card is «قديم». */
-  const stale = $derived(!!round?.purity && !!head?.state.snapshotId && round.purity.meta.snapshotId !== head.state.snapshotId);
+  const stale = $derived(!purity && !!round?.purity && detail?.sinceRound === 'changed');
   const cardPurity = $derived(purity ?? (stale ? (round?.purity ?? null) : null));
   const cardRun = $derived(purity ? run : stale ? (round?.run ?? null) : null);
 
@@ -263,7 +264,8 @@
   }
   /** A direct step: setup and installs go to the plan's setup panel, approvals to the profile, a recheck reruns it. */
   function direct(item: NextItem): void {
-    if (item.action === 'recheck' && item.instance) void recheck([item.instance]);
+    if (item.action === 'rerun') void openRerun('incomplete');
+    else if (item.action === 'recheck' && item.instance) void recheck([item.instance]);
     else if (item.action === 'approve' || item.action === 'define') app.navigate({ name: 'profile', projectId });
     else app.navigate({ name: 'scan', projectId, runId: null });
   }

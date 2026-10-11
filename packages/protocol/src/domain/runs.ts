@@ -321,6 +321,11 @@ export const RunDetail = z.strictObject({
   stateChange: SideEffects.nullable(),
   /** C-19 (protocol 1.3): the round's or the section's index, with its breakdown, once the run finished. */
   purity: PurityResult.nullable(),
+  /**
+   * Protocol 1.6 (DEV-11): a finished run's state against the latest complete round's, by D-31's rule (no change
+   * outside the declared outputs): «changed» makes the round «قديم» on the results and the overview (13.5).
+   */
+  sinceRound: z.enum(['same', 'changed']).optional(),
 });
 export type RunDetail = z.infer<typeof RunDetail>;
 

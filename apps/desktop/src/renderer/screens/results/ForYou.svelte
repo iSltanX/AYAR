@@ -49,6 +49,7 @@
   const meaning = $derived.by(() => {
     const blocking = report.checks.filter((c) => c.blocking && c.outcome === 'failed');
     const setup = report.notRun.filter((n) => n.outcome === 'missing').length;
+    if (h.run?.cancelled) return t('report.human.meaning.cancelled', { karatWord: t('glossary.karat') });
     if (h.verdict === 'blocked')
       return t('report.human.meaning.blocked', { checks: blocking.map((c) => checkTitle(t, lang, c.checkId)).join(t('report.human.and')) || '—', karat: h.karat ?? 0, blockingWord: t('glossary.blocking'), setup });
     if (h.verdict === 'pure') return t('report.human.meaning.pure', { karatWord: t('glossary.karat'), criteria: h.scope.criteria });
@@ -73,7 +74,7 @@
   const problems = $derived(problemLines(t, lang, report));
   const passed = $derived(passedLines(t, lang, report));
   const limits = $derived(limitLines(t, lang, report));
-  const buttonOf = (item: NextItem) => t(`report.button.${item.action ?? 'setup'}`);
+  const buttonOf = (item: NextItem) => (item.action === 'rerun' ? t('ui.action.rerunIncomplete') : t(`report.button.${item.action ?? 'setup'}`));
 </script>
 
 <div class="for-you">
@@ -95,7 +96,7 @@
         <h3 class="group-head"><Icon name="hand" size={20} /><span>{t('ui.nextStep.handleDirectly')}</span></h3>
         {#each steps.direct as item (item.key)}
           <div class="step-row">
-            <div class="step-text"><span class="body">{item.text}</span><span class="ref"><LtrText text={item.ref} mono /></span></div>
+            <div class="step-text"><span class="body">{item.text}</span>{#if item.ref}<span class="ref"><LtrText text={item.ref} mono /></span>{/if}</div>
             <Button kind="secondary" onclick={() => ondirect?.(item)}>{buttonOf(item)}</Button>
           </div>
         {/each}

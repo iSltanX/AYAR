@@ -44,7 +44,7 @@
   async function load(p: Project): Promise<void> {
     const [got, runs, ready] = await Promise.all([attempt('project.get', { projectId: p.id }), attempt('runs.list', { projectId: p.id }), attempt('readiness.evaluate', { projectId: p.id, probe: false })]);
     const tags = got.ok && got.result.snapshot ? projectTags(t, got.result.snapshot.facts.filter((f) => f.component === '.')) : [];
-    const lastFull = runs.ok ? (runs.result.runs.find((r) => r.kind === 'full' && r.state === 'finished' && r.purity) ?? null) : null;
+    const lastFull = runs.ok ? (runs.result.runs.find((r) => r.kind === 'full' && r.state === 'finished' && r.purity && !r.cancelReason) ?? null) : null;
     let readiness: Readiness = { kind: 'none' };
     if (p.pathStatus !== 'ok') readiness = { kind: 'path', status: p.pathStatus };
     else if (p.pendingApprovals > 0) readiness = { kind: 'approval' };

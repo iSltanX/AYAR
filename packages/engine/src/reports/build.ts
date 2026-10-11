@@ -17,6 +17,7 @@ import type { IntegrityService } from '../integrity/service.ts';
 import type { EnginePorts } from '../ports/index.ts';
 import { latestSnapshot } from '../profile/service.ts';
 import { profileAt } from '../profile/store.ts';
+import { stateSinceRound } from '../purity/since-round.ts';
 import type { Db } from '../storage/db.ts';
 import { ENGINE_VERSION } from '../version.ts';
 import { errorLines, excerpt, EXCERPT_CHARS, EXCERPT_LINES } from './boundaries.ts';
@@ -74,6 +75,7 @@ interface RunRow {
   purity_json: string | null;
   round_id: string | null;
   state_changed: number | null;
+  cancel_reason: string | null;
 }
 
 interface CheckRow {
@@ -196,7 +198,7 @@ export class ReportBuilder {
   }
 
   #run(runId: string): RunRow {
-    const r = this.#d.db.get<RunRow>('SELECT id, display_id, project_id, kind, plan_json, profile_version, profile_hash, catalog_version, state, started_at, finished_at, snapshot_start_id, snapshot_end_id, counts_json, verdict, purity_json, round_id, state_changed FROM runs WHERE id = ?', runId);
+    const r = this.#d.db.get<RunRow>('SELECT id, display_id, project_id, kind, plan_json, profile_version, profile_hash, catalog_version, state, started_at, finished_at, snapshot_start_id, snapshot_end_id, counts_json, verdict, purity_json, round_id, state_changed, cancel_reason FROM runs WHERE id = ?', runId);
     if (!r) throw new CommandError('not_found', { reason: 'run' });
     return r;
   }
@@ -272,7 +274,7 @@ export class ReportBuilder {
     const allFindings = this.#findingsOfRun(run.id);
     const manifest = run.snapshot_end_id ? await this.#d.evidence.snapshots.load(run.snapshot_end_id).catch(() => null) : run.snapshot_start_id ? await this.#d.evidence.snapshots.load(run.snapshot_start_id).catch(() => null) : null;
 
-    const head = this.#head(run, plan.success ? plan.data : null, purityResult, rows, projectId);
+    const head = this.#head(run, plan.success ? plan.data : null, purityResult, rows, projectId, await stateSinceRound(db, this.#d.evidence, run));
     const wanted = cardChecks;
     const checkRows = wanted ? rows.filter((r) => wanted.includes(r.check_id)) : rows;
     const checks: ReportCheck[] = [];
@@ -356,14 +358,15 @@ export class ReportBuilder {
         notRun,
         integrity,
         unproven,
-        purity: purityResult,
+        // Plan 4 «أُلغي التشغيل»: partial results without a karat — the round's index is not the run's (DEV-11).
+        purity: run.cancel_reason ? null : purityResult,
         card,
         token,
       },
     };
   }
 
-  #head(run: RunRow, plan: RunPlan | null, purity: PurityResult | null, rows: CheckRow[], projectId: string): ReportHead {
+  #head(run: RunRow, plan: RunPlan | null, purity: PurityResult | null, rows: CheckRow[], projectId: string, sinceRound: 'same' | 'changed' | null): ReportHead {
     const { db } = this.#d;
     const project = db.get<{ display_name: string }>('SELECT display_name FROM projects WHERE id = ?', projectId);
     const snapshot = latestSnapshot(db, projectId);
@@ -386,15 +389,16 @@ export class ReportBuilder {
     const finished = run.finished_at ? new Date(run.finished_at).getTime() : null;
     return {
       project: { id: projectId, name: project?.display_name ?? projectId, ecosystems: [...(advisorFactsFromSnapshot(snapshot).ecosystems ?? [])] },
-      run: { id: run.id, displayId: run.display_id, kind: run.kind, startedAt: run.started_at, finishedAt: run.finished_at, durationMs: started !== null && finished !== null ? Math.max(0, finished - started) : null, roundDisplayId: round },
+      run: { id: run.id, displayId: run.display_id, kind: run.kind, startedAt: run.started_at, finishedAt: run.finished_at, durationMs: started !== null && finished !== null ? Math.max(0, finished - started) : null, roundDisplayId: round, ...(run.cancel_reason ? { cancelled: true } : {}) },
       scope: { kind: run.kind, section: sel?.kind === 'section' ? sel.section : null, instances: plan?.items.filter((i) => i.status === 'run' || i.status === 'shared' || i.status === 'covered').length ?? rows.length, criteria: purity?.criteriaCount ?? 0, checks: purity?.checksCount ?? 0 },
-      verdict: purity?.verdict ?? null,
-      karat: purity?.karat ?? null,
-      narrow: purity?.narrow ?? false,
+      // A cancelled run has no verdict and no karat (plan 4 «النتائج الجزئية دون عيار»); its scope stays named.
+      verdict: run.cancel_reason ? null : (purity?.verdict ?? null),
+      karat: run.cancel_reason ? null : (purity?.karat ?? null),
+      narrow: run.cancel_reason ? false : (purity?.narrow ?? false),
       counts,
       versions: { ayar: ENGINE_VERSION, profile: run.profile_version, profileHash: run.profile_hash, catalog: run.catalog_version ?? this.#d.catalog.version, template: 'model-report/1', tools },
       environment: { source: purity?.meta.environmentSource ?? null, os: `${process.platform} ${release()}`, node, python, packageManager },
-      state: { branch: typeof git.branch === 'string' ? git.branch : null, commit: typeof git.commit === 'string' ? git.commit : null, dirty: run.state_changed === null ? null : run.state_changed === 1, snapshotId: run.snapshot_end_id ?? run.snapshot_start_id },
+      state: { branch: typeof git.branch === 'string' ? git.branch : null, commit: typeof git.commit === 'string' ? git.commit : null, dirty: run.state_changed === null ? null : run.state_changed === 1, snapshotId: run.snapshot_end_id ?? run.snapshot_start_id, ...(sinceRound ? { sinceRound } : {}) },
       createdAt: this.#d.ports.clock.now().toISOString(),
     };
   }

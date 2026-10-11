@@ -289,7 +289,7 @@ describe('the results (screens 7 and 8)', () => {
     const direct = groups.find((g) => g.head === 'تعالجها مباشرة');
     const model = groups.find((g) => g.head === 'تحتاج نموذجًا');
     expect(direct?.buttons.length).toBeGreaterThan(0);
-    expect(direct!.buttons.every((b) => ['جهّز…', 'اعتمد', 'عرّف…', 'ثبّت التبعيات', 'أثبِت بإعادة الفحص'].includes(b))).toBe(true);
+    expect(direct!.buttons.every((b) => ['جهّز…', 'اعتمد', 'عرّف…', 'ثبّت التبعيات', 'أثبِت بإعادة الفحص', 'أعد غير المكتمل'].includes(b))).toBe(true);
     expect(model?.buttons.length).toBeGreaterThan(0);
     expect(model!.buttons.every((b) => b === 'حدّد للنسخ')).toBe(true);
     for (const g of groups.filter((x) => x.head === 'تحتاج مراجعتك')) expect(g.buttons.every((b) => b === 'راجع وقرّر')).toBe(true);

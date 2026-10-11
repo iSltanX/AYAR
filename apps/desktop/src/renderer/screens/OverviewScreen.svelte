@@ -67,16 +67,15 @@
     if (tools.ok) staleTools = tools.result.tools.filter((x) => x.stale);
     if (!list.ok) return;
     runs = list.result.runs;
-    const full = runs.find((r) => r.kind === 'full' && r.state === 'finished' && r.purity);
+    const full = runs.find((r) => r.kind === 'full' && r.state === 'finished' && r.purity && !r.cancelReason);
     round = full ? await app.runs.load(full.runId) : null;
     // 13.5 «إعادة فحص بعد تغير الشيفرة»: a later finished run read another state of the code than the round did.
+    // The latest finished run after the round says whether the code is still the round's (D-31's rule, engine-side).
     stale = false;
-    if (full && round?.purity) {
-      for (const r of runs.filter((x) => x.state === 'finished' && x.finishedAt && full.finishedAt && x.finishedAt > full.finishedAt).slice(0, 5)) {
-        const d = await attempt('run.get', { runId: r.runId });
-        const snap = d.ok ? d.result.purity?.meta.snapshotId : null;
-        if (snap && snap !== round.purity.meta.snapshotId) stale = true;
-      }
+    const later = full && round?.purity ? runs.find((x) => x.state === 'finished' && x.finishedAt && full.finishedAt && x.finishedAt > full.finishedAt) : undefined;
+    if (later) {
+      const d = await attempt('run.get', { runId: later.runId });
+      stale = d.ok && d.result.sinceRound === 'changed';
     }
   }
   $effect(() => {
@@ -292,10 +291,10 @@
                 <td class="c-verdict">
                   {#if run.state !== 'finished'}
                     <span class="muted">{t('overview.runs.running')}</span>
-                  {:else if run.kind === 'full' && run.verdict}
-                    <span class="verdict"><VerdictBadge verdict={run.verdict} />{#if run.purity?.karat !== null && run.purity?.karat !== undefined}<span class="karat">{t('overview.runs.karat', { karat: run.purity.karat })}</span>{/if}</span>
                   {:else if run.kind === 'full' && run.cancelReason}
                     <span class="verdict"><ResultBadge result="cancelled" size="sm" /><span class="karat">{t('overview.runs.noKarat')}</span></span>
+                  {:else if run.kind === 'full' && run.verdict}
+                    <span class="verdict"><VerdictBadge verdict={run.verdict} />{#if run.purity?.karat !== null && run.purity?.karat !== undefined}<span class="karat">{t('overview.runs.karat', { karat: run.purity.karat })}</span>{/if}</span>
                   {:else}
                     <span class="muted">{t('overview.runs.notFull')}</span>
                   {/if}

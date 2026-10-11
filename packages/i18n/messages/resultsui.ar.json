@@ -76,5 +76,6 @@
   "resultsui.loading": "يُقرأ التشغيل…",
   "resultsui.reportFailed": "تعذّر بناء التقرير ({code}).",
   "resultsui.crumb": "النتائج",
-  "resultsui.meta.date": "{day}، {time}"
+  "resultsui.meta.date": "{day}، {time}",
+  "resultsui.next.stopped": "أعد غير المكتمل: {count, plural, one {فحص واحد أُلغي} two {فحصان أُلغيا} few {# فحوص أُلغيت} many {# فحصًا أُلغيت} other {# فحص أُلغيت}} قبل انتهائها"
 }

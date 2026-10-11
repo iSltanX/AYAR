@@ -61,8 +61,8 @@ export interface NextItem {
   text: string;
   /** The id under it (mono): a check instance or a finding's display id. */
   ref: string;
-  /** For a direct step, the action; the finding for a model or review step. */
-  action?: NonNullable<NextStepInfo['action']>;
+  /** For a direct step, the action («rerun»: the checks a cancel or a stop left, re-run as one, S7-10). */
+  action?: NonNullable<NextStepInfo['action']> | 'rerun';
   findingId?: string;
   checkRunId?: string;
   instance?: string;
@@ -82,9 +82,12 @@ const issueOf = (f: ReportFinding) => f.effect !== 'note' && f.effect !== 'exclu
 export function nextSteps(t: Translate, lang: Lang, report: Report): NextSteps {
   const issues = report.findings.filter(issueOf);
   const checkLine = (checkId: string, reason: string) => t('resultsui.next.check', { check: checkTitle(t, lang, checkId), reason });
+  // A cancel or a stop left checks without a result: one step re-runs them all (DES-4 7.10 «أعد غير المكتمل»).
+  const stopped = report.checks.filter((c) => c.outcome === 'cancelled' || c.outcome === 'interrupted');
   const direct: NextItem[] = [
+    ...(stopped.length ? [{ key: 'stopped', text: t('resultsui.next.stopped', { count: stopped.length }), ref: '', action: 'rerun' as const }] : []),
     ...report.checks
-      .filter((c) => c.nextStep.kind === 'direct' && c.outcome !== null)
+      .filter((c) => c.nextStep.kind === 'direct' && c.outcome !== null && c.outcome !== 'cancelled' && c.outcome !== 'interrupted')
       .map((c) => ({ key: c.instance, text: checkLine(c.checkId, reasonText(t, lang, c.reason) || reasonText(t, lang, c.nextStep.reason)), ref: c.checkId, action: c.nextStep.action ?? 'setup', ...(c.checkRunId ? { checkRunId: c.checkRunId } : {}), instance: c.instance })),
     ...report.notRun
       .filter((n) => n.nextStep.kind === 'direct' && !report.checks.some((c) => c.instance === n.instance))
