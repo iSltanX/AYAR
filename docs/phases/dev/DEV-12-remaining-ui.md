@@ -13,7 +13,7 @@ owner_inputs: []
 model: Claude Opus 5.5
 effort: high
 model_reason: شاشات كثيرة على الأنماط التي ثبتت في DEV-11
-scope: [apps/desktop/src/renderer/, apps/desktop/src/main/, apps/desktop/src/preload/, apps/desktop/test/, apps/desktop/package.json, apps/desktop/vite.renderer.config.ts, packages/i18n/, packages/protocol/, package-lock.json]
+scope: [apps/desktop/src/renderer/, apps/desktop/src/main/, apps/desktop/src/preload/, apps/desktop/test/, apps/desktop/package.json, apps/desktop/vite.renderer.config.ts, packages/i18n/, packages/protocol/, packages/engine/, package-lock.json]
 goal: إكمال الواجهة من التصميم المعتمد — صفحات الأقسام السبعة وفحوصها الخاصة، والنزاهة، وفحوص النموذج، والمهام والمستشار، والتشغيلات والمقارنة، وإعداد المشروع، والأدوات، والإعدادات، وحالات الخطأ والنقص — حتى تعمل الرحلات العشر كلها.
 start:
   - DEV-11 مغلقة
@@ -120,4 +120,14 @@ closing_commit:
 - **المنجز:** فتح المرحلة: مجلد العمل `AYAR-wt/DEV-12` على `phase/DEV-12` من `main` عند `ac3f00a`، والتبعية DEV-11 وبوابة التصميم DES-5 مغلقتان بوسميهما، والبصمات سليمة، ولا عائق مفتوح يخصها.
 - **آخر commit:** —
 - **المواضع المؤقتة:** لا شيء بعد.
-- **نقطة الاستئناف:** المهمة 1 (قالب صفحة القسم).
+- **خطة التنفيذ (commit لكل بند):**
+  1. البروتوكول 1.7 والمحرك (D-DEV12-01): `check.report` (التقرير الموحد لتنفيذ فحص دون اكتشافاته، ومخرجات البناء بأحجامها)، و`profile.versions`، و`data.purge`، وإعدادات `editor.template` و`run.notify` و`purity.narrowThreshold`، والإيقاف الآمن عند امتلاء القرص.
+  2. الإطار: مسارات الصفحات الجديدة، وتفعيل وجهات الشريط الجانبي كلها، وشارات الأقسام.
+  3. قالب صفحة القسم (9.1) وفحوص مخصصة (9.2) والمجموعات المحفوظة في قائمة «شغّل».
+  4. التصميم والواجهة (10.1–10.3)، ثم الأمن (11)، والشيفرة (12)، والسلوك (13)، والأداء (14).
+  5. النزاهة (15)، وفحوص النموذج (16).
+  6. المهام والمستشار (17)، والتشغيلات والمقارنة (18).
+  7. إعداد المشروع (19) بتبويباته، والأدوات (20)، والإعدادات (21).
+  8. حالات الخطأ والنقص (22).
+  9. الرحلات العشر واختبارات القسم 7، وaxe وCSP، وتغطية التعريب، ومطابقة اللقطات، والمراجعة، والتسليم.
+- **نقطة الاستئناف:** البند 1 من الخطة.
