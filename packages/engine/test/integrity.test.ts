@@ -201,6 +201,34 @@ describe.runIf(existsSync(PNPM))('AT-24: the fix cycle and the integrity guard (
     expect(r.findings.find((f) => f.checkId === 'code.lint' && f.ruleId === 'review.expired')).toMatchObject({ location: { path: 'src/popup.ts' }, effect: 'review' });
     expect(r.findings.find((f) => f.checkId === 'integ.reviews')).toMatchObject({ ruleId: 'review.expired' });
   }, 600_000);
+
+  it('(ط) G-DEV12-05: a new full scan with no change still carries the unreviewed eslint-disable; a holding review settles it', async () => {
+    // The round's base is now (و)'s snapshot, which already holds the eslint-disable: without the carry the guard
+    // would pass and the unreviewed effect would vanish. (ز)'s review expired, so it settles nothing.
+    await approveAll(engine, projectId);
+    let p = await plan(engine, projectId, { kind: 'full' });
+    const again = await waitRun(engine, (await startRun(engine, p.id)).runId, 900_000);
+    expect(execOf(again, 'integ.guard@.')).toMatchObject({ outcome: 'needs_review', outcomeReason: { key: 'integrity.reason.guardFindings' } });
+    expect(execOf(again, 'code.lint@.')).toMatchObject({ outcome: 'needs_review', outcomeReason: { key: 'verdict.reason.guardTouched' } });
+    const r = await results(projectId, again.run.runId);
+    const carried = r.findings.find((f) => f.checkId === 'integ.guard' && f.ruleId === 'guard.silenced-rule');
+    expect(carried).toMatchObject({ location: { path: 'src/popup.ts' }, proof: 'suspected' });
+    const report = ok<CheckReport>(await engine.invoke('check.report', { checkRunId: execOf(again, 'integ.guard@.').checkRunId }));
+    expect(report.info.carried).toBeGreaterThanOrEqual(1);
+    expect(again.run.verdict).not.toBe('pure');
+    // Reviews that hold (nothing changes after them) settle the effects: the eslint-disable on code.lint, and the
+    // snapshot that differs from the baseline variant's on beh.unit. The next full scan's guard passes.
+    for (const instance of ['code.lint@.', 'beh.unit@.']) {
+      const x = execOf(again, instance);
+      if (x.outcome !== 'needs_review') continue;
+      ok<ReviewRecorded>(await engine.invoke('review.record', { target: { type: 'check', id: x.checkRunId }, decision: 'accept', note: `reviewed again for G-DEV12-05: ${instance}` }));
+    }
+    p = await plan(engine, projectId, { kind: 'full' });
+    const settled = await waitRun(engine, (await startRun(engine, p.id)).runId, 900_000);
+    expect(execOf(settled, 'integ.guard@.')).toMatchObject({ outcome: 'passed' });
+    const r2 = await results(projectId, settled.run.runId);
+    expect(r2.findings.filter((f) => f.checkId === 'integ.guard')).toEqual([]);
+  }, 1_800_000);
 });
 
 describe.runIf(existsSync(PNPM))('AT-25: completing a round (D-31, FR-47)', () => {

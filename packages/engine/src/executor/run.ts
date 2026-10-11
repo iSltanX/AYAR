@@ -625,7 +625,7 @@ export class RunService {
     let judgement: Judgement;
     let extra: Record<string, unknown> | null = null;
     if (spec.checkId === 'integ.guard') {
-      const g = integ.guardJudgement(spec, ctx.projectId, ctx.guard ?? { baseSnapshotIds: [], baseLost: true, result: null, markers: [], byInstance: new Map(), unattributed: [], expiredReviews: new Map() });
+      const g = integ.guardJudgement(spec, ctx.projectId, ctx.guard ?? { baseSnapshotIds: [], baseLost: true, result: null, markers: [], byInstance: new Map(), unattributed: [], expiredReviews: new Map(), carried: 0 });
       judgement = g.judgement;
       extra = g.evidence;
     } else if (spec.checkId === 'integ.state') {
