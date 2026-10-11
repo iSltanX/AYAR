@@ -17,6 +17,13 @@ const BIDI = /[\u202a-\u202e\u2066-\u2069]/g;
 /** Other invisible format characters that could hide text from a reader: shown too. */
 const INVISIBLE = /[\u200b\u200c\u200d\u200e\u200f\u2028\u2029\ufeff]/g;
 
+/** The redaction markers a text carries (from the first pass on the evidence), counted by rule (12.6 «عدادات»). */
+export function markerCounts(text: string): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const m of text.matchAll(/\u27E6redacted:([^\u27E7]+)\u27E7/g)) counts[m[1]!] = (counts[m[1]!] ?? 0) + 1;
+  return counts;
+}
+
 export const EXCERPT_LINES = 40;
 export const EXCERPT_CHARS = 4000;
 export const PROMPT_CHARS = 24_000;

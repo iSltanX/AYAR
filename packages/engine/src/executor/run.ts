@@ -554,14 +554,14 @@ export class RunService {
       this.#o.logger.log('error', 'the purity index could not be computed', { runId, error: e instanceof Error ? e.message.slice(0, 300) : String(e) });
       return null;
     });
+    // DEV-9 (12.8): the open cards are verified against this run, by evidence alone, before it is announced finished.
+    if (active.cancel !== 'app_quit' && this.#o.afterRun) await this.#o.afterRun(runId, projectId).catch((e: unknown) => this.#o.logger.log('error', 'after-run step failed', { error: e instanceof Error ? e.message.slice(0, 300) : String(e) }));
     db.transaction(() => {
       db.run("UPDATE runs SET state = 'finished', finished_at = ?, counts_json = ? WHERE id = ?", this.#now(), JSON.stringify(this.#counts(runId)), runId);
       if (active.cancel) recordAudit(db, { id: newId(ports.random, 'aud'), at: ports.clock.now(), action: 'run.cancelled', projectId, details: { runId, reason: active.cancel } });
     });
     this.#emitRun(runId);
     this.#o.events.emit('run.summary', { runId, purity: purity ? this.#o.purity.summaryOf(runId) : null, counts: this.#counts(runId), findings: db.get<{ n: number }>('SELECT count(*) AS n FROM findings f JOIN check_runs c ON c.id = f.check_run_id WHERE c.run_id = ?', runId)?.n ?? 0 });
-    // DEV-9 (12.8): the open cards are verified against this run, by evidence alone.
-    if (active.cancel !== 'app_quit' && this.#o.afterRun) await this.#o.afterRun(runId, projectId).catch((e: unknown) => this.#o.logger.log('error', 'after-run step failed', { error: e instanceof Error ? e.message.slice(0, 300) : String(e) }));
     // Retention waits for the next run (or the weekly pass) when the app is quitting: the quit stays short.
     if (active.cancel !== 'app_quit') await evidence.retain(projectId).catch((e: unknown) => this.#o.logger.log('error', 'retention failed', { error: e instanceof Error ? e.message : String(e) }));
   }
@@ -584,7 +584,7 @@ export class RunService {
     let judgement: Judgement;
     let extra: Record<string, unknown> | null = null;
     if (spec.checkId === 'integ.guard') {
-      const g = integ.guardJudgement(spec, ctx.projectId, ctx.guard ?? { baseSnapshotIds: [], baseLost: true, result: null, markers: [], byInstance: new Map(), unattributed: [] });
+      const g = integ.guardJudgement(spec, ctx.projectId, ctx.guard ?? { baseSnapshotIds: [], baseLost: true, result: null, markers: [], byInstance: new Map(), unattributed: [], expiredReviews: new Map() });
       judgement = g.judgement;
       extra = g.evidence;
     } else if (spec.checkId === 'integ.state') {
@@ -1377,7 +1377,7 @@ export class RunService {
         origin,
         verdict ? JSON.stringify(verdict.judgement.counts) : null,
         verdict?.reader ? JSON.stringify({ ...verdict.reader, dropped: verdict.judgement.report?.findingsDropped ?? 0 }) : null,
-        verdict?.judgement.report?.tests ? JSON.stringify(verdict.judgement.report.tests) : null,
+        verdict?.judgement.report?.tests ? JSON.stringify(this.#o.redaction.redactor().redactJson(verdict.judgement.report.tests)) : null,
         this.#now(),
         r?.durationMs ?? raw?.durationMs ?? null,
         raw?.exitCode ?? null,

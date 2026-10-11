@@ -99,8 +99,10 @@ export class Renderer {
     return `${this.t('report.label.scope')}: ${this.t('report.scope.value', { criteria: report.head.scope.criteria, checks: report.head.scope.checks, instances: report.head.scope.instances })}`;
   }
 
+  /** The check's limits, and its execution notes (G-DEV7-04: the blocked external resources, the project command outside the network guarantee). */
   limitsLine(c: ReportCheck): string {
-    return `- ${this.checkTitle(c.checkId)} (\`${c.checkId}\`): ${tryT(this.t, c.limitsKey) ?? ''}`;
+    const notes = c.notes.map((n) => ` ${this.t('report.label.note')}: ${tryT(this.t, n) ?? `\`${n}\``}`).join(' ·');
+    return `- ${this.checkTitle(c.checkId)} (\`${c.checkId}\`): ${tryT(this.t, c.limitsKey) ?? ''}${notes ? ` ·${notes}` : ''}`;
   }
 
   // ── «للنموذج» (12.3 / 12.4) ───────────────────────────────────────────────────────────────────────────────
@@ -229,7 +231,7 @@ export class Renderer {
   #claimLine(c: ReportClaim): string {
     const { t } = this;
     const status = c.status === 'proven' ? t('report.claim.proven', { finding: c.provenFindingDisplayId ?? '—' }) : c.status === 'decided_card' ? t('report.claim.decidedCard') : c.status === 'decided_not_issue' ? t('report.claim.decidedNotIssue') : t('report.claim.open');
-    return `- ${c.displayId} (${t('glossary.modelClaim')} · ${t(`report.claim.kind.${c.kind}` as MessageKey)}${c.location?.path ? ` · ${inline(c.location.path)}${c.location.line ? `:${c.location.line}` : ''}` : ''}): ${inline(c.summary.slice(0, 300))} → ${status}`;
+    return `- ${c.displayId} (${t('glossary.modelClaim')} · ${t(`report.claim.kind.${c.kind}` as MessageKey)}${c.location?.path ? ` · ${inline(c.location.path)}${c.location.line ? `:${c.location.line}` : ''}` : ''}): «${inline(c.summary.slice(0, 300))}» → ${status}`;
   }
 
   // ── «لك» (12.2) ──────────────────────────────────────────────────────────────────────────────────────────

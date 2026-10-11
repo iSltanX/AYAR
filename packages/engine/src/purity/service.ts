@@ -79,6 +79,12 @@ export class PurityService {
     let result: PurityResult | null = null;
     if (run.kind === 'full') result = this.#newRound(run);
     else if (run.kind === 'continue_round' && plan.data.selection.kind === 'continueRound') result = await this.#continueRound(run, plan.data.selection.roundId, declared);
+    // DEV-9 (9.12 point 4, AT-25): a rerun of a run that belongs to a round, on the round's unchanged state, completes
+    // that round by the same rule; on a changed state it stays a targeted run and computes no index.
+    else if (plan.data.selection.kind === 'rerun') {
+      const roundId = db.get<{ round_id: string | null }>('SELECT round_id FROM runs WHERE id = ?', plan.data.selection.runId)?.round_id ?? null;
+      if (roundId) result = await this.#continueRound(run, roundId, declared);
+    }
     else if (run.kind === 'section' && plan.data.selection.kind === 'section') result = this.#compute(run, { kind: 'section', section: plan.data.selection.section }, this.#membersOfRun(run.id), run.state_changed === 1, run.snapshot_start_id);
     db.run('UPDATE runs SET purity_json = ?, verdict = ? WHERE id = ?', result ? JSON.stringify(result) : null, result?.verdict ?? null, runId);
     return result;
@@ -173,6 +179,7 @@ export class PurityService {
       db.run('UPDATE rounds SET verdict = ?, purity_json = ?, updated_at = ? WHERE id = ?', result.verdict, JSON.stringify(result), ports.clock.now().toISOString(), roundId);
       for (const m of members.values()) db.run('INSERT INTO round_checks (round_id, instance, check_run_id, outcome, reviewed, attempts_json) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (round_id, instance) DO UPDATE SET check_run_id = excluded.check_run_id, outcome = excluded.outcome, reviewed = excluded.reviewed, attempts_json = excluded.attempts_json', roundId, m.instance, m.checkRunId, m.outcome, m.reviewed ? 1 : 0, JSON.stringify(m.attempts));
       db.run('UPDATE runs SET round_id = ? WHERE id = ?', roundId, run.id);
+      for (const id of db.all<{ id: string }>('SELECT id FROM runs WHERE round_id = ?', roundId)) db.run('UPDATE runs SET purity_json = ?, verdict = ? WHERE id = ?', JSON.stringify(result), result.verdict, id.id);
     });
     return result;
   }

@@ -44,6 +44,8 @@ export interface GuardContext {
   byInstance: Map<string, GuardFinding[]>;
   /** Effects whose check is unknown: the round's summary («ما لا يُعرف فحصه»). */
   unattributed: GuardFinding[];
+  /** 11.4 rule 6: reviews on a check instance whose scope changed since: the instance goes back to «يحتاج مراجعة». */
+  expiredReviews: Map<string, { reviewId: string; changed: string[] }>;
 }
 
 export interface IntegrityOptions {
@@ -84,7 +86,15 @@ export class IntegrityService {
    */
   async prepare(o: { projectId: string; runId: string; plan: { items: PlanItem[] }; startManifest: Manifest; declared: (p: string) => boolean }): Promise<GuardContext> {
     const { db, evidence } = this.#o;
-    const ctx: GuardContext = { baseSnapshotIds: [], baseLost: false, result: null, markers: [], byInstance: new Map(), unattributed: [] };
+    const ctx: GuardContext = { baseSnapshotIds: [], baseLost: false, result: null, markers: [], byInstance: new Map(), unattributed: [], expiredReviews: new Map() };
+    // 11.4 rule 6: the latest review of each check instance, against the files of its scope as they are now.
+    const nowHashes = new Map(o.startManifest.files.map((f) => [f[0], f[5]]));
+    const latestReviews = new Map<string, { id: string; scope_json: string; snapshot_id: string | null }>();
+    for (const r of db.all<{ id: string; target_ref: string; scope_json: string; snapshot_id: string | null }>("SELECT id, target_ref, scope_json, snapshot_id FROM reviews WHERE project_id = ? AND target_type = 'check' ORDER BY created_at, rowid", o.projectId)) latestReviews.set(r.target_ref, { id: r.id, scope_json: r.scope_json, snapshot_id: r.snapshot_id });
+    for (const [instance, r] of latestReviews) {
+      const expired = await this.reviewExpired(r, nowHashes).catch(() => ({ expired: false, changed: [] as string[] }));
+      if (expired.expired) ctx.expiredReviews.set(instance, { reviewId: r.id, changed: expired.changed });
+    }
     const bases = new Set<string>();
     let hadBase = false;
     const round = db.get<{ snapshot_id: string | null }>('SELECT snapshot_id FROM rounds WHERE project_id = ? ORDER BY updated_at DESC, rowid DESC LIMIT 1', o.projectId);
@@ -179,10 +189,19 @@ export class IntegrityService {
     return ctx;
   }
 
-  /** The guard's effects on one instance, as findings of that check with their anchors (7.3 rule 8). */
+  /**
+   * The guard's effects on one instance, as findings of that check with their anchors (7.3 rule 8), and an expired
+   * review on it as a `review.expired` finding (11.4 rule 6: the check goes back to «يحتاج مراجعة»).
+   */
   effectsOn(ctx: GuardContext | null, instance: string): { findings: ParsedFinding[]; anchors: string[] } {
     const list = ctx?.byInstance.get(instance) ?? [];
     const out = list.map(guardAsFinding);
+    const expired = ctx?.expiredReviews.get(instance);
+    if (expired) {
+      const value = `review|${expired.reviewId}`;
+      const path = expired.changed[0] ?? null;
+      out.push({ finding: { rule: 'review.expired', toolRule: null, severity: null, proof: null, level: null, origin: 'project', message: `the recorded review no longer holds: ${expired.changed.length} file(s) of its scope changed`, location: path ? { path } : null, anchor: { kind: 'text', value }, expected: null, actual: expired.changed.slice(0, 10).join(', ') || null }, anchor: integrityAnchor(value) });
+    }
     return { findings: out.map((x) => x.finding), anchors: out.map((x) => x.anchor) };
   }
 
@@ -197,7 +216,7 @@ export class IntegrityService {
       const def = book.rule(p.finding.rule);
       const isExcluded = excluded.has(prints[i]!);
       const f: WeighedFinding = { ...p.finding, severity: p.finding.severity ?? def?.severity ?? 'medium', proof: 'suspected', effect: isExcluded ? 'excluded' : 'review' };
-      return { finding: f, origin: 'project', fingerprint: prints[i]!, ruleVersion: def?.version ?? book.version, reviewId: excluded.get(prints[i]!) ?? null };
+      return { finding: f, origin: f.origin ?? 'project', fingerprint: prints[i]!, ruleVersion: def?.version ?? book.version, reviewId: excluded.get(prints[i]!) ?? null };
     });
     const live = findings.filter((f) => f.finding.effect !== 'excluded').length;
     const counts = { violations: 0, warnings: 0, review: live, notes: 0, excludedByReview: findings.length - live };
@@ -292,13 +311,15 @@ export class IntegrityService {
     if (!claims.length) return this.judgement(spec, projectId, [], 'not_applicable', { key: 'integrity.reason.noClaims' });
     const findings = db.all<{ id: string; check_id: string; location_json: string | null; effect: string | null }>("SELECT f.id, f.check_id, f.location_json, f.effect FROM findings f JOIN check_runs c ON c.id = f.check_run_id WHERE c.run_id = ? AND f.check_id NOT LIKE 'integ.%' AND coalesce(f.effect, '') <> 'excluded'", runId);
     const parsed = findings.map((f) => ({ ...f, loc: f.location_json ? (JSON.parse(f.location_json) as FindingLocation) : null }));
+    // The same file, or the test file of the unit (`src/money.js` ↔ `test/money.test.js`): the stems match.
+    const stem = (p: string) => p.split('/').pop()!.replace(/\.(test|spec)(?=\.)/, '').replace(/^test_/, '').replace(/_test(?=\.py$)/, '').replace(/\.[^.]+$/, '');
+    const samePlace = (a: string, b: string) => a === b || stem(a) === stem(b);
     const pairs: { finding: ParsedFinding; anchor: string }[] = [];
     let proven = 0;
     for (const c of claims) {
       const loc = c.location_json ? (JSON.parse(c.location_json) as FindingLocation) : null;
-      const match = loc?.path
-        ? parsed.find((f) => f.loc?.path === loc.path && (!c.matched_check_id || f.check_id === c.matched_check_id) && (loc.line === undefined || f.loc?.line === undefined || Math.abs((f.loc.line ?? 0) - loc.line) <= 3)) ?? parsed.find((f) => f.loc?.path === loc.path && (loc.line === undefined || f.loc?.line === undefined || Math.abs((f.loc.line ?? 0) - loc.line) <= 3))
-        : null;
+      const near = (f: (typeof parsed)[number]) => loc?.path !== undefined && loc.path !== null && f.loc?.path !== undefined && f.loc.path !== null && (f.loc.path === loc.path ? loc.line === undefined || f.loc.line === undefined || Math.abs((f.loc.line ?? 0) - loc.line) <= 3 : samePlace(f.loc.path, loc.path));
+      const match = loc?.path ? (parsed.find((f) => near(f) && (!c.matched_check_id || f.check_id === c.matched_check_id)) ?? parsed.find(near) ?? null) : null;
       if (match) {
         proven++;
         if (c.match_status !== 'proven') db.run("UPDATE model_claims SET match_status = 'proven', proven_finding_id = ?, matched_check_id = coalesce(matched_check_id, ?) WHERE id = ?", match.id, match.check_id, c.id);

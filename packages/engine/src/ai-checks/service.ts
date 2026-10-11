@@ -65,9 +65,11 @@ interface AiCheckRow {
   redaction_counts_json: string | null;
 }
 
+/** The project's current results: the latest finished execution of each check (FR-66, FR-67), whichever run ran it. */
 interface LastRun {
   runId: string;
   outcomes: Map<string, string>;
+  checkRunIds: Map<string, string>;
   findings: { checkId: string; ruleId: string; path: string | null; line: number | null; message: string }[];
 }
 
@@ -103,14 +105,22 @@ export class AiChecksService {
   }
 
   #lastRun(projectId: string): LastRun | null {
-    const run = this.#o.db.get<{ id: string }>("SELECT id FROM runs WHERE project_id = ? AND state IN ('finished', 'interrupted') ORDER BY coalesce(finished_at, started_at, '') DESC LIMIT 1", projectId);
+    const { db } = this.#o;
+    const run = db.get<{ id: string }>("SELECT id FROM runs WHERE project_id = ? AND state IN ('finished', 'interrupted') ORDER BY coalesce(finished_at, started_at, '') DESC LIMIT 1", projectId);
     if (!run) return null;
-    const outcomes = new Map(this.#o.db.all<{ check_id: string; outcome: string | null }>('SELECT check_id, outcome FROM check_runs WHERE run_id = ? AND outcome IS NOT NULL ORDER BY rowid', run.id).map((r) => [r.check_id, r.outcome!]));
-    const findings = this.#o.db.all<{ check_id: string; rule_id: string | null; location_json: string | null; message_redacted: string | null; effect: string | null }>("SELECT f.check_id, f.rule_id, f.location_json, f.message_redacted, f.effect FROM findings f JOIN check_runs c ON c.id = f.check_run_id WHERE c.run_id = ? AND coalesce(f.effect, '') <> 'excluded'", run.id).map((f) => {
+    // The latest finished execution of each check (its latest instance), across the project's finished runs.
+    const latest = new Map<string, { id: string; outcome: string }>();
+    for (const c of db.all<{ id: string; check_id: string; outcome: string | null }>("SELECT c.id, c.check_id, c.outcome FROM check_runs c JOIN runs r ON r.id = c.run_id WHERE r.project_id = ? AND r.state IN ('finished', 'interrupted') AND c.outcome IS NOT NULL ORDER BY coalesce(r.finished_at, r.started_at, ''), c.rowid", projectId)) latest.set(c.check_id, { id: c.id, outcome: c.outcome! });
+    const outcomes = new Map([...latest].map(([k, v]) => [k, v.outcome]));
+    const checkRunIds = new Map([...latest].map(([k, v]) => [k, v.id]));
+    const ids = [...checkRunIds.values()];
+    const findings = ids.length
+      ? db.all<{ check_id: string; rule_id: string | null; location_json: string | null; message_redacted: string | null; effect: string | null }>(`SELECT f.check_id, f.rule_id, f.location_json, f.message_redacted, f.effect FROM findings f WHERE f.check_run_id IN (${ids.map(() => '?').join(', ')}) AND coalesce(f.effect, '') <> 'excluded'`, ...ids).map((f) => {
       const loc = f.location_json ? (JSON.parse(f.location_json) as FindingLocation) : null;
       return { checkId: f.check_id, ruleId: f.rule_id ?? '', path: loc?.path ?? null, line: loc?.line ?? null, message: f.message_redacted ?? '' };
-    });
-    return { runId: run.id, outcomes, findings };
+    })
+      : [];
+    return { runId: run.id, outcomes, checkRunIds, findings };
   }
 
   #userInputs(projectId: string): Map<string, Map<string, string>> {
@@ -226,7 +236,7 @@ export class AiChecksService {
       reasons: c.reasons,
       inputs: view.inputs,
       files: c.files,
-      passed: view.passed.map((p) => ({ ...p, reason: run ? this.#reasonOf(run.runId, p.checkId) : null })),
+      passed: view.passed.map((p) => ({ ...p, reason: run?.checkRunIds.has(p.checkId) ? this.#reasonOf(run.checkRunIds.get(p.checkId)!) : null })),
       openFindings: view.openFindings.map((f) => ({ displayId: f.displayId, checkId: f.checkId, titleKey: f.titleKey, where: f.location?.path ? `${f.location.path}${f.location.line ? `:${f.location.line}` : ''}` : null })),
       quotes,
       resultPath,
@@ -264,8 +274,8 @@ export class AiChecksService {
     return this.get(id);
   }
 
-  #reasonOf(runId: string, checkId: string): Reason | null {
-    const r = this.#o.db.get<{ outcome_reason: string | null }>('SELECT outcome_reason FROM check_runs WHERE run_id = ? AND check_id = ? ORDER BY rowid LIMIT 1', runId, checkId);
+  #reasonOf(checkRunId: string): Reason | null {
+    const r = this.#o.db.get<{ outcome_reason: string | null }>('SELECT outcome_reason FROM check_runs WHERE id = ?', checkRunId);
     return r?.outcome_reason ? (JSON.parse(r.outcome_reason) as Reason) : null;
   }
 
@@ -376,7 +386,9 @@ export class AiChecksService {
         read.result.notes.forEach((note, i) => {
           const displayId = `${target.display_id}.${i + 1}`;
           if (db.get('SELECT id FROM model_claims WHERE ai_check_id = ? AND display_id = ?', target.id, displayId)) return; // a decided one
-          const local = note.localCheck && this.#o.catalog.check(note.localCheck) ? note.localCheck : (template?.provableBy[0] ?? null);
+          // 12.7: a note that names a local check, or points at a location with a suspicion or a suggestion, is «أثبِت
+          // بإعادة الفحص»; a question or a note with no location is for the owner's review.
+          const local = note.localCheck && this.#o.catalog.check(note.localCheck) ? note.localCheck : note.location && note.kind !== 'question' ? (template?.provableBy[0] ?? null) : null;
           const location: FindingLocation | null = note.location ? { path: note.location.path.replace(/^\.\//, '').slice(0, 4096), ...(note.location.line ? { line: note.location.line } : {}), ...(note.location.symbol ? { key: note.location.symbol } : {}) } : null;
           db.run(
             'INSERT INTO model_claims (id, display_id, ai_check_id, location_json, kind, severity_suggested, evidence_quote_redacted, matched_check_id, match_status, note_index, summary_redacted, imported_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',

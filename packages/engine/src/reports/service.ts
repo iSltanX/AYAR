@@ -25,7 +25,7 @@ import { recordAudit } from '../storage/audit.ts';
 import type { Db } from '../storage/db.ts';
 import type { TasksService } from '../tasks/service.ts';
 import type { VerdictService } from '../verdict/service.ts';
-import { capText, newToken, PROMPT_CHARS, RUN_CHARS } from './boundaries.ts';
+import { capText, newToken, PROMPT_CHARS, RUN_CHARS, markerCounts } from './boundaries.ts';
 import { ReportBuilder, type BuildTarget } from './build.ts';
 import { compareRuns } from './compare.ts';
 import { render as renderExport, type ExportFormat } from './export.ts';
@@ -71,7 +71,11 @@ interface ReportRow {
 const COLUMNS = 'id, display_id, project_id, run_id, target_kind, finding_ids_json, lang, template_version, model_text_redacted, human_chars, model_chars, redaction_counts_json, parity_ok, copied_at, created_at, report_json, blocked_reason';
 const MAX_EVIDENCE_FILE = 64 * 1024 * 1024;
 
-const summary = (counts: RedactionCounts): RedactionSummary => ({ total: Object.values(counts).reduce((a, b) => a + b, 0), byRule: counts });
+const summary = (counts: RedactionCounts, text: string): RedactionSummary => {
+  const byRule: Record<string, number> = { ...counts };
+  for (const [k, v] of Object.entries(markerCounts(text))) byRule[k] = (byRule[k] ?? 0) + v;
+  return { total: Object.values(byRule).reduce((a, b) => a + b, 0), byRule };
+};
 
 export class ReportsService {
   readonly #o: ReportsServiceOptions;
@@ -101,8 +105,8 @@ export class ReportsService {
     const parity = checkParity(report, h.text, m.text, lang);
     const splitSuggestion = modelCut.truncated ? { key: report.findings.length > 1 ? 'report.split.byFindings' : 'report.split.bySections', params: { limit: modelLimit } } : null;
     return {
-      human: { text: humanCut.text, chars: humanCut.text.length, truncated: humanCut.truncated, splitSuggestion: humanCut.truncated ? splitSuggestion ?? { key: 'report.split.bySections', params: { limit: modelLimit } } : null, redactions: summary(h.counts) },
-      model: { text: modelCut.text, chars: modelCut.text.length, truncated: modelCut.truncated, splitSuggestion, redactions: summary(m.counts) },
+      human: { text: humanCut.text, chars: humanCut.text.length, truncated: humanCut.truncated, splitSuggestion: humanCut.truncated ? splitSuggestion ?? { key: 'report.split.bySections', params: { limit: modelLimit } } : null, redactions: summary(h.counts, humanCut.text) },
+      model: { text: modelCut.text, chars: modelCut.text.length, truncated: modelCut.truncated, splitSuggestion, redactions: summary(m.counts, modelCut.text) },
       parity,
       blocked,
     };

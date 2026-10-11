@@ -23,7 +23,7 @@ export interface ParityFacts {
 /** What a text claims, read back from it. */
 export function factsOf(text: string, lang: Lang, report: Report): ParityFacts {
   const t = createTranslator(lang);
-  const ids = [...new Set([...text.matchAll(ID)].map((m) => m[0]))].sort();
+  const ids = [...new Set([...text.replace(/«[^»]*»/g, '«…»').matchAll(ID)].map((m) => m[0]))].sort();
   const counts: Record<string, number> = {};
   for (const o of OUTCOMES) {
     const label = t(`status.result.${o.replace(/_/g, '-')}` as MessageKey);
@@ -55,8 +55,11 @@ export function checkParity(report: Report, human: string, model: string, lang: 
   const liveM = m.ids.filter((id) => wantIds.includes(id));
   if (liveH.join(',') !== wantIds.join(',')) mismatches.push({ field: 'ids', human: liveH.join(','), model: wantIds.join(',') });
   if (liveM.join(',') !== wantIds.join(',')) mismatches.push({ field: 'ids', human: wantIds.join(','), model: liveM.join(',') });
-  const extraH = h.ids.filter((id) => !report.findings.some((f) => f.displayId === id) && !report.integrity.checks.some((c) => c.findingIds.includes(id)) && !report.checks.some((c) => c.findingIds.includes(id)));
-  const extraM = m.ids.filter((id) => !report.findings.some((f) => f.displayId === id) && !report.integrity.checks.some((c) => c.findingIds.includes(id)) && !report.checks.some((c) => c.findingIds.includes(id)));
+  // An id the report may name without carrying its finding: a check's or an integrity check's finding, or the finding
+  // that proved a model claim (a cross-run reference, like «عبر التشغيلات»).
+  const known = (id: string) => report.findings.some((f) => f.displayId === id) || report.integrity.checks.some((c) => c.findingIds.includes(id)) || report.checks.some((c) => c.findingIds.includes(id)) || report.integrity.claims.some((c) => c.provenFindingDisplayId === id);
+  const extraH = h.ids.filter((id) => !known(id));
+  const extraM = m.ids.filter((id) => !known(id));
   if (extraH.length || extraM.length) mismatches.push({ field: 'ids.unknown', human: extraH.join(','), model: extraM.join(',') });
   const wantCounts: Record<string, number> = {};
   for (const o of OUTCOMES) if (report.head.counts[o]) wantCounts[o] = report.head.counts[o]!;

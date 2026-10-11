@@ -146,7 +146,7 @@ export function computeNeeds(i: NeedsInput): ComputedNeed[] {
       const fromUser = user.get(inp.key);
       const fromFacts = found.get(inp.key);
       const value = fromUser ?? fromFacts ?? null;
-      return { key: inp.key, labelKey: inp.label, source: fromUser !== undefined ? 'user' : fromFacts !== undefined ? inp.from : null, value: value?.slice(0, 10_000) ?? null };
+      return { key: inp.key, labelKey: inp.label, source: fromUser !== undefined ? 'user' : fromFacts !== undefined ? (inp.from === 'user' ? 'discovery' : inp.from) : null, value: value?.slice(0, 10_000) ?? null };
     });
     const factsKey = JSON.stringify({ applies, reasons, inputs: inputs.filter((x) => x.source !== 'user').map((x) => [x.key, x.value]) });
     out.push({ template, applies, reasons, notApplicableReason: notApplicable, inputs, files: [...new Set(named)].slice(0, 200), factsKey });
