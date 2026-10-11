@@ -102,3 +102,15 @@ describe('message keys of DEV-6 (NFR-11)', () => {
     for (const r of book.rules) both(`catalog.rule.${r.id}.title`);
   });
 });
+
+describe('message keys of DEV-7 (NFR-11)', () => {
+  const probe = sources(join(SRC, '..', '..', 'probe', 'src')).join('\n');
+
+  it('has both languages for every probe reason and note the engine and the probe write', () => {
+    const keys = [...new Set([...`${all}\n${probe}`.matchAll(/'(probe\.(?:reason|note)\.[A-Za-z]+)'/g)].map((m) => m[1]!))];
+    expect(keys.length).toBeGreaterThan(20);
+    keys.forEach(both);
+    // Built from a value: `probe.reason.${'browserFailed' | 'failed'}` for a job that could not run.
+    for (const k of ['browserFailed', 'failed']) both(`probe.reason.${k}`);
+  });
+});

@@ -324,7 +324,7 @@ const RTL_LANGS = /^(ar|fa|he|ur|ps|ku|yi|dv|sd|ug)(-|$)/i;
 
 export const web: Detector = {
   id: 'web',
-  version: 1,
+  version: 2,
   async run(ctx, add) {
     const c = ctx.component.id;
     const rootFiles = ctx.files.filter((f) => posix.dirname(f) === c);
@@ -344,8 +344,9 @@ export const web: Detector = {
     if (ctx.reader.has(at(c, 'Package.swift'))) add('type.desktopApp', { kind: 'swift' }, fileSource(at(c, 'Package.swift')), 'declared');
     const xcode = [...ctx.dirs].find((d) => posix.dirname(d) === c && d.endsWith('.xcodeproj'));
     if (xcode) add('type.desktopApp', { kind: 'xcode' }, fileSource(xcode), 'declared');
-    // Entry pages, and the right-to-left languages they declare.
-    const pages = ctx.files.filter((f) => ext(f) === 'html' && [c, at(c, 'public'), at(c, 'src')].includes(posix.dirname(f)));
+    // Entry pages, and the right-to-left languages they declare. A documentation site's pages (docs/) count too
+    // (DEV-7, AT-18: «صفحة التوثيق الثابتة هدف عرض مقترح»).
+    const pages = ctx.files.filter((f) => ext(f) === 'html' && [c, at(c, 'public'), at(c, 'src'), at(c, 'docs')].includes(posix.dirname(f)));
     if (pages.length) add('ui.entryPages', { files: pages }, fileSource(pages[0]!), 'inferred');
     const rtlFiles: string[] = [];
     const languages = new Set<string>();

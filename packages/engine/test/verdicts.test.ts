@@ -49,7 +49,9 @@ describe.runIf(existsSync(PNPM))('the verdict through the engine', () => {
     expect(execOf(d, 'beh.unit@.')).toMatchObject({ outcome: 'missing', outcomeReason: { key: 'setup.reason.missing.tests' } });
     expect(d.run.verdict).toBe('incomplete');
     expect(d.run.purity).toMatchObject({ formula: 'purity/1', verdict: 'incomplete', partial: false });
-    expect(d.purity?.incompleteReasons[0]).toMatchObject({ key: 'purity.reason.missing' });
+    // «ناقص» is among the reasons (DEV-7: the documentation page is a rendered interface now, so its accessibility
+    // review, «يحتاج مراجعة» until one is recorded, is another reason of the same scan).
+    expect(d.purity?.incompleteReasons).toEqual(expect.arrayContaining([expect.objectContaining({ key: 'purity.reason.missing' })]));
     expect(d.purity?.checks.find((c) => c.instance === 'beh.unit@.')).toMatchObject({ outcome: 'missing', credit: 0 });
     // The round is kept, by its display id, with the run that made it.
     const round = d.purity?.scope;

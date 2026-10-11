@@ -230,7 +230,9 @@ export function buildPlan(i: PlanInput): RunPlan {
     it.readiness = inner === 'not_applicable' ? 'not_applicable' : inner;
     if (inner === 'ready') continue;
     it.status = inner === 'untrusted' ? 'untrusted' : 'missing';
-    it.reasons = [...(r?.reasons ?? []), ...it.reasons];
+    // A check that runs because it was chosen (or added as a dependency) is not «not included» here: the reason
+    // shown first is what it lacks (AT-18 «ناقص إعداد بالبند الناقص تحديدًا»).
+    it.reasons = [...(r?.reasons ?? []).filter((x) => x.key !== 'setup.reason.notIncluded'), ...it.reasons];
   }
 
   // 4, after the readiness (9.4 point 5): «يشمل» — the covered check does not run again and inherits the covering
