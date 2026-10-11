@@ -21,6 +21,11 @@ import { compare, parseVersion } from '../environment/semver.ts';
 import { PROBE_ENV, PROBE_TIMEOUT_MS } from '../environment/resolve.ts';
 import { isStale, loadEnvRegistry, machineArch, SYSTEM_ONLY_TOOLS, type ManagedEnvDef, type ManagedToolDef } from './registry.ts';
 
+/** A system tool's second try at its version, after a first that ran out of C-07's 5 s. */
+const SLOW_PROBE_MS = 20_000;
+/** How long a tool that did not answer even then is taken as absent before it is asked again. */
+const TIMEOUT_REMEMBERED_MS = 5 * 60_000;
+
 export interface ToolLocation {
   key: string;
   source: 'managed' | 'system';
@@ -74,7 +79,8 @@ export class ToolsService {
   readonly #o: ToolsServiceOptions;
   readonly #installing = new Map<string, Promise<ToolInstallResult>>();
   /** Version probes of system tools, by real path and file identity (a session cache). */
-  readonly #probed = new Map<string, string | null>();
+  /** System tools' versions by file (path, size, time, inode); a timeout is kept a short while only. */
+  readonly #probed = new Map<string, { version: string | null; until: number | null }>();
 
   readonly #envs: ReadonlyMap<string, ManagedEnvDef>;
 
@@ -121,13 +127,17 @@ export class ToolsService {
    * own as its home (Semgrep writes its settings there even for `--version`), deleted after.
    */
   async probe(def: Pick<ManagedToolDef, 'versionArgs' | 'versionPattern'>, path: string, timeoutMs = PROBE_TIMEOUT_MS): Promise<string | null> {
+    return (await this.#version(def, path, timeoutMs)).version;
+  }
+
+  async #version(def: Pick<ManagedToolDef, 'versionArgs' | 'versionPattern'>, path: string, timeoutMs: number): Promise<{ version: string | null; timedOut: boolean }> {
     const home = posix.join(this.#o.layout.tmp, `probe-${Buffer.from(this.#o.ports.random.bytes(6)).toString('hex')}`);
     await this.#o.ports.fs.mkdir(home, 0o700);
     try {
       const r = await this.#o.ports.processes.spawn(path, def.versionArgs, { cwd: home, env: { PATH: '/usr/bin:/bin', HOME: home, ...PROBE_ENV }, timeoutMs, maxOutputBytes: 64 * 1024 });
-      if (r.error || r.timedOut || r.code !== 0) return null;
+      if (r.error || r.timedOut || r.code !== 0) return { version: null, timedOut: r.timedOut };
       const text = new TextDecoder().decode(r.stdout) + new TextDecoder().decode(r.stderr);
-      return new RegExp(def.versionPattern, 'm').exec(text)?.[1] ?? null;
+      return { version: new RegExp(def.versionPattern, 'm').exec(text)?.[1] ?? null, timedOut: false };
     } finally {
       await this.#o.ports.fs.remove(home);
     }
@@ -163,8 +173,18 @@ export class ToolsService {
         if (!st?.isFile || (st.mode & 0o111) === 0) continue;
         const real = (await this.#o.ports.fs.realpath(p).catch(() => null)) ?? p;
         const cacheKey = `${real}\0${st.size}\0${st.mtimeMs}\0${st.ino}`;
-        if (!this.#probed.has(cacheKey)) this.#probed.set(cacheKey, await this.probe(def, p));
-        const version = this.#probed.get(cacheKey) ?? null;
+        const now = this.#o.ports.clock.monotonicMs();
+        let known = this.#probed.get(cacheKey);
+        if (!known || (known.until !== null && known.until <= now)) {
+          // C-07's 5 s first; a program that did not answer in time gets one longer try (a first run is slow: Python
+          // compiles, the system checks new binaries — and a busy machine is slower still), and a timeout is not
+          // remembered for long: a tool is never «missing» for good because it was slow once.
+          let r = await this.#version(def, p, PROBE_TIMEOUT_MS);
+          if (r.timedOut) r = await this.#version(def, p, SLOW_PROBE_MS);
+          known = { version: r.version, until: r.timedOut ? now + TIMEOUT_REMEMBERED_MS : null };
+          this.#probed.set(cacheKey, known);
+        }
+        const version = known.version;
         if (version && this.#inRange(def, version)) return { key, source: 'system', path: p, version };
       }
     }
@@ -331,7 +351,8 @@ export class ToolsService {
       await this.#o.ports.processes.spawn('/usr/bin/xattr', ['-r', '-d', 'com.apple.quarantine', unpacked], { cwd: work, env: { PATH: '/usr/bin:/bin' }, timeoutMs: 15_000, maxOutputBytes: 4096 });
       // 6. The version from the tool itself (9.4 point 4).
       this.#progress(actionId, 'probing');
-      const version = await this.probe(def, binTarget);
+      // A new binary's first run is slow (the system checks it, E-20): more than a readiness probe allows.
+      const version = await this.probe(def, binTarget, 60_000);
       if (version !== def.version) return { status: 'failed', reason: 'extract', tool: await this.view(def.key), detail: `version ${version ?? 'unknown'}` };
       // 7. Into place, then the register and the audit log.
       const dest = this.#installDir(def);

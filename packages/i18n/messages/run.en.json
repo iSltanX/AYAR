@@ -23,5 +23,6 @@
   "run.note.escapeSuspected": "A process left the check’s group and may still be running",
   "run.note.leftoversEnded": "Processes the check left behind were ended",
   "run.note.sleepGap": "The Mac slept during the check; the sleep did not count toward the timeout",
-  "run.note.outputTruncated": "The output was cut because it exceeded the stored limit"
+  "run.note.outputTruncated": "The output was cut because it exceeded the stored limit",
+  "run.note.projectCommandNetwork": "This check ran the project’s own command, which AYAR does not cut off from the network: the no-network guarantee covers AYAR and its tools only"
 }

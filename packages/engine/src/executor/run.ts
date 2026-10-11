@@ -798,6 +798,8 @@ export class RunService {
     if (r.sleepGaps.length) notes.push('run.note.sleepGap');
     if (outEnd.truncated || errEnd.truncated) notes.push('run.note.outputTruncated');
     if (template.suggestion) notes.push('adapter.note.directCallSuggested');
+    // 15.3 and A-14: the project's own command (or its companion service) is outside AYAR's no-network guarantee.
+    if (e.item.command || e.item.needs.services.length) notes.push('run.note.projectCommandNetwork');
     // C-15: a tool version outside its adapter's tested range was accepted once; the result says so.
     const av = await adapterVersion(spec, tool, (component, name) => packageVersion(ports.fs, ctx.root, component, name)).catch(() => null);
     if (av) inv.plan.toolVersions[av.adapter.tool] = av.version;
@@ -1037,7 +1039,7 @@ export class RunService {
       durationMs: Math.max(0, Math.round(ports.clock.monotonicMs() - t0)),
       command: null,
       envKeys: [],
-      toolVersions: { 'probe:web-probe': summary?.browserVersion ?? browser.version, playwright: '1.64.0' },
+      toolVersions: { 'probe:web-probe': summary?.browserVersion ?? browser.version, ...(run.playwright ? { playwright: run.playwright } : {}) },
       logs: { stdout: null, stderr: null },
       reports: refs.filter((r) => r.kind === 'probe' || r.kind === 'probe_log'),
       tail: [],
@@ -1053,6 +1055,7 @@ export class RunService {
     const notes: string[] = [];
     if (run.results.some((r) => r.blocked.length)) notes.push('probe.note.externalBlocked');
     if (run.results.some((r) => r.allowed.length)) notes.push('probe.note.allowedHosts');
+    if (e.item.needs.services.length) notes.push('run.note.projectCommandNetwork');
     raw.notes = notes;
     // What the process itself says (7.3 rule 1): cancelled, timed out, or a probe that could not run.
     if (run.failure?.code === 'cancelled' || active.cancel || active.cancelledChecks.has(e.checkRunId)) return this.#finishCheck(e, 'cancelled', cancelledReason(), raw, notes);

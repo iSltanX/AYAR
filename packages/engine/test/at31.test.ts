@@ -3,7 +3,8 @@
 // default profiles of FX-EXT, FX-PY and FX-WEB-DESIGN (the page that asks for a font from an outside host, the probe
 // included), the readiness of a project whose packageManager names a pnpm that is not installed, and a check that
 // needs the network. What needs the network is «ناقص: يحتاج شبكة»; the pnpm version is a readiness gap, never a
-// download; the page's outside request is refused by the probe and kept in the evidence with C-14's note.
+// download; the page's outside request is refused by the probe and kept in the evidence with C-14's note; and a check
+// that ran the project's own command carries the note that it is outside the guarantee (15.3, A-14).
 // Afterwards, outside the sandbox (the kernel's log cannot be read inside it), support/at31-refusals.mjs names every
 // refused connection by its process: none may come from AYAR — the engine, its probe and browser, its managed tools,
 // its version probes — and the project's own commands, outside the guarantee (15.3), are listed apart. The probe's
@@ -95,6 +96,11 @@ describe('AT-31: no network by default, in a monitored network', () => {
     // FX-PY with its default profile.
     const py = await scanVariant(engine, root, 'FX-PY', 'good', { timeoutMs: 900_000, folder: 'py' });
     expect(unavailable(py.detail)).toEqual([]);
+    // 15.3 and A-14: a check that ran the project's own command says it is outside the guarantee; AYAR's tools do not.
+    const notes = (d: typeof ext.detail, i: string) => d.checks.find((c) => c.instance === i)?.notes ?? null;
+    expect(notes(ext.detail, 'beh.e2e@.')).toContain('run.note.projectCommandNetwork');
+    expect(notes(py.detail, 'code.build@.')).toContain('run.note.projectCommandNetwork');
+    expect(notes(py.detail, 'sec.deps@.')).not.toContain('run.note.projectCommandNetwork');
     // FX-WEB-DESIGN's page that asks for a font from an outside host, its documentation page the proposed target.
     const web = await scanVariant(engine, root, 'FX-WEB-DESIGN', 'external-font-host', { timeoutMs: 900_000, folder: 'web' });
     const a11y = web.detail.checks.find((c) => c.instance === 'design.a11y@.')!;
