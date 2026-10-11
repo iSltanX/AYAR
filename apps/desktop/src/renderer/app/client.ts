@@ -11,9 +11,15 @@ export function bridge(): BridgeClient {
   return client;
 }
 
+/**
+ * The page's reactive state is a proxy the bridge cannot clone («An object could not be cloned»): a payload crosses as
+ * the plain JSON data it holds (every payload is JSON by its contract).
+ */
+const plain = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
+
 /** Invokes a command; a coded failure is thrown as AyarError. */
 export function call<C extends RendererCommandName>(command: C, payload: CommandPayload<C>): Promise<RendererResult<C>> {
-  return bridge().invoke(command, payload);
+  return bridge().invoke(command, plain(payload));
 }
 
 /** Invokes a command and returns the result or the coded error, never throwing a protocol failure. */
