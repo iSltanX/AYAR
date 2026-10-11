@@ -20,8 +20,8 @@
   import Tag from '../components/Tag.svelte';
   import { useLocale } from '../lib/locale.ts';
   import type { InspectorCheck } from '../lib/inspector.ts';
-  import { attempt } from '../app/client.ts';
-  import { checkTitle, costOf, sectionRank, sectionTitle, textOr } from '../app/format.ts';
+  import { attempt, copyText } from '../app/client.ts';
+  import { bySection, checkTexts, checkTitle, costOf, sectionTitle } from '../app/format.ts';
   import { changeOf, commandOf, reasonsOf } from '../app/specs.ts';
   import { useApp } from '../app/state.svelte.ts';
 
@@ -55,11 +55,7 @@
   const firstProposal = $derived(!!profile && profile.approvals.length === 0);
   /** What the profile proposes (13.3 «18 فحصًا مقترحًا»): the applicable checks the full scan includes, and any change. */
   const checks = $derived((profile?.checks ?? []).filter((c) => c.applicable && (c.included || pendingBy.has(c.instance))));
-  const sections = $derived.by(() => {
-    const by = new Map<string, CheckSpec[]>();
-    for (const c of checks) by.set(c.section, [...(by.get(c.section) ?? []), c]);
-    return [...by.entries()].sort((a, b) => sectionRank(a[0]) - sectionRank(b[0]));
-  });
+  const sections = $derived(bySection(checks, (c) => c.section));
   const pendingItems = $derived(profile?.pending.items ?? []);
   const approvable = $derived(pendingItems.filter((i) => i.approvable && !i.approveAlone));
   const dangerous = $derived(pendingItems.filter((i) => i.approveAlone));
@@ -68,14 +64,20 @@
 
   /** The approval diff (Sheet/Approval diff): the approvable changes, by check id (instances keep their key when ids repeat). */
   const diffIds = $derived.by(() => {
-    const counts = new Map<string, number>();
-    for (const i of approvable) counts.set(i.instance.split('@')[0]!, (counts.get(i.instance.split('@')[0]!) ?? 0) + 1);
-    return new Map(approvable.map((i) => [i.instance, counts.get(i.instance.split('@')[0]!)! > 1 ? i.instance : i.instance.split('@')[0]!]));
+    const counts: Record<string, number> = {};
+    for (const i of approvable) counts[i.instance.split('@')[0]!] = (counts[i.instance.split('@')[0]!] ?? 0) + 1;
+    const ids: Record<string, string> = {};
+    for (const i of approvable) {
+      const id = i.instance.split('@')[0]!;
+      ids[i.instance] = (counts[id] ?? 0) > 1 ? i.instance : id;
+    }
+    return ids;
   });
-  const changes = $derived(approvable.map((i) => changeOf(t, lang, i, diffIds.get(i.instance)!)));
+  const changes = $derived(approvable.map((i) => changeOf(t, lang, i, diffIds[i.instance] ?? i.instance)));
 
   // ── context declarations (FR-13) ─────────────────────────────────────────────────────────────────────────
-  type Choice = 'unknown' | string;
+  /** A context select's value: 'unknown' or one of the declaration's own values. */
+  type Choice = string;
   const ctx = $derived(profile?.context);
   const audienceOptions = $derived([
     { value: 'unknown', label: t('approval.context.unknown') },
@@ -141,7 +143,7 @@
 
   async function approveSelected(ids: string[]) {
     showDiff = false;
-    const instances = approvable.filter((i) => ids.includes(diffIds.get(i.instance)!)).map((i) => i.instance);
+    const instances = approvable.filter((i) => ids.includes(diffIds[i.instance] ?? i.instance)).map((i) => i.instance);
     if (instances.length) await approve(instances);
   }
 
@@ -179,15 +181,13 @@
   const inspected = $derived.by<InspectorCheck | null>(() => {
     const c = selected;
     if (!c) return null;
-    const key = (k: string) => `catalog.check.${c.checkId}.${k}`;
     const command = commandOf(c);
     return {
       kind: 'check',
       name: checkTitle(t, lang, c.checkId),
       id: c.checkId,
-      definition: textOr(t, lang, key('why')),
+      ...checkTexts(t, lang, c.checkId),
       why: reasonsOf(t, lang, c.reasons).text,
-      limits: textOr(t, lang, key('limits')),
       ...(command ? { command: { command, runsCode: c.sideEffects.runsProjectCode, writes: c.sideEffects.writesRepo === 'maybe', network: c.network === 'required' } } : {}),
       readiness: pendingBy.has(c.instance) ? 'needs-approval' : c.missing.length ? 'needs-setup' : 'ready',
     };
@@ -198,10 +198,6 @@
     if (content) app.inspectorOpen = true;
     return () => (app.inspector = null);
   });
-
-  function copyText(text: string) {
-    void navigator.clipboard?.writeText(text);
-  }
 
   function edit(spec: CheckSpec) {
     selectedInstance = spec.instance;
@@ -224,7 +220,7 @@
   {@const danger = dangerOf(c)}
   <article class="check" data-instance={c.instance}>
     <div class="check-head">
-      <Switch checked={c.enabled} label={t('approval.enable', { name })} showLabel={false} onchange={(on) => void setEnabled(c, on)} />
+      <Switch checked={c.enabled} label={t('approval.enable', { name })} showLabel={false} onchange={(on: boolean) => void setEnabled(c, on)} />
       <span class="name">{name}</span>
       <span class="id"><bdi dir="ltr">{c.checkId}{c.component !== '.' ? `@${c.component}` : ''}</bdi></span>
       <span class="spacer"></span>
@@ -275,12 +271,12 @@
         </div>
         <p class="hint">{t('approval.context.hint')}</p>
         <div class="fields">
-          <label class="field"><span>{t('approval.context.audience')}</span><Select width="fill" value={ctx.audience ?? 'unknown'} options={audienceOptions} onchange={(e) => void setContext({ audience: fromChoice(e.currentTarget.value) as ProfileContext['audience'] })} /></label>
-          <label class="field"><span>{t('approval.context.worst')}</span><Select width="fill" value={ctx.worstConsequence ?? 'unknown'} options={worstOptions} onchange={(e) => void setContext({ worstConsequence: fromChoice(e.currentTarget.value) as ProfileContext['worstConsequence'] })} /></label>
-          <label class="field"><span>{t('approval.context.persistent')}</span><Select width="fill" value={bool(ctx.persistentData)} options={yesNo} onchange={(e) => void setContext({ persistentData: fromBool(e.currentTarget.value) })} /></label>
-          <label class="field"><span>{t('approval.context.permissions')}</span><Select width="fill" value={bool(ctx.permissions)} options={yesNo} onchange={(e) => void setContext({ permissions: fromBool(e.currentTarget.value) })} /></label>
-          <label class="field"><span>{t('approval.context.stage')}</span><Select width="fill" value={ctx.stage ?? 'unknown'} options={stageOptions} onchange={(e) => void setContext({ stage: fromChoice(e.currentTarget.value) as ProfileContext['stage'] })} /></label>
-          <label class="field"><span>{t('approval.context.languages')}</span><Select width="fill" value={langsOf(ctx.uiLanguages)} options={languageOptions} onchange={(e) => void setContext({ uiLanguages: fromLangs(e.currentTarget.value) })} /></label>
+          <label class="field"><span>{t('approval.context.audience')}</span><Select width="fill" value={ctx.audience ?? 'unknown'} options={audienceOptions} onchange={(e: Event & { currentTarget: HTMLSelectElement }) => void setContext({ audience: fromChoice(e.currentTarget.value) as ProfileContext['audience'] })} /></label>
+          <label class="field"><span>{t('approval.context.worst')}</span><Select width="fill" value={ctx.worstConsequence ?? 'unknown'} options={worstOptions} onchange={(e: Event & { currentTarget: HTMLSelectElement }) => void setContext({ worstConsequence: fromChoice(e.currentTarget.value) as ProfileContext['worstConsequence'] })} /></label>
+          <label class="field"><span>{t('approval.context.persistent')}</span><Select width="fill" value={bool(ctx.persistentData)} options={yesNo} onchange={(e: Event & { currentTarget: HTMLSelectElement }) => void setContext({ persistentData: fromBool(e.currentTarget.value) })} /></label>
+          <label class="field"><span>{t('approval.context.permissions')}</span><Select width="fill" value={bool(ctx.permissions)} options={yesNo} onchange={(e: Event & { currentTarget: HTMLSelectElement }) => void setContext({ permissions: fromBool(e.currentTarget.value) })} /></label>
+          <label class="field"><span>{t('approval.context.stage')}</span><Select width="fill" value={ctx.stage ?? 'unknown'} options={stageOptions} onchange={(e: Event & { currentTarget: HTMLSelectElement }) => void setContext({ stage: fromChoice(e.currentTarget.value) as ProfileContext['stage'] })} /></label>
+          <label class="field"><span>{t('approval.context.languages')}</span><Select width="fill" value={langsOf(ctx.uiLanguages)} options={languageOptions} onchange={(e: Event & { currentTarget: HTMLSelectElement }) => void setContext({ uiLanguages: fromLangs(e.currentTarget.value) })} /></label>
         </div>
       </section>
     {/if}
@@ -288,9 +284,7 @@
     {#each sections as [section, list] (section)}
       {@const open = !collapsed.includes(section)}
       <div class="group" role="grid" aria-label={sectionTitle(t, section)}>
-        <div role="row">
-          <TableGroupRow title={sectionTitle(t, section)} count={list.length} expanded={open} controls="sec-{section}" ontoggle={(e) => (collapsed = e ? collapsed.filter((s) => s !== section) : [...collapsed, section])} />
-        </div>
+        <TableGroupRow title={sectionTitle(t, section)} count={list.length} expanded={open} controls="sec-{section}" ontoggle={(e: boolean) => (collapsed = e ? collapsed.filter((s) => s !== section) : [...collapsed, section])} />
       </div>
       {#if open}
         <div class="checks" id="sec-{section}">
@@ -324,7 +318,7 @@
     </footer>
   </div>
 
-  <SheetApprovalDiff open={showDiff} {changes} oncancel={() => (showDiff = false)} onapproveall={() => void approveAll()} onapproveselected={(ids) => void approveSelected(ids)} />
+  <SheetApprovalDiff open={showDiff} {changes} oncancel={() => (showDiff = false)} onapproveall={() => void approveAll()} onapproveselected={(ids: string[]) => void approveSelected(ids)} />
 
   <Sheet open={preview !== null} title={t('approval.export.title')} width="wide" oncancel={() => (preview = null)}>
     {#if preview}

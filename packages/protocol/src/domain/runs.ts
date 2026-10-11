@@ -175,6 +175,7 @@ export const Leftovers = z.strictObject({
 export type Leftovers = z.infer<typeof Leftovers>;
 
 export const SleepGap = z.strictObject({ at: IsoTimestamp, ms: z.int().positive() });
+export type SleepGap = z.infer<typeof SleepGap>;
 
 /** What the executor hands over for one check execution (C-12 «المخرجات»). No verdict: that is C-15/C-16 (DEV-6). */
 export const RawCheckResult = z.strictObject({

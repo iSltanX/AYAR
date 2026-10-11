@@ -284,6 +284,17 @@ describe('gateway: the screens\u2019 main-process commands (protocol 1.6)', () =
     expect(await setup().gw.invoke({ command: 'menu.popup', payload: { entries } })).toEqual({ ok: true, result: { id: null } });
     expect(await setup().gw.invoke({ command: 'menu.popup', payload: { entries: [] } })).toMatchObject({ ok: false, error: { code: 'invalid_payload' } });
   });
+
+  it('clipboard.copyText writes a short visible text, never asking the engine, and refuses control characters', async () => {
+    const { gw, calls, clipboard } = setup();
+    expect(await gw.invoke({ command: 'clipboard.copyText', payload: { text: 'beh.unit' } })).toEqual({ ok: true, result: { copied: true } });
+    expect(await gw.invoke({ command: 'clipboard.copyText', payload: { text: 'npm run test\n--watch=false' } })).toEqual({ ok: true, result: { copied: true } });
+    expect(clipboard).toEqual(['beh.unit', 'npm run test\n--watch=false']);
+    expect(calls).toEqual([]);
+    for (const text of ['', 'a\u001b[31mred', 'x'.repeat(4097), 'a\rb'])
+      expect(await gw.invoke({ command: 'clipboard.copyText', payload: { text } })).toMatchObject({ ok: false, error: { code: 'invalid_payload' } });
+    expect(clipboard).toHaveLength(2);
+  });
 });
 
 describe('gateway: a dropped folder (C-01 «السحب والإفلات»)', () => {

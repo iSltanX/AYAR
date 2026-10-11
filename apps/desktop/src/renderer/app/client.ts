@@ -34,4 +34,9 @@ export function on<T extends SubscribableTopic>(topic: T, handler: (message: Top
   return bridge().subscribe(topic, handler);
 }
 
+/** Copies a short text the user sees (an id, a command, a path) through the main process (the page has no clipboard). */
+export function copyText(text: string): void {
+  if (text) void attempt('clipboard.copyText', { text: text.slice(0, 4096) });
+}
+
 export { AyarError };

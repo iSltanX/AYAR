@@ -84,5 +84,15 @@ export const systemCommands = {
     payload: z.strictObject({ entries: z.array(NativeMenuEntry).min(1).max(40), x: z.int().min(0).max(100_000).optional(), y: z.int().min(0).max(100_000).optional() }),
     result: z.strictObject({ id: z.string().nullable() }),
   }),
+  /**
+   * A short text the user sees and copies (an id, a command, a path) — never a report: reports go through
+   * clipboard.copy, built and redacted by the engine (FR-44). The text is already what the engine handed the
+   * renderer (redacted); the clipboard is written only on the user's own action (AT-23).
+   */
+  'clipboard.copyText': defineCommand({
+    ...shell,
+    payload: z.strictObject({ text: z.string().min(1).max(4096).regex(/^[^\u0000-\u0008\u000b-\u001f\u007f]*$/) }),
+    result: z.strictObject({ copied: z.literal(true) }),
+  }),
   'engine.restart': defineCommand({ ...base, payload: z.strictObject({}), result: z.strictObject({ accepted: z.boolean() }) }),
 };

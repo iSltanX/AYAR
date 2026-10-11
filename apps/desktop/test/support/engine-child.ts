@@ -27,7 +27,7 @@ export function stubbornChild(): EngineChild & { ready: Promise<void> } {
   const child = spawn(process.execPath, ['-e', "process.on('SIGTERM', () => {}); process.stdout.write('ready\\n'); setInterval(() => {}, 1000)"], { stdio: ['ignore', 'pipe', 'ignore'] });
   const ready = new Promise<void>((resolve) => {
     let out = '';
-    child.stdout!.on('data', (d: Buffer) => {
+    child.stdout.on('data', (d: Buffer) => {
       out += d.toString();
       if (out.includes('ready\n')) resolve();
     });

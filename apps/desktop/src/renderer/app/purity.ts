@@ -3,7 +3,7 @@
 // of 13.3. The number never travels without its verdict and scope (11.5).
 import type { CheckOutcome, PurityResult } from '@ayar/protocol';
 import type { Lang, Translate } from '@ayar/i18n';
-import type { StatusCount } from '../components/PurityCard.svelte';
+import type { ResultCount as StatusCount } from '../lib/shell.ts';
 import type { ScoredCriterion, ScoringSummary } from '../lib/sheets.ts';
 import { checkTitle, countsInOrder, resultOf, textOr } from './format.ts';
 

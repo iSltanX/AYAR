@@ -825,6 +825,8 @@ export class RunService {
             processor: `${Math.round(s.cpuPercent)}%`,
             silentMs: s.silentMs,
             linesSeen: totals.lines,
+            // Protocol 1.6 (DEV-11): the group's resident memory, for the monitor's resource meter (13.3).
+            memoryKb: s.rssKb,
           });
         },
       });

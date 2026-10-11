@@ -18,7 +18,7 @@
   import TermTooltip from '../components/TermTooltip.svelte';
   import VerdictBadge from '../components/VerdictBadge.svelte';
   import { useLocale } from '../lib/locale.ts';
-  import { attempt } from '../app/client.ts';
+  import { attempt, copyText } from '../app/client.ts';
   import { day, displayPath, homeOf } from '../app/format.ts';
   import { projectTags } from '../app/projects.ts';
   import { addProjectFromDialog } from '../app/actions.ts';
@@ -170,7 +170,7 @@
             <td class="c-name">
               <div class="name">
                 <span class="project-name">{p.displayName}</span>
-                <PathPill path={displayPath(p.rootPath, homeOf(p.rootPath))} oncopy={(text) => void navigator.clipboard?.writeText(text)} />
+                <PathPill path={displayPath(p.rootPath, homeOf(p.rootPath))} oncopy={copyText} />
               </div>
             </td>
             <td class="c-type">

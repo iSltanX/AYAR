@@ -58,6 +58,8 @@ export class AppState {
   toast = $state<ToastMessage | null>(null);
   /** A polite announcement for screen readers (13.6): the run summary at most every 10 s, and the end. */
   announcement = $state('');
+  /** The cancel confirmation (13.4 «ألغِ التشغيل»), opened from the run bar, the monitor or ⌘. */
+  confirmCancel = $state(false);
 
   #toastTimer: ReturnType<typeof setTimeout> | null = null;
   #unsubscribe: (() => void)[] = [];
@@ -85,6 +87,13 @@ export class AppState {
     this.applyTheme();
     await this.refreshProjects();
     this.ready = true;
+  }
+
+  /** Cancels the active run after its confirmation; the engine's run.state says when it is cancelling. */
+  async cancelActiveRun(): Promise<void> {
+    this.confirmCancel = false;
+    const active = this.runs.active;
+    if (active) await attempt('run.cancel', { target: { kind: 'run', runId: active.runId } });
   }
 
   destroy(): void {

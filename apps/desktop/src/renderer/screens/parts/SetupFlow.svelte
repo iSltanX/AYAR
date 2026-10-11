@@ -9,7 +9,7 @@
   import SheetSetupPreview from '../../components/SheetSetupPreview.svelte';
   import { useLocale } from '../../lib/locale.ts';
   import type { SetupAction, SetupPreviewData } from '../../lib/sheets.ts';
-  import { attempt, on } from '../../app/client.ts';
+  import { attempt, on, copyText } from '../../app/client.ts';
   import { reasonText } from '../../app/format.ts';
   import { argvText } from '../../app/specs.ts';
 
@@ -86,7 +86,7 @@
   }
 </script>
 
-<SheetSetupPanel open={open && !previewing} actions={view} oncancel={onclose} onpreview={(id) => void preview(id)} onapply={(id) => void preview(id)} />
+<SheetSetupPanel open={open && !previewing} actions={view} oncancel={onclose} onpreview={(id: string) => void preview(id)} onapply={(id: string) => void preview(id)} />
 {#if previewData}
-  <SheetSetupPreview open data={previewData} oncancel={() => (previewing = null)} onapply={() => void apply()} oncopy={(text) => void navigator.clipboard?.writeText(text)} />
+  <SheetSetupPreview open data={previewData} oncancel={() => (previewing = null)} onapply={() => void apply()} oncopy={copyText} />
 {/if}

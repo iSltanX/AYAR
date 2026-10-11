@@ -15,7 +15,7 @@
   import { NAV_PROJECT, NAV_SECTIONS, type NavId, type ResultCount } from '../lib/shell.ts';
   import { attempt, on } from '../app/client.ts';
   import { countChecks } from '../app/runs.svelte.ts';
-  import { countsInOrder, sectionTitle } from '../app/format.ts';
+  import { countsInOrder, runKind } from '../app/format.ts';
   import { useApp } from '../app/state.svelte.ts';
   import { addDroppedProject, addProjectFromDialog } from '../app/actions.ts';
   import ProjectsScreen from './ProjectsScreen.svelte';
@@ -95,36 +95,8 @@
   const live = $derived(active ? countChecks(app.runs.checksOf(active.runId)) : null);
   const runCounts = $derived<ResultCount[]>(live ? countsInOrder(live.byOutcome) : []);
   const elapsed = $derived(active?.startedAt ? Math.max(0, Math.floor((app.runs.now - Date.parse(active.startedAt)) / 1000)) : 0);
-  let confirmCancel = $state(false);
+  const runKindLabel = (run: RunView) => runKind(t, run, app.runs.plans[run.runId]);
 
-  function runKindLabel(run: RunView): string {
-    switch (run.kind) {
-      case 'full':
-        return t('app.runKind.full');
-      case 'section': {
-        const plan = app.runs.plans[run.runId];
-        const section = plan?.selection.kind === 'section' ? plan.selection.section : '';
-        return t('app.runKind.section', { section: sectionTitle(t, section) });
-      }
-      case 'check':
-        return t('app.runKind.check');
-      case 'group':
-        return t('app.runKind.group');
-      case 'rerun_failed':
-        return t('app.runKind.rerunFailed');
-      case 'rerun_incomplete':
-        return t('app.runKind.rerunIncomplete');
-      case 'advisor':
-        return t('app.runKind.advisor');
-      case 'continue_round':
-        return t('app.runKind.continueRound');
-    }
-  }
-
-  async function cancelRun() {
-    confirmCancel = false;
-    if (active) await attempt('run.cancel', { target: { kind: 'run', runId: active.runId } });
-  }
 
   // ── 13.6: what a screen reader hears while a run is active, and once at its end ────────────────────────────
   let lastAnnounced = 0;
@@ -172,7 +144,7 @@
       else window.dispatchEvent(new CustomEvent('ayar:rerun-failed'));
     } else if (e.key === '.' && active) {
       e.preventDefault();
-      confirmCancel = true;
+      app.confirmCancel = true;
     } else if (k === 'f' && !e.shiftKey) {
       e.preventDefault();
       document.querySelector<HTMLInputElement>('.title-bar input[type="search"]')?.focus();
@@ -216,7 +188,7 @@
       {elapsed}
       counts={runCounts}
       onshowprogress={() => app.navigate({ name: 'scan', projectId: active.projectId, runId: active.runId })}
-      oncancel={() => (confirmCancel = true)}
+      oncancel={() => (app.confirmCancel = true)}
     />
   {/if}
 {/snippet}
@@ -253,6 +225,6 @@
   inspector={app.inspector ? inspector : undefined}
 />
 
-<SheetCancelConfirmation open={confirmCancel} oncancel={() => (confirmCancel = false)} oncancelrun={cancelRun} />
+<SheetCancelConfirmation open={app.confirmCancel} oncancel={() => (app.confirmCancel = false)} oncancelrun={() => void app.cancelActiveRun()} />
 <ToastRegion toast={app.toast} />
 <div class="visually-hidden" role="status" aria-live="polite">{app.announcement}</div>

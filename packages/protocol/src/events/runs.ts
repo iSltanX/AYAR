@@ -26,6 +26,8 @@ export const runEvents = {
       silentMs: z.int().nonnegative(),
       /** 9.6 point 5: what could be counted from the output so far (lines of output in DEV-5; adapters refine it). */
       linesSeen: z.int().nonnegative(),
+      /** Protocol 1.6 (DEV-11): the process group's resident memory in KB at this sample (13.3 «مؤشر موارد»). */
+      memoryKb: z.int().nonnegative().optional(),
     }),
   }),
   // References to log segments, rate-limited by the engine's event bus (C-04 aggregation).

@@ -117,7 +117,7 @@ export interface RefLine {
 export function referenceLines(s: DiscoverySnapshot): RefLine[] {
   const root = s.facts.filter((f) => f.component === '.');
   const val = (key: string, field: string) => root.filter((f) => f.key === key).map((f) => rec(f.value)[field]);
-  const strings = (xs: unknown[]) => xs.flatMap((x) => (Array.isArray(x) ? x : [x])).filter((x): x is string => typeof x === 'string' && x.length > 0);
+  const strings = (xs: unknown[]) => xs.flatMap((x) => (Array.isArray(x) ? (x as unknown[]) : [x])).filter((x): x is string => typeof x === 'string' && x.length > 0);
   const lines: RefLine[] = [];
   const add = (key: RefLine['key'], values: string[]) => values.length && lines.push({ key, values: [...new Set(values)] });
   add('permissions', strings(val('references.permissionsPolicy', 'path')));

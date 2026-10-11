@@ -53,7 +53,7 @@ describe('command registry (6.5)', () => {
   const DEV9_EXTRA = ['aiChecks.get', 'aiChecks.list', 'reports.list', 'reviews.list', 'tasks.verify'];
   // D-DEV11-02 and D-DEV11-03 (protocol 1.6): what the screens need from the main process (the window buttons'
   // side, Finder, the editor, native menus) and the live log tail of a running check.
-  const DEV11_MAIN = ['editor.open', 'menu.popup', 'project.reveal', 'window.layout'];
+  const DEV11_MAIN = ['clipboard.copyText', 'editor.open', 'menu.popup', 'project.reveal', 'window.layout'];
   const DEV11_EXTRA = [...DEV11_MAIN, 'check.tail'];
 
   it('adds only the documented main-process, host-only, DEV-4, DEV-5, DEV-7, DEV-9 and DEV-11 commands', () => {

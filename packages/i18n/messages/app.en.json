@@ -25,5 +25,7 @@
   "app.projectType.cli": "Command-line tool",
   "app.projectType.library": "Library",
   "app.projectType.vscodeExtension": "VS Code extension",
-  "app.projectType.obsidianPlugin": "Obsidian plugin"
+  "app.projectType.obsidianPlugin": "Obsidian plugin",
+  "app.customCheck.definition": "A custom check the profile defines: it runs the declared command and judges by its exit code and declared outputs.",
+  "app.customCheck.limits": "It proves only what its command measures. AYAR does not know what the command covers or leaves out."
 }

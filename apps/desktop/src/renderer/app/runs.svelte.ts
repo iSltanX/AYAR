@@ -2,8 +2,9 @@
 // check execution, and re-read from the engine (run.get) whenever a run is opened or the bridge asks to resync (a
 // gap in the numbering, a new engine stream, a replaced port). The UI never invents a state: no verdict before the
 // run's own summary (FR-28), no optimistic success before the engine confirms (C-03).
-import type { CheckOutcome, CheckRunView, EventPayload, RunDetail, RunPlan, RunView } from '@ayar/protocol';
+import type { CheckOutcome, CheckRunView, EventPayload, RunDetail, RunPlan, RunView, SleepGap } from '@ayar/protocol';
 import { attempt, on } from './client.ts';
+import { isoAt } from './format.ts';
 
 export type CheckProgress = EventPayload<'check.progress'>;
 export type Provisional = EventPayload<'finding.provisional'>;
@@ -33,6 +34,9 @@ export function countChecks(checks: Iterable<CheckRunView>): LiveCounts {
   return c;
 }
 
+/** A wall-clock lead over the monotonic clock beyond this between two ticks is time asleep (the executor's 5 s). */
+const SLEEP_GAP_MIN_MS = 5000;
+
 const ACTIVE = new Set(['queued', 'running', 'cancelling']);
 export const isActive = (r: RunView | undefined | null): boolean => !!r && ACTIVE.has(r.state);
 
@@ -51,10 +55,15 @@ export class RunTracker {
   now = $state(Date.now());
   /** The last summary of each finished run (run.summary). */
   summaries = $state<Record<string, EventPayload<'run.summary'>>>({});
+  /**
+   * FR-26: the times the computer slept during a run — from its executions' raw results (run.get), and seen live by
+   * this page's own clock: the wall clock jumping ahead of the monotonic one (the same test as the executor's).
+   */
+  sleepGaps = $state<Record<string, SleepGap[]>>({});
 
   #unsubscribe: (() => void)[] = [];
   #timer: ReturnType<typeof setInterval> | null = null;
-  #listeners = new Set<(run: RunView, previous: RunView | undefined) => void>();
+  #listeners: ((run: RunView, previous: RunView | undefined) => void)[] = [];
 
   /** D-33: the one active run of the app (running first, then cancelling, then the queue's head). */
   get active(): RunView | null {
@@ -78,8 +87,17 @@ export class RunTracker {
       }),
       on('bridge.resync', () => void this.resync()),
     );
+    let wall = Date.now();
+    let mono = performance.now();
     this.#timer = setInterval(() => {
-      if (this.active) this.now = Date.now();
+      const w = Date.now();
+      const m = performance.now();
+      const gap = w - wall - (m - mono);
+      wall = w;
+      mono = m;
+      const active = this.active;
+      if (active && gap > SLEEP_GAP_MIN_MS) this.#addGaps(active.runId, [{ at: isoAt(w - gap), ms: Math.round(gap) }]);
+      if (active) this.now = w;
     }, 1000);
   }
 
@@ -90,8 +108,10 @@ export class RunTracker {
 
   /** Called on every change of a run's view (the monitor turns into the results when its run finishes). */
   onRun(listener: (run: RunView, previous: RunView | undefined) => void): () => void {
-    this.#listeners.add(listener);
-    return () => this.#listeners.delete(listener);
+    this.#listeners.push(listener);
+    return () => {
+      this.#listeners = this.#listeners.filter((l) => l !== listener);
+    };
   }
 
   /** Reads a run from the engine: its view, its plan and every execution (the source of truth after any gap). */
@@ -107,6 +127,10 @@ export class RunTracker {
       if (c.state === 'finished') delete this.provisional[c.checkRunId];
     }
     this.checks[runId] = map;
+    this.#addGaps(
+      runId,
+      d.checks.flatMap((c) => c.raw?.sleepGaps ?? []),
+    );
     this.#setRun(d.run);
     return d;
   }
@@ -123,6 +147,20 @@ export class RunTracker {
 
   checksOf(runId: string): CheckRunView[] {
     return Object.values(this.checks[runId] ?? {});
+  }
+
+  /** Keeps the gaps of a run once each: two that overlap (seen by the page and by a check) are one sleep. */
+  #addGaps(runId: string, gaps: readonly SleepGap[]): void {
+    if (!gaps.length) return;
+    const all = [...(this.sleepGaps[runId] ?? [])];
+    for (const g of gaps) {
+      const start = Date.parse(g.at);
+      const end = start + g.ms;
+      const same = all.findIndex((x) => Date.parse(x.at) < end && start < Date.parse(x.at) + x.ms);
+      if (same < 0) all.push(g);
+      else if (g.ms > all[same]!.ms) all[same] = g;
+    }
+    this.sleepGaps[runId] = all.sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
   }
 
   #setRun(run: RunView): void {

@@ -15,8 +15,8 @@
   import TableGroupRow from '../components/TableGroupRow.svelte';
   import TableHeaderCell from '../components/TableHeaderCell.svelte';
   import { useLocale } from '../lib/locale.ts';
-  import { attempt } from '../app/client.ts';
-  import { checkTitle, clockMs, costOf, readinessOf, reasonText, sectionRank, sectionTitle } from '../app/format.ts';
+  import { attempt, copyText } from '../app/client.ts';
+  import { bySection, checkTitle, clockMs, costOf, readinessOf, reasonText, sectionTitle } from '../app/format.ts';
   import { argvText, commandOf } from '../app/specs.ts';
   import { useApp } from '../app/state.svelte.ts';
   import SetupFlow from './parts/SetupFlow.svelte';
@@ -47,11 +47,7 @@
   const RUNS = new Set(['run', 'shared', 'covered']);
   const MISSING = new Set(['missing', 'untrusted']);
   const rows = $derived((plan?.items ?? []).filter((i) => RUNS.has(i.status) || MISSING.has(i.status)));
-  const sections = $derived.by(() => {
-    const by = new Map<string, PlanItem[]>();
-    for (const i of rows) by.set(i.section, [...(by.get(i.section) ?? []), i]);
-    return [...by.entries()].sort((a, b) => sectionRank(a[0]) - sectionRank(b[0]));
-  });
+  const sections = $derived(bySection(rows, (i) => i.section));
   const runCount = $derived(rows.filter((i) => RUNS.has(i.status)).length);
   const missingItems = $derived(rows.filter((i) => MISSING.has(i.status)));
   const needsApproval = $derived(missingItems.filter((i) => i.readiness === 'needs_approval'));
@@ -137,7 +133,7 @@
       {#each sections as [section, items] (section)}
         {@const open = !collapsed.includes(section)}
         <tbody>
-          <tr class="group"><td colspan="7"><div role="grid" aria-label={sectionTitle(t, section)}><div role="row"><TableGroupRow title={sectionTitle(t, section)} count={items.length} expanded={open} ontoggle={(e) => (collapsed = e ? collapsed.filter((s) => s !== section) : [...collapsed, section])} /></div></div></td></tr>
+          <tr class="group"><td colspan="7"><div role="grid" aria-label={sectionTitle(t, section)}><div role="row"><TableGroupRow title={sectionTitle(t, section)} count={items.length} expanded={open} ontoggle={(e: boolean) => (collapsed = e ? collapsed.filter((s) => s !== section) : [...collapsed, section])} /></div></div></td></tr>
           {#if open}
             {#each items as i (i.instance)}
               {@const spec = specs.get(i.instance)}
@@ -167,7 +163,7 @@
                 </td>
               </tr>
               {#if isOpen && command}
-                <tr class="expanded"><td colspan="7"><CommandBlock {command} runsCode={spec?.sideEffects.runsProjectCode ?? false} writes={spec?.sideEffects.writesRepo === 'maybe'} network={i.needs.network === 'required'} oncopy={(x) => void navigator.clipboard?.writeText(x)} /></td></tr>
+                <tr class="expanded"><td colspan="7"><CommandBlock {command} runsCode={spec?.sideEffects.runsProjectCode ?? false} writes={spec?.sideEffects.writesRepo === 'maybe'} network={i.needs.network === 'required'} oncopy={copyText} /></td></tr>
               {/if}
             {/each}
           {/if}
@@ -179,7 +175,7 @@
       {@const open = !collapsed.includes('__wont')}
       <table class="plan not-run" data-testid="will-not-run">
         <tbody>
-          <tr class="group"><td colspan="4"><div role="grid" aria-label={t('scanplan.willNotRun')}><div role="row"><TableGroupRow title={t('scanplan.willNotRun')} count={willNotRun.length} expanded={open} ontoggle={(e) => (collapsed = e ? collapsed.filter((s) => s !== '__wont') : [...collapsed, '__wont'])} /></div></div></td></tr>
+          <tr class="group"><td colspan="4"><div role="grid" aria-label={t('scanplan.willNotRun')}><div role="row"><TableGroupRow title={t('scanplan.willNotRun')} count={willNotRun.length} expanded={open} ontoggle={(e: boolean) => (collapsed = e ? collapsed.filter((s) => s !== '__wont') : [...collapsed, '__wont'])} /></div></div></td></tr>
           {#if open}
             {#each willNotRun as w (w.instance)}
               {@const checkId = w.instance.split('@')[0] ?? w.instance}

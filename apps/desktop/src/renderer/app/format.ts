@@ -1,7 +1,7 @@
 // From the protocol's data to what the components draw (C-24): outcome and readiness ids, check and section
 // names, reasons as sentences, dates and durations. Pure functions; no markup, no engine call.
 import { formatDate, LOCALES, MESSAGES, type Lang, type MessageKey, type Translate } from '@ayar/i18n';
-import type { CheckOutcome, PurityVerdict, Readiness as WireReadiness, Reason } from '@ayar/protocol';
+import type { CheckOutcome, PurityVerdict, Readiness as WireReadiness, Reason, RunPlan, RunView } from '@ayar/protocol';
 import type { BadgeResult, Readiness, Result, Verdict } from '../lib/status.ts';
 import type { Cost } from '../lib/tags.ts';
 import { NAV_SECTIONS } from '../lib/shell.ts';
@@ -47,6 +47,13 @@ export function checkTitle(t: Translate, lang: Lang, checkId: string): string {
   return checkId;
 }
 
+/** What the inspector says a check measures and cannot prove: the catalog's texts, or a custom check's general ones. */
+export function checkTexts(t: Translate, lang: Lang, checkId: string): { definition: string; limits: string } {
+  const key = (k: string) => `catalog.check.${checkId}.${k}`;
+  if (checkId.startsWith('custom.') && !hasMessage(lang, key('why'))) return { definition: t('app.customCheck.definition'), limits: t('app.customCheck.limits') };
+  return { definition: textOr(t, lang, key('why')), limits: textOr(t, lang, key('limits')) };
+}
+
 /** The section of a check id (`sec.deps` → security), by the catalog's prefixes (10.3). */
 export function sectionOfCheck(checkId: string): (typeof NAV_SECTIONS)[number] | 'model' {
   const prefix = checkId.split('.')[0];
@@ -78,6 +85,21 @@ export const SECTION_ORDER = NAV_SECTIONS;
 export function sectionTitle(t: Translate, section: string): string {
   const key = `ui.section.${section}` as MessageKey;
   return (SECTION_ORDER as readonly string[]).includes(section) ? t(key) : section;
+}
+
+/** Items grouped by section, the sections in the sidebar's order (each group keeps the items' order). */
+export function bySection<T>(items: readonly T[], sectionOf: (item: T) => string): [string, T[]][] {
+  const groups = new Map<string, T[]>();
+  for (const item of items) {
+    const s = sectionOf(item);
+    groups.set(s, [...(groups.get(s) ?? []), item]);
+  }
+  return [...groups.entries()].sort((a, b) => sectionRank(a[0]) - sectionRank(b[0]));
+}
+
+/** An ISO time from epoch milliseconds. */
+export function isoAt(ms: number): string {
+  return new Date(ms).toISOString();
 }
 
 /** Sorts by the sidebar's section order; unknown sections last. */
@@ -165,4 +187,28 @@ export function displayPath(path: string, home: string | null): string {
 export function homeOf(path: string): string | null {
   const m = /^\/Users\/[^/]+/.exec(path);
   return m ? m[0] : null;
+}
+
+/** The run's kind as the run bar and the monitor name it («فحص كامل»، «قسم الأمن والصلاحيات»). */
+export function runKind(t: Translate, run: RunView, plan: RunPlan | null | undefined): string {
+  switch (run.kind) {
+    case 'full':
+      return t('app.runKind.full');
+    case 'section': {
+      const section = plan?.selection.kind === 'section' ? plan.selection.section : '';
+      return t('app.runKind.section', { section: sectionTitle(t, section) });
+    }
+    case 'check':
+      return t('app.runKind.check');
+    case 'group':
+      return t('app.runKind.group');
+    case 'rerun_failed':
+      return t('app.runKind.rerunFailed');
+    case 'rerun_incomplete':
+      return t('app.runKind.rerunIncomplete');
+    case 'advisor':
+      return t('app.runKind.advisor');
+    case 'continue_round':
+      return t('app.runKind.continueRound');
+  }
 }

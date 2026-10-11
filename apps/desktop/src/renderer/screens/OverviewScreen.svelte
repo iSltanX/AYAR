@@ -20,9 +20,8 @@
   import VerdictBadge from '../components/VerdictBadge.svelte';
   import { useLocale } from '../lib/locale.ts';
   import type { SectionCounts } from '../lib/results.ts';
-  import type { Result } from '../lib/status.ts';
   import { NAV_SECTIONS } from '../lib/shell.ts';
-  import { attempt } from '../app/client.ts';
+  import { attempt, copyText } from '../app/client.ts';
   import { ago, checkTitle, clockMs, countsInOrder, dayTime, displayPath, homeOf, reasonText, resultOf, sectionTitle } from '../app/format.ts';
   import { projectTags } from '../app/projects.ts';
   import { blockingOf, integrityHold, missingForPure, scoringOf, sectionKarat } from '../app/purity.ts';
@@ -111,7 +110,7 @@
     const out: SectionCounts = {};
     for (const c of roundChecks) {
       if (c.state !== 'finished' || !c.outcome || sectionOf.get(c.instance) !== section) continue;
-      const r = resultOf(c.outcome) as Result;
+      const r = resultOf(c.outcome);
       out[r] = (out[r] ?? 0) + 1;
     }
     return out;
@@ -187,7 +186,7 @@
       <div class="title-block">
         <h1 class="title">{project.displayName}</h1>
         <div class="meta">
-          <PathPill path={displayPath(project.rootPath, homeOf(project.rootPath))} oncopy={(x) => void navigator.clipboard?.writeText(x)} />
+          <PathPill path={displayPath(project.rootPath, homeOf(project.rootPath))} oncopy={copyText} />
           {#each tags as tag (tag)}<Tag>{tag}</Tag>{/each}
           {#if metaLine}<span class="meta-line">{metaLine}</span>{/if}
         </div>

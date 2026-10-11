@@ -58,8 +58,9 @@ export function electronSystemServices(parent: () => BrowserWindow | null): Syst
         .catch(() => 'left' as const);
       return controls;
     },
-    async reveal(path) {
+    reveal(path) {
       shell.showItemInFolder(path);
+      return Promise.resolve();
     },
     async fileInside(root, relative) {
       try {

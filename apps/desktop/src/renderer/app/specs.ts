@@ -31,7 +31,7 @@ export function reasonsOf(t: Translate, lang: Lang, reasons: readonly Reason[]):
   return { text: texts.join(' · '), refs };
 }
 
-const show = (v: JsonValue | null): string => (v === null ? '' : Array.isArray(v) && v.every((x) => typeof x === 'string') ? argvText(v as string[]) : typeof v === 'string' ? v : JSON.stringify(v));
+const show = (v: JsonValue | null): string => (v === null ? '' : Array.isArray(v) && v.every((x) => typeof x === 'string') ? argvText(v) : typeof v === 'string' ? v : JSON.stringify(v));
 
 /** A pending change as the approval diff draws it (Sheet/Approval diff 114:8898): the command first, then the rest. */
 export function changeOf(t: Translate, lang: Lang, item: ChangeItem, display: string): CommandChange {

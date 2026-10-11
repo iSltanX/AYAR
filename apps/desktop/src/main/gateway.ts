@@ -237,6 +237,11 @@ export class Gateway {
         return { ok: true, result: engine.status() };
       case 'engine.restart':
         return { ok: true, result: { accepted: engine.restart() } };
+      case 'clipboard.copyText': {
+        const { text } = payload as CommandPayload<'clipboard.copyText'>;
+        await system.writeClipboard(text);
+        return { ok: true, result: { copied: true } };
+      }
       case 'clipboard.copy': {
         // FR-44: always the model format, fetched from the engine; then the copy is recorded (G-21).
         const { kind, id } = payload as CommandPayload<'clipboard.copy'>;

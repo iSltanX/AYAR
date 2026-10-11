@@ -36,7 +36,7 @@
       {#if writes}
         <li>
           <Tag kind="neutral-icon" icon="file-text">
-            {#if writesPath}{t('results.command.writesTo')} <LtrText text={writesPath} />{:else}{t('results.command.writesTo')}{/if}
+            {#if writesPath}{t('results.command.writesTo')} <LtrText text={writesPath} />{:else}{t('results.command.mayWrite')}{/if}
           </Tag>
         </li>
       {/if}

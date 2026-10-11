@@ -1,0 +1,12 @@
+{
+  "monitor.started": "started {time} · {elapsed} ago",
+  "monitor.remaining": "about {duration} left (estimate)",
+  "monitor.note.running": "No verdict before every check ends. A failure shown is final for its check; the run is still “Running”.",
+  "monitor.note.cancelling": "Cancelling the run: running checks stop, and partial results and evidence are kept. A run that did not complete has no karat.",
+  "monitor.note.queued": "Waiting its turn: another run is active, and this one is next in the queue ({position}).",
+  "monitor.sleep": "The computer slept {minutes, plural, one {# minute} other {# minutes}} during the scan ({from}–{to}). The gap does not count against the checks’ timeouts.",
+  "monitor.step.lines": "{count, plural, =0 {no output yet} one {# line of output} other {# lines of output}}",
+  "monitor.sectionSummary": "{status} {count}",
+  "monitor.cancelCheck": "Cancel “{name}”",
+  "monitor.step.cells": "Rendering states"
+}
