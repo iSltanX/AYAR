@@ -14,6 +14,7 @@ import type { ProfileView, ReadinessReport, ResultsPage, RunDetail, RunPlan, Set
 import { execFileSync } from 'node:child_process';
 import { existsSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { DatabaseSync } from 'node:sqlite';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { confirmationGrant } from '../../../tools/cli/src/grants.ts';
 import { addProject, approveAll, plan, startRun, waitRun } from '../../../tools/cli/test/support/fixtures.ts';
@@ -154,5 +155,31 @@ describe.runIf(existsSync(PNPM))('the verdict through the engine', () => {
     const detail = ok<{ finding: { displayId: string }; history: unknown[] }>(await engine.invoke('finding.get', { findingId: r1.findings.find((f) => f.displayId === broken.displayId)!.id }));
     expect(detail.finding.displayId).toBe(broken.displayId);
     expect(detail.history.length).toBeGreaterThanOrEqual(2);
+  }, 300_000);
+it('D-35: a finding a review marked a false alarm does not count while its anchor is unchanged, and is always shown', async () => {
+    const path = materialize('FX-NOTEST', 'broken-anchor', join(root, 'review'));
+    const { projectId } = await addProject(engine, path);
+    await approveAll(engine, projectId);
+    const first = await run(projectId, { kind: 'check', instance: 'code.refs.local@.' });
+    expect(execOf(first, 'code.refs.local@.')).toMatchObject({ outcome: 'failed' });
+    const f = (await results(projectId, first.run.runId)).findings.find((x) => x.effect === 'violation')!;
+    // DEV-9's review.record writes this row; here it is written as it would be (D-DEV6-14).
+    const db = new DatabaseSync(join(root, 'AYAR', 'ayar.db'));
+    try {
+      db.exec('PRAGMA busy_timeout = 5000');
+      db.prepare("INSERT INTO reviews (id, project_id, target_type, target_ref, decision, scope_json, note, created_at) VALUES ('rev_test_false_alarm_000000000', ?, 'finding', ?, 'false_positive', '{}', 'test', ?)").run(projectId, f.id, new Date().toISOString());
+    } finally {
+      db.close();
+    }
+    const again = await run(projectId, { kind: 'check', instance: 'code.refs.local@.' });
+    const c = execOf(again, 'code.refs.local@.');
+    expect(c).toMatchObject({ outcome: 'passed', findings: { violations: 0, excludedByReview: 1 } });
+    // Shown apart, never silently: counted in the page, listed with includeExcluded.
+    const page = await results(projectId, again.run.runId);
+    expect(page.excludedByReview).toBe(1);
+    expect(page.findings.find((x) => x.fingerprint === f.fingerprint)).toMatchObject({ effect: 'excluded', excludedByReview: true, reviewId: 'rev_test_false_alarm_000000000', displayId: f.displayId });
+    const hidden = ok<ResultsPage>(await engine.invoke('results.query', { projectId, filters: { runId: again.run.runId } }));
+    expect(hidden.findings.some((x) => x.fingerprint === f.fingerprint)).toBe(false);
+    expect(hidden.excludedByReview).toBe(1);
   }, 300_000);
 });
