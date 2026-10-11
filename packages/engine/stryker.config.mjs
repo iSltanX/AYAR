@@ -2,12 +2,18 @@
 // wrong change — the classifier (C-16), the purity index (C-19), the redaction (C-18) and the planner (C-10) —
 // with StrykerJS (its command runner over Vitest). Run from the repository root:
 //   node node_modules/@stryker-mutator/core/bin/stryker.js run packages/engine/stryker.config.mjs
-// Its sandbox, its reports and its incremental file live outside the repository (~/.cache/ayar-stryker/), so a run
-// leaves nothing in the working tree. The threshold `break` is the owner's decision (Q-05), applied here once taken.
+// Its sandbox, its reports and the tests' temp folders live outside the repository (~/.cache/ayar-stryker/, or
+// AYAR_STRYKER_OUT), so a run leaves nothing in the working tree. The threshold `break` is the owner's decision
+// (Q-05), applied here once taken.
+import { mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 
 const out = process.env.AYAR_STRYKER_OUT ?? join(homedir(), '.cache', 'ayar-stryker');
+// The tests' own temp folders go under the output too: a mutant ended by its timeout is killed before its test removes
+// them, and they would stay in the system's temp folder (seven planner folders did in the first run).
+const tmp = join(out, 'tmp');
+mkdirSync(tmp, { recursive: true });
 
 /** @type {import('@stryker-mutator/api/core').PartialStrykerOptions} */
 export default {
@@ -16,7 +22,7 @@ export default {
   // under 1%: a mutant `else if (true)` in the classifier survived its own test). Each mutant runs the four
   // components' tests in a Vitest process with __STRYKER_ACTIVE_MUTANT__ set, which the instrumented code reads.
   testRunner: 'command',
-  commandRunner: { command: `${JSON.stringify(process.execPath)} node_modules/vitest/vitest.mjs run --config packages/engine/vitest.stryker.config.ts` },
+  commandRunner: { command: `TMPDIR=${JSON.stringify(tmp)} ${JSON.stringify(process.execPath)} node_modules/vitest/vitest.mjs run --config packages/engine/vitest.stryker.config.ts` },
   mutate: ['packages/engine/src/classifier/classify.ts', 'packages/engine/src/purity/compute.ts', 'packages/engine/src/redaction/redactor.ts', 'packages/engine/src/redaction/names.ts', 'packages/engine/src/planner/plan.ts'],
   // The planner's tests discover fixture projects (materialized in a temp folder from fixtures/).
   ignorePatterns: ['/apps', '/docs', '/spikes', '/tools', '/packages/adapters', '/packages/analyzers', '/.claude'],
