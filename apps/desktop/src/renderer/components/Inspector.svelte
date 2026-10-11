@@ -117,7 +117,7 @@
       <header class="header">
         <div class="title-row">
           <h2 class="title">{c.name}</h2>
-          <ResultBadge result={c.result} />
+          {#if c.result}<ResultBadge result={c.result} />{/if}
         </div>
         {@render idRow(c.id)}
       </header>
@@ -133,21 +133,25 @@
           {@render kv(t('results.inspector.definition'), c.definition)}
           {@render kv(t('results.inspector.why'), c.why)}
           {@render kv(t('results.inspector.limits'), c.limits)}
-          <section class="section">
-            <h3 class="section-title">{t('results.inspector.command')}</h3>
-            <CommandBlock {...c.command} oncopy={oncopycommand} />
-          </section>
+          {#if c.command}
+            <section class="section">
+              <h3 class="section-title">{t('results.inspector.command')}</h3>
+              <CommandBlock {...c.command} oncopy={oncopycommand} />
+            </section>
+          {/if}
           <section class="section">
             <h3 class="section-title">{t('glossary.readiness')}</h3>
             <span class="badge"><ReadinessBadge readiness={c.readiness} /></span>
           </section>
-          <section class="section">
-            <h3 class="section-title">{t('results.inspector.lastResult')}</h3>
-            <div class="last-result">
-              <ResultBadge result={c.result} size="sm" />
-              <span class="run-id"><LtrText text={c.runId} mono /></span>
-            </div>
-          </section>
+          {#if c.result}
+            <section class="section">
+              <h3 class="section-title">{t('results.inspector.lastResult')}</h3>
+              <div class="last-result">
+                <ResultBadge result={c.result} size="sm" />
+                {#if c.runId}<span class="run-id"><LtrText text={c.runId} mono /></span>{/if}
+              </div>
+            </section>
+          {/if}
           {#if c.review}
             {@const r = c.review}
             <section class="section">

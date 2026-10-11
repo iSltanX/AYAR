@@ -11,6 +11,11 @@ export function hasMessage(lang: Lang, key: string): key is MessageKey {
   return Object.hasOwn(MESSAGES[lang], key);
 }
 
+/** The message of a key built from data (a catalog text), or the fallback when the table has none. */
+export function textOr(t: Translate, lang: Lang, key: string, fallback = '', values?: Record<string, string | number>): string {
+  return hasMessage(lang, key) ? t(key, values) : fallback;
+}
+
 /** 7.2-ج: the protocol's snake_case outcome as the UI's status id. */
 export function resultOf(outcome: CheckOutcome): Result {
   return outcome.replaceAll('_', '-') as Result;

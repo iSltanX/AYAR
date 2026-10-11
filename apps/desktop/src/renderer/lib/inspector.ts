@@ -48,14 +48,15 @@ export interface InspectorCheck {
   readonly name: string;
   /** The check id (beh.unit). */
   readonly id: string;
-  /** The last result (the header badge and «آخر نتيجة»). */
-  readonly result: BadgeResult;
+  /** The last result (the header badge and «آخر نتيجة»); absent for a check that has not run yet (DEV-11). */
+  readonly result?: BadgeResult;
   /** The run of the last result (RUN-20261009-003). */
-  readonly runId: string;
+  readonly runId?: string;
   readonly definition: string;
   readonly why: string;
   readonly limits: string;
-  readonly command: InspectorCommand;
+  /** Absent for a check AYAR runs itself, with no command of the project or a tool (DEV-11). */
+  readonly command?: InspectorCommand;
   readonly readiness: Readiness;
   readonly review?: InspectorReview;
   /** The Log tab's content. */
