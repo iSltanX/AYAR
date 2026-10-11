@@ -209,7 +209,8 @@ export function buildPlan(i: PlanInput): RunPlan {
     for (const alt of defOf(i.catalog, it.checkId)?.relations.alternativeTo ?? []) {
       const other = items.get(`${alt}@${it.component}`);
       if (!other || other.status !== 'run') continue;
-      const ready = (x: PlanItem) => i.readiness.get(x.instance)?.inner === 'ready';
+      // As step 6 reads it: no readiness recorded is ready.
+      const ready = (x: PlanItem) => (i.readiness.get(x.instance)?.inner ?? 'ready') === 'ready';
       const keep = ready(it) && !ready(other) ? it : ready(other) && !ready(it) ? other : cmp(it.instance, other.instance) <= 0 ? it : other;
       const drop = keep === it ? other : it;
       drop.status = 'not_included';
