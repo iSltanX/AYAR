@@ -180,6 +180,19 @@ describe('the narrow-scope threshold setting', () => {
   }, 180_000);
 });
 
+describe('the run list (18.1 «الالتزام والملف»)', () => {
+  it('names the profile version a run was planned on, and the commit it started on read from .git (E-16)', async () => {
+    const commit = 'a1b2c3d4e5f60718293a4b5c6d7e8f9012345678';
+    mkdirSync(join(path, '.git', 'refs', 'heads'), { recursive: true });
+    writeFileSync(join(path, '.git', 'HEAD'), 'ref: refs/heads/main\n');
+    writeFileSync(join(path, '.git', 'refs', 'heads', 'main'), `${commit}\n`);
+    writeFileSync(join(path, '.git', 'config'), '[core]\n\trepositoryformatversion = 0\n');
+    const d = await runCheck('code.refs.local@.');
+    expect(d.run.commit).toBe(commit);
+    expect(d.run.profileVersion).toBeGreaterThanOrEqual(1);
+  }, 120_000);
+});
+
 describe('data.purge', () => {
   it('needs its confirmation, then removes the projects and what AYAR fetched, and keeps the settings', async () => {
     expect((await engine.invoke('data.purge', { confirmationToken: confirmationGrant('data.purge', GLOBAL_TARGET).token })).ok).toBe(false);

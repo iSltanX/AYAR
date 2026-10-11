@@ -262,6 +262,10 @@ export const RunView = z.strictObject({
    * run.preventSleep). The main process follows run.state and holds a power-save blocker for such runs.
    */
   preventSleep: z.boolean(),
+  /** Protocol 1.7 (DEV-12, 18.1 «الالتزام والملف»): the profile version the run was planned on. */
+  profileVersion: z.int().positive().nullable(),
+  /** Protocol 1.7 (DEV-12, 18.1): the Git commit the run started on, read from the files (E-16); null outside a repository. */
+  commit: z.string().regex(/^[0-9a-f]{7,64}$/).nullable(),
 });
 export type RunView = z.infer<typeof RunView>;
 

@@ -30,6 +30,8 @@
   import ModelChecksScreen from './ModelChecksScreen.svelte';
   import TasksScreen from './TasksScreen.svelte';
   import AdvisorScreen from './AdvisorScreen.svelte';
+  import RunsScreen from './RunsScreen.svelte';
+  import CompareScreen from './CompareScreen.svelte';
   import AccessState from './states/AccessState.svelte';
 
   const app = useApp();
@@ -44,7 +46,7 @@
   const missing = $derived(!!project && project.pathStatus === 'missing' && route.name === 'overview');
 
   /** Destinations whose page is not built yet keep the approved disabled state. */
-  const LATER: readonly NavId[] = ['runs', 'tools', 'settings'];
+  const LATER: readonly NavId[] = ['tools', 'settings'];
 
   const isSection = (id: NavId): id is SectionId => (NAV_SECTIONS as readonly string[]).includes(id);
 
@@ -322,6 +324,10 @@
     {:else}
       {#key route.projectId}<TasksScreen projectId={route.projectId} />{/key}
     {/if}
+  {:else if route.name === 'runs'}
+    {#key route.projectId}<RunsScreen projectId={route.projectId} />{/key}
+  {:else if route.name === 'compare'}
+    {#key `${route.fromRunId}:${route.toRunId}`}<CompareScreen projectId={route.projectId} fromRunId={route.fromRunId} toRunId={route.toRunId} />{/key}
   {/if}
 {/snippet}
 

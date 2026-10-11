@@ -106,6 +106,17 @@ export interface RunServiceOptions {
   afterRun?: (runId: string, projectId: string) => Promise<void>;
 }
 
+/** The commit of a run's `git_json` (18.1), or null outside a repository or before it was read. */
+function commitOf(json: string | null): string | null {
+  if (!json) return null;
+  try {
+    const c = (JSON.parse(json) as { commit?: unknown }).commit;
+    return typeof c === 'string' && /^[0-9a-f]{7,64}$/.test(c) ? c : null;
+  } catch {
+    return null;
+  }
+}
+
 interface RunRow {
   id: string;
   display_id: string;
@@ -124,6 +135,8 @@ interface RunRow {
   cancel_reason: string | null;
   prevent_sleep: number | null;
   state_changed: number | null;
+  profile_version: number | null;
+  git_json: string | null;
 }
 
 interface CheckRunRow {
@@ -397,6 +410,9 @@ export class RunService {
     // 9.5 point 5 and C-12 point 3: every spec checked again against its approval, from the files as they are now.
     const approvals = approvalsOf(db, projectId);
     const fresh = await this.#freshSpecs(projectId);
+    // 18.1 «الالتزام»: the commit the run started on, as the same reading of the files found it.
+    const git = fresh ? this.#o.projects.lastGit(projectId) : null;
+    if (git) db.run('UPDATE runs SET git_json = ? WHERE id = ?', JSON.stringify(git), runId);
     const execs = new Map<string, Exec>();
     for (const c of this.#checkRows(runId)) {
       const instance = `${c.check_id}@${c.component}`;
@@ -1686,6 +1702,8 @@ export class RunService {
       keepForever: r.keep_forever === 1,
       cancelReason: r.cancel_reason === 'user' || r.cancel_reason === 'app_quit' || r.cancel_reason === 'disk_full' ? r.cancel_reason : null,
       preventSleep: r.prevent_sleep === 1,
+      profileVersion: r.profile_version ?? null,
+      commit: commitOf(r.git_json),
     };
   }
 

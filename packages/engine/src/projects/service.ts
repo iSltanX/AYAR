@@ -332,8 +332,16 @@ export class ProjectsService {
    */
   async freshSpecs(projectId: string, signal: AbortSignal = new AbortController().signal): Promise<CheckSpec[]> {
     const snapshot = await this.#snapshotNow(projectId, signal, null);
+    const git = snapshot.facts.find((f) => f.key === 'git.repository')?.value as { commit?: unknown; branch?: unknown } | undefined;
+    this.#git.set(projectId, git ? { commit: typeof git.commit === 'string' ? git.commit : null, branch: typeof git.branch === 'string' ? git.branch : null } : null);
     return this.#o.profiles.specs(snapshot, this.#o.profiles.settingsOf(projectId));
   }
+
+  /** The Git head the latest fresh discovery of the project read (from files, E-16), or null outside a repository. */
+  lastGit(projectId: string): { commit: string | null; branch: string | null } | null {
+    return this.#git.get(projectId) ?? null;
+  }
+  readonly #git = new Map<string, { commit: string | null; branch: string | null } | null>();
 
   /** A discovery of the project now, redacted (C-18 before anything is kept), not saved. */
   async #snapshotNow(projectId: string, signal: AbortSignal, onProgress: ((p: { filesSeen: number; dirsSeen: number; currentDir: string; markers: ReadonlySet<string>; skipped: number; skippedDirs: readonly string[] }) => void) | null): Promise<DiscoverySnapshot> {

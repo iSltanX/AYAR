@@ -1,0 +1,20 @@
+{
+  "runsui.subtitle": "يُحتفظ بآخر {count} تشغيلًا لهذا المشروع، والمحفوظ دائمًا لا يُحذف. حدّد تشغيلين لمقارنتهما.",
+  "runsui.compare": "قارن المحددين ({count})",
+  "runsui.run": "التشغيل والتاريخ",
+  "runsui.kind": "النوع",
+  "runsui.verdict": "الحكم والعيار",
+  "runsui.counts": "الأعداد",
+  "runsui.duration": "المدة",
+  "runsui.commit": "الالتزام والملف",
+  "runsui.choose": "حدّد {run} للمقارنة",
+  "runsui.cancelled": "أُلغي",
+  "runsui.karat": "عيار {karat}",
+  "runsui.notFull": "— ليس فحصًا كاملًا",
+  "runsui.profile": "الملف {version}",
+  "runsui.keep": "احفظ دائمًا",
+  "runsui.kept": "محفوظ دائمًا",
+  "runsui.delete": "احذف",
+  "runsui.footer": "العيار والحكم للفحص الكامل وحده، والتشغيل الملغى بلا عيار. «احذف» يطلب تأكيدًا.",
+  "runsui.empty": "لا تشغيلات بعد. ابدأ الفحص الكامل من شريط العنوان."
+}
