@@ -5,13 +5,15 @@ import { fork } from 'node:child_process';
 import type { ProbeHost, ProbeProcess } from '../ports/index.ts';
 
 const ENV_KEYS = ['HOME', 'USER', 'LOGNAME', 'PATH', 'TMPDIR', 'LANG', '__CF_USER_TEXT_ENCODING'];
+/** Tests only: where the probe's browser writes its net-log (AT-31). The app's probe never has it. */
+const TEST_KEYS = ['AYAR_TEST_PROBE_NETLOG'];
 
 export function nodeProbeHost(o: { entry: string | URL; axePath: string | null; onStderr?: (text: string) => void }): ProbeHost {
   return {
     axePath: o.axePath,
     start() {
       const env: Record<string, string> = {};
-      for (const k of ENV_KEYS) if (process.env[k] !== undefined) env[k] = process.env[k];
+      for (const k of [...ENV_KEYS, ...TEST_KEYS]) if (process.env[k] !== undefined) env[k] = process.env[k];
       const child = fork(o.entry, [], { stdio: ['ignore', 'ignore', 'pipe', 'ipc'], env, execArgv: [] });
       child.stderr?.on('data', (d: Buffer) => o.onStderr?.(d.toString().slice(0, 4000)));
       const exited = new Promise<string>((resolve) => child.once('exit', (code, signal) => resolve(signal ?? String(code ?? 'closed'))));

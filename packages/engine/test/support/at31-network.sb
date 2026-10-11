@@ -1,0 +1,10 @@
+;; AT-31 «بيئة شبكة مراقبة»: the test process and everything it starts (the engine, the probe, its browser, the
+;; managed tools, the project's commands) may reach this machine only. Every other connection — and every name
+;; lookup through mDNSResponder — is refused and logged by the kernel («Sandbox: <process>(<pid>) deny(1)
+;; network-outbound …»), which the test reads back. The order matters: the loopback allowance comes last.
+;; Run: sandbox-exec -f packages/engine/test/support/at31-network.sb vitest run --project engine test/at31.test.ts
+(version 1)
+(allow default)
+(deny network-outbound (remote ip "*:*"))
+(deny network-outbound (literal "/private/var/run/mDNSResponder"))
+(allow network-outbound (remote ip "localhost:*"))

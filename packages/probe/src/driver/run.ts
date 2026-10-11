@@ -10,7 +10,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'no
 import { join } from 'node:path';
 import type { Browser, BrowserContext, BrowserType, ConsoleMessage, Page, Request, Route } from 'playwright-core';
 import { cellKey, type CellResult, type ConsoleEntry, type ExtensionResult, type FromProbe, type PerfRun, type ProbeCell, type ProbeJob, type ProbeSummary } from '../contract.ts';
-import { findMock, judgeUrl, proxyArgs, shownUrl, type NetworkLog } from './network.ts';
+import { findMock, judgeUrl, networkArgs, shownUrl, type NetworkLog } from './network.ts';
 import { FONTS_STATE, PERF_TIMINGS, RTL_MEASURE, SAMPLE_STYLES, SCRIPT_NEAR } from './page-scripts.ts';
 import { serveFolder, type StaticServer } from './server.ts';
 
@@ -21,6 +21,12 @@ const MAX_SAMPLED = 400;
 const STABLE_ARGS = ['--force-color-profile=srgb', '--font-render-hinting=none', '--disable-lcd-text', '--hide-scrollbars', '--mute-audio', '--no-first-run', '--no-default-browser-check'];
 
 type Chromium = BrowserType;
+
+/** Tests only (AT-31): the browser's own record of its sockets, to name what the system's monitor refused. */
+function netLogArgs(jobId: string): string[] {
+  const dir = process.env.AYAR_TEST_PROBE_NETLOG;
+  return dir ? [`--log-net-log=${join(dir, `${jobId}.json`)}`, '--net-log-capture-mode=Default'] : [];
+}
 
 export interface RunOptions {
   chromium: Chromium;
@@ -62,7 +68,9 @@ export async function runJob(job: ProbeJob, o: RunOptions): Promise<void> {
     } else if (job.target.kind === 'url') base = job.target.baseUrl;
     else base = '';
 
-    const launchArgs = [...STABLE_ARGS, ...proxyArgs(job.allowHosts)];
+    // Playwright's own temporary folders (a launched browser's profile, its artifacts) go with the job, not /tmp.
+    process.env.TMPDIR = job.outDir;
+    const launchArgs = [...STABLE_ARGS, ...networkArgs(job.allowHosts), ...netLogArgs(job.jobId)];
     if (job.target.kind === 'extension') {
       profile = mkdtempSync(join(job.outDir, 'profile-'));
       persistent = await o.chromium.launchPersistentContext(profile, {

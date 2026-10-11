@@ -61,9 +61,19 @@ export function mockMatches(pattern: string, raw: string): boolean {
   return new RegExp(`^${re}$`).test(subject);
 }
 
-/** The proxy rule beneath the handler: everything outside this machine and the allowed hosts goes to a dead proxy. */
-export function proxyArgs(allowHosts: readonly string[]): string[] {
-  return ['--proxy-server=http://127.0.0.1:9', `--proxy-bypass-list=${['127.0.0.1', 'localhost', '[::1]', ...allowHosts].join(';')}`];
+/**
+ * The rule beneath the handler, for what the browser does by itself: no name resolves but this machine's and the
+ * allowed hosts' (Chromium's automatic DNS-over-HTTPS probe goes direct, past any proxy, and would otherwise ask the
+ * system's resolver and its DoH server — seen under AT-31's monitor, D-DEV7-20), and everything else goes to a proxy
+ * that does not exist. What remains is Chromium's IPv6 reachability check: a UDP connect that sends nothing.
+ */
+export function networkArgs(allowHosts: readonly string[]): string[] {
+  const local = ['127.0.0.1', 'localhost', '[::1]'];
+  return [
+    '--proxy-server=http://127.0.0.1:9',
+    `--proxy-bypass-list=${[...local, ...allowHosts].join(';')}`,
+    `--host-resolver-rules=${['MAP * ~NOTFOUND', ...[...local, '::1', ...allowHosts].map((h) => `EXCLUDE ${h}`)].join(' , ')}`,
+  ];
 }
 
 export type Mock = ProbeCell['mock'][number];

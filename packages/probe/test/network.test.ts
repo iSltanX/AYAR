@@ -1,7 +1,7 @@
 // C-14 «شبكة المسبار»: what the probe's pages may reach (this machine, the extension, inline data; hosts allowed by
 // name), how a declared simulation matches a request, and what the log keeps of an address (never its query).
 import { describe, expect, it } from 'vitest';
-import { judgeUrl, mockMatches, proxyArgs, shownUrl } from '../src/driver/network.ts';
+import { judgeUrl, mockMatches, networkArgs, shownUrl } from '../src/driver/network.ts';
 import { resolveInside, serveFolder } from '../src/driver/server.ts';
 import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -27,8 +27,12 @@ describe('the network rule', () => {
     expect(mockMatches('/api/**', 'http://127.0.0.1:1/api/7/detail')).toBe(true);
     expect(mockMatches('/search?q=x', 'http://127.0.0.1:1/search?q=x')).toBe(true);
   });
-  it('sends what the handler cannot see to a proxy that does not exist, except this machine and the allowed hosts', () => {
-    expect(proxyArgs(['fonts.example.org'])).toEqual(['--proxy-server=http://127.0.0.1:9', '--proxy-bypass-list=127.0.0.1;localhost;[::1];fonts.example.org']);
+  it('resolves no name and sends what the handler cannot see to a proxy that does not exist, except this machine and the allowed hosts', () => {
+    expect(networkArgs(['fonts.example.org'])).toEqual([
+      '--proxy-server=http://127.0.0.1:9',
+      '--proxy-bypass-list=127.0.0.1;localhost;[::1];fonts.example.org',
+      '--host-resolver-rules=MAP * ~NOTFOUND , EXCLUDE 127.0.0.1 , EXCLUDE localhost , EXCLUDE [::1] , EXCLUDE ::1 , EXCLUDE fonts.example.org',
+    ]);
   });
 });
 

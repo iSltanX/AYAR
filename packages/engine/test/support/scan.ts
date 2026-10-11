@@ -49,8 +49,8 @@ export interface Scan {
 }
 
 /** One engine for a test (its own data folder), reading a login shell with the toolchain's PATH. */
-export async function engineFor(root: string, o: { path?: string; exports?: Record<string, string> } = {}): Promise<EngineConnection> {
-  const engine = await connectEngine({ dataDir: join(root, 'AYAR'), env: { AYAR_TEST_LOGIN_SHELL: loginShell(root, { path: o.path ?? LOGIN_PATH, ...(o.exports ? { exports: o.exports } : {}) }) } });
+export async function engineFor(root: string, o: { path?: string; exports?: Record<string, string>; env?: Record<string, string> } = {}): Promise<EngineConnection> {
+  const engine = await connectEngine({ dataDir: join(root, 'AYAR'), env: { ...o.env, AYAR_TEST_LOGIN_SHELL: loginShell(root, { path: o.path ?? LOGIN_PATH, ...(o.exports ? { exports: o.exports } : {}) }) } });
   await engine.waitForEvent('engine.health', undefined, 30_000);
   return engine;
 }
