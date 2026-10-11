@@ -230,7 +230,7 @@ const view = phases.map((p) => {
   const waitingDesign = p.design_gates.filter((id) => !isClosed(id));
   const ownerPending = (id) => !decisions[id]?.resolved && !decisions[id]?.delegated;
   const waitingOwner = p.owner_gates.filter(ownerPending);
-  // مجلد جُهّز ولم يبدأ فيه عمل، ثم تقدم main: تحدّثه الجلسة الرئيسية قبل تكليف وكيله
+  // مجلد جُهّز ولم يبدأ فيه عمل، ثم تقدم main: تحدّثه الجلسة الرئيسية قبل العمل فيه
   const stale = l.exists && l.ahead === 0 && !l.dirty && (l.status ?? 'not-started') === 'not-started' && l.behind > 0;
   let state;
   let statusDate = p.status_date;

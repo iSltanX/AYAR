@@ -249,7 +249,7 @@ a.ref:hover { color: var(--ink); }
 <main class="page" dir="rtl" lang="ar">
   <header class="masthead">
     <div class="brand"><span class="name">عِيَار</span><span class="latin">AYAR</span></div>
-    <p class="lede">تتعامل مع جلسة واحدة. ترسل لها أمر الموجة، فتوزّع مراحلها المستقلة على وكلاء يعملون معًا، وتدمج كل ما ينجح في فحوصه، وتتوقف حين تحتاج قرارك. الأزرار هنا تنسخ فقط ولا تشغّل شيئًا.</p>
+    <p class="lede">تتعامل مع جلسة واحدة. ترسل لها أمر الموجة، فتنفّذ مراحلها بنفسها مرحلة بعد مرحلة، وتدمج كل ما ينجح في فحوصه، وتتوقف حين تحتاج قرارك. الأزرار هنا تنسخ فقط ولا تشغّل شيئًا.</p>
     <div class="meta" id="meta"></div>
   </header>
 
@@ -271,8 +271,8 @@ a.ref:hover { color: var(--ink); }
     <h2 id="how-h">كيف تعمل الموجة</h2>
     <ol>
       <li>ترسل أمر الموجة في الجلسة الرئيسية.</li>
-      <li>تحسم الجلسة قرارات البدء بتفويضك، وتسألك دفعة واحدة عمّا بقي لك منها، ثم تكلّف وكيلًا بكل مرحلة جاهزة، كل وكيل في مجلد عمل مستقل.</li>
-      <li>تتوقف لتسألك حين يلزم اعتمادك أو إذنك، أو حين يثبت عائق. والوكلاء الآخرون يواصلون عملهم.</li>
+      <li>تحسم الجلسة قرارات البدء بتفويضك، وتسألك دفعة واحدة عمّا بقي لك منها، ثم تنفّذ كل مرحلة جاهزة بنفسها، مرحلة بعد مرحلة، كلٌّ في مجلد عمل مستقل.</li>
+      <li>تتوقف لتسألك حين يلزم اعتمادك أو إذنك، أو حين يثبت عائق.</li>
       <li>كل مرحلة تُسلَّم تتحقق منها الجلسة آليًا، وتدمجها، وتفحص التكامل، وتغلقها، وتدفعها إلى GitHub، دون أمر منك.</li>
       <li>في النهاية تسلّمك خلاصة الموجة، وتتوقف قبل الموجة التالية.</li>
     </ol>
@@ -379,8 +379,8 @@ function statusLine(p, inCurrent) {
   const s = p.state;
   if (s === 'closed') return ['أُغلقت ودُمجت في ', fmtDate(p.statusDate)];
   if (s === 'unverified') return ['مغلقة في ملفها دون وسم إغلاق، فلا تبدأ بها المراحل التي تعتمد عليها حتى تتحقق منها الجلسة الرئيسية.'];
-  if (s === 'delivered') return ['سلّمها وكيلها، والجلسة الرئيسية تتحقق منها ثم تدمجها.'];
-  if (s === 'in-progress') return ['يعمل عليها وكيلها في مجلدها.'];
+  if (s === 'delivered') return ['سُلّمت، والجلسة الرئيسية تتحقق منها ثم تدمجها.'];
+  if (s === 'in-progress') return ['تعمل عليها الجلسة الرئيسية في مجلدها.'];
   if (s === 'awaiting-owner') return [p.ownerRequest || 'تنتظر جوابك عن سؤال أو اعتماد تعرضه عليك الجلسة الرئيسية.'];
   if (s === 'blocked') return [p.ownerRequest || 'معطّلة بعائق مثبت، وسببه وما يلزم لفكّه في سجل العوائق.'];
   if (s === 'prepared' || s === 'available') return [inCurrent ? 'تبدأ مع أمر الموجة.' : 'تبعياتها مغلقة، وتبدأ مع موجتها.'];
@@ -412,7 +412,7 @@ function techDetails(p) {
   if (p.closingCommit) add('commit الإغلاق', h('span', { class: 'ltr', text: p.closingCommit }));
 
   const notes = [];
-  if (p.stale) notes.push('مجلدها جُهّز على نسخة أقدم من main. تحدّثه الجلسة الرئيسية قبل تكليف وكيلها.');
+  if (p.stale) notes.push('مجلدها جُهّز على نسخة أقدم من main. تحدّثه الجلسة الرئيسية قبل العمل فيه.');
   if (p.returned) notes.push('أُعيدت بعائق مفتوح في سجل العوائق، وتتابعها الجلسة الرئيسية بعد فكّه.');
   if (p.unmerged) notes.push(`على فرعها ${p.unmerged} commits لم تُدمج في main.`);
 
@@ -502,7 +502,7 @@ function renderCurrent() {
     ),
     h('div', { class: 'panels' },
       h('div', { class: 'panel' },
-        h('h3', null, 'يعمل بالتوازي', parallel.length ? h('span', { class: 'count', text: parallel.length === 1 ? 'وكيل واحد' : parallel.length === 2 ? 'وكيلان، كلٌّ في مجلده' : `${parallel.length} وكلاء، كلٌّ في مجلده` }) : null),
+        h('h3', null, 'مراحل الموجة', parallel.length ? h('span', { class: 'count', text: parallel.length === 1 ? 'مرحلة واحدة' : parallel.length === 2 ? 'مرحلتان، بالتتابع' : `${parallel.length} مراحل، بالتتابع` }) : null),
         parallel.length
           ? h('ul', { class: 'items' }, parallel.map((p) => h('li', null,
               h('div', { class: 'row' }, phaseRef(p.id), h('strong', { text: p.title })),
