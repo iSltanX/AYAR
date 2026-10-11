@@ -49,3 +49,6 @@ export const internalPrepareQuit: CommandHandler = async (_payload, ctx) => {
   const [runs, cancelledSetups] = await Promise.all([ctx.services.runs.prepareQuit(), ctx.services.setup.prepareQuit()]);
   return { ...runs, cancelledSetups };
 };
+
+/** check.report (protocol 1.7, DEV-12): an execution's unified report without its findings, for the section panels. */
+export const checkReport: CommandHandler = (payload, ctx) => ctx.services.runs.report((payload as CommandPayload<'check.report'>).checkRunId);

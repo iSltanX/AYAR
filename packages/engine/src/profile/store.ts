@@ -3,7 +3,7 @@
 // check instance (approvals: the approved specHash, when, the profile version, a note), and the change set: what
 // is new or changed since its approval, field by field (D-08, FR-11). Only a changed specHash asks for approval.
 import { canonicalJson } from '@ayar/catalog';
-import type { ChangeItem, ChangeSet, CheckSpec, JsonValue } from '@ayar/protocol';
+import type { ChangeItem, ChangeSet, CheckSpec, JsonValue, ProfileVersion } from '@ayar/protocol';
 import { createHash } from 'node:crypto';
 import type { Db } from '../storage/db.ts';
 import { needsApproval, type ProfileSettings } from './propose.ts';
@@ -212,4 +212,27 @@ export function writeApprovals(db: Db, o: { projectId: string; items: readonly {
 /** An import asks for every command to be approved again (C-09 point 6). */
 export function clearApprovals(db: Db, projectId: string): number {
   return db.run('DELETE FROM approvals WHERE project_id = ?', projectId).changes;
+}
+
+/**
+ * profile.versions (protocol 1.7, DEV-12): every saved version, newest first, with the check specs it added, changed
+ * (another specHash) or removed against the version before it, and the instances whose current approval was given
+ * in it (an approval is kept per instance, so a later approval of the same instance replaces the earlier one).
+ */
+export function profileVersions(db: Db, projectId: string): ProfileVersion[] {
+  const rows = db.all<DbProfile>('SELECT * FROM profiles WHERE project_id = ? ORDER BY version', projectId).map(toRow);
+  const approvals = [...approvalsOf(db, projectId).values()];
+  let before = new Map<string, string>();
+  const out: ProfileVersion[] = [];
+  for (const row of rows) {
+    const now = new Map(row.content.checks.map((c) => [c.instance, c.specHash]));
+    const changes = {
+      added: [...now.keys()].filter((i) => !before.has(i)).sort(),
+      changed: [...now.entries()].filter(([i, h]) => before.has(i) && before.get(i) !== h).map(([i]) => i).sort(),
+      removed: [...before.keys()].filter((i) => !now.has(i)).sort(),
+    };
+    out.push({ version: row.version, createdAt: row.createdAt, source: row.source, changes, approved: approvals.filter((a) => a.profileVersion === row.version).map((a) => a.instance).sort() });
+    before = now;
+  }
+  return out.reverse();
 }

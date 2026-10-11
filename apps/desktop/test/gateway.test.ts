@@ -3,18 +3,21 @@
 import { protocolError, type CommandName, type EngineHealth, type Grants, type InvokeResult, type NativeMenuEntry } from '@ayar/protocol';
 import { describe, expect, it } from 'vitest';
 import type { DestructiveAlert } from '../src/main/destructive-alert.ts';
+import { editorCommand, type EditorCommand } from '../src/main/editor-command.ts';
 import { Gateway, type EngineLink, type SystemServices } from '../src/main/gateway.ts';
 import { TokenRegistry } from '../src/main/tokens.ts';
 import { controlsFromAppleLanguages } from '../src/main/window-controls.ts';
 
 type Call = { command: CommandName; payload: unknown; grants: Grants | undefined };
 
-function setup(o: { engine?: (c: Call) => InvokeResult<unknown>; picked?: string | null; folder?: string | null; dialogThrows?: boolean; confirm?: boolean; lang?: 'ar' | 'en'; menuChoice?: string | null; file?: string | null } = {}) {
+function setup(o: { engine?: (c: Call) => InvokeResult<unknown>; picked?: string | null; folder?: string | null; dialogThrows?: boolean; confirm?: boolean; lang?: 'ar' | 'en'; menuChoice?: string | null; file?: string | null; linkAnswer?: boolean } = {}) {
   const calls: Call[] = [];
   const clipboard: string[] = [];
   const alerts: DestructiveAlert[] = [];
   const revealed: string[] = [];
-  const opened: string[] = [];
+  const opened: EditorCommand[] = [];
+  const links: { url: string; title: string }[] = [];
+  let privacyOpened = 0;
   const asked: { root: string; rel: string }[] = [];
   const menus: NativeMenuEntry[][] = [];
   let now = 0;
@@ -60,9 +63,18 @@ function setup(o: { engine?: (c: Call) => InvokeResult<unknown>; picked?: string
       menus.push([...entries]);
       return Promise.resolve(o.menuChoice ?? null);
     },
+    appVersion: () => '0.1.0',
+    openExternal: (url, confirm) => {
+      links.push({ url, title: confirm.title });
+      return Promise.resolve(o.linkAnswer ?? true);
+    },
+    openPrivacySettings: () => {
+      privacyOpened++;
+      return Promise.resolve();
+    },
   };
   const gw = new Gateway({ engine, system, tokens, language: () => o.lang ?? 'ar', locationOf: (p) => (p.includes('/Documents/') ? 'documents' : null), home: '/private/Users/me' });
-  return { gw, calls, clipboard, alerts, revealed, opened, asked, menus, advance: (ms: number) => (now += ms) };
+  return { gw, calls, clipboard, alerts, revealed, opened, asked, menus, links, privacy: () => privacyOpened, advance: (ms: number) => (now += ms) };
 }
 
 const ok = <T>(r: InvokeResult<T>): T => {
@@ -261,13 +273,36 @@ describe('gateway: the screens\u2019 main-process commands (protocol 1.6)', () =
     const good = setup({ engine });
     expect(await good.gw.invoke({ command: 'editor.open', payload: { findingId: 'fnd_1' } })).toEqual({ ok: true, result: { opened: true } });
     expect(good.asked).toEqual([{ root: project.rootPath, rel: 'src/a.ts' }]);
-    expect(good.opened).toEqual([`${project.rootPath}/src/a.ts`]);
+    expect(good.opened).toEqual([{ program: '/usr/bin/open', args: ['-t', `${project.rootPath}/src/a.ts`] }]);
     const escaped = setup({ engine, file: null });
     expect(await escaped.gw.invoke({ command: 'editor.open', payload: { findingId: 'fnd_1' } })).toMatchObject({ ok: false, error: { code: 'not_found' } });
     expect(escaped.opened).toEqual([]);
     const outside = setup({ engine: (c) => (c.command === 'finding.get' ? { ok: true, result: { finding: { runId: 'run_1', location: { path: '/etc/passwd', outside: true } }, history: [] } } : engine(c)) });
     expect(await outside.gw.invoke({ command: 'editor.open', payload: { findingId: 'fnd_1' } })).toMatchObject({ ok: false, error: { code: 'not_found' } });
     expect(outside.asked).toEqual([]);
+  });
+
+  it('editor.open runs the editor template of the settings, with the file and its line, without a shell (E-17)', async () => {
+    const templated = setup({ engine: (c) => (c.command === 'settings.get' ? { ok: true, result: { values: { 'editor.template': 'code --goto {file}:{line}' } } } : engine(c)) });
+    expect(await templated.gw.invoke({ command: 'editor.open', payload: { findingId: 'fnd_1' } })).toEqual({ ok: true, result: { opened: true } });
+    expect(templated.opened).toEqual([{ program: 'code', args: ['--goto', `${project.rootPath}/src/a.ts:3`] }]);
+    // The pure split: words, {file} and {line} wherever they are, no template or one without {file}: open -t.
+    expect(editorCommand('zed {file}:{line}', '/p/a b.ts', 7)).toEqual({ program: 'zed', args: ['/p/a b.ts:7'] });
+    expect(editorCommand(null, '/p/a.ts', 3)).toEqual({ program: '/usr/bin/open', args: ['-t', '/p/a.ts'] });
+    expect(editorCommand('code --wait', '/p/a.ts', 3)).toEqual({ program: '/usr/bin/open', args: ['-t', '/p/a.ts'] });
+  });
+
+  it('about.get names the version and the repository, and about.openRepository opens it only after the native confirmation (D-DEV12-02, 15.2)', async () => {
+    const yes = setup();
+    expect(await yes.gw.invoke({ command: 'about.get', payload: {} })).toEqual({ ok: true, result: { version: '0.1.0', repository: 'https://github.com/iSltanX/AYAR' } });
+    expect(await yes.gw.invoke({ command: 'about.openRepository', payload: {} })).toEqual({ ok: true, result: { opened: true } });
+    expect(yes.links).toEqual([{ url: 'https://github.com/iSltanX/AYAR', title: 'افتح الرابط في المتصفح؟' }]);
+    const no = setup({ linkAnswer: false });
+    expect(await no.gw.invoke({ command: 'about.openRepository', payload: {} })).toEqual({ ok: true, result: { opened: false } });
+    // The page cannot hand the main process an address of its own.
+    expect(await no.gw.invoke({ command: 'about.openRepository', payload: { url: 'https://evil.example' } })).toMatchObject({ ok: false, error: { code: 'invalid_payload' } });
+    expect(await yes.gw.invoke({ command: 'system.openPrivacySettings', payload: {} })).toEqual({ ok: true, result: { opened: true } });
+    expect(yes.privacy()).toBe(1);
   });
 
   it('menu.popup shows the native menu and returns only an enabled item the renderer offered', async () => {

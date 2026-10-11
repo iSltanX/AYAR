@@ -1,7 +1,7 @@
 // C-09: the standards profile. Implemented in DEV-4 (protocol 1.1 gives the results their contracts, narrows
 // profile.update's patch to ProfilePatch, and adds profile.exportPreview and profile.importFromRepo [D-DEV4-02]).
 import { Id } from '../common.ts';
-import { ExportPreview, InstanceKey, ProfilePatch, ProfileView } from '../domain/profile.ts';
+import { ExportPreview, InstanceKey, ProfilePatch, ProfileVersion, ProfileView } from '../domain/profile.ts';
 import { DestinationToken, SourceToken } from '../tokens.ts';
 import { z } from '../zod.ts';
 import { defineCommand } from './define.ts';
@@ -47,6 +47,8 @@ export const profileCommands = {
   }),
   /** FR-12: the differences between the repository's .ayar/profile.json and what an export would write. */
   'profile.exportPreview': defineCommand({ ...added, payload: z.strictObject({ projectId: Id }), result: ExportPreview }),
+  /** Protocol 1.7 (DEV-12): the saved versions of the profile, newest first, with what each changed (screen 19 «الملف»). */
+  'profile.versions': defineCommand({ ...base, since: '1.7', implementedIn: 'DEV-12', payload: z.strictObject({ projectId: Id }), result: z.strictObject({ versions: z.array(ProfileVersion) }) }),
   /** 9.2 point 4: «استخدام ملف المستودع» — the .ayar/profile.json discovery found; every command needs approval again. */
   'profile.importFromRepo': defineCommand({ ...added, payload: z.strictObject({ projectId: Id }), result: ProfileView }),
 };

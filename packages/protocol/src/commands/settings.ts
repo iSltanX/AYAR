@@ -28,6 +28,17 @@ const ShellPath = z
   .max(1024)
   .refine((p) => p.startsWith('/') && !p.includes('\0'), 'not an absolute path');
 
+/**
+ * E-17's editor template (DEV-12): words separated by spaces, the first one the program, with {file} somewhere and
+ * {line} where the editor takes one. The main process splits it and runs it without a shell; no control character.
+ */
+export const EditorTemplate = z
+  .string()
+  .trim()
+  .min(1)
+  .max(512)
+  .refine((s) => s.includes('{file}') && !/[\u0000-\u001f\u007f]/.test(s), 'an editor template names {file} and holds no control character');
+
 export const SETTINGS = {
   'ui.language': { schema: z.enum(['system', 'ar', 'en']), default: 'system' },
   'ui.theme': { schema: z.enum(['system', 'light', 'dark']), default: 'system' },
@@ -53,6 +64,13 @@ export const SETTINGS = {
   'evidence.retainRuns': { schema: z.int().min(1).max(500), default: 20 },
   /** C-17 «خصوصية»: keep the text of project files in the content store for diffs; off keeps hashes only. */
   'evidence.storeContent': { schema: z.boolean(), default: true },
+  // DEV-12 (protocol 1.7): the settings screen (13.3, screen 21).
+  /** E-17 «افتح عند السطر»: a program and its arguments with {file} and {line}, run without a shell; null: `open -t`. */
+  'editor.template': { schema: EditorTemplate.nullable(), default: null },
+  /** 13.3 «الإشعارات»: a system notification when a run finishes while the window is not in front. */
+  'run.notify': { schema: z.boolean(), default: true },
+  /** 11.4 rule 4 («حد النطاق الضيق»): below this many criteria, the karat carries «نطاق ضيق». */
+  'purity.narrowThreshold': { schema: z.int().min(1).max(10), default: 3 },
 } as const;
 
 export type SettingKey = keyof typeof SETTINGS;
@@ -78,6 +96,9 @@ export const SettingValuesSchema = z.strictObject({
   'run.allowNetwork': SETTINGS['run.allowNetwork'].schema,
   'evidence.retainRuns': SETTINGS['evidence.retainRuns'].schema,
   'evidence.storeContent': SETTINGS['evidence.storeContent'].schema,
+  'editor.template': SETTINGS['editor.template'].schema,
+  'run.notify': SETTINGS['run.notify'].schema,
+  'purity.narrowThreshold': SETTINGS['purity.narrowThreshold'].schema,
 });
 
 export const SettingEntry = z.discriminatedUnion('key', [
@@ -96,6 +117,9 @@ export const SettingEntry = z.discriminatedUnion('key', [
   z.strictObject({ key: z.literal('run.allowNetwork'), value: SETTINGS['run.allowNetwork'].schema }),
   z.strictObject({ key: z.literal('evidence.retainRuns'), value: SETTINGS['evidence.retainRuns'].schema }),
   z.strictObject({ key: z.literal('evidence.storeContent'), value: SETTINGS['evidence.storeContent'].schema }),
+  z.strictObject({ key: z.literal('editor.template'), value: SETTINGS['editor.template'].schema }),
+  z.strictObject({ key: z.literal('run.notify'), value: SETTINGS['run.notify'].schema }),
+  z.strictObject({ key: z.literal('purity.narrowThreshold'), value: SETTINGS['purity.narrowThreshold'].schema }),
 ]);
 export type SettingEntry = z.infer<typeof SettingEntry>;
 
@@ -116,6 +140,9 @@ export function settingDefaults(): SettingValues {
     'run.allowNetwork': SETTINGS['run.allowNetwork'].default,
     'evidence.retainRuns': SETTINGS['evidence.retainRuns'].default,
     'evidence.storeContent': SETTINGS['evidence.storeContent'].default,
+    'editor.template': SETTINGS['editor.template'].default,
+    'run.notify': SETTINGS['run.notify'].default,
+    'purity.narrowThreshold': SETTINGS['purity.narrowThreshold'].default,
   };
 }
 

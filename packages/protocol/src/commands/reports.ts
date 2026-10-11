@@ -27,6 +27,18 @@ export const reportCommands = {
     payload: z.strictObject({ target: ReportTarget, options: ReportOptions }),
     result: ReportBuilt,
   }),
+  /**
+   * Protocol 1.7 (DEV-12, 12.10 «التكلفة»): how many times «انسخ للنموذج» copied something of this project in the last
+   * `days` days, from the audit records (`report.copied`, G-21) — a count, never an estimate of what it cost.
+   */
+  'reports.copies': defineCommand({
+    ...renderer,
+    owner: 'C-21',
+    since: '1.7',
+    implementedIn: 'DEV-12',
+    payload: z.strictObject({ projectId: Id, days: z.int().min(1).max(365) }),
+    result: z.strictObject({ count: z.int().nonnegative() }),
+  }),
   /** The reports kept for a project (14.1 `reports`), newest first. */
   'reports.list': defineCommand({ ...renderer, owner: 'C-21', since: '1.5', implementedIn: 'DEV-9', payload: z.strictObject({ projectId: Id }), result: z.strictObject({ reports: z.array(ReportRecord) }) }),
   /** C-22 «المقارنة» (FR-39, AT-22): two runs of one project, with the comparability notes of 11.5. */

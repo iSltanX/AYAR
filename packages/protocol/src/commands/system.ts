@@ -10,6 +10,8 @@ import { EngineHealth } from '../events/engine.ts';
 const base = { owner: 'C-01', handler: 'main', audience: 'renderer', since: '1.0', implementedIn: 'DEV-3' } as const;
 /** Protocol 1.6 (DEV-11, D-DEV11-02): what the screens need from the main process and macOS itself. */
 const shell = { ...base, since: '1.6', implementedIn: 'DEV-11' } as const;
+/** Protocol 1.7 (DEV-12): the settings' «حول» (D-DEV12-02) and the privacy guide's «افتح الإعدادات» (13.5, 22.1). */
+const later = { ...base, since: '1.7', implementedIn: 'DEV-12' } as const;
 
 /**
  * One entry of a native menu the renderer asks for (D-DES3-07: context menus are macOS menus). The renderer sends
@@ -95,4 +97,13 @@ export const systemCommands = {
     result: z.strictObject({ copied: z.literal(true) }),
   }),
   'engine.restart': defineCommand({ ...base, payload: z.strictObject({}), result: z.strictObject({ accepted: z.boolean() }) }),
+  /** D-DEV12-02: the app's version, its maker, and its repository's address, as the settings' «حول» shows them. */
+  'about.get': defineCommand({ ...later, payload: z.strictObject({}), result: z.strictObject({ version: z.string(), repository: z.string() }) }),
+  /**
+   * D-DEV12-02: opens the repository in the default browser after the user confirmed it in the main process's own
+   * alert (15.2); the address is the main process's, never the page's. `opened` is false when the user declined.
+   */
+  'about.openRepository': defineCommand({ ...later, payload: z.strictObject({}), result: z.strictObject({ opened: z.boolean() }) }),
+  /** 13.5 «إذن macOS مرفوض» (22.1): System Settings at Privacy & Security › Files and Folders. Nothing is granted by it. */
+  'system.openPrivacySettings': defineCommand({ ...later, payload: z.strictObject({}), result: z.strictObject({ opened: z.literal(true) }) }),
 };

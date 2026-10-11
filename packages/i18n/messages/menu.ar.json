@@ -15,5 +15,14 @@
   "menu.window.minimize": "تصغير",
   "menu.window.zoom": "تكبير",
   "menu.window.close": "إغلاق النافذة",
-  "menu.window.front": "إحضار الكل للأمام"
+  "menu.window.front": "إحضار الكل للأمام",
+  "menu.about.credits": "تصميم وتطوير: سلطان",
+  "menu.link.title": "افتح الرابط في المتصفح؟",
+  "menu.link.detail": "سيفتح متصفحك على {address}. لا يرسل عِيَار شيئًا معه.",
+  "menu.link.open": "افتح",
+  "menu.link.cancel": "ألغِ",
+  "menu.notify.finished": "انتهى {kind}",
+  "menu.notify.verdict": "انتهى {kind}: {verdict}",
+  "menu.notify.cancelled": "أُلغي {kind}",
+  "menu.notify.body": "افتح عِيَار لقراءة النتائج."
 }

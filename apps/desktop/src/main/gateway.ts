@@ -22,8 +22,10 @@ import {
   type ProtocolError,
   z,
 } from '@ayar/protocol';
-import type { Lang } from '@ayar/i18n';
+import { createTranslator, type Lang } from '@ayar/i18n';
+import { REPOSITORY } from './about.ts';
 import { destructiveAlert, type DestructiveAlert } from './destructive-alert.ts';
+import { editorCommand, type EditorCommand } from './editor-command.ts';
 import type { TokenRegistry } from './tokens.ts';
 
 export interface SystemServices {
@@ -42,10 +44,16 @@ export interface SystemServices {
   reveal(path: string): Promise<void>;
   /** The real path of a regular file inside the real root, or null (a link out of it, `..`, a folder, nothing). */
   fileInside(root: string, relative: string): Promise<string | null>;
-  /** E-17's default: the file in the default text editor (`open -t`). */
-  openInEditor(path: string): Promise<void>;
+  /** E-17: the program and arguments of the editor template (editor-command.ts), run without a shell. */
+  openInEditor(command: EditorCommand): Promise<void>;
   /** D-DES3-07: a native context menu; the chosen item's id, or null. */
   popupMenu(entries: readonly NativeMenuEntry[], at?: { x: number; y: number }): Promise<string | null>;
+  /** D-DEV12-02: the app's version. */
+  appVersion(): string;
+  /** 15.2: an https link in the default browser, after the user confirmed it in a native alert; false when declined. */
+  openExternal(url: string, confirm: { title: string; detail: string; open: string; cancel: string }): Promise<boolean>;
+  /** 13.5 (22.1): System Settings at Privacy & Security › Files and Folders. */
+  openPrivacySettings(): Promise<void>;
 }
 
 export interface EngineLink {
@@ -214,7 +222,7 @@ export class Gateway {
         // resolves the file inside the real root, and opens it. A path outside the root is never opened (C-15).
         const found = await engine.request('finding.get', { findingId: (payload as CommandPayload<'editor.open'>).findingId });
         if (!found.ok) return found;
-        const finding = (found.result as { finding: { runId: string; location: { path: string | null; outside?: boolean } | null } }).finding;
+        const finding = (found.result as { finding: { runId: string; location: { path: string | null; outside?: boolean; line?: number } | null } }).finding;
         const rel = finding.location?.path;
         if (!rel || finding.location?.outside) return fail(protocolError('not_found', { reason: 'no_file' }));
         const run = await engine.request('run.get', { runId: finding.runId });
@@ -223,9 +231,24 @@ export class Gateway {
         if (!root.ok) return root;
         const file = await system.fileInside(root.result, rel);
         if (file === null) return fail(protocolError('not_found', { reason: 'no_file' }));
-        await system.openInEditor(file);
+        // E-17 (DEV-12): the template the settings hold, or `open -t` when there is none.
+        const settings = await engine.request('settings.get', { keys: ['editor.template'] });
+        const template = settings.ok ? ((settings.result as { values: { 'editor.template'?: string | null } }).values['editor.template'] ?? null) : null;
+        await system.openInEditor(editorCommand(template, file, finding.location?.line ?? null));
         return { ok: true, result: { opened: true } };
       }
+      case 'about.get':
+        return { ok: true, result: { version: system.appVersion(), repository: REPOSITORY } };
+      case 'about.openRepository': {
+        // 15.2: an external link opens in the browser, https only, after a confirmation the page cannot click.
+        const t = createTranslator(this.#o.language?.() ?? 'ar');
+        const address = REPOSITORY.replace(/^https:\/\//, '');
+        const opened = await system.openExternal(REPOSITORY, { title: t('menu.link.title'), detail: t('menu.link.detail', { address }), open: t('menu.link.open'), cancel: t('menu.link.cancel') });
+        return { ok: true, result: { opened } };
+      }
+      case 'system.openPrivacySettings':
+        await system.openPrivacySettings();
+        return { ok: true, result: { opened: true } };
       case 'menu.popup': {
         const { entries, x, y } = payload as CommandPayload<'menu.popup'>;
         const id = await system.popupMenu(entries, x !== undefined && y !== undefined ? { x, y } : undefined);

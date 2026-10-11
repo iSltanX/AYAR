@@ -10,7 +10,7 @@
 - **الرموز والمنح:** الواجهة لا ترسل مسارًا أبدًا. ترسل رمزًا (`sel_` و`dst_` و`src_` و`cfm_`) تصدره العملية الرئيسية بعد نافذة نظام، أو بعد معاينة (`setup.preview` و`tools.preview`)، أو بعد تأكيد الواجهة لإجراء مدمّر (`confirm.issue`). وعند تمرير الأمر إلى المحرك تستبدل العملية الرئيسية بالرمز «منحة» (`grants`) تحمل المسار أو ربط التأكيد بالأمر وهدفه. والمحرك يرفض الأمر دون منحه (`checkGrants`).
 - **الأحداث:** مرقمة في «مجرى» (`stream`) لكل جلسة محرك، وللمشرف مجراه. الفجوة في الترقيم أو تبدّل المجرى تطلق إعادة المزامنة في الجسر (`bridge.resync`).
 - **`report.copied`** سجل تدقيق في `audit_log`، لا حدث (G-21). والأحداث الناقصة (تقدم التجهيز، وحالات فحوص النموذج والبطاقات) تضيفها مراحلها بإصدار ثانوي.
-- **عقود المجال** في `src/domain/` ملفًا لكل مجال: `DiscoverySnapshot` و`ResolvedEnv` وملف المعايير (`ProfileView` و`ExportedProfile` بصيغة `ayar-profile/1`) وعقود المشاريع من DEV-4 (الإصدار 1.1)، وسياق التغيير ونتيجة المستشار (`AdvisorContext` و`AdvisorResult`) والبطاقة (`TaskCard` و`TaskRecord` و`TaskSource`) من DEV-8، و`RunPlan` و`RunView` و`RunDetail` و`SavedGroup` وعقود الأدوات والتجهيز من DEV-5. والمرحلتان أضافتا عقودهما بالتوازي في الإصدار 1.2 نفسه، فجُمعتا فيه عند الدمج (G-WAVE4-03)، ومراحل التشغيل تضيف ما بعدها. ومن DEV-6 (الإصدار 1.3): عقود الأحكام في `domain/terms.ts` (النتائج والشدة والثبوت والمنشأ والحالة عبر التشغيلات) و`domain/findings.ts` (`ParsedReport` و`ParsedFinding` و`ExitSignal` و`Finding` وصفحة `results.query` وتفصيل `finding.get`) و`domain/purity.ts` (`PurityResult` و`PuritySummary` ومدخلات النزاهة)، واستدعاء المحول `InvocationTemplate` في `CheckSpec`، وحمولات `run.summary` و`finding.provisional` و`finding.final`. ومن DEV-7 (الإصدار 1.4): عقود المسبار في `domain/probe.ts` (هدف العرض ومصفوفته `RenderTarget`، والحالات `ProbeStates` بخطواتها ومحاكاة شبكتها وتوقعاتها، وميزانيات الويب `WebBudgets`، ومفتاح الصورة المرجعية `CaptureKey` واللقطة `CaptureView` والمرجع `BaselineView`)، والأمران `captures.list` و`baselines.list`، وعقد `baseline.approve`، ونوع التجهيز `install_browser`. ومن DEV-11 (الإصدار 1.6): أوامر العملية الرئيسية التي تحتاجها الشاشات (`window.layout` لموضع أزرار النافذة D-54، و`project.reveal` و`editor.open` و`menu.popup`، و`clipboard.copyText` لنسخ نص قصير يراه المستخدم كالمعرّف والأمر)، و`check.tail` لذيل سجل الفحص الحي (والسطر الأطول من 20,000 محرف يُقطع بعلامة «…»)، وموضوع الجسر `bridge.drop` لرمز اختيار المجلد المُفلت، و`memoryKb` في `check.progress`، و`cancelled` اختياريًا في رأس `report/1` لتشغيل أُلغي فلا حكم له ولا عيار (D-DEV11-02، D-DEV11-03). ونتيجة `z.unknown()` تعني أن عقد النتيجة لم يُعرَّف بعد.
+- **عقود المجال** في `src/domain/` ملفًا لكل مجال: `DiscoverySnapshot` و`ResolvedEnv` وملف المعايير (`ProfileView` و`ExportedProfile` بصيغة `ayar-profile/1`) وعقود المشاريع من DEV-4 (الإصدار 1.1)، وسياق التغيير ونتيجة المستشار (`AdvisorContext` و`AdvisorResult`) والبطاقة (`TaskCard` و`TaskRecord` و`TaskSource`) من DEV-8، و`RunPlan` و`RunView` و`RunDetail` و`SavedGroup` وعقود الأدوات والتجهيز من DEV-5. والمرحلتان أضافتا عقودهما بالتوازي في الإصدار 1.2 نفسه، فجُمعتا فيه عند الدمج (G-WAVE4-03)، ومراحل التشغيل تضيف ما بعدها. ومن DEV-6 (الإصدار 1.3): عقود الأحكام في `domain/terms.ts` (النتائج والشدة والثبوت والمنشأ والحالة عبر التشغيلات) و`domain/findings.ts` (`ParsedReport` و`ParsedFinding` و`ExitSignal` و`Finding` وصفحة `results.query` وتفصيل `finding.get`) و`domain/purity.ts` (`PurityResult` و`PuritySummary` ومدخلات النزاهة)، واستدعاء المحول `InvocationTemplate` في `CheckSpec`، وحمولات `run.summary` و`finding.provisional` و`finding.final`. ومن DEV-7 (الإصدار 1.4): عقود المسبار في `domain/probe.ts` (هدف العرض ومصفوفته `RenderTarget`، والحالات `ProbeStates` بخطواتها ومحاكاة شبكتها وتوقعاتها، وميزانيات الويب `WebBudgets`، ومفتاح الصورة المرجعية `CaptureKey` واللقطة `CaptureView` والمرجع `BaselineView`)، والأمران `captures.list` و`baselines.list`، وعقد `baseline.approve`، ونوع التجهيز `install_browser`. ومن DEV-11 (الإصدار 1.6): أوامر العملية الرئيسية التي تحتاجها الشاشات (`window.layout` لموضع أزرار النافذة D-54، و`project.reveal` و`editor.open` و`menu.popup`، و`clipboard.copyText` لنسخ نص قصير يراه المستخدم كالمعرّف والأمر)، و`check.tail` لذيل سجل الفحص الحي (والسطر الأطول من 20,000 محرف يُقطع بعلامة «…»)، وموضوع الجسر `bridge.drop` لرمز اختيار المجلد المُفلت، و`memoryKb` في `check.progress`، و`cancelled` اختياريًا في رأس `report/1` لتشغيل أُلغي فلا حكم له ولا عيار (D-DEV11-02، D-DEV11-03). ومن DEV-12 (الإصدار 1.7): `check.report` لتقرير تنفيذ الفحص الموحد دون اكتشافاته (أعداد الاختبارات والإشارات وحقائق القارئ) مع المخرجات المعلنة التي كتبها بأحجامها في نهاية التشغيل ونهاية الجولة السابقة، و`profile.versions` لإصدارات ملف المعايير وما غيّره كل منها، و`reports.copies` لعدد مرات «انسخ للنموذج» في المشروع من سجل التدقيق، و`disk_full` سببًا لإلغاء التشغيل حين يوقفه المنفذ بأمان لامتلاء القرص، وإعدادات `editor.template` و`run.notify` و`purity.narrowThreshold`، وأوامر العملية الرئيسية `about.get` و`about.openRepository` (D-DEV12-02) و`system.openPrivacySettings` (D-DEV12-01). ونتيجة `z.unknown()` تعني أن عقد النتيجة لم يُعرَّف بعد.
 
 ## ملكية الأوامر (G-19)
 
@@ -35,6 +35,7 @@
 | `profile.export` | C-09 | engine | renderer | destination | DEV-4 |
 | `profile.import` | C-09 | engine | renderer | source | DEV-4 |
 | `profile.exportPreview` | C-09 | engine | renderer | — | DEV-4 |
+| `profile.versions` | C-09 | engine | renderer | — | DEV-12 |
 | `profile.importFromRepo` | C-09 | engine | renderer | — | DEV-4 |
 | `environment.resolve` | C-07 | engine | renderer | — | DEV-4 |
 | `readiness.evaluate` | C-10 | engine | renderer | — | DEV-5 |
@@ -55,6 +56,7 @@
 | `results.query` | C-17 | engine | renderer | — | DEV-6 |
 | `finding.get` | C-17 | engine | renderer | — | DEV-6 |
 | `check.tail` | C-17 | engine | renderer | — | DEV-11 |
+| `check.report` | C-17 | engine | renderer | — | DEV-12 |
 | `evidence.token` | C-17 | engine | renderer | — | DEV-5 |
 | `review.record` | C-16 | engine | renderer | — | DEV-9 |
 | `reviews.list` | C-16 | engine | renderer | — | DEV-9 |
@@ -62,6 +64,7 @@
 | `captures.list` | C-14 | engine | renderer | — | DEV-7 |
 | `baselines.list` | C-14 | engine | renderer | — | DEV-7 |
 | `report.build` | C-21 | engine | renderer | — | DEV-9 |
+| `reports.copies` | C-21 | engine | renderer | — | DEV-12 |
 | `reports.list` | C-21 | engine | renderer | — | DEV-9 |
 | `compare.runs` | C-22 | engine | renderer | — | DEV-9 |
 | `clipboard.copy` | C-01 | main | renderer | — | DEV-9 |
@@ -97,6 +100,9 @@
 | `menu.popup` | C-01 | main | renderer | — | DEV-11 |
 | `clipboard.copyText` | C-01 | main | renderer | — | DEV-11 |
 | `engine.restart` | C-01 | main | renderer | — | DEV-3 |
+| `about.get` | C-01 | main | renderer | — | DEV-12 |
+| `about.openRepository` | C-01 | main | renderer | — | DEV-12 |
+| `system.openPrivacySettings` | C-01 | main | renderer | — | DEV-12 |
 | `internal.clipboardText` | C-21 | engine | host | — | DEV-9 |
 | `internal.recordCopy` | C-17 | engine | host | — | DEV-9 |
 | `internal.evidencePath` | C-17 | engine | host | — | DEV-5 |

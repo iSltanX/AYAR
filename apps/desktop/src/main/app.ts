@@ -1,13 +1,15 @@
 // The main process (C-01): one instance, the hardened window and session, the app protocol, the menus, the
 // engine supervisor, and the IPC gateway with its sender check. Loaded by entry.ts after the D-52 guard.
-import { app, ipcMain, Menu, powerSaveBlocker, protocol, session, type BrowserWindow, type IpcMainEvent, type IpcMainInvokeEvent } from 'electron';
+import { app, BrowserWindow as Windows, ipcMain, Menu, Notification, powerSaveBlocker, protocol, session, type BrowserWindow, type IpcMainEvent, type IpcMainInvokeEvent } from 'electron';
 import { randomBytes } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { IPC, protocolError, z, type DeliveredEvent, type EngineHealth, type ParsedEvent } from '@ayar/protocol';
 import { createFileLogger, ensureDataDir, nodeFileSystem, protectedLocation, stderrLogger, systemClock, type Logger } from '@ayar/engine/host-support';
-import { resolveLanguage } from '@ayar/i18n';
+import { createTranslator, resolveLanguage } from '@ayar/i18n';
+import { REPOSITORY } from './about.ts';
+import { RunNotifier, type RunStateLike } from './run-notifier.ts';
 import { serveAppRequest } from './app-protocol.ts';
 import { spawnUtilityEngine } from './engine-utility.ts';
 import { EngineSupervisor, PREPARE_QUIT_WAIT_MS } from './engine-supervisor.ts';
@@ -95,6 +97,10 @@ async function run(): Promise<void> {
   }
   logger.log('info', 'main process started', { version: app.getVersion(), packaged: app.isPackaged });
   Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate(resolveLanguage('system', app.getPreferredSystemLanguages()))));
+  // D-DEV12-02: macOS's own «حول عِيَار» names who made it and where its repository is.
+  const systemLang = () => resolveLanguage('system', app.getPreferredSystemLanguages());
+  const about = createTranslator(systemLang());
+  app.setAboutPanelOptions({ applicationName: about('common.appName'), applicationVersion: app.getVersion(), credits: `${about('menu.about.credits')}\n${REPOSITORY}` });
 
   const ports = new EventPorts();
   const supervisorStream = `supervisor-${randomBytes(9).toString('base64url')}`;
@@ -106,6 +112,19 @@ async function run(): Promise<void> {
     list.push(item);
     if (list.length > max) list.splice(0, list.length - max);
   };
+  // 13.3 «الإشعارات» (DEV-12): a run that ends while the window is not in front, when the setting allows it.
+  let notifierEngine: Pick<EngineSupervisor, 'request'> | null = null;
+  const notifier = new RunNotifier({
+    enabled: async () => {
+      const r = await notifierEngine?.request('settings.get', { keys: ['run.notify'] }).catch(() => null);
+      return !!(r?.ok && (r.result as { values: { 'run.notify'?: boolean } }).values['run.notify']);
+    },
+    focused: () => Windows.getFocusedWindow() !== null,
+    show: (title, body) => {
+      if (Notification.isSupported()) new Notification({ title, body }).show();
+    },
+    lang: systemLang,
+  });
   const deliver = (e: ParsedEvent): DeliveredEvent => ({ topic: e.topic, stream: e.stream, seq: e.seq, at: e.at, payload: e.payload });
 
   const supervisor = new EngineSupervisor({
@@ -124,16 +143,19 @@ async function run(): Promise<void> {
     onEngineEvent: (e) => {
       if (e.topic === 'engine.health') keepLast(healthLog, e.payload as EngineHealth);
       if (e.topic === 'run.state') sleepGuard.onRunState(e.payload as { runId: string; state: string; preventSleep: boolean });
+      if (e.topic === 'run.state') notifier.onRunState(e.payload as RunStateLike);
       ports.broadcast(deliver(e));
     },
     onConnected: () => {
       // A new engine session: the runs of the previous one are no longer running (FR-25 marks them interrupted).
       sleepGuard.reset();
+      notifier.reset();
       ports.renewAll();
     },
     log: (level, message, fields) => logger.log(level, message, fields),
   });
 
+  notifierEngine = supervisor;
   const tokens = new TokenRegistry({ randomBytes: (n) => new Uint8Array(randomBytes(n)), clock: { wall: () => Date.now(), mono: () => performance.now() } });
   const gateway = new Gateway({
     engine: supervisor,

@@ -43,6 +43,8 @@ export const AUDIT_ACTIONS = [
   'aiCheck.saved',
   'aiResult.imported',
   'aiResult.rejected',
+  // DEV-12 (protocol 1.7): «مسح كل البيانات» (14.3), the one record left after it.
+  'data.purged',
 ] as const;
 export const AuditAction = z.enum(AUDIT_ACTIONS);
 export type AuditAction = z.infer<typeof AuditAction>;

@@ -74,6 +74,8 @@ export interface EngineServices {
    * new user patterns), and the backups too (G-DEV4-01). A failure is logged, never fatal (re-review R4).
    */
   rescrubStored(): void;
+  /** The data folder (C-17): data.purge (DEV-12) empties its folders. */
+  layout: DataLayout;
 }
 
 export interface ServicesInput {
@@ -157,5 +159,5 @@ export function createServices(o: ServicesInput): EngineServices {
   const reports = new ReportsService({ db: o.db, catalog: o.catalog, ports: o.ports, logger: o.logger, evidence, redaction, purity, verdict, projects, profiles, tasks, runs, integrity });
   const aiChecks = new AiChecksService({ db: o.db, catalog: o.catalog, ports: o.ports, logger: o.logger, redaction, projects, profiles, verdict, events: o.events, evidence });
   tasksVerify = (runId, projectId) => tasks.verifyAfterRun(runId, projectId).then(() => undefined);
-  return { redaction, profiles, projects, environment, tasks, evidence, tools, setup, planner, runs, verdict, purity, browsers, baselines, integrity, reviews, reports, aiChecks, rescrubStored };
+  return { redaction, profiles, projects, environment, tasks, evidence, tools, setup, planner, runs, verdict, purity, browsers, baselines, integrity, reviews, reports, aiChecks, rescrubStored, layout: o.layout };
 }

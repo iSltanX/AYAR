@@ -12,7 +12,7 @@
 // (9.10). Every state change is saved before its event is sent.
 import type { Catalog } from '@ayar/catalog';
 import { adapterById } from '@ayar/adapters';
-import type { CheckOutcome, CheckRunDetail, CheckRunView, CheckSpec, EvidenceRef, JsonValue, ParsedReport, PlanItem, RawCheckResult, Reason, RunCounts, RunDetail, RunList, RunPlan, RunView, SideEffects, VerdictCounts } from '@ayar/protocol';
+import type { CheckOutcome, CheckReport, CheckRunDetail, CheckRunView, CheckSpec, EvidenceRef, JsonValue, ParsedReport, PlanItem, RawCheckResult, Reason, RunCounts, RunDetail, RunList, RunPlan, RunView, SideEffects, VerdictCounts } from '@ayar/protocol';
 import { RawCheckResult as RawSchema, RunPlan as PlanSchema } from '@ayar/protocol';
 import { createHash } from 'node:crypto';
 import { posix } from 'node:path';
@@ -54,6 +54,14 @@ import { buildJob, cellMeta } from '../probe/job.ts';
 import type { ProbeService } from '../probe/service.ts';
 import type { ProbeOutcome, VisualComparison } from '@ayar/probe';
 import type { GuardContext, IntegrityService } from '../integrity/service.ts';
+
+/** 13.5 «القرص ممتلئ» (DEV-12): the free space the data volume keeps; below it no further check starts. */
+export const DISK_RESERVE_BYTES = 300 * 1000 * 1000;
+
+/** Why a check ended «أُلغي» with its run: by the user, because the app quits, or because the disk ran low (DEV-12). */
+function cancelReasonOf(cancel: 'user' | 'app_quit' | 'disk_full' | null): Reason {
+  return { key: cancel === 'app_quit' ? 'run.reason.appQuit' : cancel === 'disk_full' ? 'run.reason.diskFull' : 'run.reason.cancelledByUser' };
+}
 
 /** check.tail's longest line (protocol 1.6): a longer one is cut and marked. */
 const TAIL_LINE_CHARS = 20_000;
@@ -180,7 +188,7 @@ interface Active {
   runId: string;
   projectId: string;
   plan: RunPlan;
-  cancel: 'user' | 'app_quit' | null;
+  cancel: 'user' | 'app_quit' | 'disk_full' | null;
   procs: Map<string, RunningProcess>;
   cancelledChecks: Set<string>;
   services: CompanionServices | null;
@@ -447,7 +455,7 @@ export class RunService {
     const running = new Map<string, Promise<void>>();
     while (pending.length || running.size) {
       if (active.cancel) {
-        for (const x of pending.splice(0)) this.#finishCheck(execs.get(x)!, 'cancelled', { key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }, null, []);
+        for (const x of pending.splice(0)) this.#finishCheck(execs.get(x)!, 'cancelled', cancelReasonOf(active.cancel), null, []);
       }
       let progressed = false;
       for (let n = 0; n < pending.length; n++) {
@@ -504,6 +512,13 @@ export class RunService {
           if (heavy) break; // a heavy check waits for the others to drain, and nothing overtakes it (G-34)
           continue;
         }
+        // 13.5 «القرص ممتلئ» (DEV-12): before another check writes its logs and evidence, the data volume keeps its
+        // reserve; otherwise the run stops safely, its partial results kept, before a write can fail.
+        if (await this.#diskLow()) {
+          this.#o.logger.log('warn', 'the data volume is low: the run stops safely', { runId });
+          this.#requestCancel(active, 'disk_full');
+          break;
+        }
         e.state = 'running';
         pending.splice(n--, 1);
         progressed = true;
@@ -546,7 +561,7 @@ export class RunService {
       const e = execs.get(inst)!;
       if (e.state !== 'pending') continue;
       if (active.cancel) {
-        this.#finishCheck(e, 'cancelled', { key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }, null, []);
+        this.#finishCheck(e, 'cancelled', cancelReasonOf(active.cancel), null, []);
         continue;
       }
       await this.#runIntegrity(active, e, ctx, endManifest, [...change.created, ...change.modified, ...change.deleted].filter((p) => !ctx.declared(p))).catch((err: unknown) => {
@@ -668,6 +683,12 @@ export class RunService {
     return underAny([...this.#outputs(projectId), ...outputDirs]);
   }
 
+  /** The data volume's free space is under its reserve (an unknown free space is not low). */
+  async #diskLow(): Promise<boolean> {
+    const free = await this.#o.ports.fs.freeBytes(this.#o.layout.root).catch(() => null);
+    return free !== null && free < DISK_RESERVE_BYTES;
+  }
+
   /** FR-36: the outputs the profile declares. */
   #outputs(projectId: string): string[] {
     const raw = latestProfile(this.#o.db, projectId)?.content.references.outputs;
@@ -730,7 +751,7 @@ export class RunService {
     if (waiting.signal.aborted || active.cancel || active.cancelledChecks.has(e.checkRunId)) {
       await active.services!.release(held);
       await ports.fs.remove(tmpRoot);
-      return this.#finishCheck(e, 'cancelled', { key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }, null, []);
+      return this.#finishCheck(e, 'cancelled', cancelReasonOf(active.cancel), null, []);
     }
     if (failedService) {
       await active.services!.release(held);
@@ -777,7 +798,7 @@ export class RunService {
       for (const name of ['stdout.log', 'stderr.log']) await ports.fs.remove(posix.join(evDir, name));
       await active.services!.release(held);
       await ports.fs.remove(tmpRoot);
-      return this.#finishCheck(e, 'cancelled', { key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }, null, []);
+      return this.#finishCheck(e, 'cancelled', cancelReasonOf(active.cancel), null, []);
     }
     // The steps, one after the other, as one execution: one token, one ledger row (the next step reopens it), one
     // timeout for them all. A step that did not end on its own (cancelled, timed out, killed) ends the execution.
@@ -1014,7 +1035,7 @@ export class RunService {
   async #runProbe(active: Active, e: Exec, ctx: CheckContext, spec: CheckSpec): Promise<void> {
     const { db, ports, evidence, layout } = this.#o;
     const runId = active.runId;
-    const cancelledReason = (): Reason => ({ key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' });
+    const cancelledReason = (): Reason => cancelReasonOf(active.cancel);
     if (!this.#o.probe.available) return this.#finishCheck(e, 'unavailable', { key: 'probe.reason.noHost' }, null, []);
     const browser = await this.#o.browsers.located();
     if (!browser) return this.#finishCheck(e, 'missing', { key: 'setup.reason.probeBrowserMissing' }, null, []);
@@ -1264,7 +1285,7 @@ export class RunService {
     const t0 = ports.clock.monotonicMs();
     const judgement = await this.#o.verdict.judge(spec, { projectId: ctx.projectId, root: ctx.root, req: { kind: 'analyze', analyzer, files, facts }, signal: AbortSignal.any([ctrl.signal, active.quit.signal]), guard: this.#o.integrity.effectsOn(ctx.guard, e.instance) }).finally(() => active.waiting.delete(e.checkRunId));
     active.collecting.add(e.checkRunId);
-    if (judgement.outcome === 'cancelled') return this.#finishCheck(e, 'cancelled', { key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }, null, []);
+    if (judgement.outcome === 'cancelled') return this.#finishCheck(e, 'cancelled', cancelReasonOf(active.cancel), null, []);
     const raw: RawCheckResult = {
       checkRunId: e.checkRunId,
       runId,
@@ -1312,7 +1333,7 @@ export class RunService {
         if (r.spawnError === 'EACCES') return ['unavailable', { key: 'run.reason.permissionDenied' }];
         return ['unavailable', { key: 'run.reason.spawnFailed', params: { error: r.spawnError ?? 'unknown' } }];
       case 'cancelled':
-        return ['cancelled', { key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' }];
+        return ['cancelled', cancelReasonOf(active.cancel)];
       case 'timed_out':
         return ['timed_out', { key: 'run.reason.timeout', params: { minutes: spec.timeoutMin } }];
       case 'idle_timed_out':
@@ -1501,7 +1522,7 @@ export class RunService {
     this.#emitRun(runId);
   }
 
-  #requestCancel(a: Active, reason: 'user' | 'app_quit'): void {
+  #requestCancel(a: Active, reason: 'user' | 'app_quit' | 'disk_full'): void {
     if (a.cancel === 'app_quit') return;
     a.cancel = reason;
     // The app quits: a report still being read is dropped (the run ends the short way).
@@ -1618,7 +1639,7 @@ export class RunService {
       verdict: TERMINAL_RUN.includes(r.state) ? ((r.verdict as RunView['verdict']) ?? null) : null,
       purity: TERMINAL_RUN.includes(r.state) ? this.#o.purity.summaryOf(runId) : null,
       keepForever: r.keep_forever === 1,
-      cancelReason: r.cancel_reason === 'user' || r.cancel_reason === 'app_quit' ? r.cancel_reason : null,
+      cancelReason: r.cancel_reason === 'user' || r.cancel_reason === 'app_quit' || r.cancel_reason === 'disk_full' ? r.cancel_reason : null,
       preventSleep: r.prevent_sleep === 1,
     };
   }
@@ -1643,6 +1664,62 @@ export class RunService {
     if (!row) throw new CommandError('not_found', { reason: 'check_run' });
     const tail = row.raw_json ? RawSchema.parse(JSON.parse(row.raw_json)).tail : [];
     return { lines: cut(tail.slice(-n)), totalLines: tail.length, live: false };
+  }
+
+  /**
+   * check.report (protocol 1.7, DEV-12): the unified report kept with an execution's evidence (redacted on its way in),
+   * without its findings, and the declared outputs the execution wrote with their sizes at the end of its run and at
+   * the end of the previous complete round. A report whose file no longer matches its hash is «دليل تالف»: not read.
+   */
+  async report(checkRunId: string): Promise<CheckReport | null> {
+    const row = this.#o.db.get<{ run_id: string; raw_json: string | null }>('SELECT run_id, raw_json FROM check_runs WHERE id = ?', checkRunId);
+    if (!row) throw new CommandError('not_found', { reason: 'check_run' });
+    const ref = this.#o.evidence.store.refsOf(checkRunId).find((e) => e.kind === 'parsed');
+    if (!ref || ref.size > REPORT_READ_LIMIT) return null;
+    let parsed: ParsedReport;
+    try {
+      const data = await this.#o.ports.fs.readFile(this.#o.evidence.store.absolute(ref.relPath));
+      if (createHash('sha256').update(data).digest('hex') !== ref.sha256) return null;
+      parsed = JSON.parse(new TextDecoder().decode(data)) as ParsedReport;
+    } catch {
+      return null;
+    }
+    // The kept JSON may carry more than the report (reportEvidence's extra keys): only the contract's fields leave.
+    return {
+      reader: parsed.reader,
+      readerVersion: parsed.readerVersion,
+      formats: parsed.formats,
+      tests: parsed.tests,
+      findingsDropped: parsed.findingsDropped,
+      signals: parsed.signals,
+      problems: parsed.problems,
+      info: parsed.info,
+      findingsCount: parsed.findings.length,
+      outputs: await this.#writtenOutputs(row.run_id, row.raw_json),
+    };
+  }
+
+  /** The declared outputs an execution created or modified, sized from its run's end snapshot and the round before. */
+  async #writtenOutputs(runId: string, rawJson: string | null): Promise<CheckReport['outputs']> {
+    const effects = rawJson ? RawSchema.parse(JSON.parse(rawJson)).sideEffects : null;
+    if (!effects) return [];
+    const written = new Set([...effects.created, ...effects.modified]);
+    const paths = effects.declared.filter((p) => written.has(p)).slice(0, 200);
+    if (!paths.length) return [];
+    const run = this.#o.db.get<{ project_id: string; snapshot_end_id: string | null; started_at: string | null }>('SELECT project_id, snapshot_end_id, started_at FROM runs WHERE id = ?', runId);
+    if (!run) return paths.map((path) => ({ path, sizeBytes: null, previousBytes: null }));
+    const previous = this.#o.db.get<{ snapshot_end_id: string }>(
+      "SELECT snapshot_end_id FROM runs WHERE project_id = ? AND id <> ? AND kind = 'full' AND state = 'finished' AND cancel_reason IS NULL AND snapshot_end_id IS NOT NULL AND started_at < ? ORDER BY started_at DESC LIMIT 1",
+      run.project_id,
+      runId,
+      run.started_at ?? '9999',
+    );
+    const sizes = async (snapshotId: string | null | undefined) => {
+      const m = snapshotId ? await this.#o.evidence.snapshots.load(snapshotId) : null;
+      return new Map((m?.files ?? []).map((f) => [f[0], f[1]] as const));
+    };
+    const [now, before] = await Promise.all([sizes(run.snapshot_end_id), sizes(previous?.snapshot_end_id)]);
+    return paths.map((path) => ({ path, sizeBytes: now.get(path) ?? null, previousBytes: before.get(path) ?? null }));
   }
 
   list(projectId: string): RunList {

@@ -313,3 +313,16 @@ export const ExportPreview = z.strictObject({
   diff: z.array(z.strictObject({ op: z.enum(['=', '+', '-']), line: z.string() })),
 });
 export type ExportPreview = z.infer<typeof ExportPreview>;
+
+/**
+ * profile.versions (protocol 1.7, DEV-12): one saved version of the profile and what it changed from the version
+ * before it, instance by instance (an added, changed or removed check spec), with the instances approved in it.
+ */
+export const ProfileVersion = z.strictObject({
+  version: z.int().positive(),
+  createdAt: IsoTimestamp,
+  source: z.enum(['proposed', 'edited', 'imported']),
+  changes: z.strictObject({ added: z.array(InstanceKey), changed: z.array(InstanceKey), removed: z.array(InstanceKey) }),
+  approved: z.array(InstanceKey),
+});
+export type ProfileVersion = z.infer<typeof ProfileVersion>;

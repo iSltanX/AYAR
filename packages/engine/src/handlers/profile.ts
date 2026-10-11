@@ -3,6 +3,7 @@ import type { CommandPayload } from '@ayar/protocol';
 import { posix } from 'node:path';
 import type { CommandHandler } from '../host/dispatcher.ts';
 import { CommandError, withFs } from '../host/errors.ts';
+import { profileVersions } from '../profile/store.ts';
 
 const MAX_PROFILE_BYTES = 2 * 1024 * 1024;
 
@@ -69,4 +70,11 @@ export const profileImportFromRepo: CommandHandler = async (payload, ctx) => {
   const text = await repoProfile(ctx, projectId);
   if (text === null) throw new CommandError('not_found', { reason: 'no_repository_profile' });
   return ctx.services.profiles.importText(projectId, text, 'repository');
+};
+
+/** profile.versions (protocol 1.7, DEV-12): the saved versions and what each changed (screen 19 «الملف»). */
+export const profileVersionsList: CommandHandler = (payload, ctx) => {
+  const { projectId } = payload as CommandPayload<'profile.versions'>;
+  if (!ctx.db.get('SELECT id FROM projects WHERE id = ?', projectId)) throw new CommandError('not_found', { reason: 'project' });
+  return { versions: profileVersions(ctx.db, projectId) };
 };
