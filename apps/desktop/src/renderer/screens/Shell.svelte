@@ -141,11 +141,13 @@
 
   // Every project page offers «ابدأ الفحص الكامل» in the title bar (it shows the plan first, 13.7) unless the page
   // sets its own; a project whose folder is gone or unreadable cannot be scanned (22.1, 22.2).
+  // A page of a project that sets its own primary action (the overview, the results) keeps the Run menu beside it.
   const primary = $derived.by(() => {
-    if (app.primary) return app.primary;
+    const ok = !!project && !denied && project.pathStatus === 'ok';
+    const menu = ok && project ? { label: t('controls.runMenu.open'), onopen: (a: DOMRect) => void openRunMenu(project.id, a) } : undefined;
+    if (app.primary) return menu ? { ...app.primary, menu } : app.primary;
     if (!project || denied || route.name === 'discovery' || route.name === 'scan' || route.name === 'profile') return undefined;
-    const ok = project.pathStatus === 'ok';
-    return { label: t('ui.action.startFullScan'), onclick: () => openScan(project.id), disabled: !ok, menu: ok ? { label: t('controls.runMenu.open'), onopen: (a: DOMRect) => void openRunMenu(project.id, a) } : undefined };
+    return { label: t('ui.action.startFullScan'), onclick: () => openScan(project.id), disabled: !ok, menu };
   });
 
   // ── the Run menu (C-23, D-DES3-07; D-DEV12-04): a native menu under the chevron beside the primary action ──

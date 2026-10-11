@@ -140,7 +140,10 @@ export class AppState {
     if (!settings.ok) return;
     this.languageSetting = settings.result.values['ui.language'] ?? 'system';
     this.themeSetting = settings.result.values['ui.theme'] ?? 'system';
-    this.lang = resolveLanguage(this.languageSetting, navigator.languages);
+    const lang = resolveLanguage(this.languageSetting, navigator.languages);
+    // An announcement said in the other language is not repeated in this one (AT-28: the whole interface switches).
+    if (lang !== this.lang) this.announcement = '';
+    this.lang = lang;
     this.applyTheme();
   }
 
