@@ -17,7 +17,8 @@ export const resultCommands = {
   /**
    * Protocol 1.6 (DEV-11, D-DEV11-03): the last lines of a check's log — while it runs, from the executor's redacted
    * tail (9.7 keeps the last 200), after it, from its raw result — for the live row's «ذيل السجل» (9.6 point 3, 13.3).
-   * Text only, redacted before it was kept; the UI draws it as text (C-03).
+   * Text only, redacted before it was kept; the UI draws it as text (C-03). A line longer than 20,000 characters
+   * is cut there and ends with «…» (AT-29: a long line neither freezes the page nor fails the call).
    */
   'check.tail': defineCommand({
     ...base,

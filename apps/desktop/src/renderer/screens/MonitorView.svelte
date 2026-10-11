@@ -212,7 +212,7 @@
     {#if engineDown}<Banner kind="engine-restarting" />{/if}
 
     <div class="body">
-      <section class="card summary" aria-label={runKind(t, run, plan)}>
+      <section class="card summary" aria-label={runKind(t, run, plan)} data-testid="monitor-summary" data-state={cycle}>
         <div class="head">
           <CycleIndicator {cycle} label={`${runKind(t, run, plan)} · ${t(`status.cycle.${cycle}`)}`} />
           <span class="run-id"><LtrText text={run.displayId} mono /></span>
@@ -224,7 +224,7 @@
 
         <Progress kind="count" done={live.finished} total={live.total} estimate={remainingMs ? t('monitor.remaining', { duration: clockMs(remainingMs) }) : undefined} />
 
-        <div class="counts">
+        <div class="counts" data-testid="monitor-counts">
           {#if live.cancelling}<CycleIndicator cycle="cancelling" size="sm" count={live.cancelling} />{/if}
           {#if live.running}<CycleIndicator cycle="running" size="sm" count={live.running} />{/if}
           {#if live.queued}<CycleIndicator cycle="queued" size="sm" count={live.queued} />{/if}

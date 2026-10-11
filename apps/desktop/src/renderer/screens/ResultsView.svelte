@@ -418,7 +418,7 @@
 {/snippet}
 
 {#if run}
-  <div class="page">
+  <div class="page" data-testid="results" data-run={run.displayId} data-view={view}>
     <header class="page-header">
       <h1 class="title">{forModel ? t('resultsui.title.forModel') : t('resultsui.title')}</h1>
       {#if forModel}<p class="subtitle"><LtrText text={copyReport && copyReport.displayId !== run.displayId ? t('resultsui.subtitle.forModel', { run: run.displayId, report: copyReport.displayId }) : run.displayId} mono /></p>{/if}

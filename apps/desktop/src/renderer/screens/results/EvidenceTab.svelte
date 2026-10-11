@@ -20,11 +20,11 @@
     <table class="evidence">
       <thead>
         <tr>
-          <th class="c-file" scope="col"><TableHeaderCell label={t('resultsui.evidence.file')} sortable={false} /></th>
-          <th class="c-check" scope="col"><TableHeaderCell label={t('resultsui.evidence.check')} sortable={false} /></th>
-          <th class="c-size" scope="col"><TableHeaderCell label={t('resultsui.evidence.size')} sortable={false} /></th>
-          <th class="c-hash" scope="col"><TableHeaderCell label={t('resultsui.evidence.hash')} sortable={false} /></th>
-          <th class="c-red" scope="col"><TableHeaderCell label={t('resultsui.evidence.redactions')} sortable={false} overflow="start" /></th>
+          <th class="c-file" scope="col"><TableHeaderCell native label={t('resultsui.evidence.file')} sortable={false} /></th>
+          <th class="c-check" scope="col"><TableHeaderCell native label={t('resultsui.evidence.check')} sortable={false} /></th>
+          <th class="c-size" scope="col"><TableHeaderCell native label={t('resultsui.evidence.size')} sortable={false} /></th>
+          <th class="c-hash" scope="col"><TableHeaderCell native label={t('resultsui.evidence.hash')} sortable={false} /></th>
+          <th class="c-red" scope="col"><TableHeaderCell native label={t('resultsui.evidence.redactions')} sortable={false} overflow="start" /></th>
         </tr>
       </thead>
       <tbody>

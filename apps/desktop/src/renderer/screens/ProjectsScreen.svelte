@@ -156,10 +156,10 @@
     <table class="projects" data-testid="projects-table">
       <thead>
         <tr>
-          <th class="c-name" scope="col"><TableHeaderCell label={t('projectlist.column.project')} sortable={false} /></th>
-          <th class="c-type" scope="col"><TableHeaderCell label={t('projectlist.column.type')} sortable={false} /></th>
-          <th class="c-verdict" scope="col"><TableHeaderCell label={t('projectlist.column.verdict')} sortable={false} /></th>
-          <th class="c-readiness" scope="col"><TableHeaderCell label={t('projectlist.column.readiness')} sortable={false} /></th>
+          <th class="c-name" scope="col"><TableHeaderCell native label={t('projectlist.column.project')} sortable={false} /></th>
+          <th class="c-type" scope="col"><TableHeaderCell native label={t('projectlist.column.type')} sortable={false} /></th>
+          <th class="c-verdict" scope="col"><TableHeaderCell native label={t('projectlist.column.verdict')} sortable={false} /></th>
+          <th class="c-readiness" scope="col"><TableHeaderCell native label={t('projectlist.column.readiness')} sortable={false} /></th>
           <th class="c-actions" scope="col"><span class="visually-hidden">{t('projectlist.column.actions')}</span></th>
         </tr>
       </thead>

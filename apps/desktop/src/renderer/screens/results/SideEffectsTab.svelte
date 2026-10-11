@@ -25,11 +25,11 @@
     <table>
       <thead>
         <tr>
-          <th class="c-path" scope="col"><TableHeaderCell label={t('resultsui.effects.path')} sortable={false} /></th>
-          <th class="c-change" scope="col"><TableHeaderCell label={t('resultsui.effects.change')} sortable={false} /></th>
-          <th class="c-check" scope="col"><TableHeaderCell label={t('resultsui.effects.check')} sortable={false} /></th>
-          <th class="c-inside" scope="col"><TableHeaderCell label={t('resultsui.effects.inside')} sortable={false} /></th>
-          <th class="c-note" scope="col"><TableHeaderCell label={t('resultsui.effects.note')} sortable={false} overflow="start" /></th>
+          <th class="c-path" scope="col"><TableHeaderCell native label={t('resultsui.effects.path')} sortable={false} /></th>
+          <th class="c-change" scope="col"><TableHeaderCell native label={t('resultsui.effects.change')} sortable={false} /></th>
+          <th class="c-check" scope="col"><TableHeaderCell native label={t('resultsui.effects.check')} sortable={false} /></th>
+          <th class="c-inside" scope="col"><TableHeaderCell native label={t('resultsui.effects.inside')} sortable={false} /></th>
+          <th class="c-note" scope="col"><TableHeaderCell native label={t('resultsui.effects.note')} sortable={false} overflow="start" /></th>
         </tr>
       </thead>
       <tbody>

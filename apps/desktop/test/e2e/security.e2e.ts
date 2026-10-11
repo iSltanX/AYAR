@@ -1,4 +1,4 @@
-// AT-30 (part), on the development build: isolation and sandbox, zero CSP violations on the empty root (with
+// AT-30 (part), on the development build: isolation and sandbox, zero CSP violations on the first page (with
 // positive controls proving the policy and the collector work), no navigation and no new windows, every
 // permission refused, a message from an unexpected frame refused, and the D-52 guard. Plus the whole path
 // renderer → preload → main → engine (utilityProcess) → back.
@@ -56,16 +56,16 @@ describe('window configuration (15.2)', () => {
     expect(world).toEqual({ process: 'undefined', require: 'undefined', buffer: 'undefined', ipcRenderer: 'undefined', bridge: ['invoke', 'subscribe'] });
   });
 
-  it('shows an empty root: no visual element and no style', async () => {
+  it('draws its first page from the app’s own files: no inline style element, and only CSS custom properties set from script', async () => {
+    await run.page.waitForSelector('#app > *');
     const dom = await run.page.evaluate(() => ({
-      children: document.getElementById('app')?.childElementCount,
-      text: document.body.innerText.trim(),
-      bodyElements: [...document.body.children].map((e) => e.tagName),
-      styleSheets: document.styleSheets.length,
-      styled: document.querySelectorAll('[style]').length,
-      styleTags: document.querySelectorAll('style, link[rel=stylesheet]').length,
+      drawn: (document.getElementById('app')?.childElementCount ?? 0) > 0,
+      inlineStyleTags: document.querySelectorAll('style').length,
+      sheets: [...document.querySelectorAll('link[rel=stylesheet]')].every((l) => (l as HTMLLinkElement).href.startsWith('app://ayar/')),
+      // CSSOM custom properties (Progress, Karat dial) are allowed by the CSP; any other inline declaration is not ours.
+      styled: [...document.querySelectorAll('[style]')].filter((e) => [...(e as HTMLElement).style].some((p) => !p.startsWith('--'))).length,
     }));
-    expect(dom).toEqual({ children: 0, text: '', bodyElements: ['DIV'], styleSheets: 0, styled: 0, styleTags: 0 });
+    expect(dom).toEqual({ drawn: true, inlineStyleTags: 0, sheets: true, styled: 0 });
   });
 
   it('serves the UI from the app protocol with the 15.2 CSP header, and nothing outside it', async () => {
@@ -80,7 +80,7 @@ describe('window configuration (15.2)', () => {
 });
 
 describe('content security policy (15.2, AT-30)', () => {
-  it('records zero violations on the empty root', async () => {
+  it('records zero violations on the first page', async () => {
     await new Promise((r) => setTimeout(r, 500));
     expect((await diag()).cspViolations).toEqual([]);
   });

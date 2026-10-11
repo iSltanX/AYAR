@@ -114,6 +114,15 @@ function report(o: Partial<Report> = {}): Report {
 
 describe('report/1 → «لك» and «للنموذج» (12.1 to 12.5)', () => {
   for (const lang of ['ar', 'en'] as const) {
+    it(`${lang}: a run with a custom check (no catalog limits) still agrees (DEV-11)`, () => {
+      const base = report();
+      const r = ReportSchema.parse({ ...base, checks: [...base.checks, check('custom.failfast', 'failed', { section: 'custom', criterion: null, required: false, blocking: false, proves: null })], head: { ...base.head, counts: { passed: 13, failed: 3, missing: 3 } } });
+      const rr = new Renderer(lang);
+      const parity = checkParity(r, rr.renderHuman(r).text, rr.renderModel(r).text, lang);
+      expect(parity.mismatches).toEqual([]);
+      expect(parity.checked.limits).toBe(5);
+    });
+
     it(`${lang}: both formats agree on ids, counts, scope, verdict and limits, and the parity says so`, () => {
       const r = report();
       const rr = new Renderer(lang);

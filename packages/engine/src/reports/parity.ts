@@ -68,7 +68,9 @@ export function checkParity(report: Report, human: string, model: string, lang: 
   const wantVerdict = report.head.verdict ? t(`status.verdict.${report.head.verdict}` as MessageKey) : t('report.verdict.none');
   if (h.verdict !== wantVerdict || m.verdict !== wantVerdict) mismatches.push({ field: 'verdict', human: h.verdict ?? '', model: m.verdict ?? '' });
   if (h.scope === null || m.scope === null || h.scope !== m.scope) mismatches.push({ field: 'scope', human: h.scope ?? '', model: m.scope ?? '' });
-  const wantLimits = [...new Set(report.checks.filter((c) => c.outcome !== null && c.outcome !== 'not_applicable').map((c) => c.checkId))].sort();
+  // The limits the catalog writes: a custom check (DEV-11: «custom.<name>») has no catalog text, so neither format
+  // can name one, and its absence is no disagreement.
+  const wantLimits = [...new Set(report.checks.filter((c) => c.outcome !== null && c.outcome !== 'not_applicable' && tryT(t, `catalog.check.${c.checkId.replace('*', 'any')}.limits`)).map((c) => c.checkId))].sort();
   if (h.limits.join(',') !== wantLimits.join(',')) mismatches.push({ field: 'limits', human: h.limits.join(','), model: wantLimits.join(',') });
   if (m.limits.join(',') !== wantLimits.join(',')) mismatches.push({ field: 'limits', human: wantLimits.join(','), model: m.limits.join(',') });
   if (hasForgedBoundary(human, report.token) || hasForgedBoundary(model, report.token)) mismatches.push({ field: 'boundaries', human: String(hasForgedBoundary(human, report.token)), model: String(hasForgedBoundary(model, report.token)) });

@@ -220,7 +220,7 @@
   primary={app.primary ?? undefined}
   {search}
   bind:inspectorOpen={app.inspectorOpen}
-  inspectorId={INSPECTOR_ID}
+  inspectorId={app.inspector && app.inspectorOpen ? INSPECTOR_ID : undefined}
   {sidebar}
   runbar={active && !onItsMonitor ? runbar : undefined}
   {content}

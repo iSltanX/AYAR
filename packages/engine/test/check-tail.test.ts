@@ -33,7 +33,7 @@ describe('check.tail', () => {
     writeFileSync(join(path, 'notes.txt'), 'a plain folder\n');
     const { projectId } = await addProject(engine, path);
     // The profile refuses a secret in a command (C-18), so the shell builds it at run time from short pieces.
-    const script = `s=$(printf 'A1b2C3d4E5%.0s' 1 2 3); for i in 1 2 3 4 5 6; do echo tail-line-$i; [ $i = 2 ] && echo token gh"p_"$s"abcdef"; sleep 0.4; done`;
+    const script = `s=$(printf 'A1b2C3d4E5%.0s' 1 2 3); for i in 1 2 3 4 5 6; do echo tail-line-$i; [ $i = 2 ] && echo token gh"p_"$s"abcdef"; [ $i = 3 ] && printf '%30000s\\n' '' | tr ' ' y; sleep 0.4; done`;
     ok(await engine.invoke('profile.update', { projectId, patch: { custom: { slow: { argv: ['sh', '-c', script], cwd: '.', timeoutMin: 1, success: { exitCode: 0 } } } } }));
     await approveAll(engine, projectId);
     const p = await plan(engine, projectId, { kind: 'check', instance: 'custom.slow@.' });
@@ -52,6 +52,9 @@ describe('check.tail', () => {
     expect(live!.lines.join('\n')).not.toContain(SECRET);
     expect(live!.lines.find((l) => l.startsWith('token '))).toMatch(/⟦redacted:/);
     expect(live!.totalLines).toBeGreaterThanOrEqual(4);
+    // AT-29: the 30,000-character line arrives cut to the contract's 20,000, marked, and the call does not fail.
+    const long = ok<Tail>(await engine.invoke('check.tail', { checkRunId })).lines.find((l) => l.startsWith('yyy'));
+    if (long) expect([long.length, long.endsWith('…')]).toEqual([20_000, true]);
 
     const limited = ok<Tail>(await engine.invoke('check.tail', { checkRunId, maxLines: 1 }));
     expect(limited.lines).toHaveLength(1);
@@ -62,6 +65,7 @@ describe('check.tail', () => {
     expect(after.live).toBe(false);
     expect(after.lines.filter((l) => l.startsWith('tail-line-'))).toEqual(['tail-line-1', 'tail-line-2', 'tail-line-3', 'tail-line-4', 'tail-line-5', 'tail-line-6']);
     expect(after.lines.join('\n')).not.toContain(SECRET);
+    expect(after.lines.find((l) => l.startsWith('yyy'))).toMatch(/^y{19999}…$/);
 
     const missing = await engine.invoke('check.tail', { checkRunId: 'chk_missing' });
     expect(missing).toMatchObject({ ok: false, error: { code: 'not_found' } });

@@ -276,12 +276,12 @@
         <table class="runs-table">
           <thead>
             <tr>
-              <th class="c-id" scope="col"><TableHeaderCell label={t('overview.runs.run')} sortable={false} /></th>
-              <th class="c-kind" scope="col"><TableHeaderCell label={t('overview.runs.kind')} sortable={false} /></th>
-              <th class="c-verdict" scope="col"><TableHeaderCell label={t('overview.runs.verdict')} sortable={false} /></th>
-              <th class="c-counts" scope="col"><TableHeaderCell label={t('overview.runs.counts')} sortable={false} /></th>
-              <th class="c-dur" scope="col"><TableHeaderCell label={t('overview.runs.duration')} sortable={false} /></th>
-              <th class="c-date" scope="col"><TableHeaderCell label={t('overview.runs.date')} sortable={false} /></th>
+              <th class="c-id" scope="col"><TableHeaderCell native label={t('overview.runs.run')} sortable={false} /></th>
+              <th class="c-kind" scope="col"><TableHeaderCell native label={t('overview.runs.kind')} sortable={false} /></th>
+              <th class="c-verdict" scope="col"><TableHeaderCell native label={t('overview.runs.verdict')} sortable={false} /></th>
+              <th class="c-counts" scope="col"><TableHeaderCell native label={t('overview.runs.counts')} sortable={false} /></th>
+              <th class="c-dur" scope="col"><TableHeaderCell native label={t('overview.runs.duration')} sortable={false} /></th>
+              <th class="c-date" scope="col"><TableHeaderCell native label={t('overview.runs.date')} sortable={false} /></th>
             </tr>
           </thead>
           <tbody>

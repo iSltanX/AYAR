@@ -121,13 +121,13 @@
     <table class="plan" data-testid="plan-table">
       <thead>
         <tr>
-          <th class="c-check" scope="col"><TableHeaderCell label={t('scanplan.column.check')} sortable={false} /></th>
-          <th class="c-ready" scope="col"><TableHeaderCell label={t('scanplan.column.readiness')} sortable={false} /></th>
-          <th class="c-cmd" scope="col"><TableHeaderCell label={t('scanplan.column.command')} sortable={false} /></th>
-          <th class="c-res" scope="col"><TableHeaderCell label={t('scanplan.column.resources')} sortable={false} /></th>
-          <th class="c-dur" scope="col"><TableHeaderCell label={t('scanplan.column.duration')} sortable={false} /></th>
-          <th class="c-cost" scope="col"><TableHeaderCell label={t('scanplan.column.cost')} sortable={false} /></th>
-          <th class="c-fx" scope="col"><TableHeaderCell label={t('scanplan.column.effects')} sortable={false} overflow="start" /></th>
+          <th class="c-check" scope="col"><TableHeaderCell native label={t('scanplan.column.check')} sortable={false} /></th>
+          <th class="c-ready" scope="col"><TableHeaderCell native label={t('scanplan.column.readiness')} sortable={false} /></th>
+          <th class="c-cmd" scope="col"><TableHeaderCell native label={t('scanplan.column.command')} sortable={false} /></th>
+          <th class="c-res" scope="col"><TableHeaderCell native label={t('scanplan.column.resources')} sortable={false} /></th>
+          <th class="c-dur" scope="col"><TableHeaderCell native label={t('scanplan.column.duration')} sortable={false} /></th>
+          <th class="c-cost" scope="col"><TableHeaderCell native label={t('scanplan.column.cost')} sortable={false} /></th>
+          <th class="c-fx" scope="col"><TableHeaderCell native label={t('scanplan.column.effects')} sortable={false} overflow="start" /></th>
         </tr>
       </thead>
       {#each sections as [section, items] (section)}

@@ -54,6 +54,8 @@ import type { ProbeService } from '../probe/service.ts';
 import type { ProbeOutcome, VisualComparison } from '@ayar/probe';
 import type { GuardContext, IntegrityService } from '../integrity/service.ts';
 
+/** check.tail's longest line (protocol 1.6): a longer one is cut and marked. */
+const TAIL_LINE_CHARS = 20_000;
 /** At most this many provisional findings are sent per execution (9.6 point 5: the final reading decides). */
 const PROVISIONAL_MAX = 200;
 /** A raw report is read with a limit (C-15): 50 MB; beyond it, the part read is kept and the report is not judged. */
@@ -1630,14 +1632,16 @@ export class RunService {
    */
   tail(checkRunId: string, maxLines = 200): { lines: string[]; totalLines: number; live: boolean } {
     const n = Math.max(1, Math.min(200, maxLines));
+    // AT-29: a line longer than the contract's 20,000 characters is cut, marked with «…», never refused whole.
+    const cut = (lines: readonly string[]) => lines.map((l) => (l.length > TAIL_LINE_CHARS ? `${l.slice(0, TAIL_LINE_CHARS - 1)}…` : l));
     for (const a of this.#active.values()) {
       const t = a.tails.get(checkRunId);
-      if (t) return { lines: t.tail.slice(-n), totalLines: t.lines, live: true };
+      if (t) return { lines: cut(t.tail.slice(-n)), totalLines: t.lines, live: true };
     }
     const row = this.#o.db.get<{ raw_json: string | null }>('SELECT raw_json FROM check_runs WHERE id = ?', checkRunId);
     if (!row) throw new CommandError('not_found', { reason: 'check_run' });
     const tail = row.raw_json ? RawSchema.parse(JSON.parse(row.raw_json)).tail : [];
-    return { lines: tail.slice(-n), totalLines: tail.length, live: false };
+    return { lines: cut(tail.slice(-n)), totalLines: tail.length, live: false };
   }
 
   list(projectId: string): RunList {

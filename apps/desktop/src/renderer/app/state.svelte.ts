@@ -2,7 +2,7 @@
 // (D-54), the projects, the engine's health, the live runs, and what the frame shows for the current page (its
 // primary action, its inspector, its search). Screens read and set it; the engine stays the source of truth.
 import { getContext, setContext, type Snippet } from 'svelte';
-import { resolveLanguage, type Lang } from '@ayar/i18n';
+import { createTranslator, resolveLanguage, type Lang } from '@ayar/i18n';
 import type { EngineHealth, PendingConfirmation, Project, ProtectedLocation } from '@ayar/protocol';
 import type { ToastMessage, WindowControls } from '../lib/shell.ts';
 import { attempt, on } from './client.ts';
@@ -106,6 +106,7 @@ export class AppState {
     if (this.themeSetting === 'system') delete root.dataset.theme;
     else root.dataset.theme = this.themeSetting;
     root.lang = this.lang;
+    document.title = createTranslator(this.lang)('common.appName');
     root.dir = this.lang === 'ar' ? 'rtl' : 'ltr';
   }
 
