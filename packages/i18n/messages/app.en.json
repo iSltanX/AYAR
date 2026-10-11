@@ -29,5 +29,6 @@
   "app.customCheck.definition": "A custom check the profile defines: it runs the declared command and judges by its exit code and declared outputs.",
   "app.customCheck.limits": "It proves only what its command measures. AYAR does not know what the command covers or leaves out.",
   "app.drop.notFolder": "Nothing was added: drop the project folder, not a file.",
-  "app.drop.multiple": "Nothing was added: drop one folder at a time."
+  "app.drop.multiple": "Nothing was added: drop one folder at a time.",
+  "app.rerun.none": "This project has no finished run to re-run yet."
 }

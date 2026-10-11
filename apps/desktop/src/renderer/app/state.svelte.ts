@@ -53,6 +53,14 @@ export type ThemeSetting = 'system' | 'light' | 'dark';
 
 const KEY = Symbol('ayar.app');
 
+export interface RunContext {
+  /** The section's id in the sidebar (custom checks included), for the menu's «القسم الحالي». */
+  section: string;
+  selected: number;
+  runSection: () => void;
+  runSelected: () => void;
+}
+
 export class AppState {
   lang = $state<Lang>('ar');
   languageSetting = $state<'system' | Lang>('system');
@@ -76,6 +84,13 @@ export class AppState {
   announcement = $state('');
   /** The cancel confirmation (13.4 «ألغِ التشغيل»), opened from the run bar, the monitor or ⌘. */
   confirmCancel = $state(false);
+  /**
+   * What the Run menu (C-23) runs on this page: a section page names its section and how many checks are selected,
+   * and runs them itself (it holds the selection). Null elsewhere.
+   */
+  runContext = $state<RunContext | null>(null);
+  /** «أعد الفاشل»/«أعد غير المكتمل» chosen away from the results: the results page opens its sheet once it shows. */
+  pendingRerun = $state<'failed' | 'incomplete' | null>(null);
 
   #toastTimer: ReturnType<typeof setTimeout> | null = null;
   #unsubscribe: (() => void)[] = [];

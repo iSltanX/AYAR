@@ -313,7 +313,7 @@ export class Renderer {
       const reasons = (report.purity?.incompleteReasons ?? []).map((r) => this.reason(r)).filter(Boolean).slice(0, 6);
       return t('report.human.meaning.incomplete', { karat: h.karat ?? 0, reasons: reasons.join('؛ ') || t('report.unknown'), setup: needsSetup });
     }
-    return t('report.human.meaning.none', { kind: h.scope.kind });
+    return t('report.human.meaning.none', { kind: t(`report.runKind.${h.scope.kind}` as MessageKey) });
   }
 
   #humanProblem(f: ReportFinding): string[] {

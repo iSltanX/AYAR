@@ -31,6 +31,7 @@
   "controls.runMenu.currentSection": "Current section: {section}",
   "controls.runMenu.selected": "Selected ({count})",
   "controls.runMenu.savedGroups": "Saved groups",
+  "controls.runMenu.open": "Run menu",
   "controls.dropZone.label": "Or drag the folder here",
   "controls.risk.title": "Dangerous command: it may delete files or write outside the project",
   "controls.risk.detail": "Not part of “Approve all”. Read the command, then approve it on its own.",

@@ -14,12 +14,13 @@
   import ToastRegion from '../components/ToastRegion.svelte';
   import WindowFrame from '../components/WindowFrame.svelte';
   import { useLocale } from '../lib/locale.ts';
-  import { NAV_SECTIONS, type NavId, type ResultCount } from '../lib/shell.ts';
+  import { menuLabel, runMenu, type MenuEntry } from '../lib/menus.ts';
+  import { NAV, NAV_SECTIONS, type NavId, type ResultCount } from '../lib/shell.ts';
   import { attempt, on } from '../app/client.ts';
   import { countChecks, isActive } from '../app/runs.svelte.ts';
   import { countsInOrder, runKind, sectionTitle } from '../app/format.ts';
   import { useApp, type Route, type SectionId } from '../app/state.svelte.ts';
-  import { addDroppedProject, addProjectFromDialog } from '../app/actions.ts';
+  import { addDroppedProject, addProjectFromDialog, runSelection } from '../app/actions.ts';
   import ProjectsScreen from './ProjectsScreen.svelte';
   import DiscoveryScreen from './DiscoveryScreen.svelte';
   import ProfileScreen from './ProfileScreen.svelte';
@@ -29,7 +30,7 @@
   import AccessState from './states/AccessState.svelte';
 
   const app = useApp();
-  const { t } = useLocale();
+  const { t, dir } = useLocale();
 
   const INSPECTOR_ID = 'ayar-inspector';
   const project = $derived(app.currentProject);
@@ -137,8 +138,41 @@
   const primary = $derived.by(() => {
     if (app.primary) return app.primary;
     if (!project || denied || route.name === 'discovery' || route.name === 'scan' || route.name === 'profile') return undefined;
-    return { label: t('ui.action.startFullScan'), onclick: () => openScan(project.id), disabled: project.pathStatus !== 'ok' };
+    const ok = project.pathStatus === 'ok';
+    return { label: t('ui.action.startFullScan'), onclick: () => openScan(project.id), disabled: !ok, menu: ok ? { label: t('controls.runMenu.open'), onopen: (a: DOMRect) => void openRunMenu(project.id, a) } : undefined };
   });
+
+  // ── the Run menu (C-23, D-DES3-07; D-DEV12-04): a native menu under the chevron beside the primary action ──
+  const toNative = (e: MenuEntry) => (e.kind === 'separator' ? e : e.kind === 'header' ? { kind: 'header' as const, label: menuLabel(e, t) } : { kind: 'item' as const, id: e.id, label: menuLabel(e, t), enabled: e.enabled, ...(e.accelerator ? { accelerator: e.accelerator } : {}) });
+  async function openRunMenu(projectId: string, anchor: DOMRect): Promise<void> {
+    const groups = await attempt('groups.list', { projectId });
+    const ctx = app.runContext;
+    const section = ctx && (NAV_SECTIONS as readonly string[]).includes(ctx.section) ? NAV[ctx.section as SectionId].key : undefined;
+    const entries = runMenu({ section, selectedCount: ctx?.selected ?? 0, savedGroups: groups.ok ? groups.result.groups.map((g) => ({ id: g.id, name: g.name })) : [] });
+    // Under the chevron, from its start edge (the menu opens toward the page's reading direction).
+    const x = Math.max(0, Math.round(dir === 'rtl' ? anchor.right : anchor.left));
+    const r = await attempt('menu.popup', { entries: entries.map(toNative), x, y: Math.round(anchor.bottom + 4) });
+    const id = r.ok ? r.result.id : null;
+    if (!id) return;
+    if (id === 'run.fullScan') openScan(projectId);
+    else if (id === 'run.currentSection') ctx?.runSection();
+    else if (id === 'run.selected') ctx?.runSelected();
+    else if (id === 'run.rerunFailed') void rerunFrom(projectId, 'failed');
+    else if (id === 'run.rerunIncomplete') void rerunFrom(projectId, 'incomplete');
+    else if (id.startsWith('run.savedGroup:')) void runSelection(app, projectId, { kind: 'savedGroup', groupId: id.slice('run.savedGroup:'.length) });
+  }
+  /** «أعد الفاشل»/«أعد غير المكتمل»: the sheet on the results of the project's latest finished run (13.4). */
+  async function rerunFrom(projectId: string, variant: 'failed' | 'incomplete'): Promise<void> {
+    if (route.name === 'scan' && route.runId && !isActive(app.runs.runs[route.runId])) {
+      window.dispatchEvent(new CustomEvent('ayar:rerun', { detail: variant }));
+      return;
+    }
+    const list = await attempt('runs.list', { projectId });
+    const last = list.ok ? list.result.runs.find((r) => !isActive(r)) : undefined;
+    if (!last) return app.announce(t('app.rerun.none'));
+    app.pendingRerun = variant;
+    app.navigate({ name: 'scan', projectId, runId: last.runId });
+  }
 
   async function projectMenu() {
     const entries = [
@@ -207,7 +241,7 @@
       e.preventDefault();
       // ⌘R: the plan first if it has not been shown (13.7); ⇧⌘R: «أعد الفاشل» on the results page itself.
       if (!e.shiftKey) openScan(project.id);
-      else window.dispatchEvent(new CustomEvent('ayar:rerun-failed'));
+      else void rerunFrom(project.id, 'failed');
     } else if (e.key === '.' && active) {
       e.preventDefault();
       app.confirmCancel = true;

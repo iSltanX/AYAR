@@ -97,6 +97,14 @@
   const runOne = (instance: string) => run({ kind: 'check', instance });
   const runSelected = () => run(selected.length === 1 ? { kind: 'check', instance: selected[0]! } : { kind: 'group', instances: [...selected] });
 
+  // The Run menu (C-23) runs this section and this selection through the page that holds them.
+  $effect(() => {
+    app.runContext = { section, selected: selected.length, runSection: () => void run({ kind: 'section', section }), runSelected: () => void (selected.length ? runSelected() : undefined) };
+    return () => {
+      app.runContext = null;
+    };
+  });
+
   async function saveGroup(name: string): Promise<void> {
     savingGroup = false;
     const r = await attempt('groups.save', { projectId, name, instanceKeys: [...selected] });
