@@ -148,6 +148,8 @@ describe('the human accessibility review, item by item (10.3)', () => {
       };
       const first = await runReview();
       expect(first.outcome).toBe('needs_review');
+      // Judged without a process, it still keeps its elapsed time: the history the remaining estimate needs (AT-10).
+      expect(first.durationMs).not.toBeNull();
       const record = (item: string, decision: string) => e.invoke('review.record', { target: { type: 'check', id: first.checkRunId, item }, decision, note: '' });
       for (const item of ['keyboard', 'screenReader', 'zoom']) {
         const r = ok<{ check: { outcome: string | null } }>(await record(item, 'accept'));

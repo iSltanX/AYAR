@@ -1469,7 +1469,9 @@ export class RunService {
         verdict?.reader ? JSON.stringify({ ...verdict.reader, dropped: verdict.judgement.report?.findingsDropped ?? 0 }) : null,
         verdict?.judgement.report?.tests ? JSON.stringify(this.#o.redaction.redactor().redactJson(verdict.judgement.report.tests)) : null,
         this.#now(),
-        r?.durationMs ?? raw?.durationMs ?? null,
+        // A check judged without a process (the human review, the integrity checks) keeps its elapsed time too, so it
+        // has the history the remaining-time estimate needs (C-10 point 8, AT-10).
+        r?.durationMs ?? raw?.durationMs ?? (verdict && row.started_at ? Math.max(0, Date.parse(this.#now()) - Date.parse(row.started_at)) : null),
         raw?.exitCode ?? null,
         raw?.signal ?? null,
         raw ? JSON.stringify(raw.envKeys) : null,
