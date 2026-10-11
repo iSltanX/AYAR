@@ -20,6 +20,7 @@
     "lint": "eslint --max-warnings 0 .",
     "test": "vitest run",
     "test:e2e": "npm run test:e2e -w @ayar/desktop",
+    "test:mutation": "node node_modules/@stryker-mutator/core/bin/stryker.js run packages/engine/stryker.config.mjs && node packages/engine/stryker-gate.mjs",
     "verify": "npm run typecheck && npm run lint && npm run build && npm test && npm run test:e2e"
   },
   "devDependencies": {
@@ -31,5 +32,10 @@
     "typescript": "6.0.3",
     "typescript-eslint": "8.71.1",
     "vitest": "5.0.3"
+  },
+  "overrides": {
+    "typed-rest-client": {
+      "qs": "6.16.0"
+    }
   }
 }
