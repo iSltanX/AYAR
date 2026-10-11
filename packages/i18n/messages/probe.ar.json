@@ -18,7 +18,6 @@
   "probe.reason.noJudge": "تعذّر: لا محكّم للفحص {check} في المسبار",
   "probe.reason.serviceNotDeclared": "تعذّر: هدف العرض يسمّي خدمة مرافقة غير معلنة ({service})",
   "probe.reason.renderTargetInvalid": "تعذّر: هدف العرض المعلن غير صالح ({detail})",
-  "probe.reason.notAnExtension": "تعذّر: هدف العرض ليس مجلد إضافة مبنية",
   "probe.reason.targetFolderMissing": "تعذّر: مجلد هدف العرض غير موجود ({dir})",
   "probe.reason.statesInvalid": "تعذّر: الحالات المعلنة غير صالحة ({detail})",
   "probe.reason.statesUnreadable": "تعذّر: تعذّرت قراءة ملف الحالات ({path})",

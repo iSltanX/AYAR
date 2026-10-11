@@ -100,6 +100,8 @@ export async function buildJob(i: BuildInput): Promise<JobOutcome> {
   // The target: the reference, or for beh.ext.host the extension's build folder discovery found.
   // The spec's value is wrapped (`{ declared }` or `{ discovered }`); the profile's own references are the raw values.
   let raw = referenceOf(i.spec.referenceValues.renderTarget) ?? i.declared.renderTarget ?? null;
+  // beh.ext.host loads the extension whatever the pages checks render: a declared target that is not one is not its.
+  if (i.spec.checkId === 'beh.ext.host' && rec(raw).kind !== 'extension') raw = null;
   if (!raw && i.spec.checkId === 'beh.ext.host') {
     const out = rec(i.facts.find((f) => f.key === 'references.buildOutput')?.value).dir;
     const manifest = rec(i.facts.find((f) => f.key === 'type.browserExtension')?.value);
@@ -111,7 +113,6 @@ export async function buildJob(i: BuildInput): Promise<JobOutcome> {
   const parsed = RenderTarget.safeParse(raw);
   if (!parsed.success) return { ok: false, outcome: 'unavailable', reason: { key: 'probe.reason.renderTargetInvalid', params: { detail: parsed.error.issues.slice(0, 2).map((x) => `${x.path.join('.')}: ${x.message}`).join('; ') } } };
   const t = parsed.data;
-  if (i.spec.checkId === 'beh.ext.host' && t.kind !== 'extension') return { ok: false, outcome: 'unavailable', reason: { key: 'probe.reason.notAnExtension' } };
 
   let target: ProbeTargetSpec;
   let targetDir: string | null = null;

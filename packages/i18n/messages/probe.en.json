@@ -18,7 +18,6 @@
   "probe.reason.noJudge": "Unavailable: the probe has no judge for {check}",
   "probe.reason.serviceNotDeclared": "Unavailable: the render target names an undeclared companion service ({service})",
   "probe.reason.renderTargetInvalid": "Unavailable: the declared render target is invalid ({detail})",
-  "probe.reason.notAnExtension": "Unavailable: the render target is not a built extension folder",
   "probe.reason.targetFolderMissing": "Unavailable: the render target's folder does not exist ({dir})",
   "probe.reason.statesInvalid": "Unavailable: the declared states are invalid ({detail})",
   "probe.reason.statesUnreadable": "Unavailable: the states file could not be read ({path})",

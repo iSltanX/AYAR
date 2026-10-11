@@ -62,7 +62,8 @@ export class ProbeService {
       };
       o.signal.addEventListener('abort', onAbort, { once: true });
       if (o.signal.aborted) onAbort();
-      timers.push(setTimeout(() => finish({ code: 'not_ready', detail: `the probe did not start in ${READY_MS / 1000} s` }), READY_MS));
+      const ready = setTimeout(() => finish({ code: 'not_ready', detail: `the probe did not start in ${READY_MS / 1000} s` }), READY_MS);
+      timers.push(ready);
       timers.push(setTimeout(() => finish({ code: 'timed_out', detail: 'the check ran out of time' }), o.timeoutMs));
       void proc.exited.then((code) => finish({ code: 'probe_exited', detail: `the probe process ended (${code})` }));
       proc.onMessage((raw) => {
@@ -75,7 +76,7 @@ export class ProbeService {
         const msg = m.data;
         switch (msg.type) {
           case 'ready':
-            clearTimeout(timers[0]);
+            clearTimeout(ready);
             if (!o.signal.aborted) proc.send({ type: 'run', job });
             break;
           case 'started':

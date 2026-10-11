@@ -21,7 +21,7 @@ import { createHash } from 'node:crypto';
 import { cpSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { plan, startRun, waitRun } from '../../../tools/cli/test/support/fixtures.ts';
+import { approveAll, plan, startRun, waitRun } from '../../../tools/cli/test/support/fixtures.ts';
 import { engineFor, FIXTURES, ok, scanVariant, tempDir, toolchainReady, type EngineConnection, type Scan } from './support/scan.ts';
 import { DESIGN_RENDER, installTestBrowser, probeBrowserReady, webDesignPatch } from './support/probe.ts';
 
@@ -244,6 +244,26 @@ describe('AT-10: honest progress (FR-29)', () => {
     expect(s.detail.plan?.items.find((i) => i.instance === 'design.a11y@.')?.estimateMs).toBeNull();
     const second = await plan(engine, ext.projectId, { kind: 'group', instances: ['beh.unit@.'] });
     expect(second.items.find((i) => i.instance === 'beh.unit@.')?.estimateMs).toEqual(expect.any(Number));
+  }, 1_800_000);
+});
+
+describe('perf.web (E-21)', () => {
+  it.runIf(READY)('measures with the processor slowed 4×, the median of five loads, against the declared web budgets', async () => {
+    const s = await scanVariant(engine, root, 'FX-WEB-DESIGN', 'good', { include: ['perf.web@.'], patch: { ...webDesignPatch(4177), references: { ...(webDesignPatch(4177).references as Record<string, unknown>), budgets: { web: { fcpMs: 5000, loadMs: 10000, bytes: 5_000_000 } } } }, selection: { kind: 'group', instances: ['perf.web@.'] }, timeoutMs: 600_000, folder: 'perf' });
+    const perf = exec(s.detail, 'perf.web@.');
+    expect(perf.outcome).toBe('passed');
+    const out = JSON.parse(readFileSync(join(root, 'AYAR', 'evidence', s.projectId, s.detail.run.runId, perf.checkRunId, 'probe.json'), 'utf8')) as { mode: string; results: { key: string; perf: { runs: { fcp: number | null; taskMs: number | null }[] } | null }[] };
+    expect(out.mode).toBe('perf');
+    // One measured page per state and size (E-21), five loads each.
+    expect(out.results.length).toBe(10);
+    expect(out.results.every((r) => r.perf?.runs.length === 5 && r.perf.runs.every((x) => typeof x.fcp === 'number'))).toBe(true);
+    // An impossible budget: «أخفق» by the median, never by one load.
+    ok(await engine.invoke('profile.update', { projectId: s.projectId, patch: { references: { budgets: { web: { fcpMs: 1 } } } } }));
+    await approveAll(engine, s.projectId);
+    const tight = await rerun(s.projectId, ['perf.web@.']);
+    const t = exec(tight.detail, 'perf.web@.');
+    expect(t.outcome).toBe('failed');
+    expect(findingsOf(tight, 'perf.web').every((f) => f.ruleId === 'perf.budget-exceeded' && f.expected === '1')).toBe(true);
   }, 1_800_000);
 });
 
