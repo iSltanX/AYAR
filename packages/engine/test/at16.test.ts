@@ -6,6 +6,8 @@
 // probe's checks (DEV-7), the integrity checks and the guard's effect on an outcome (DEV-9).
 //
 // About twenty minutes with the real tools: AYAR_AT16=1 (one project: AYAR_AT16_ONLY=FX-PY).
+import { execFileSync } from 'node:child_process';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { report, type Row } from './support/conformance.ts';
@@ -58,8 +60,44 @@ beforeAll(async () => {
   ok(await engine.invoke('settings.set', { key: 'run.allowNetwork', value: false }));
   installOsvMiniDb(join(root, 'AYAR'));
 }, 60_000);
+/**
+ * What FX-PROC's variants leave outside every process tree, as they are meant to (AYAR ends what carries its token
+ * and names the rest, never claiming it cleaned, AT-11), the fixture asks its tester to remove: the launchd job whose
+ * label launchctl-submit wrote in its project, and the processes whose numbers the scenarios wrote in their *.pids.
+ */
+function cleanFxProc(): { labels: string[]; pids: number[] } {
+  const out = { labels: [] as string[], pids: [] as number[] };
+  if (!root || !existsSync(root)) return out;
+  for (const d of readdirSync(root).filter((x) => x.startsWith('FX-PROC-'))) {
+    const dir = join(root, d);
+    for (const f of readdirSync(dir)) {
+      const text = f === 'launchctl.label' || f.endsWith('.pids') ? readFileSync(join(dir, f), 'utf8') : '';
+      if (f === 'launchctl.label' && /^ayar\.fx\.proc\.\d+\.\d+$/.test(text.trim())) out.labels.push(text.trim());
+      if (f.endsWith('.pids')) out.pids.push(...text.split('\n').filter((x) => /^\d+$/.test(x)).map(Number));
+    }
+  }
+  for (const label of out.labels) {
+    try {
+      execFileSync('/bin/launchctl', ['remove', label], { stdio: 'ignore' });
+    } catch {
+      /* not there */
+    }
+  }
+  // Only a process that is still the fixture's (its program under procs/), never a number reused since.
+  for (const pid of out.pids) if (commandOf(pid)?.includes('procs/')) process.kill(pid, 'SIGKILL');
+  return out;
+}
+function commandOf(pid: number): string | null {
+  try {
+    return execFileSync('/bin/ps', ['-o', 'command=', '-p', String(pid)], { encoding: 'utf8' }).trim() || null;
+  } catch {
+    return null;
+  }
+}
+
 afterAll(async () => {
   await engine?.close();
+  cleanFxProc();
   if (process.env.AYAR_KEEP_TMP) console.log(root);
   else cleanup?.();
 });
@@ -72,6 +110,11 @@ describe('AT-16 (outside the probe): planted defects found, none invented', () =
       for (const v of variantsOf(project).filter((x) => !VARIANTS || VARIANTS.test(x))) rows.push(...(await runVariant(engine, root, project, v, o)));
     }
     console.log(report(rows));
+    // What FX-PROC's variants left is removed, and is gone.
+    const left = cleanFxProc();
+    await new Promise((res) => setTimeout(res, 300));
+    for (const label of left.labels) expect(execFileSync('/bin/launchctl', ['list'], { encoding: 'utf8' }).includes(label), label).toBe(false);
+    for (const pid of left.pids) expect(commandOf(pid)?.includes('procs/') ?? false, String(pid)).toBe(false);
     expect(rows.filter((r) => !r.ok)).toEqual([]);
   }, 3 * 60 * 60_000);
 });
