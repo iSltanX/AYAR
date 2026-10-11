@@ -712,7 +712,7 @@ export class RunService {
     const { fs } = this.#o.ports;
     const dirs = [...new Set([...ctx.outputs, ...(latestSnapshot(this.#o.db, ctx.projectId)?.inventory.outputDirs.map((d) => d.path) ?? [])])]
       .map((d) => d.replace(/^\.\//, '').replace(/\/+$/, ''))
-      .filter((d) => d && d !== '.' && !d.startsWith('..') && !d.startsWith('/'));
+      .filter((d) => d && d !== '.' && !d.startsWith('/') && !d.split('/').includes('..'));
     const out: { path: string; size: number }[] = [];
     const walk = async (rel: string, depth: number): Promise<void> => {
       if (out.length >= OUTPUT_INVENTORY_MAX || depth > OUTPUT_INVENTORY_DEPTH) return;
