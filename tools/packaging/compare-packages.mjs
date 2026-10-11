@@ -1,0 +1,74 @@
+#!/usr/bin/env node
+// Compares two AYAR packages for repeatability (plan 25): the same files, the same app.asar (byte for byte, so the
+// same bundles), the same Electron files, and the same cdhash of every signed Mach-O (the signature's CMS blob
+// carries its signing time and is expected to differ). Exit 0 when repeatable, 1 otherwise.
+//   node tools/packaging/compare-packages.mjs --a <.app> --b <.app> [--json <report>] [--note <text>]
+import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+
+const argv = process.argv.slice(2);
+const opt = (name, fallback) => {
+  const i = argv.indexOf(`--${name}`);
+  return i >= 0 ? argv[i + 1] : fallback;
+};
+const a = opt('a');
+const b = opt('b');
+const jsonOut = opt('json');
+const note = opt('note', '');
+if (!a || !b) {
+  console.error('usage: compare-packages.mjs --a <.app> --b <.app> [--json <path>] [--note <text>]');
+  process.exit(2);
+}
+const walk = (root, rel = '') =>
+  readdirSync(join(root, rel), { withFileTypes: true }).flatMap((d) => {
+    const r = join(rel, d.name);
+    if (d.isSymbolicLink()) return [];
+    return d.isDirectory() ? walk(root, r) : [r];
+  });
+const sha = (f) => createHash('sha256').update(readFileSync(f)).digest('hex');
+const isMachO = (f) => {
+  const fd = readFileSync(f).subarray(0, 4).toString('hex');
+  return ['cffaedfe', 'feedfacf', 'cafebabe'].includes(fd);
+};
+const cdhash = (f) => {
+  try {
+    const out = execFileSync('codesign', ['-dvvv', f], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+    return /CDHash=([0-9a-f]+)/.exec(out)?.[1] ?? null;
+  } catch (e) {
+    const out = `${e.stdout ?? ''}${e.stderr ?? ''}`;
+    return /CDHash=([0-9a-f]+)/.exec(out)?.[1] ?? null;
+  }
+};
+const filesA = walk(a).sort();
+const filesB = walk(b).sort();
+const onlyA = filesA.filter((f) => !filesB.includes(f));
+const onlyB = filesB.filter((f) => !filesA.includes(f));
+const common = filesA.filter((f) => filesB.includes(f));
+const differing = [];
+const signatureOnly = [];
+for (const f of common) {
+  if (f.includes('_CodeSignature/')) {
+    if (sha(join(a, f)) !== sha(join(b, f))) signatureOnly.push(f);
+    continue;
+  }
+  if (sha(join(a, f)) === sha(join(b, f))) continue;
+  const pa = join(a, f);
+  if (isMachO(pa)) {
+    const ca = cdhash(pa);
+    const cb = cdhash(join(b, f));
+    if (ca && ca === cb) signatureOnly.push(f);
+    else differing.push({ file: f, cdhashA: ca, cdhashB: cb, sizeA: statSync(pa).size, sizeB: statSync(join(b, f)).size });
+  } else differing.push({ file: f, sizeA: statSync(pa).size, sizeB: statSync(join(b, f)).size });
+}
+const asar = { a: sha(join(a, 'Contents/Resources/app.asar')), b: sha(join(b, 'Contents/Resources/app.asar')) };
+const bundle = { a: cdhash(a), b: cdhash(b) };
+const ok = !onlyA.length && !onlyB.length && !differing.length && asar.a === asar.b && bundle.a === bundle.b;
+const report = { a: resolve(a), b: resolve(b), at: new Date().toISOString(), note, files: { a: filesA.length, b: filesB.length, onlyA, onlyB }, asarSha256: asar, bundleCdhash: bundle, signatureOnlyDifferences: signatureOnly, differing, ok };
+if (jsonOut) {
+  mkdirSync(dirname(jsonOut), { recursive: true });
+  writeFileSync(jsonOut, `${JSON.stringify(report, null, 2)}\n`);
+}
+console.log(JSON.stringify(report, null, 2));
+process.exit(ok ? 0 : 1);

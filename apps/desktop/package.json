@@ -8,7 +8,7 @@
   "license": "UNLICENSED",
   "main": "dist/main/entry.js",
   "scripts": {
-    "build": "AYAR_GALLERY= vite build -c vite.renderer.config.ts && vite build -c vite.preload.config.ts && vite build -c vite.main.config.ts && vite build -c vite.engine.config.ts",
+    "build": "AYAR_GALLERY= vite build -c vite.renderer.config.ts && vite build -c vite.preload.config.ts && vite build -c vite.main.config.ts && vite build -c vite.engine.config.ts && node ../../tools/packaging/make-icns.mjs",
     "typecheck": "node ../../node_modules/typescript/bin/tsc -p src/main/tsconfig.json && node ../../node_modules/typescript/bin/tsc -p src/preload/tsconfig.json && node ../../node_modules/typescript/bin/tsc -p test/tsconfig.json && svelte-check --tsconfig ./src/renderer/tsconfig.json --fail-on-warnings",
     "start": "electron .",
     "package": "npm run build && electron-forge package",

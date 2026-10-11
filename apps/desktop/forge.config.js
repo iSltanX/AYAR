@@ -26,6 +26,8 @@ export default {
     arch: 'arm64',
     platform: 'darwin',
     darwinDarkModeSupport: true,
+    // D-48: the approved AppIcon (apps/desktop/icon/, exported from Figma), rendered to dist/icon/ by the build.
+    icon: 'dist/icon/AppIcon',
     extendInfo: { LSMinimumSystemVersion: '13.0' },
     ignore: (p) => !keep(p),
     osxSign: {
