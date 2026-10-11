@@ -4,7 +4,7 @@ track: dev
 number: 7
 stage: engine
 title: مسبار الويب وفحوص العرض الحي
-status: delivered
+status: closed
 status_date: 2026-10-11
 depends_on: [DEV-6]
 design_gates: []
@@ -22,7 +22,7 @@ outputs:
   - packages/probe (C-14) وعقد مواصفة المسبار وأحداثه
   - فحوص design.*.render وdesign.a11y وdesign.states وdesign.visual وbeh.ext.host وperf.web
   - اعتماد الصور المرجعية ومقارنتها
-closing_commit:
+closing_commit: e4088b8
 ---
 
 # DEV-7 — مسبار الويب وفحوص العرض الحي
@@ -116,7 +116,7 @@ closing_commit:
 
 ## 11. حالة التقدم ونقطة الاستئناف
 
-- **الحالة:** سُلّمت (الجلسة الرئيسية بنفسها، ORG-16، Claude Opus 5.5)، وتنتظر الدمج.
+- **الحالة:** مغلقة: دُمجت في `main` ووُسمت `DEV-7-closed` (الجلسة الرئيسية بنفسها، ORG-16، Claude Opus 5.5).
 - **آخر تحديث:** 2026-10-11.
 - **المنجز:** المهام الست كلها، وG-DEV6-01، وكل فحوص القسم 7 نجحت فعلًا، ومعايير القسم 8 كلها:
   - [x] AT-17 وAT-18 وAT-10 (المحرك) وAT-19 وAT-20 وAT-16 وAT-31 كاملة، وثبات اللقطات (ثلاثة تشغيلات متطابقة).
@@ -125,4 +125,4 @@ closing_commit:
   - [x] مراجعة الفرق كاملًا دون ملاحظة حرجة باقية (ORG-16).
   - التفاصيل والأوامر والقرارات D-DEV7-01 إلى D-DEV7-22 في [docs/handoffs/DEV-7.md](../../handoffs/DEV-7.md).
 - **آخر commit عمل:** `e4088b8`، ثم commit التسليم.
-- **نقطة الاستئناف:** لا شيء للمرحلة؛ الدمج والإغلاق للجلسة الرئيسية (docs/waves/README.md القسم 7، الخطوة 6).
+- **نقطة الاستئناف:** لا شيء؛ المرحلة مغلقة.

@@ -26,7 +26,11 @@
 | خط Almarai (Regular وBold) | google/fonts عند `3d8d20e8` | OFL-1.1 | خط النص، مضمّن في الواجهة، وترخيصه في `public/licenses/`. أضافته DEV-10 | `apps/desktop` (الواجهة) |
 | أيقونات Lucide (المستخدمة وحدها، مولّدة في `icons.generated.ts` من lucide-static) | 1.48.0 | ISC | أيقونات الواجهة (A-12، D-DES2-03). أضافتها DEV-10 | `apps/desktop` (الواجهة) |
 | @babel/parser | 8.0.7 | MIT | شجرة JS وTS لـ `code.complexity` (التعقيد الدوري وطول الدالة) دون تشغيل شيء. أضافته DEV-6 (G-26) | `packages/analyzers` |
-| postcss | 8.5.29 | MIT | قراءة CSS لـ `design.tokens.static` و`design.fonts.static` و`design.rtl.static` ومراجع CSS في `code.refs.local`. أضافته DEV-6 (G-26) | `packages/analyzers` |
+| postcss | 8.5.29 | MIT | قراءة CSS لـ `design.tokens.static` و`design.fonts.static` و`design.rtl.static` ومراجع CSS في `code.refs.local`. أضافته DEV-6 (G-26) | `packages/analyzers`، و`packages/probe` (إسناد المصدر) |
+| playwright-core | 1.64.0 | Apache-2.0 | قيادة Chromium في المسبار (C-14، E-11). يُشحن نسخة خارج الحزمة في `dist/engine/node_modules` (D-DEV7-02). وأدخلته DEV-7 في الشحن | `packages/probe` |
+| axe-core | 4.14.0 | MPL-2.0 | فحص الإتاحة داخل صفحات المسبار (`design.a11y`)، ملفه `axe.min.js` بجانب المحرك. وفي الجذر 4.13.0 للاختبار (القسم 3). أضافته DEV-7 | `packages/probe` |
+| pixelmatch | 7.2.0 | ISC | مقارنة الصور بمراجعها (G-28، D-DEV7-06). و6.6 تذكر 8.0.0، لكنه نُشر 2026-10-06 قبل المرحلة بخمسة أيام، فاختيرت 7.2.0. أضافته DEV-7 | `packages/probe` |
+| pngjs | 7.0.0 | MIT | قراءة PNG وكتابته للمقارنة. أضافته DEV-7 | `packages/probe` |
 
 و`node:sqlite` (طبقة التخزين، E-03) مضمّن في Node داخل Electron، فلا حزمة له.
 
@@ -46,6 +50,7 @@
 | typescript-eslint | 8.71.1 | MIT | التدقيق بمعلومات الأنواع |
 | eslint-plugin-svelte | 3.23.1 | MIT | تدقيق مكونات Svelte |
 | @types/node | 24.19.2 | MIT | أنواع Node 24 |
+| @types/pngjs | 6.0.5 | MIT | أنواع pngjs. أضافته DEV-7 |
 
 ## 3. الاختبار (لا يُشحن)
 
@@ -53,7 +58,7 @@
 |---|---|---|---|
 | vitest | 5.0.3 | MIT | مشغّل اختبارات عِيَار للوحدة والخصائص والتكامل (E-13) |
 | fast-check | 4.10.2 | MIT | اختبارات الخصائص (الخطة 19) |
-| playwright-core | 1.64.0 | Apache-2.0 | قيادة Electron في اختبارات الأمان (G-05)؛ ويستخدمه المسبار لاحقًا (C-14) |
+| playwright-core | 1.64.0 | Apache-2.0 | قيادة Electron في اختبارات الأمان (G-05)؛ وصار يُشحن مع المسبار (القسم 1) |
 | lucide-static | 1.48.0 | ISC | مصدر عقد الأيقونات لمولّد `icons.generated.ts` وقت التطوير؛ لا تُشحن الحزمة نفسها. أضافتها DEV-10 |
 | axe-core | 4.13.0 | MPL-2.0 | فحص الإتاحة في اختبارات Electron للواجهة (AT-40). أضافته DEV-10 |
 | @stryker-mutator/core | 10.0.0 | Apache-2.0 | قياس قوة الاختبار على المصنّف والنقاء والإخفاء والمخطِّط (الخطة 19، Q-05)، بـ `npm run test:mutation`. أضافته DEV-6 |
@@ -67,11 +72,11 @@
 |---|---|---|---|
 | fast-xml-parser | 5.11.2 | MIT | لم تحتجه DEV-6: قارئ XML داخلي محروس لـ JUnit (`packages/adapters/src/read/xml.ts`) |
 | picomatch | 4.0.7 | MIT | لم تحتجه DEV-4 (الاكتشاف بـ `ignore`)؛ يُضاف حين تحتاجه مرحلة |
-| pixelmatch | 8.0.0 | ISC | DEV-7 |
-| @axe-core/playwright | 4.13.0 | MPL-2.0 | DEV-7. وأضافت DEV-10 axe-core 4.13.0 للاختبار (القسم 3)، ويُتحقق من إصداره عند تضمينه في المسبار |
+| pixelmatch | 8.0.0 | ISC | أُضيف 7.2.0 في DEV-7 (القسم 1) |
+| @axe-core/playwright | 4.13.0 | MPL-2.0 | لا يُضاف: المسبار يحقن axe-core 4.14.0 مباشرة بـ `page.evaluate` (D-DEV7-11) |
 | better-sqlite3 | 13.0.3 | MIT | لا يُضاف: E-03 حسمت `node:sqlite` |
 | **G-26:** مكتبة الضغط | — | — | DEV-5 (المحتوى المعنون، C-17)؛ وقد يكفي `node:zlib` المضمّن |
 
 ## 5. خلاصة تراخيص ملف القفل
 
-`npm query '*'` على ملف القفل في 2026-10-11 (بعد DEV-6): 451 حزمة، منها 9 حزم عِيَار نفسها (`UNLICENSED`، خاصة). والبقية: MIT (347)، وApache-2.0 (38)، وISC (23)، وBSD-2-Clause (12)، وBlueOak-1.0.0 (9)، وBSD-3-Clause (7)، وMPL-2.0 (3: `lightningcss` وملفه الثنائي، أداة بناء في Vite لا تُشحن، و`axe-core` للاختبار)، و`MIT OR CC0-1.0` (1)، وCC-BY-4.0 (1: `caniuse-lite`، بيانات تطوير تحت Stryker لا تُشحن)، و0BSD (1: `tslib`، تطوير). **لا ترخيص من عائلة GPL.**
+`npm query '*'` على ملف القفل في 2026-10-11 (بعد DEV-7): 456 حزمة، منها 10 حزم عِيَار نفسها (`UNLICENSED`، خاصة). والبقية: MIT (349)، وApache-2.0 (38)، وISC (24)، وBSD-2-Clause (12)، وBlueOak-1.0.0 (9)، وBSD-3-Clause (7)، وMPL-2.0 (4: `lightningcss` وملفه الثنائي، أداة بناء في Vite لا تُشحن، و`axe-core` 4.13.0 للاختبار، و`axe-core` 4.14.0 الذي يُشحن مع المسبار دون تعديل، فيُرفق نص ترخيصه ومصدره في الإصدار)، و`MIT OR CC0-1.0` (1)، وCC-BY-4.0 (1: `caniuse-lite`، بيانات تطوير تحت Stryker لا تُشحن)، و0BSD (1: `tslib`، تطوير). **لا ترخيص من عائلة GPL.**
