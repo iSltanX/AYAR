@@ -121,9 +121,12 @@ export const ProfilePatch = z.strictObject({
 });
 export type ProfilePatch = z.infer<typeof ProfilePatch>;
 
-/** A reason, as message keys: `key` is the sentence, `refs` names its subjects (signals, references). */
+/**
+ * A reason, as message keys: `key` is the sentence, `refs` names its subjects (signals, references). An underscore is
+ * allowed (protocol 1.4): the setup results name their causes by value (`setup.rejected.hash_mismatch`).
+ */
 export const Reason = z.strictObject({
-  key: z.string().regex(/^[a-z][A-Za-z0-9.-]*$/),
+  key: z.string().regex(/^[a-z][A-Za-z0-9._-]*$/),
   params: z.record(z.string(), z.union([z.string(), z.number()])).optional(),
   refs: z.array(z.string()).optional(),
 });
