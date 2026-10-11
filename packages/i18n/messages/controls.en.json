@@ -37,5 +37,6 @@
   "controls.risk.approve": "Approve this command",
   "controls.resource.cpu": "CPU",
   "controls.resource.memory": "Memory",
-  "controls.reportData.label": "Data from the project"
+  "controls.reportData.label": "Data from the project",
+  "controls.dropZone.active": "Drop the folder for AYAR to read"
 }

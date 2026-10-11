@@ -72,7 +72,7 @@ async function dbCounts(runId: string): Promise<{ counts: Counts; state: string 
     if (x.state === 'planned' || x.state === 'queued') c.queued++;
     else if (x.state === 'running') c.running++;
     else if (x.state === 'cancelling') c.cancelling++;
-    else if (x.outcome) c.finished[x.outcome] = (c.finished[x.outcome] ?? 0) + 1;
+    else if (x.outcome && x.outcome !== 'not_applicable') c.finished[x.outcome] = (c.finished[x.outcome] ?? 0) + 1;
   }
   return { counts: c, state: d.result.run.state };
 }

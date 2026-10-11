@@ -29,6 +29,7 @@
   .risk-notice {
     display: flex;
     align-items: flex-start;
+    inline-size: 100%;
     gap: var(--space-12);
     padding: var(--space-12) var(--space-16);
     border: 1px solid var(--border-strong);

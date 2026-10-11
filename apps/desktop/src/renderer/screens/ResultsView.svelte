@@ -27,7 +27,7 @@
   import { useLocale } from '../lib/locale.ts';
   import { attempt, copyText, on } from '../app/client.ts';
   import { argvText, commandOf, reasonsOf } from '../app/specs.ts';
-  import { badgeOf, checkTexts, checkTitle, clockMs, countsInOrder, dayTime, readinessOf, reasonText, runKind, textOr } from '../app/format.ts';
+  import { badgeOf, checkTexts, checkTitle, clockMs, countsInOrder, day, dayTime, readinessOf, reasonText, runKind, textOr, time } from '../app/format.ts';
   import { logLines, logSegments, redactionKinds } from '../app/logs.ts';
   import { blockingOf, integrityHold, missingForPure, scoringOf } from '../app/purity.ts';
   import { directAction, evidenceRows, findingTitle, outcomesOf, rerunCounts, sideEffectRows, type FindingGrouping, type NextItem } from '../app/results.ts';
@@ -158,7 +158,7 @@
 
   const metaLine = $derived.by(() => {
     if (!run) return '';
-    const date = run.startedAt ? dayTime(run.startedAt, lang) : '';
+    const date = run.startedAt ? t('resultsui.meta.date', { day: day(run.startedAt, lang), time: time(run.startedAt, lang) }) : '';
     const duration = clockMs(run.startedAt && run.finishedAt ? Date.parse(run.finishedAt) - Date.parse(run.startedAt) : 0);
     return t(cancelled ? 'resultsui.meta.cancelled' : 'resultsui.meta.line', { kind: runKind(t, run, plan), date, duration });
   });

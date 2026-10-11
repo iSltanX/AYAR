@@ -1,5 +1,5 @@
 {
-  "monitor.started": "started {time} · {elapsed} ago",
+  "monitor.started": "Started {time} · {elapsed} elapsed",
   "monitor.remaining": "about {duration} left (estimate)",
   "monitor.note.running": "No verdict before every check ends. A failure shown is final for its check; the run is still “Running”.",
   "monitor.note.cancelling": "Cancelling the run: running checks stop, and partial results and evidence are kept. A run that did not complete has no karat.",

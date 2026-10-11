@@ -75,5 +75,6 @@
   "resultsui.inspector.firstSeen": "{run}",
   "resultsui.loading": "Reading the run…",
   "resultsui.reportFailed": "The report could not be built ({code}).",
-  "resultsui.crumb": "Results"
+  "resultsui.crumb": "Results",
+  "resultsui.meta.date": "{day}, {time}"
 }

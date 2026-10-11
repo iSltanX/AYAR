@@ -75,5 +75,6 @@
   "resultsui.inspector.firstSeen": "{run}",
   "resultsui.loading": "يُقرأ التشغيل…",
   "resultsui.reportFailed": "تعذّر بناء التقرير ({code}).",
-  "resultsui.crumb": "النتائج"
+  "resultsui.crumb": "النتائج",
+  "resultsui.meta.date": "{day}، {time}"
 }

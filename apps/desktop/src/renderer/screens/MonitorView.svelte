@@ -41,7 +41,8 @@
 
   const run = $derived(app.runs.runs[runId]);
   const plan = $derived(app.runs.plans[runId] ?? null);
-  const checks = $derived(app.runs.checksOf(runId));
+  // What runs, as the plan listed it: a check that does not apply to the project is in «ما لن يُشغَّل» (13.3), not here.
+  const checks = $derived(app.runs.checksOf(runId).filter((c) => c.outcome !== 'not_applicable'));
   const live = $derived(countChecks(checks));
   const items = $derived(new Map<string, PlanItem>((plan?.items ?? []).map((i) => [i.instance, i])));
   const orderOf = $derived(new Map<string, number>((plan?.order ?? []).map((k, i) => [k, i])));

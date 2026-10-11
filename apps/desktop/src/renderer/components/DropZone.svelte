@@ -17,8 +17,9 @@
 
 <div class="drop-zone" class:active data-state={active ? 'active' : 'default'}>
   <svg class="edge" aria-hidden="true" focusable="false"><rect class="dash" x="0.5" y="0.5" rx="9.5" ry="9.5" /></svg>
-  <span class="icon"><Icon name="folder-open" size={24} /></span>
-  <p class="label">{t('controls.dropZone.label')}</p>
+  <!-- Figma: the Lucide/16 instance in a 24 box (the glyph keeps its 16, as in the approved frame). -->
+  <span class="icon"><Icon name="folder-open" size={16} /></span>
+  <p class="label">{active ? t('controls.dropZone.active') : t('controls.dropZone.label')}</p>
 </div>
 
 <style>
@@ -62,6 +63,10 @@
   }
   .icon {
     display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    inline-size: 24px;
+    block-size: 24px;
     color: var(--text-secondary);
   }
   .active .icon {

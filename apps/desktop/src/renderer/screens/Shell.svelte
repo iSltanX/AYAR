@@ -94,7 +94,8 @@
   // ── the run bar (C-03) ──────────────────────────────────────────────────────────────────────────────────
   const active = $derived(app.runs.active);
   const onItsMonitor = $derived(!!active && route.name === 'scan' && route.runId === active.runId);
-  const live = $derived(active ? countChecks(app.runs.checksOf(active.runId)) : null);
+  // The run bar counts what runs, as the monitor does (a check that does not apply is not part of the run's progress).
+  const live = $derived(active ? countChecks(app.runs.checksOf(active.runId).filter((c) => c.outcome !== 'not_applicable')) : null);
   const runCounts = $derived<ResultCount[]>(live ? countsInOrder(live.byOutcome) : []);
   const elapsed = $derived(active?.startedAt ? Math.max(0, Math.floor((app.runs.now - Date.parse(active.startedAt)) / 1000)) : 0);
   const runKindLabel = (run: RunView) => runKind(t, run, app.runs.plans[run.runId]);

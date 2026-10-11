@@ -37,5 +37,6 @@
   "controls.risk.approve": "اعتمد هذا الأمر",
   "controls.resource.cpu": "المعالج",
   "controls.resource.memory": "الذاكرة",
-  "controls.reportData.label": "بيانات من المشروع"
+  "controls.reportData.label": "بيانات من المشروع",
+  "controls.dropZone.active": "أفلت المجلد ليقرأه عِيَار"
 }
