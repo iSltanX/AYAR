@@ -1,18 +1,21 @@
-// AT-16 (FR-31, FR-32), the part outside the probe: every check proves it finds the defect planted for it, at its
-// place, by its rule and with its proof, and invents none in the clean variants. Every variant of plan 20's
-// projects (FX-ADAPTERS is AT-14's, at14.test.ts) is scanned by the engine with the checks its expectations name,
-// the optional ones included as AT-16 says; the report compares every expectation with the result, and any
-// difference in either direction fails. What a later phase owns is listed apart, never counted as a pass: the
-// probe's checks (DEV-7), the integrity checks and the guard's effect on an outcome (DEV-9).
+// AT-16 (FR-31, FR-32): every check proves it finds the defect planted for it, at its place, by its rule and with
+// its proof, and invents none in the clean variants. Every variant of plan 20's projects (FX-ADAPTERS is AT-14's,
+// at14.test.ts) is scanned by the engine with the checks its expectations name, the optional ones included as AT-16
+// says; the report compares every expectation with the result, and any difference in either direction fails. The
+// probe's checks run too (DEV-7), with its browser; what a later phase owns is listed apart, never counted as a
+// pass: the integrity checks and the guard's effect on an outcome (DEV-9).
 //
-// About twenty minutes with the real tools: AYAR_AT16=1 (one project: AYAR_AT16_ONLY=FX-PY).
+// About twenty-five minutes with the real tools: AYAR_AT16=1 (one project: AYAR_AT16_ONLY=FX-PY).
 import { execFileSync } from 'node:child_process';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { cpSync, existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { report, type Row } from './support/conformance.ts';
-import { engineFor, LOGIN_PATH, ok, tempDir, toolchainReady, type EngineConnection, type Expectation } from './support/scan.ts';
+import { engineFor, FIXTURES, LOGIN_PATH, ok, tempDir, toolchainReady, type EngineConnection, type Expectation } from './support/scan.ts';
 import { installOsvMiniDb, runVariant, systemBin, variantsOf, type VariantOptions } from './support/variants.ts';
+import { installTestBrowser, probeBrowserReady, webDesignPatch } from './support/probe.ts';
+import type { CaptureView, RunDetail } from '@ayar/protocol';
+import { approveAll, plan as planRun, startRun, waitRun } from '../../../tools/cli/test/support/fixtures.ts';
 
 const FULL = process.env.AYAR_AT16 === '1';
 const ONLY = process.env.AYAR_AT16_ONLY?.split(',') ?? null;
@@ -46,9 +49,25 @@ const PROJECTS: Record<string, VariantOptions> = {
   'FX-NOTEST': { patch: () => ({ checks: { 'code.complexity@.': { thresholds: { complexity: 10 } } } }) },
   'FX-PROC': { patch: procPatch },
   'FX-MALICIOUS': {},
-  // The fonts the design approves, as its owner declares them in the profile (design/design.config.json: Cairo).
-  'FX-WEB-DESIGN': { patch: () => ({ references: { fonts: { approved: ['Cairo'] } } }) },
+  // FX-WEB-DESIGN's profile as its owner writes it (design/design.config.json): the approved font, the states file,
+  // the preview server as a companion service with the matrix of sizes, themes and languages. visual-change's
+  // precondition (its expected file: references approved from the sound variant): the sound tokens first, a run of
+  // design.visual, its captures approved, then the variant's change back in place.
+  'FX-WEB-DESIGN': { patch: () => webDesignPatch(4176), before: approveSoundReferences, timeoutMs: 900_000 },
 };
+
+async function approveSoundReferences(variant: string, ctx: { engine: EngineConnection; projectId: string; path: string }): Promise<void> {
+  if (variant !== 'visual-change') return;
+  const changed = ['design/tokens.json', 'styles/tokens.css'];
+  for (const f of changed) cpSync(join(FIXTURES, 'FX-WEB-DESIGN/base', f), join(ctx.path, f));
+  await approveAll(ctx.engine, ctx.projectId);
+  const p = await planRun(ctx.engine, ctx.projectId, { kind: 'group', instances: ['design.visual@.'] });
+  const d: RunDetail = await waitRun(ctx.engine, (await startRun(ctx.engine, p.id)).runId, 900_000);
+  const visual = d.checks.find((c) => c.instance === 'design.visual@.')!;
+  const { captures } = ok<{ captures: CaptureView[] }>(await ctx.engine.invoke('captures.list', { checkRunId: visual.checkRunId }));
+  ok(await ctx.engine.invoke('baseline.approve', { projectId: ctx.projectId, captureIds: captures.map((c) => c.id) }));
+  for (const f of changed) cpSync(join(FIXTURES, 'FX-WEB-DESIGN/variants/visual-change/overlay', f), join(ctx.path, f));
+}
 
 let root: string;
 let cleanup: () => void;
@@ -59,6 +78,7 @@ beforeAll(async () => {
   engine = await engineFor(root, { path: `${systemBin(root)}:${LOGIN_PATH}` });
   ok(await engine.invoke('settings.set', { key: 'run.allowNetwork', value: false }));
   installOsvMiniDb(join(root, 'AYAR'));
+  installTestBrowser(join(root, 'AYAR'));
 }, 60_000);
 /**
  * What FX-PROC's variants leave outside every process tree, as they are meant to (AYAR ends what carries its token
@@ -102,8 +122,8 @@ afterAll(async () => {
   else cleanup?.();
 });
 
-describe('AT-16 (outside the probe): planted defects found, none invented', () => {
-  it.runIf(FULL && toolchainReady())('compares every expectation of every variant with what the engine found', async () => {
+describe('AT-16: planted defects found, none invented', () => {
+  it.runIf(FULL && toolchainReady() && probeBrowserReady())('compares every expectation of every variant with what the engine found', async () => {
     const rows: Row[] = [];
     for (const [project, o] of Object.entries(PROJECTS)) {
       if (ONLY && !ONLY.includes(project)) continue;
