@@ -21,5 +21,6 @@
   "shell.selectionBar.count": "{count, plural, one {# محدد} two {# محددان} other {# محددة}}",
   "shell.selectionBar.runSelected": "شغّل المحدد ({count})",
   "shell.selectionBar.recheckSelected": "أعد فحص المحدد ({count})",
-  "shell.selectionBar.copyScope": "نطاق «انسخ للنموذج»: المحدد ({count})"
+  "shell.selectionBar.copyScope": "نطاق «انسخ للنموذج»: المحدد ({count})",
+  "shell.toast.created": "أُنشئت البطاقة {id}"
 }

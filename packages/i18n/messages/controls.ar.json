@@ -36,5 +36,6 @@
   "controls.risk.detail": "لا يدخل في «اعتمد الكل». اقرأ الأمر، ثم اعتمده وحده.",
   "controls.risk.approve": "اعتمد هذا الأمر",
   "controls.resource.cpu": "المعالج",
-  "controls.resource.memory": "الذاكرة"
+  "controls.resource.memory": "الذاكرة",
+  "controls.reportData.label": "بيانات من المشروع"
 }

@@ -207,10 +207,12 @@
       {:else}
         <section class="section">
           <h3 class="section-title">{t('glossary.evidence')}</h3>
-          <div class="location">
-            <PathPill path={f.location.path} line={f.location.line} oncopy={oncopypath} />
-            <Button kind="quiet" icon="external-link" onclick={() => onopenineditor?.(f.location)}>{t('ui.action.openInEditor')}</Button>
-          </div>
+          {#if f.location.path}
+            <div class="location">
+              <PathPill path={f.location.path} line={f.location.line} oncopy={oncopypath} />
+              <Button kind="quiet" icon="external-link" onclick={() => onopenineditor?.(f.location)}>{t('ui.action.openInEditor')}</Button>
+            </div>
+          {/if}
           {@render kv(t('results.inspector.expected'), f.expected)}
           {@render kv(t('results.inspector.actual'), f.actual)}
           {#if f.excerpt}
@@ -257,6 +259,8 @@
     flex-direction: column;
     gap: var(--space-16);
     inline-size: 380px;
+    /* A classic (always shown) scrollbar takes its width from the slot: shrink rather than scroll sideways. */
+    max-inline-size: 100%;
     min-block-size: 100%;
     padding: var(--space-16);
     border-inline-start: 1px solid var(--border-subtle);

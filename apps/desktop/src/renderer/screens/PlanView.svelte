@@ -133,7 +133,7 @@
       {#each sections as [section, items] (section)}
         {@const open = !collapsed.includes(section)}
         <tbody>
-          <tr class="group"><td colspan="7"><div role="grid" aria-label={sectionTitle(t, section)}><div role="row"><TableGroupRow title={sectionTitle(t, section)} count={items.length} expanded={open} ontoggle={(e: boolean) => (collapsed = e ? collapsed.filter((s) => s !== section) : [...collapsed, section])} /></div></div></td></tr>
+          <tr class="group"><td colspan="7"><div role="grid" aria-label={sectionTitle(t, section)}><TableGroupRow title={sectionTitle(t, section)} count={items.length} expanded={open} ontoggle={(e: boolean) => (collapsed = e ? collapsed.filter((s) => s !== section) : [...collapsed, section])} /></div></td></tr>
           {#if open}
             {#each items as i (i.instance)}
               {@const spec = specs.get(i.instance)}
@@ -175,7 +175,7 @@
       {@const open = !collapsed.includes('__wont')}
       <table class="plan not-run" data-testid="will-not-run">
         <tbody>
-          <tr class="group"><td colspan="4"><div role="grid" aria-label={t('scanplan.willNotRun')}><div role="row"><TableGroupRow title={t('scanplan.willNotRun')} count={willNotRun.length} expanded={open} ontoggle={(e: boolean) => (collapsed = e ? collapsed.filter((s) => s !== '__wont') : [...collapsed, '__wont'])} /></div></div></td></tr>
+          <tr class="group"><td colspan="4"><div role="grid" aria-label={t('scanplan.willNotRun')}><TableGroupRow title={t('scanplan.willNotRun')} count={willNotRun.length} expanded={open} ontoggle={(e: boolean) => (collapsed = e ? collapsed.filter((s) => s !== '__wont') : [...collapsed, '__wont'])} /></div></td></tr>
           {#if open}
             {#each willNotRun as w (w.instance)}
               {@const checkId = w.instance.split('@')[0] ?? w.instance}

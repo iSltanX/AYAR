@@ -74,6 +74,8 @@ import scanplanAr from './scanplan.ar.json' with { type: 'json' };
 import scanplanEn from './scanplan.en.json' with { type: 'json' };
 import monitorAr from './monitor.ar.json' with { type: 'json' };
 import monitorEn from './monitor.en.json' with { type: 'json' };
+import resultsuiAr from './resultsui.ar.json' with { type: 'json' };
+import resultsuiEn from './resultsui.en.json' with { type: 'json' };
 
 export const MESSAGE_FILES = {
   adapter: { ar: adapterAr, en: adapterEn },
@@ -115,11 +117,12 @@ export const MESSAGE_FILES = {
   overview: { ar: overviewAr, en: overviewEn },
   scanplan: { ar: scanplanAr, en: scanplanEn },
   monitor: { ar: monitorAr, en: monitorEn },
+  resultsui: { ar: resultsuiAr, en: resultsuiEn },
 } as const;
 
 export type Scope = keyof typeof MESSAGE_FILES;
 
 export const MESSAGES = {
-  ar: { ...adapterAr, ...advisorAr, ...alertsAr, ...analyzerAr, ...catalogAr, ...commonAr, ...controlsAr, ...discoveryAr, ...environmentAr, ...errorsAr, ...glossaryAr, ...menuAr, ...planAr, ...probeAr, ...profileAr, ...projectsAr, ...purityAr, ...resultsAr, ...runAr, ...setupAr, ...sheetsAr, ...shellAr, ...statusAr, ...uiAr, ...verdictAr, ...reportAr, ...integrityAr, ...compareAr, ...tasksAr, ...aichecksAr, ...appAr, ...projectlistAr, ...discoveruiAr, ...approvalAr, ...overviewAr, ...scanplanAr, ...monitorAr },
-  en: { ...adapterEn, ...advisorEn, ...alertsEn, ...analyzerEn, ...catalogEn, ...commonEn, ...controlsEn, ...discoveryEn, ...environmentEn, ...errorsEn, ...glossaryEn, ...menuEn, ...planEn, ...probeEn, ...profileEn, ...projectsEn, ...purityEn, ...resultsEn, ...runEn, ...setupEn, ...sheetsEn, ...shellEn, ...statusEn, ...uiEn, ...verdictEn, ...reportEn, ...integrityEn, ...compareEn, ...tasksEn, ...aichecksEn, ...appEn, ...projectlistEn, ...discoveruiEn, ...approvalEn, ...overviewEn, ...scanplanEn, ...monitorEn },
+  ar: { ...adapterAr, ...advisorAr, ...alertsAr, ...analyzerAr, ...catalogAr, ...commonAr, ...controlsAr, ...discoveryAr, ...environmentAr, ...errorsAr, ...glossaryAr, ...menuAr, ...planAr, ...probeAr, ...profileAr, ...projectsAr, ...purityAr, ...resultsAr, ...runAr, ...setupAr, ...sheetsAr, ...shellAr, ...statusAr, ...uiAr, ...verdictAr, ...reportAr, ...integrityAr, ...compareAr, ...tasksAr, ...aichecksAr, ...appAr, ...projectlistAr, ...discoveruiAr, ...approvalAr, ...overviewAr, ...scanplanAr, ...monitorAr, ...resultsuiAr },
+  en: { ...adapterEn, ...advisorEn, ...alertsEn, ...analyzerEn, ...catalogEn, ...commonEn, ...controlsEn, ...discoveryEn, ...environmentEn, ...errorsEn, ...glossaryEn, ...menuEn, ...planEn, ...probeEn, ...profileEn, ...projectsEn, ...purityEn, ...resultsEn, ...runEn, ...setupEn, ...sheetsEn, ...shellEn, ...statusEn, ...uiEn, ...verdictEn, ...reportEn, ...integrityEn, ...compareEn, ...tasksEn, ...aichecksEn, ...appEn, ...projectlistEn, ...discoveruiEn, ...approvalEn, ...overviewEn, ...scanplanEn, ...monitorEn, ...resultsuiEn },
 } as const;

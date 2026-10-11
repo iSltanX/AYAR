@@ -14,7 +14,7 @@
   import { useLocale } from '../lib/locale.ts';
   import { NAV_PROJECT, NAV_SECTIONS, type NavId, type ResultCount } from '../lib/shell.ts';
   import { attempt, on } from '../app/client.ts';
-  import { countChecks } from '../app/runs.svelte.ts';
+  import { countChecks, isActive } from '../app/runs.svelte.ts';
   import { countsInOrder, runKind } from '../app/format.ts';
   import { useApp } from '../app/state.svelte.ts';
   import { addDroppedProject, addProjectFromDialog } from '../app/actions.ts';
@@ -53,7 +53,9 @@
           ? t('app.title.profile')
           : route.name === 'overview'
             ? t('ui.nav.overview')
-            : t('ui.nav.fullScan'),
+            : route.runId && !isActive(app.runs.runs[route.runId])
+              ? t('resultsui.crumb')
+              : t('ui.nav.fullScan'),
   );
 
   const breadcrumb = $derived.by(() => {

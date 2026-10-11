@@ -1,7 +1,7 @@
 // A log's raw lines as the log components draw them (C-13, C-24): terminal colour codes removed, and the engine's
 // redaction markers (⟦redacted:<rule>⟧, written before anything reaches the page) turned into redacted segments,
 // so a secret's place shows its kind and never a value. Bidi controls stay in the text: LogLineText reveals them.
-import type { Lang, Translate } from '@ayar/i18n';
+import { LOCALES, type Lang, type Translate } from '@ayar/i18n';
 import type { LogLine, LogSegment } from '../lib/evidence.ts';
 import { textOr } from './format.ts';
 
@@ -18,6 +18,12 @@ export function redactionKind(t: Translate, lang: Lang, rule: string): string {
   if (rule.startsWith('env:')) return t('results.redaction.env', { name: rule.slice(4) });
   if (rule.startsWith('user:')) return t('results.redaction.user');
   return textOr(t, lang, `results.redaction.rule.${rule}`, rule);
+}
+
+/** The kinds of a report's redactions as one list in the UI language («رمز GitHub وقيمة سرية»), or undefined. */
+export function redactionKinds(t: Translate, lang: Lang, byRule: Readonly<Record<string, number>>): string | undefined {
+  const kinds = [...new Set(Object.keys(byRule).map((r) => redactionKind(t, lang, r)))];
+  return kinds.length ? new Intl.ListFormat(LOCALES[lang], { type: 'conjunction' }).format(kinds) : undefined;
 }
 
 /** One raw line as segments: text, and a redacted segment for each marker (its kind in the UI language). */

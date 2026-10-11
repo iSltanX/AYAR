@@ -21,5 +21,6 @@
   "shell.selectionBar.count": "{count} selected",
   "shell.selectionBar.runSelected": "Run selected ({count})",
   "shell.selectionBar.recheckSelected": "Re-check selected ({count})",
-  "shell.selectionBar.copyScope": "«Copy for the model» scope: Selected ({count})"
+  "shell.selectionBar.copyScope": "«Copy for the model» scope: Selected ({count})",
+  "shell.toast.created": "Card {id} created"
 }

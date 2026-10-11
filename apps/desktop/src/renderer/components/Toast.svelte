@@ -13,7 +13,7 @@
   const parts = $derived(
     props.kind === 'report'
       ? ([t('shell.toast.report', { count: props.count }), ''] as const)
-      : splitAround(t(props.kind === 'card' ? 'shell.toast.card' : 'shell.toast.instructions', { id: SLOT }), SLOT),
+      : splitAround(t(props.kind === 'card' ? 'shell.toast.card' : props.kind === 'created' ? 'shell.toast.created' : 'shell.toast.instructions', { id: SLOT }), SLOT),
   );
 </script>
 

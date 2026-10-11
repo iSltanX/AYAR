@@ -111,5 +111,8 @@ export function countProgress(done: number, total: number): { done: number; tota
   return { done: d, total: t, fraction: t > 0 ? d / t : 0 };
 }
 
-/** What a toast says was copied (Toast 117:9781: Kind report | card | instructions). */
-export type ToastMessage = { kind: 'report'; count: number } | { kind: 'card' | 'instructions'; id: string };
+/**
+ * What a toast says was copied (Toast 117:9781: Kind report | card | instructions), or — DEV-11, the same toast with
+ * another sentence — the card created from a finding («أنشئ بطاقة»).
+ */
+export type ToastMessage = { kind: 'report'; count: number } | { kind: 'card' | 'instructions' | 'created'; id: string };
