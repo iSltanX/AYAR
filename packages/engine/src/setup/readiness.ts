@@ -44,6 +44,8 @@ export interface ReadinessInput {
   tools: Pick<ToolsService, 'locate'>;
   /** Tools AYAR can install (the managed registry). */
   installable: (key: string) => boolean;
+  /** The installer an installable tool needs first, if any (uv for a Python environment, G-DEV6-01). */
+  installerOf?: (key: string) => string | undefined;
   allowNetwork: boolean;
   /** Ecosystems whose offline OSV database is present (data_assets). */
   osvDbs: ReadonlySet<string>;
@@ -180,6 +182,9 @@ export async function evaluateInstances(i: ReadinessInput): Promise<InstanceRead
         if (!tool) {
           // The first tool of the requirement AYAR can install (Betterleaks before Gitleaks, E-08).
           const first = managedReq.tools.find((k) => i.installable(k));
+          // A Python-environment install needs uv first (G-DEV6-01): its own action, before the tool's.
+          const installer = first ? i.installerOf?.(first) : undefined;
+          if (installer && !(await locate(installer))) need({ key: 'setup.reason.toolMissing', params: { tool: installer } }, { kind: 'install_tool', tool: installer });
           if (first) need({ key: 'setup.reason.toolMissing', params: { tool: first } }, { kind: 'install_tool', tool: first });
           else need({ key: 'setup.reason.toolMissing', params: { tool: managedReq.tools[0]! } });
         }

@@ -19,7 +19,7 @@ import type { DataLayout } from '../storage/data-dir.ts';
 import type { Db } from '../storage/db.ts';
 import { compare, parseVersion } from '../environment/semver.ts';
 import { PROBE_ENV, PROBE_TIMEOUT_MS } from '../environment/resolve.ts';
-import { isStale, machineArch, SYSTEM_ONLY_TOOLS, type ManagedToolDef } from './registry.ts';
+import { isStale, loadEnvRegistry, machineArch, SYSTEM_ONLY_TOOLS, type ManagedEnvDef, type ManagedToolDef } from './registry.ts';
 
 export interface ToolLocation {
   key: string;
@@ -52,6 +52,8 @@ export interface ToolsServiceOptions {
   staleAfterDays: number;
   /** The PATH of the login environment (C-07), where system tools are looked for. */
   path: () => Promise<readonly string[]>;
+  /** C-11's Python-environment installs (G-DEV6-01, DEV-7): Semgrep. */
+  envs?: ReadonlyMap<string, ManagedEnvDef>;
 }
 
 /** A hash or signature failure: what was expected, what came. */
@@ -74,12 +76,24 @@ export class ToolsService {
   /** Version probes of system tools, by real path and file identity (a session cache). */
   readonly #probed = new Map<string, string | null>();
 
+  readonly #envs: ReadonlyMap<string, ManagedEnvDef>;
+
   constructor(o: ToolsServiceOptions) {
     this.#o = o;
+    this.#envs = o.envs ?? loadEnvRegistry();
   }
 
   get registry(): ReadonlyMap<string, ManagedToolDef> {
     return this.#o.registry;
+  }
+
+  /** Can AYAR install this tool (a pinned file, or a Python environment)? */
+  installable(key: string): boolean {
+    return this.#o.registry.has(key) || this.#envs.has(key);
+  }
+
+  env(key: string): ManagedEnvDef | undefined {
+    return this.#envs.get(key);
   }
 
   def(key: string): ManagedToolDef {
@@ -98,7 +112,7 @@ export class ToolsService {
     return this.#o.db.get<ToolRow>("SELECT * FROM tools WHERE tool_key = ? AND source = 'managed' ORDER BY installed_at DESC LIMIT 1", key);
   }
 
-  #installDir(def: ManagedToolDef): string {
+  #installDir(def: Pick<ManagedToolDef, 'key' | 'version'>): string {
     return posix.join(this.#o.layout.tools, def.key, def.version);
   }
 
@@ -106,11 +120,11 @@ export class ToolsService {
    * Runs `<tool> <versionArgs>` the way C-07 probes versions: 5 s, auto-installers off, a neutral folder of its
    * own as its home (Semgrep writes its settings there even for `--version`), deleted after.
    */
-  async probe(def: Pick<ManagedToolDef, 'versionArgs' | 'versionPattern'>, path: string): Promise<string | null> {
+  async probe(def: Pick<ManagedToolDef, 'versionArgs' | 'versionPattern'>, path: string, timeoutMs = PROBE_TIMEOUT_MS): Promise<string | null> {
     const home = posix.join(this.#o.layout.tmp, `probe-${Buffer.from(this.#o.ports.random.bytes(6)).toString('hex')}`);
     await this.#o.ports.fs.mkdir(home, 0o700);
     try {
-      const r = await this.#o.ports.processes.spawn(path, def.versionArgs, { cwd: home, env: { PATH: '/usr/bin:/bin', HOME: home, ...PROBE_ENV }, timeoutMs: PROBE_TIMEOUT_MS, maxOutputBytes: 64 * 1024 });
+      const r = await this.#o.ports.processes.spawn(path, def.versionArgs, { cwd: home, env: { PATH: '/usr/bin:/bin', HOME: home, ...PROBE_ENV }, timeoutMs, maxOutputBytes: 64 * 1024 });
       if (r.error || r.timedOut || r.code !== 0) return null;
       const text = new TextDecoder().decode(r.stdout) + new TextDecoder().decode(r.stderr);
       return new RegExp(def.versionPattern, 'm').exec(text)?.[1] ?? null;
@@ -133,9 +147,9 @@ export class ToolsService {
    */
   async locate(key: string): Promise<ToolLocation | null> {
     // A tool AYAR does not install yet, but uses from the system inside its tested range (SYSTEM_ONLY_TOOLS).
-    const def: Pick<ManagedToolDef, 'versionArgs' | 'versionPattern' | 'system'> | undefined = this.#o.registry.get(key) ?? SYSTEM_ONLY_TOOLS.find((t) => t.key === key);
+    const def: Pick<ManagedToolDef, 'versionArgs' | 'versionPattern' | 'system'> | undefined = this.#o.registry.get(key) ?? this.#envs.get(key) ?? SYSTEM_ONLY_TOOLS.find((t) => t.key === key);
     if (!def) return null;
-    const managed = this.#o.registry.get(key);
+    const managed = this.#o.registry.get(key) ?? this.#envs.get(key);
     const row = managed ? this.#row(key) : undefined;
     if (managed && row && row.status === 'installed' && row.version === managed.version && row.path && (await this.#o.ports.fs.lstat(row.path))?.isFile) {
       return { key, source: 'managed', path: row.path, version: row.version };
@@ -158,6 +172,8 @@ export class ToolsService {
   }
 
   async view(key: string): Promise<ToolView> {
+    const env = this.#envs.get(key);
+    if (env) return this.#envView(env);
     const def = this.def(key);
     const row = this.#row(key);
     const loc = await this.locate(key).catch(() => null);
@@ -183,9 +199,33 @@ export class ToolsService {
     };
   }
 
+  async #envView(def: ManagedEnvDef): Promise<ToolView> {
+    const row = this.#row(def.key);
+    const loc = await this.locate(def.key).catch(() => null);
+    return {
+      key: def.key,
+      version: def.version,
+      license: def.license,
+      homepage: def.homepage,
+      source: loc?.source ?? null,
+      status: row ? (row.status as ToolView['status']) : 'not_installed',
+      path: loc?.path ?? row?.path ?? null,
+      installedVersion: row?.status === 'installed' ? row.version : (loc?.version ?? null),
+      sha256: row?.sha256 ?? null,
+      sizeBytes: def.sizeBytes,
+      installedAt: row?.installed_at ?? null,
+      verifiedAt: row?.verified_at ?? null,
+      verifiedOk: row ? row.status === 'installed' : null,
+      verification: { kind: 'sha256' },
+      signatureChecked: null,
+      catalogVerifiedAt: def.verifiedAt,
+      stale: isStale({ verifiedAt: def.verifiedAt } as ManagedToolDef, this.#o.ports.clock.now(), this.#o.staleAfterDays),
+    };
+  }
+
   async list(): Promise<{ tools: ToolView[]; dataAssets: DataAssetView[] }> {
     const tools: ToolView[] = [];
-    for (const key of [...this.#o.registry.keys()].sort()) tools.push(await this.view(key));
+    for (const key of [...this.#o.registry.keys(), ...this.#envs.keys()].sort()) tools.push(await this.view(key));
     const dataAssets = this.#o.db
       .all<{ kind: 'osv-db' | 'browser'; key: string; version_or_date: string; path: string; size: number | null; updated_at: string }>('SELECT kind, key, version_or_date, path, size, updated_at FROM data_assets ORDER BY kind, key')
       .map((r) => ({ kind: r.kind, key: r.key, versionOrDate: r.version_or_date, path: r.path, sizeBytes: r.size, updatedAt: r.updated_at }));
@@ -194,6 +234,12 @@ export class ToolsService {
 
   /** FR-17 / 9.4 point 3: what an install will do, exactly; its digest binds the confirmation (D-DEV3-05). */
   preview(key: string): { target: string; digest: string; preview: ToolInstallPreview } {
+    const env = this.#envs.get(key);
+    if (env) {
+      // What it fetches: a CPython from python-build-standalone (through uv) and the pinned files from PyPI.
+      const preview: ToolInstallPreview = { tool: key, version: env.version, url: `https://pypi.org/simple/${env.key}/`, host: 'pypi.org', sizeBytes: env.sizeBytes, sha256: env.requirementsSha256, verification: { kind: 'sha256' }, writes: `tools/${env.key}/${env.version}/`, license: env.license };
+      return { target: key, digest: sha(canonicalJson(preview)), preview };
+    }
     const def = this.def(key);
     const f = this.#file(def);
     const preview: ToolInstallPreview = {
@@ -218,7 +264,8 @@ export class ToolsService {
     const p = this.preview(key);
     if (!o.digest || o.digest !== p.digest) throw new CommandError('confirmation_mismatch', { reason: 'preview_digest', tool: key });
     if (this.#installing.has(key)) throw new CommandError('busy', { reason: 'installing', tool: key });
-    const job = this.#install(this.def(key), o.actionId ?? `tool:${key}`).finally(() => this.#installing.delete(key));
+    const env = this.#envs.get(key);
+    const job = (env ? this.#installEnv(env, o.actionId ?? `tool:${key}`) : this.#install(this.def(key), o.actionId ?? `tool:${key}`)).finally(() => this.#installing.delete(key));
     this.#installing.set(key, job);
     return job;
   }
@@ -341,6 +388,101 @@ export class ToolsService {
     }
   }
 
+  /**
+   * C-11's Python-environment install (E-10, G-DEV6-01): the shipped requirements checked against their pinned hash,
+   * then — straight into its place, as a virtual environment is not relocatable — uv installs its CPython, makes the
+   * environment, and installs the requirements with --require-hashes (only binary wheels, nothing built, no
+   * dependency beyond the file); the version is read from the tool itself; the register and the audit log follow.
+   * Any failure removes what was made. uv is a managed or system one (C-11 point 1), never fetched implicitly.
+   */
+  async #installEnv(def: ManagedEnvDef, actionId: string): Promise<ToolInstallResult> {
+    const { fs, clock, random, processes } = this.#o.ports;
+    const dest = posix.join(this.#o.layout.tools, def.key, def.version);
+    const free = await fs.freeBytes(this.#o.layout.tools);
+    if (free !== null && free < def.sizeBytes * 2) return { status: 'failed', reason: 'disk_full', tool: await this.view(def.key), detail: null };
+    const uv = await this.locate(def.installer);
+    if (!uv) return { status: 'failed', reason: 'extract', tool: await this.view(def.key), detail: `${def.installer} is not available: install it first` };
+    if (sha(def.requirements) !== def.requirementsSha256) return { status: 'rejected', reason: 'hash_mismatch', tool: await this.view(def.key), auditId: this.#auditRejected(def, 'requirements') };
+    const work = posix.join(this.#o.layout.tmp, `install-${newId(random, 'tmp').slice(4)}`);
+    await fs.mkdir(posix.join(work, 'home'), 0o700);
+    const req = posix.join(work, 'requirements.txt');
+    await fs.writeFileAtomic(req, new TextEncoder().encode(def.requirements), 0o600);
+    // uv's own settings and caches stay in the work folder: nothing of the user's uv configuration is read.
+    const env = { PATH: '/usr/bin:/bin', HOME: posix.join(work, 'home'), UV_NO_CONFIG: '1', UV_CACHE_DIR: posix.join(work, 'cache'), UV_PYTHON_PREFERENCE: 'only-managed', NO_COLOR: '1' };
+    const run = (args: string[], timeoutMs: number) => processes.spawn(uv.path, args, { cwd: work, env, timeoutMs, maxOutputBytes: 256 * 1024 });
+    const fail = async (detail: string): Promise<ToolInstallResult> => {
+      await fs.remove(dest);
+      return { status: 'failed', reason: 'extract', tool: await this.view(def.key), detail: detail.slice(0, 300) };
+    };
+    const started = clock.monotonicMs();
+    try {
+      await fs.remove(dest);
+      await fs.mkdir(dest, 0o700);
+      this.#progress(actionId, 'downloading', { totalBytes: def.sizeBytes });
+      const py = await run(['python', 'install', def.python, '--install-dir', posix.join(dest, 'python')], 15 * 60_000);
+      if (py.code !== 0) return fail(`uv python install: ${new TextDecoder().decode(py.stderr)}`);
+      const pyDir = (await fs.readdir(posix.join(dest, 'python'))).find((d) => d.startsWith(`cpython-${def.python}-`));
+      const minor = def.python.split('.').slice(0, 2).join('.');
+      const python = pyDir ? posix.join(dest, 'python', pyDir, 'bin', `python${minor}`) : null;
+      if (!python || !(await fs.stat(python))?.isFile) return fail('the managed Python was not found after its install');
+      const venv = posix.join(dest, 'venv');
+      const v = await run(['venv', venv, '--python', python, '--no-project'], 120_000);
+      if (v.code !== 0) return fail(`uv venv: ${new TextDecoder().decode(v.stderr)}`);
+      this.#progress(actionId, 'verifying');
+      // Its bytecode compiled now, so it is part of the hashed tree and Python has nothing to write later.
+      const i = await run(['pip', 'install', '--python', posix.join(venv, 'bin', 'python'), '--require-hashes', '--no-deps', '--only-binary', ':all:', '--compile-bytecode', '-r', req], 20 * 60_000);
+      if (i.code !== 0) {
+        const text = new TextDecoder().decode(i.stderr);
+        // A file that does not match its pinned hash: rejected, removed, audited, a security alert (C-11, T6).
+        if (/hash mismatch|Hash mismatch|doesn't match any of the expected hashes/i.test(text)) {
+          await fs.remove(dest);
+          this.#progress(actionId, 'rejected', { securityAlert: true, messageKey: 'setup.rejected.hash_mismatch' });
+          return { status: 'rejected', reason: 'hash_mismatch', tool: await this.view(def.key), auditId: this.#auditRejected(def, text.slice(0, 300)) };
+        }
+        return fail(`uv pip install: ${text}`);
+      }
+      const path = posix.join(dest, def.bin);
+      await fs.mkdir(posix.dirname(path), 0o700);
+      const quoted = `'${posix.join(dest, def.entry).replace(/'/g, `'\\''`)}'`;
+      await fs.writeFileAtomic(path, new TextEncoder().encode(`#!/bin/sh\n# AYAR's managed ${def.key} ${def.version}: no bytecode beside its hashed files.\nPYTHONDONTWRITEBYTECODE=1 exec ${quoted} "$@"\n`), 0o755);
+      this.#progress(actionId, 'probing');
+      // The first run after an install is slower than a readiness probe allows (the system checks the new binaries).
+      const version = await this.probe(def, path, 60_000);
+      if (version !== def.version) return fail(`version ${version ?? 'unknown'}`);
+      const tree = await this.#treeHash(dest);
+      const at = clock.now().toISOString();
+      this.#o.db.transaction(() => {
+        this.#o.db.run(
+          `INSERT INTO tools (id, tool_key, version, source, path, sha256, license, installed_at, verified_at, status, signature_checked) VALUES (?, ?, ?, 'managed', ?, ?, ?, ?, ?, 'installed', NULL)
+           ON CONFLICT (tool_key, version) DO UPDATE SET source = 'managed', path = excluded.path, sha256 = excluded.sha256, license = excluded.license, installed_at = excluded.installed_at, verified_at = excluded.verified_at, status = 'installed', signature_checked = NULL`,
+          newId(random, 'tol'),
+          def.key,
+          def.version,
+          path,
+          tree,
+          def.license,
+          at,
+          at,
+        );
+        recordAudit(this.#o.db, { id: newId(random, 'aud'), at: clock.now(), action: 'tool.installed', projectId: null, details: { tool: def.key, version: def.version, kind: def.kind, python: def.python, requirements: def.requirementsSha256 } });
+      });
+      this.#progress(actionId, 'done');
+      const st = await fs.stat(path);
+      return { status: 'installed', tool: await this.view(def.key), downloadedBytes: st ? def.sizeBytes : 0, durationMs: Math.round(clock.monotonicMs() - started) };
+    } catch (e) {
+      return fail(e instanceof Error ? e.message : String(e));
+    } finally {
+      await fs.remove(work);
+    }
+  }
+
+  #auditRejected(def: ManagedEnvDef, detail: string): string {
+    const auditId = newId(this.#o.ports.random, 'aud');
+    recordAudit(this.#o.db, { id: auditId, at: this.#o.ports.clock.now(), action: 'tool.installRejected', projectId: null, actor: 'engine', details: { tool: def.key, version: def.version, reason: 'hash_mismatch', detail } });
+    this.#o.logger.log('error', 'security alert: a pinned file of a managed environment did not match its hash, and nothing was installed', { tool: def.key });
+    return auditId;
+  }
+
   /** true: the signature was checked; false: sigstore without cosign, the pinned hash alone; null: none to check. */
   async #verifySignature(def: ManagedToolDef, bin: string, work: string, archiveSha: string, archiveUrl: string): Promise<boolean | null> {
     const v = def.verification;
@@ -376,6 +518,8 @@ export class ToolsService {
 
   /** Whether an install of this tool would check a signature now (the preview says so before the confirmation). */
   async signatureCheckable(key: string): Promise<boolean | null> {
+    // A Python environment has no signature of its own: its files are pinned by their hashes (G-DEV6-01).
+    if (this.#envs.has(key)) return null;
     const v = this.def(key).verification;
     if (v.kind === 'developer_id') return true;
     if (v.kind !== 'sigstore' || !this.def(key).signature) return null;
@@ -400,10 +544,10 @@ export class ToolsService {
 
   /** tools.verify: re-hash the installed files against the register; a change marks the tool damaged. */
   async verify(key?: string): Promise<ToolView[]> {
-    const keys = key ? [key] : [...this.#o.registry.keys()];
+    const keys = key ? [key] : [...this.#o.registry.keys(), ...this.#envs.keys()];
     const out: ToolView[] = [];
     for (const k of keys.sort()) {
-      const def = this.def(k);
+      const def = this.#envs.get(k) ?? this.def(k);
       const row = this.#row(k);
       if (row?.status === 'installed' || row?.status === 'damaged') {
         const dest = this.#installDir(def);
@@ -422,7 +566,7 @@ export class ToolsService {
 
   /** tools.remove: the managed install and its register row go; a system tool is never touched. */
   async remove(key: string): Promise<{ removed: boolean; tool: ToolView }> {
-    const def = this.def(key);
+    const def = this.#envs.get(key) ?? this.def(key);
     const row = this.#row(key);
     await this.#o.ports.fs.remove(posix.join(this.#o.layout.tools, def.key));
     this.#o.db.transaction(() => {
