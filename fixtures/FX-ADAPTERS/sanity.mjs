@@ -15,10 +15,10 @@ const tools = {
   pytest: { setup: UV, cmd: '.venv/bin/python -m pytest -p no:cacheprovider', check: 'beh.unit' },
   ruff: { setup: UV, cmd: '.venv/bin/ruff check --no-cache src', check: 'code.lint' },
   mypy: { setup: UV, cmd: '.venv/bin/python -m mypy --cache-dir=/dev/null', check: 'code.types' },
-  semgrep: { cmd: 'semgrep scan --no-git-ignore --config rules/ayar-eval.yml --metrics=off --disable-version-check --quiet src', check: 'sec.sast' },
+  semgrep: { cmd: 'semgrep scan --no-git-ignore --config .semgrep.yml --metrics=off --disable-version-check --quiet src', check: 'sec.sast' },
   // قاعدة OSV المصغرة (E-09): تُبنى وقت التشغيل من fixtures/tools/osv-mini-db إلى المجلد المؤقت، وتُقرأ دون اتصال
   osv: { cmd: 'node $FX_TOOLS/osv-mini-db/build.mjs --out "$TMPDIR/ayar-osv-mini-db" >/dev/null && OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY="$TMPDIR/ayar-osv-mini-db" osv-scanner scan source -r . --offline --no-call-analysis=all --format json --output-file ../osv.json; c=$?; cat ../osv.json 2>/dev/null; exit $c', check: 'sec.deps' },
-  gitleaks: { cmd: 'gitleaks dir . --config gitleaks.toml --redact=100 --no-banner --exit-code 42', check: 'sec.secrets.files' },
+  gitleaks: { cmd: 'gitleaks dir . --config .gitleaks.toml --redact=100 --no-banner --exit-code 42', check: 'sec.secrets.files' },
   lychee: { cmd: 'lychee --config lychee.toml README.md', check: 'code.refs.external', bg: 'node server.mjs' },
 };
 

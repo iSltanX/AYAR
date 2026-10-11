@@ -1,6 +1,6 @@
 {
   "name": "gitleaks--config-error",
-  "description": "gitleaks.toml غير صالح TOML.",
+  "description": ".gitleaks.toml غير صالح TOML (الاسم الذي يكتشفه عِيَار ويمرره بـ --config).",
   "defects": [
     "sec.secrets.files: إعداد غير صالح"
   ],

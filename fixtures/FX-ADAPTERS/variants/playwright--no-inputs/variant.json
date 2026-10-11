@@ -1,6 +1,7 @@
 {
   "name": "playwright--no-inputs",
   "description": "لا اختبارات: Playwright يخرج برمز 1 مع «No tests found».",
+  "role": "neutral",
   "defects": [
     "beh.e2e: لا اختبارات"
   ],
