@@ -81,6 +81,8 @@ const fail = (error: ProtocolError): InvokeResult<never> => ({ ok: false, error 
 
 export class Gateway {
   readonly #o: GatewayOptions;
+  /** E-17: the editor templates the user allowed in a native alert this session (the page can set one, never allow it). */
+  readonly #editorAllowed = new Set<string>();
 
   constructor(o: GatewayOptions) {
     this.#o = o;
@@ -238,6 +240,13 @@ export class Gateway {
         // E-17 (DEV-12): the template the settings hold, or `open -t` when there is none.
         const settings = await engine.request('settings.get', { keys: ['editor.template'] });
         const template = settings.ok ? ((settings.result as { values: { 'editor.template'?: string | null } }).values['editor.template'] ?? null) : null;
+        // A template names a program AYAR runs: the first time in a session, the user allows it in a native alert.
+        if (template && !this.#editorAllowed.has(template)) {
+          const t = createTranslator(this.#o.language?.() ?? 'ar');
+          const allowed = await system.confirmDestructive({ title: t('menu.editor.title'), detail: t('menu.editor.detail', { command: template }), confirm: t('menu.editor.open'), cancel: t('menu.link.cancel') });
+          if (!allowed) return fail(protocolError('cancelled'));
+          this.#editorAllowed.add(template);
+        }
         await system.openInEditor(editorCommand(template, file, finding.location?.line ?? null));
         return { ok: true, result: { opened: true } };
       }

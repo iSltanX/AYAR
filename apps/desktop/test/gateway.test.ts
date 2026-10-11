@@ -296,6 +296,16 @@ describe('gateway: the screens\u2019 main-process commands (protocol 1.6)', () =
     const templated = setup({ engine: (c) => (c.command === 'settings.get' ? { ok: true, result: { values: { 'editor.template': 'code --goto {file}:{line}' } } } : engine(c)) });
     expect(await templated.gw.invoke({ command: 'editor.open', payload: { findingId: 'fnd_1' } })).toEqual({ ok: true, result: { opened: true } });
     expect(templated.opened).toEqual([{ program: 'code', args: ['--goto', `${project.rootPath}/src/a.ts:3`] }]);
+    // The first use of a template asks in a native alert, naming the command; the same template does not ask again.
+    expect(templated.alerts).toHaveLength(1);
+    expect(templated.alerts[0]!.detail).toContain('code --goto {file}:{line}');
+    await templated.gw.invoke({ command: 'editor.open', payload: { findingId: 'fnd_1' } });
+    expect(templated.alerts).toHaveLength(1);
+    expect(templated.opened).toHaveLength(2);
+    // Declined: nothing runs.
+    const declined = setup({ confirm: false, engine: (c) => (c.command === 'settings.get' ? { ok: true, result: { values: { 'editor.template': 'code --goto {file}:{line}' } } } : engine(c)) });
+    expect(await declined.gw.invoke({ command: 'editor.open', payload: { findingId: 'fnd_1' } })).toMatchObject({ ok: false, error: { code: 'cancelled' } });
+    expect(declined.opened).toEqual([]);
     // The pure split: words, {file} and {line} wherever they are, no template or one without {file}: open -t.
     expect(editorCommand('zed {file}:{line}', '/p/a b.ts', 7)).toEqual({ program: 'zed', args: ['/p/a b.ts:7'] });
     expect(editorCommand(null, '/p/a.ts', 3)).toEqual({ program: '/usr/bin/open', args: ['-t', '/p/a.ts'] });
