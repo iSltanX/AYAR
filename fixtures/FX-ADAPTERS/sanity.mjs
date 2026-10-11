@@ -95,11 +95,11 @@ const matrix = [
   T('gitleaks', 'good', 0, ['no leaks found'], 'sec.secrets.files: اجتاز'),
   T('gitleaks', 'bad', 42, ['leaks found: 1'], 'sec.secrets.files: أخفق (رمز 42)'),
   T('gitleaks', 'config-error', 1, [], 'sec.secrets.files: تعذّر (رمز 1)'),
-  T('lychee', 'good', 0, ['0 Errors'], 'code.refs.external: اجتاز'),
-  T('lychee', 'bad', 2, ['gone', '404'], 'code.refs.external: أخفق (404)'),
-  T('lychee', 'timeout', 2, ['hang', 'imeout'], 'code.refs.external: مهلة (ليست رابطًا مكسورًا)'),
-  T('lychee', 'needs-review', 2, ['forbidden', '403'], 'code.refs.external: 403 يحتاج مراجعة'),
-  T('lychee', 'config-error', 3, ['Failed to parse configuration file'], 'code.refs.external: تعذّر (رمز 3)'),
+  T('lychee', 'good', 0, ['7 OK', '0 Errors'], 'الأداة الخام تبلغ الخادم المحلي بصيغه السبع؛ وعِيَار لا يطرق أيًّا منها: code.refs.external «ناقص» (D-DEV6-17)'),
+  T('lychee', 'bad', 2, ['gone', '404'], 'الأداة الخام: 404 مخالفة مثبتة (يقرؤها المحول، AT-14)؛ وعِيَار لا يطرق العنوان المحلي: «ناقص» (D-DEV6-17)'),
+  T('lychee', 'timeout', 2, ['hang', 'imeout'], 'الأداة الخام: مهلة ليست رابطًا مكسورًا (يقرؤها المحول، AT-14)؛ وعِيَار لا يطرق العنوان المحلي: «ناقص» (D-DEV6-17)'),
+  T('lychee', 'needs-review', 2, ['forbidden', '403'], 'الأداة الخام: 403 يحتاج مراجعة (يقرؤها المحول، AT-14)؛ وعِيَار لا يطرق العنوان المحلي: «ناقص» (D-DEV6-17)'),
+  T('lychee', 'config-error', 3, ['Failed to parse configuration file'], 'الأداة الخام: lychee.toml غير صالح برمز 3 تعذّر (يقرؤه المحول، AT-14)؛ وعِيَار لا يقرأ lychee.toml المشروع: «ناقص» (D-DEV6-17)'),
 ];
 const variants = {};
 for (const m of matrix) {

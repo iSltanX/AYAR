@@ -6,16 +6,12 @@
     {
       "check": "code.refs.external",
       "component": "lychee",
-      "result": "يحتاج مراجعة",
-      "rule": "link.unverified",
-      "location": {
-        "path": "lychee/README.md",
-        "line": 3,
-        "anchor": "/forbidden"
-      },
-      "confidence": "اشتباه",
-      "exit_code": 2,
-      "reason": "403 منع وصول لا كسر"
+      "result": "ناقص",
+      "rule": null,
+      "location": null,
+      "confidence": null,
+      "exit_code": 0,
+      "reason": "الرابط الممنوع على عنوان محلي لا يطرقه عِيَار (D-DEV6-17)؛ و403 من الأداة الخام يقرؤه المحول في AT-14"
     }
   ]
 }

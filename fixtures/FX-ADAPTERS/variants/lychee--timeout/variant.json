@@ -1,6 +1,6 @@
 {
   "name": "lychee--timeout",
-  "description": "رابط لا يستجيب أبدًا: مهلة lychee (AT-14: ليس رابطًا مكسورًا).",
+  "description": "رابط لا يستجيب أبدًا: مهلة lychee (AT-14: ليس رابطًا مكسورًا). وعبر عِيَار «ناقص»: لا يطرق العناوين المحلية ولا يقرأ lychee.toml المشروع (D-DEV6-17).",
   "defects": [
     "code.refs.external: مهلة رابط"
   ],

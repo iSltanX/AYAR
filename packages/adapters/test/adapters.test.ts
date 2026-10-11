@@ -4,7 +4,7 @@
 // at14.test.ts; here the adapters alone, deterministic and fast.
 import type { CheckSpec, ExitSignal, ParsedReport } from '@ayar/protocol';
 import { describe, expect, it } from 'vitest';
-import { adapterById, adapterFor, cvssSeverity, junitFlags, semgrepRuleId, splitScript, programOf, type Adapter, type ParseContext, type ReportFile, type SpecInput } from '../src/index.ts';
+import { adapterById, adapterFor, cvssSeverity, junitFlags, LOCAL_ADDRESSES, semgrepRuleId, splitScript, programOf, type Adapter, type ParseContext, type ReportFile, type SpecInput } from '../src/index.ts';
 
 const ROOT = '/p';
 
@@ -279,6 +279,21 @@ describe('the managed tools (AT-14)', () => {
     expect(r.exit).toEqual({ kind: 'ok' });
     expect(r.report.findings.map((f) => [f.rule, f.toolRule, f.location?.line])).toEqual([['link.broken', '404', 3], ['link.unverified', '403', 4], ['link.unverified', 'timeout', 5]]);
     expect(run(A('lychee'), ctx({ checkId: 'code.refs.external' }), 3).exit).toMatchObject({ kind: 'tool_error' });
+  });
+  it('lychee knocks on no local address, and reads no project configuration that could include one (D-DEV6-17)', () => {
+    const c = adapterFor(spec({ checkId: 'code.refs.external', section: 'quality', runner: { kind: 'adapter', ids: ['lychee'] }, tool: { key: 'lychee', source: 'managed', runtime: null, path: null } }));
+    if (!c || !('template' in c)) throw new Error('no template');
+    expect(c.template.argv).toEqual(['{tool}', '--config', '/dev/null', '--format', 'json', '--output', '{reports}/links.json', '--max-concurrency', '8', '--host-concurrency', '2', '--max-retries', '2', '--timeout', '20', '--exclude-all-private', '--exclude', LOCAL_ADDRESSES, '--scheme', 'http', '--scheme', 'https', '--no-progress', '{targets}']);
+    // The URLs as lychee matches them (normalized by the URL parser): what --exclude-all-private lets through, and
+    // the machines of the local network by name; never a public address or name.
+    const local = new RegExp(LOCAL_ADDRESSES);
+    for (const u of ['http://0.0.0.0:18231/ok', 'http://0.1.2.3/', 'http://user@0.0.0.0/', 'http://[::]:8080/', 'http://[::ffff:7f00:1]:18231/', 'http://[::7f00:1]/', 'http://[64:ff9b::a00:1]/', 'http://[fd12:3456::1]/', 'http://[fe80::1]/', 'http://localhost.:18231/', 'http://a.localhost./x', 'http://localhost.localdomain/', 'http://printer.local/', 'http://nas.home.arpa/', 'http://db.internal:5432/', 'http://router/', 'http://router./admin', 'http://100.64.0.1/', 'http://100.127.255.254/', 'http://198.18.0.1/', 'https://198.19.1.1?q']) expect([u, local.test(u)]).toEqual([u, true]);
+    for (const u of ['https://example.com/', 'https://github.com/a/b#x', 'http://8.8.8.8/', 'https://[2001:db8::1]/', 'https://localhost-docs.com/', 'https://mylocalhost.com/', 'https://foo.local.example.com/', 'http://100.63.0.1/', 'http://100.128.0.1/', 'http://198.20.0.1/', 'https://10.0.0.1.nip.io/']) expect([u, local.test(u)]).toEqual([u, false]);
+    // Nothing checked (every link local or not web): «ناقص», not a pass on nothing; some excluded and the rest checked: as read.
+    const none = run(A('lychee'), ctx({ checkId: 'code.refs.external', files: { 'links.json': JSON.stringify({ total: 3, excludes: 3, unsupported: 0, error_map: {} }) } }), 0);
+    expect(none.exit).toMatchObject({ kind: 'missing', reason: { key: 'adapter.reason.noLinksChecked', params: { links: 3, excluded: 3 } } });
+    const some = run(A('lychee'), ctx({ checkId: 'code.refs.external', files: { '1/links.json': JSON.stringify({ total: 2, excludes: 1, successful: 1 }), '2/links.json': JSON.stringify({ total: 1, excludes: 1 }) } }), 0, [0, 0]);
+    expect(some).toMatchObject({ exit: { kind: 'ok' }, report: { info: { links: 3, excluded: 2, checked: 1 } } });
   });
 });
 

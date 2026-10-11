@@ -16,6 +16,7 @@
   "adapter.reason.tscConfig": "Unavailable: a TypeScript configuration error ({code}); the problem is the configuration, not the code: {detail}",
   "adapter.reason.unparsedDiagnostics": "Unavailable: {tool} reported errors (code {code}) that could not be read: {detail}",
   "adapter.reason.noInputFiles": "Missing: no files for {tool} to check",
+  "adapter.reason.noLinksChecked": "Missing: no web link was checked ({links} links, {excluded} of them excluded as local or not web); AYAR knocks on no local address",
   "adapter.reason.noFilesProcessed": "Unavailable: {tool} processed no file",
   "adapter.reason.buildFailed": "Failed: the build failed (code {code})",
   "adapter.reason.noThreshold": "Missing: no declared threshold for {tool}",

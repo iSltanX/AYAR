@@ -16,6 +16,7 @@
   "adapter.reason.tscConfig": "تعذّر: خطأ إعداد TypeScript ({code})، والمشكلة في الإعداد لا في الشيفرة: {detail}",
   "adapter.reason.unparsedDiagnostics": "تعذّر: أبلغ {tool} عن أخطاء (رمز {code}) لم تُقرأ: {detail}",
   "adapter.reason.noInputFiles": "ناقص: لا ملفات يفحصها {tool}",
+  "adapter.reason.noLinksChecked": "ناقص: لم يُفحص أي رابط ويب ({links} رابطًا، منها {excluded} مستبعدة لأنها محلية أو ليست ويب)؛ عِيَار لا يطرق العناوين المحلية",
   "adapter.reason.noFilesProcessed": "تعذّر: لم يعالج {tool} أي ملف",
   "adapter.reason.buildFailed": "أخفق: فشل البناء (رمز {code})",
   "adapter.reason.noThreshold": "ناقص: لا عتبة معلنة لـ {tool}",

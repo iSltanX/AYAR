@@ -6,17 +6,12 @@
     {
       "check": "code.refs.external",
       "component": "lychee",
-      "result": "تعذّر",
+      "result": "ناقص",
       "rule": null,
-      "location": {
-        "path": "lychee/lychee.toml",
-        "line": 1,
-        "anchor": "timeout"
-      },
+      "location": null,
       "confidence": null,
-      "origin": "الأداة",
-      "exit_code": 3,
-      "reason": "lychee برمز 3 (خطأ إعداد) ← تعذّر"
+      "exit_code": 0,
+      "reason": "عِيَار لا يقرأ lychee.toml المشروع (include فيه يتقدم على كل استبعاد، D-DEV6-17)، والروابط محلية؛ ورمز 3 من الأداة الخام يقرؤه المحول في AT-14"
     }
   ]
 }

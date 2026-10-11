@@ -119,10 +119,12 @@
     {
       "check": "code.refs.external",
       "component": "lychee",
-      "result": "اجتاز",
+      "result": "ناقص",
       "rule": null,
       "location": null,
-      "confidence": null
+      "confidence": null,
+      "exit_code": 0,
+      "reason": "روابط الصفحة كلها محلية أو ملفات: عِيَار لا يطرق أي عنوان محلي بأي صيغة، فلا رابط ويب فُحص (D-DEV6-17)"
     },
     {
       "check": "sec.deps",

@@ -22,7 +22,7 @@ export * from './read/sarif.ts';
 export * from './read/text.ts';
 export { fillTests, isSnapshotMissing, testsExit, type Attempt, type TestResult } from './tools/tests-common.ts';
 export { junitFlags } from './tools/node-test.ts';
-export { cvssSeverity, semgrepRuleId } from './tools/security.ts';
+export { cvssSeverity, LOCAL_ADDRESSES, semgrepRuleId } from './tools/security.ts';
 export { buildErrors, mutationScore } from './tools/other.ts';
 export { TSC_CONFIG_CODES } from './tools/types.ts';
 export { repeatsOf } from './tools/vitest.ts';

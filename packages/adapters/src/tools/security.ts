@@ -313,18 +313,27 @@ export const gitleaks = secretsFiles('gitleaks', '>=8.30.0 <9.0.0');
  * (`--scheme http --scheme https`; the local ones are code.refs.local's). 404 and 410 are proven broken; 401, 403 and
  * 429 need a review; a timeout or a failed lookup is not a broken link (10.3). 0 and 2 by the report; 1 and 3 the
  * tool's. No credentials are ever sent.
+ *
+ * D-DEV6-17 (G-DEV6-04): lychee knocks on no local address. `--exclude-all-private` (private, loopback and
+ * link-local) leaves forms through that lychee 0.24.2 checks, proven against a local server: 0.0.0.0 (and `0`),
+ * [::], [::ffff:127.0.0.1], `localhost.`; and a single-label or a special-use name (`.local`, `.internal`,
+ * `.home.arpa`) is a machine of the local network. LOCAL_ADDRESSES excludes them by the normalized URL. A project's
+ * lychee.toml is not read (`--config /dev/null`): its `include` would take precedence over every `--exclude`. What
+ * flags cannot close: a public name that resolves to a local address, and a redirect to one.
  */
+export const LOCAL_ADDRESSES = String.raw`^https?://(?:[^/?#@]*@)?(?:0\.\d{1,3}\.\d{1,3}\.\d{1,3}|100\.(?:6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.\d{1,3}\.\d{1,3}|198\.1[89]\.\d{1,3}\.\d{1,3}|\[(?:::|64:ff9b:|f[c-f][0-9a-f]{0,2}:)[^\]]*\]|[^/?#:@\[\].]+\.?|(?:[^/?#:@\[\]]*\.)?(?:localhost|localdomain|local|internal|home\.arpa)\.?)(?::\d+)?(?:[/?#]|$)`;
+
 export const lychee: Adapter = {
   id: 'lychee',
   tool: 'lychee',
-  version: '1.0.0',
+  version: '1.1.0',
   tested: '>=0.20.0 <0.30.0',
   limitsKey: 'adapter.limits.links',
   sources: ['S-32'],
   recognizes: (program) => program === 'lychee',
   template(spec) {
     return managed(this, {
-      argv: ['{tool}', '--format', 'json', '--output', '{reports}/links.json', '--max-concurrency', '8', '--host-concurrency', '2', '--max-retries', '2', '--timeout', '20', '--exclude-private', '--scheme', 'http', '--scheme', 'https', '--no-progress', '{targets}'],
+      argv: ['{tool}', '--config', '/dev/null', '--format', 'json', '--output', '{reports}/links.json', '--max-concurrency', '8', '--host-concurrency', '2', '--max-retries', '2', '--timeout', '20', '--exclude-all-private', '--exclude', LOCAL_ADDRESSES, '--scheme', 'http', '--scheme', 'https', '--no-progress', '{targets}'],
       cwd: spec.component === '.' ? '{root}' : `{root}/${spec.component}`,
       env: {},
       prepare: [],
@@ -336,6 +345,12 @@ export const lychee: Adapter = {
     const r = emptyReport(this, ['lychee-json']);
     for (const v of readReports(this, ctx, 'links.json', r)) {
       const root = rec(v);
+      // What was checked at all: the links less the excluded (local addresses, D-DEV6-17) and the unsupported ones.
+      const total = num(root.total, 0);
+      const excluded = num(root.excludes, 0);
+      r.info.links = (Number(r.info.links) || 0) + total;
+      r.info.excluded = (Number(r.info.excluded) || 0) + excluded;
+      r.info.checked = (Number(r.info.checked) || 0) + Math.max(0, total - excluded - num(root.unsupported, 0));
       const maps: [string, Record<string, unknown>][] = [
         ['error', rec(root.error_map)],
         ['fail', rec(root.fail_map)],
@@ -370,6 +385,8 @@ export const lychee: Adapter = {
     if (report.problems.length) return { kind: 'ok' };
     if (codes.some((c) => c !== 0 && c !== 2)) return unknownExit(this, codes.find((c) => c !== 0 && c !== 2) ?? null);
     if (codes.includes(2) && !report.findings.length) return { kind: 'conflict', reason: reason('adapter.reason.conflictExitFail', { tool: 'lychee', exit: 2 }) };
+    // No web link checked (none, or every one local and excluded): «ناقص», never a pass on nothing (7.3 rule 3).
+    if (report.info.checked === 0 && !report.findings.length) return { kind: 'missing', reason: reason('adapter.reason.noLinksChecked', { links: Number(report.info.links) || 0, excluded: Number(report.info.excluded) || 0 }) };
     return { kind: 'ok' };
   },
 };

@@ -1,6 +1,6 @@
 {
   "name": "lychee--config-error",
-  "description": "lychee.toml غير صالح.",
+  "description": "lychee.toml غير صالح. وعبر عِيَار «ناقص»: لا يطرق العناوين المحلية ولا يقرأ lychee.toml المشروع (D-DEV6-17).",
   "defects": [
     "code.refs.external: إعداد غير صالح"
   ],
