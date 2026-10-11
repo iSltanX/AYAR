@@ -46,6 +46,14 @@ afterAll(async () => {
   cleanup?.();
 });
 
+describe('the model checks’ needs before AYAR read the files (16.1)', () => {
+  it('decides none of them and says why, rather than «لا ملفات منطق»', async () => {
+    const { needs } = ok<{ needs: { applies: boolean; canGenerate: boolean; notApplicableReason: { key: string } | null }[] }>(await engine.invoke('aiChecks.needs', { projectId }));
+    expect(needs.length).toBeGreaterThan(0);
+    expect(needs.every((n) => !n.applies && !n.canGenerate && n.notApplicableReason?.key === 'aichecks.notApplicable.notRead')).toBe(true);
+  });
+});
+
 describe('profile.versions', () => {
   it('lists the versions newest first, with what each added, changed and removed, and what was approved in it', async () => {
     ok(await engine.invoke('profile.update', { projectId, patch: { references: { outputs: ['dist'] }, custom: { build: BUILD(1000) } } }));
