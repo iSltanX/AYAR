@@ -8,7 +8,6 @@
       "component": "ruff",
       "result": "تعذّر",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "ruff/ruff.toml",
         "line": 1,

@@ -8,7 +8,6 @@
       "component": "playwright",
       "result": "انتهت المهلة",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "playwright/tests/basic.spec.js",
         "line": 3,

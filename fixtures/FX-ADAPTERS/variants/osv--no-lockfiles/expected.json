@@ -8,7 +8,6 @@
       "component": "osv",
       "result": "ناقص",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "osv/package.json",
         "line": 6,

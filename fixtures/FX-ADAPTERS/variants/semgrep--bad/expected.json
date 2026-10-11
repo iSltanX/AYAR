@@ -7,8 +7,7 @@
       "check": "sec.sast",
       "component": "semgrep",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "sast.project-rule",
       "tool_rule": "ayar-test.no-eval",
       "location": {
         "path": "semgrep/src/a.js",

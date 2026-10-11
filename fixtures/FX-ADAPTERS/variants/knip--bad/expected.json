@@ -7,8 +7,7 @@
       "check": "code.unused",
       "component": "knip",
       "result": "تحذير",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "unused.item",
       "location": {
         "path": "knip/src/orphan.js",
         "anchor": "neverUsed"

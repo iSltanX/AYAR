@@ -6,8 +6,7 @@
     {
       "check": "code.lint",
       "result": "يحتاج مراجعة",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "guard.silenced-rule",
       "location": {
         "path": "src/popup.ts",
         "line": 8,
@@ -22,8 +21,7 @@
     {
       "check": "integ.guard",
       "result": "يحتاج مراجعة",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "guard.silenced-rule",
       "location": {
         "path": "src/popup.ts",
         "line": 8,

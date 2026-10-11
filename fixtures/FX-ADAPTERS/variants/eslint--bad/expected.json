@@ -7,8 +7,7 @@
       "check": "code.lint",
       "component": "eslint",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "lint.error",
       "tool_rule": "no-unused-vars",
       "location": {
         "path": "eslint/src/a.js",

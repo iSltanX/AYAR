@@ -6,8 +6,7 @@
     {
       "check": "design.tokens.static",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "tokens.off-scale",
       "location": {
         "path": "styles/app.css",
         "line": 101,
@@ -20,8 +19,7 @@
     {
       "check": "design.tokens.render",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "tokens.render-off-scale",
       "location": {
         "path": "styles/app.css",
         "line": 101,
@@ -35,7 +33,6 @@
       "check": "design.states",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     }

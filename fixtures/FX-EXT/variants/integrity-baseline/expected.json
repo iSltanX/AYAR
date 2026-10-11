@@ -6,8 +6,7 @@
     {
       "check": "beh.unit",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "test.failed",
       "location": {
         "path": "src/lib/stats.test.ts",
         "line": 11,
@@ -20,8 +19,7 @@
     {
       "check": "beh.unit",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "test.failed",
       "location": {
         "path": "src/lib/count.test.ts",
         "line": 33,
@@ -34,8 +32,7 @@
     {
       "check": "code.lint",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "lint.error",
       "tool_rule": "no-console",
       "location": {
         "path": "src/popup.ts",
@@ -49,7 +46,6 @@
       "check": "integ.guard",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "reason": "اجتاز (لا أساس للمقارنة): الجولة الأولى تسجل جردة فقط"

@@ -6,8 +6,7 @@
     {
       "check": "beh.unit",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "test.failed",
       "location": {
         "path": "test/hostile-output.test.js",
         "line": 20,

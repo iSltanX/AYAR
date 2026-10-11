@@ -6,8 +6,7 @@
     {
       "check": "design.fonts.static",
       "result": "تحذير",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "fonts.remote",
       "location": {
         "path": "index.html",
         "line": 8,

@@ -7,8 +7,7 @@
       "check": "code.refs.external",
       "component": "lychee",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "link.broken",
       "location": {
         "path": "lychee/README.md",
         "line": 3,

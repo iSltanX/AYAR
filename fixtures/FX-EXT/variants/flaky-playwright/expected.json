@@ -6,8 +6,7 @@
     {
       "check": "beh.e2e",
       "result": "متذبذب",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "test.flaky",
       "location": {
         "path": "e2e/flaky.spec.ts",
         "line": 4,

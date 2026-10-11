@@ -8,7 +8,6 @@
       "component": "semgrep-sarif",
       "result": "تعذّر",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "reports/semgrep.sarif",
         "line": 12,

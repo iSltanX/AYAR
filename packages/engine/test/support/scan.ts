@@ -98,7 +98,6 @@ export interface Expectation {
   component?: string;
   result: string;
   rule: string | null;
-  rule_pending?: boolean;
   tool_rule?: string;
   location: { path: string; line?: number; anchor?: string; history?: string } | null;
   confidence: string | null;

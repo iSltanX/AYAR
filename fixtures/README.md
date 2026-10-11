@@ -19,7 +19,7 @@
 | [FX-MONO](FX-MONO/project.json) | مساحة عمل pnpm بحزمتين | 2: السليمة، وإخفاق في الحزمة الأساسية | AT-16 والمكوّنات وعدم التكرار |
 | [FX-ADAPTERS](FX-ADAPTERS/project.json) | **مشاريع المحولات** (G-06): مكوّن لكل محول بقفله، بالمتغيرات الستة (ومكوّن osv يُفحص بقاعدة OSV المصغرة من DEV-2) | 57: السليمة، و56 معيبة (`<أداة>--<نوع>`) | AT-14 |
 
-المحولات الداخلة: vitest وjest وnode:test وplaywright وeslint وbiome وtsc وknip وpyright وpytest وruff وmypy وsemgrep وosv-scanner وgitleaks وlychee. **مؤجل:** Stryker وk6 (اختياريان وثقيلان)، يُبنيان مع محوليهما.
+المحولات الداخلة: vitest وjest وnode:test وplaywright وeslint وbiome وtsc وknip وpyright وpytest وruff وmypy وsemgrep وosv-scanner وgitleaks وlychee. **بلا نسخ:** Stryker وk6 (اختياريان وثقيلان)؛ محولاهما في DEV-6 مختبران على تقارير بشكلها.
 
 ### جدول AT-14 (الصف ← النسخة)
 
@@ -81,7 +81,7 @@ node fixtures/tools/materialize.mjs FX-EXT failing-test "$TMPDIR/fx-ext-1"    # 
 | `check` | معرّف الفحص في كتالوج الخطة 10.3 (`beh.unit`…) |
 | `component` | المكوّن (مساحة العمل أو مكوّن المحولات) |
 | `result` | اجتاز / أخفق / تحذير / يحتاج مراجعة / متذبذب / ناقص / ناقص إعداد / تعذّر / غير منطبق / غير مضمّن / أُلغي / انتهت المهلة |
-| `rule` و`rule_pending` | معرّف قاعدة عِيَار؛ **`null` مع `rule_pending: true` حتى تُعرَّف في DEV-6** (ORG-06). وهذا إكمال مخطط له |
+| `rule` | معرّف قاعدة عِيَار من `packages/catalog/data/rules.json` لكل اكتشاف متوقع (موضع ودرجة ثبوت)، و`null` حيث لا اكتشاف. أكملته DEV-6 (ORG-06)، و`rule_pending` لم يعد مقبولًا |
 | `tool_rule` | معرّف القاعدة في الأداة الأصلية (`F401` و`TS6133` و`no-unused-vars`) |
 | `location` | `{path, line, anchor}` أو `{path, history}` لملف حُذف وبقي في التاريخ. **المدقق يتحقق أن الملف والسطر والمرساة حقيقية** |
 | `confidence` | مخالفة مثبتة / اشتباه / اقتراح تحسين / `null` |
@@ -129,5 +129,5 @@ Node 24.16.0 مع pnpm 12.8.1 (`packageManager` في كل مشروع pnpm)، وu
 |---|---|---|
 | **AT-26** مولّد حالة بيانات عِيَار: مشروع بـ 21 تشغيلًا أحدها «محفوظ دائمًا» ومراجعات وبطاقات وصور مرجعية | **أُنجز في DEV-5** | `tools/at26-state.ts` بمخطط القاعدة (ترحيلات المحرك) وخدماته، لا بنسخة منهما؛ ويستعمله `tools/cli/test/at26.test.ts` |
 | قاعدة OSV المصغرة (حزمة وثغرة مزيفتان) و`sec.deps` لنسخ `vuln-dep` (FX-EXT وFX-PY) و`osv--bad` | **أُنجز في DEV-2** (E-09) | `tools/osv-mini-db/`؛ وثبت أن osv-scanner يقرأ تبعية `file:` من `pnpm-lock.yaml` (بإصدار نصي `file:vendor/ayar-vuln-fake`) وتبعية `directory` من `uv.lock` (بإصدارها 1.0.0) ويطابقهما؛ فلا حاجة لمدخل قفل بسجل وهمي |
-| معرّفات القواعد (`rule`) في كل ملفات التوقع | **DEV-6** | كلها `null` بوسم `rule_pending: true` |
-| محولا Stryker وk6 | DEV-6 أو DEV-8 | اختياريان |
+| معرّفات القواعد (`rule`) في كل ملفات التوقع | **أُنجز في DEV-6** | من التشغيل الفعلي عبر المحرك (AT-14 وAT-16)، وقواعد الفحوص اللاحقة (العرض الحي والنزاهة) من كتاب القواعد؛ و`validate.mjs` يفرضها |
+| محولا Stryker وk6 | **المحولان أُنجزا في DEV-6** باختبارات الحزمة على تقارير بشكلها | نسختاهما في FX-ADAPTERS اختياريتان ولم تُبنيا |

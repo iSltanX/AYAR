@@ -7,8 +7,7 @@
       "check": "sec.deps",
       "component": "osv",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "vuln.known",
       "location": {
         "path": "osv/package.json",
         "line": 7,

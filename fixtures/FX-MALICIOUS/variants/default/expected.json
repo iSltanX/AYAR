@@ -8,7 +8,6 @@
       "check": "sec.secrets.files",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "reason": ".env مستبعد بـ .gitignore ولا يقرأه الاكتشاف؛ ولا سر في الملفات المقروءة (قيمة .env لا تُحفظ في أي مكان)"
@@ -16,8 +15,7 @@
     {
       "check": "sec.secrets.history",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "secret.detected",
       "location": {
         "path": "config/old-credentials.js",
         "history": "29cc486a1a6f"
@@ -30,8 +28,7 @@
     {
       "check": "sec.sast",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "ayar.js.eval-dynamic",
       "location": {
         "path": "src/app.js",
         "line": 3,
@@ -45,8 +42,7 @@
     {
       "check": "sec.sast",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "ayar.py.subprocess-shell-true",
       "location": {
         "path": "src/util.py",
         "line": 6,
@@ -61,7 +57,6 @@
       "check": "beh.unit",
       "result": "ناقص",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "reason": "لا اختبارات في المستودع المفخخ"
@@ -70,7 +65,6 @@
       "check": "code.lint",
       "result": "غير منطبق",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "reason": "لا مدقق معلن"

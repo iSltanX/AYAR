@@ -8,7 +8,6 @@
       "check": "beh.unit",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "reason": "node --test: اختباران ينجحان؛ وتُشغَّل بسكربت مركب فيُقترح استدعاء الأداة المحلية مباشرة"
@@ -16,8 +15,7 @@
     {
       "check": "integ.state",
       "result": "يحتاج مراجعة",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "state.changed",
       "location": {
         "path": "data/runs.json",
         "anchor": "\"runs\""
@@ -29,7 +27,6 @@
       "check": "code.refs.local",
       "result": "غير منطبق",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "reason": "لا HTML ولا CSS ولا Markdown"

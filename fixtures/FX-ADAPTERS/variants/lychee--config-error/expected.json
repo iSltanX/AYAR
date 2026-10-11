@@ -8,7 +8,6 @@
       "component": "lychee",
       "result": "تعذّر",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "lychee/lychee.toml",
         "line": 1,

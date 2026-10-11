@@ -8,7 +8,6 @@
       "component": "semgrep",
       "result": "تعذّر",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "semgrep/.semgrep.yml",
         "line": 5,

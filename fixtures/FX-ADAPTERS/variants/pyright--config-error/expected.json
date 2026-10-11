@@ -8,7 +8,6 @@
       "component": "pyright",
       "result": "تعذّر",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "pyright/pyrightconfig.json",
         "line": 1,

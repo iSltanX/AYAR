@@ -7,7 +7,6 @@
       "check": "beh.unit",
       "result": "ناقص",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "exit_code": 5,
@@ -17,7 +16,6 @@
       "check": "code.lint",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     }

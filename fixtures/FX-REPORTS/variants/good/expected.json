@@ -9,7 +9,6 @@
       "component": "vitest-json",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -18,7 +17,6 @@
       "component": "pytest-junit",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -27,7 +25,6 @@
       "component": "eslint-json",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -36,7 +33,6 @@
       "component": "semgrep-sarif",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     }

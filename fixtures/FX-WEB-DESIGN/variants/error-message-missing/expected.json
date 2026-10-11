@@ -6,8 +6,7 @@
     {
       "check": "design.states",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "states.expectation-failed",
       "location": {
         "path": "src/i18n.js",
         "line": 9,

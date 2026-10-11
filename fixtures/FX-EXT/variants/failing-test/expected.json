@@ -6,8 +6,7 @@
     {
       "check": "beh.unit",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "test.failed",
       "location": {
         "path": "src/lib/count.test.ts",
         "line": 11,
@@ -20,8 +19,7 @@
     {
       "check": "beh.stability",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "test.failed",
       "location": {
         "path": "src/lib/count.test.ts",
         "line": 11,
@@ -35,7 +33,6 @@
       "check": "code.build",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -43,7 +40,6 @@
       "check": "code.types",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -51,7 +47,6 @@
       "check": "code.lint",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     }

@@ -7,8 +7,7 @@
       "check": "code.types",
       "component": "pyright",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "types.error",
       "tool_rule": "reportArgumentType",
       "location": {
         "path": "pyright/src/a.py",

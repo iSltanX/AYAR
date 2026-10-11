@@ -6,8 +6,7 @@
     {
       "check": "design.a11y",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "a11y.violation",
       "tool_rule": "color-contrast",
       "location": {
         "path": "design/tokens.json",

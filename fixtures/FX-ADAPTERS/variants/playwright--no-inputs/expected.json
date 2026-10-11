@@ -8,7 +8,6 @@
       "component": "playwright",
       "result": "غير منطبق",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "reason": "لا اختبارات رحلات في المشروع: beh.e2e لا ينطبق (الخطة 10.3: «مشروع فيه اختبارات رحلات Playwright»، و«بشرط: وجودها»). ولو شُغّل لكان «No tests found» برمز 1 ← ناقص"

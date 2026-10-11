@@ -7,8 +7,7 @@
       "check": "code.refs.external",
       "component": "lychee",
       "result": "يحتاج مراجعة",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "link.unverified",
       "location": {
         "path": "lychee/README.md",
         "line": 3,

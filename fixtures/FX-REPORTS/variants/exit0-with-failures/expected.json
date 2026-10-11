@@ -8,7 +8,6 @@
       "component": "vitest-json",
       "result": "تعذّر",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "reports/vitest.json",
         "line": 8,

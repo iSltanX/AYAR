@@ -8,7 +8,6 @@
       "check": "beh.unit",
       "result": "ناقص",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "reason": "لا ملفات اختبار ولا إطار اختبار في المشروع (AT-14: ناقص)"
@@ -17,7 +16,6 @@
       "check": "code.refs.local",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -25,7 +23,6 @@
       "check": "code.complexity",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "reason": "لا دالة تتجاوز عتبة التعقيد المعلنة 10"
@@ -34,7 +31,6 @@
       "check": "design.tokens.static",
       "result": "ناقص إعداد",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "reason": "المشروع فيه أنماط CSS ولا مرجع رموز تصميم"
@@ -43,7 +39,6 @@
       "check": "sec.secrets.files",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -51,7 +46,6 @@
       "check": "sec.deps",
       "result": "غير منطبق",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "reason": "لا تبعيات خارجية"
@@ -60,7 +54,6 @@
       "check": "code.build",
       "result": "غير منطبق",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "reason": "لا خطوة بناء معلنة"
@@ -69,7 +62,6 @@
       "check": "code.types",
       "result": "غير منطبق",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "reason": "لا TypeScript ولا مدقق أنواع"
@@ -78,7 +70,6 @@
       "check": "code.lint",
       "result": "غير منطبق",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "reason": "لا مدقق معلن في المشروع"
@@ -87,7 +78,6 @@
       "check": "integ.guard",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null,
       "reason": "الجولة الأولى: لا أساس للمقارنة"

@@ -6,8 +6,7 @@
     {
       "check": "beh.unit",
       "result": "يحتاج مراجعة",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "guard.threshold-lowered",
       "location": {
         "path": "vitest.config.ts",
         "line": 10,
@@ -22,8 +21,7 @@
     {
       "check": "integ.guard",
       "result": "يحتاج مراجعة",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "guard.threshold-lowered",
       "location": {
         "path": "vitest.config.ts",
         "line": 10,

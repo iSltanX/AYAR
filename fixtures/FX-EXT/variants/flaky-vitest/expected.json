@@ -6,8 +6,7 @@
     {
       "check": "beh.stability",
       "result": "متذبذب",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "test.flaky",
       "location": {
         "path": "src/lib/flaky.test.ts",
         "line": 19,
@@ -19,8 +18,7 @@
     {
       "check": "beh.unit",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "test.failed",
       "location": {
         "path": "src/lib/flaky.test.ts",
         "line": 19,

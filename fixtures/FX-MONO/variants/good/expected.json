@@ -9,7 +9,6 @@
       "component": "packages/core",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     },
@@ -18,7 +17,6 @@
       "component": "packages/web",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     }

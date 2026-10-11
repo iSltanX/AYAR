@@ -6,8 +6,7 @@
     {
       "check": "code.refs.local",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "ref.missing-file",
       "location": {
         "path": "docs/index.html",
         "line": 11,
@@ -21,7 +20,6 @@
       "check": "beh.unit",
       "result": "ناقص",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     }

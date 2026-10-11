@@ -8,7 +8,6 @@
       "component": "playwright",
       "result": "تعذّر",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "playwright/playwright.config.js",
         "line": 6,

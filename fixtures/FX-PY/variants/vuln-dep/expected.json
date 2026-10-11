@@ -6,8 +6,7 @@
     {
       "check": "sec.deps",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "vuln.known",
       "location": {
         "path": "pyproject.toml",
         "line": 7,

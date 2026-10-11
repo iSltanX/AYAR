@@ -6,8 +6,7 @@
     {
       "check": "sec.ext.permissions",
       "result": "أخفق",
-      "rule": null,
-      "rule_pending": true,
+      "rule": "permission.outside-policy",
       "location": {
         "path": "public/manifest.json",
         "line": 26,
@@ -21,7 +20,6 @@
       "check": "sec.ext.manifest",
       "result": "اجتاز",
       "rule": null,
-      "rule_pending": true,
       "location": null,
       "confidence": null
     }

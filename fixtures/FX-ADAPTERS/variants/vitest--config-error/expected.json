@@ -8,7 +8,6 @@
       "component": "vitest",
       "result": "تعذّر",
       "rule": null,
-      "rule_pending": true,
       "location": {
         "path": "vitest/vitest.config.js",
         "line": 4,
