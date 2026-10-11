@@ -313,3 +313,23 @@ describe('reports the project writes (StrykerJS, a custom check\'s declared file
     expect(run(A('custom-command'), custom, 0).report.problems).toEqual([expect.objectContaining({ code: 'missing' })]);
   });
 });
+
+describe('k6 by its summary export (S-31: 0 passes, 99 the thresholds failed)', () => {
+  const summary = (crossed: boolean) => JSON.stringify({ metrics: { http_req_duration: { avg: 812.5, 'p(95)': 1450, thresholds: { 'p(95)<500': crossed } }, iterations: { count: 30 } } });
+  const k6 = (files: Record<string, string>, stderr = '') => ctx({ checkId: 'perf.load', files, stderr });
+  it('a threshold crossed is a finding at its metric, and the run «أخفق» by it', () => {
+    const r = run(A('k6'), k6({ 'k6.json': summary(true) }), 99);
+    expect(r.report.findings).toEqual([expect.objectContaining({ rule: 'load.threshold', message: 'http_req_duration: p(95)<500', location: null, actual: '812.5' })]);
+    expect(r.exit).toEqual({ kind: 'ok' });
+  });
+  it('passes with every threshold held; a 0 with a crossed threshold, or a 99 without one, is not taken on trust', () => {
+    expect(run(A('k6'), k6({ 'k6.json': summary(false) }), 0)).toMatchObject({ report: { findings: [] }, exit: { kind: 'ok' } });
+    expect(run(A('k6'), k6({ 'k6.json': summary(true) }), 0).exit).toMatchObject({ kind: 'conflict', reason: { key: 'adapter.reason.conflictExitPass' } });
+    expect(run(A('k6'), k6({ 'k6.json': summary(false) }), 99).exit).toMatchObject({ kind: 'project_failure', reason: { key: 'adapter.reason.loadThresholds' } });
+  });
+  it('no summary after a finished run is «تعذّر» by its reason; another exit code is the tool\'s own failure', () => {
+    expect(run(A('k6'), k6({}), 0).report.problems).toEqual([expect.objectContaining({ code: 'missing', file: 'k6.json' })]);
+    expect(run(A('k6'), k6({ 'k6.json': '{"metrics":' }), 0).report.problems).toHaveLength(1);
+    expect(run(A('k6'), k6({}, 'level=error msg="could not initialize \'script.js\'"'), 107).exit).toMatchObject({ kind: 'tool_error', reason: { key: 'adapter.reason.configError', params: { tool: 'k6', code: 107 } } });
+  });
+});
