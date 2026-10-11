@@ -89,7 +89,9 @@ approval: —
 
 ## حسم بنود قائمة
 
-لا شيء.
+| البند | الحسم | الدليل |
+|---|---|---|
+| G-DEV9-01 | أول مراجعة تقترح ملف المعايير من آخر اكتشاف فيصير `integ.reviews` منطبقًا (G-DEV12-06)، ووصول ادعاءات نموذج يعيد قراءة المشروع فيصير `integ.model-claims` منطبقًا (D-DEV12-06)؛ ويُعتمد كل منهما كأي فحص | `packages/engine/src/handlers/reviews.ts` واختبار `dev12-protocol.test.ts`، و`ModelChecksScreen.svelte`، و`screens.e2e.ts` و`notest.e2e.ts` |
 
 ## العوائق
 
