@@ -147,51 +147,96 @@ function nearestPx(scale: number[], px: number): number {
   return scale.reduce((best, s) => (Math.abs(s - px) < Math.abs(best - px) ? s : best), scale[0] ?? 0);
 }
 
+/** The declared design scale (DTCG tokens and token stylesheets): colours, the spacing, radius and font-size scales. */
+export interface TokenScale {
+  tokens: Token[];
+  /** The tokens' files: the scale's source, never judged against it. */
+  sourceFiles: Set<string>;
+  /** A colour of the tokens (normalized) → its token. */
+  colors: Map<string, string>;
+  spacing: number[];
+  radius: number[];
+  fontSize: number[];
+  /** A length of the tokens (px) → its token. */
+  dimToken: Map<number, string>;
+  tolerancePx: number;
+  scope: string[] | null;
+  exclude: string[];
+}
+
+export const SCALE_PROPS = { color: COLOR_PROPS, spacing: SPACING_PROPS, radius: RADIUS_PROPS, fontSize: FONT_SIZE_PROPS };
+
+/**
+ * The tokens reference read into a scale (design.tokens.static here, design.tokens.render in the probe's judge):
+ * the reference absent or unreadable is the exit signal of «ناقص إعداد» or «تعذّر», never an invented scale (7.4).
+ */
+export function loadTokenScale(i: AnalyzerInput): { scale: TokenScale } | { exit: ExitSignal } {
+  const cfg = tokensConfig(i);
+  if (!cfg || (!cfg.source && !cfg.css.length)) return { exit: { kind: 'missing', reason: { key: 'analyzer.reason.noTokens' } } };
+  const comp = i.component === '.' ? '' : `${i.component}/`;
+  const at = (p: string) => (i.exists(p) ? p : i.exists(`${comp}${p}`) ? `${comp}${p}` : p);
+  const tokens: Token[] = [];
+  const sourceFiles = new Set<string>();
+  if (cfg.source) {
+    const rel = at(cfg.source);
+    sourceFiles.add(rel);
+    const text = i.read(rel);
+    if (text === null) return { exit: { kind: 'missing', reason: { key: 'analyzer.reason.tokensUnreadable', params: { path: cfg.source } } } };
+    if (/\.json$/i.test(rel)) {
+      try {
+        tokens.push(...dtcgTokens(JSON.parse(stripJsonComments(text).json)));
+      } catch (e) {
+        return { exit: { kind: 'tool_error', reason: { key: 'analyzer.reason.tokensUnparsable', params: { path: rel, detail: e instanceof Error ? e.message.slice(0, 200) : 'invalid' } } } };
+      }
+    } else if (/\.(css|scss|pcss)$/i.test(rel)) tokens.push(...cssTokens(text));
+    else return { exit: { kind: 'missing', reason: { key: 'analyzer.reason.tokensFormat', params: { path: rel } } } };
+  }
+  for (const c of cfg.css) {
+    const rel = at(c);
+    sourceFiles.add(rel);
+    tokens.push(...cssTokens(i.read(rel) ?? ''));
+  }
+  const colors = new Map<string, string>();
+  for (const t of tokens) if (t.type === 'color') for (const v of t.values) {
+    const n = normalizeColor(v);
+    if (n) colors.set(n, t.name);
+  }
+  const dims = (re: RegExp) => [...new Set(tokens.filter((t) => t.type === 'dimension' && re.test(t.name)).flatMap((t) => t.values.flatMap((v) => lengthLiterals(v).map((l) => l.px))))].sort((a, b) => a - b);
+  const spacing = cfg.spacingScalePx ?? dims(/space|spacing|gap|gutter/);
+  const radius = dims(/radius|rounded/);
+  const dimToken = new Map<number, string>();
+  for (const t of tokens) if (t.type === 'dimension') for (const v of t.values) for (const l of lengthLiterals(v)) if (!dimToken.has(l.px)) dimToken.set(l.px, t.name);
+  return {
+    scale: {
+      tokens,
+      sourceFiles,
+      colors,
+      spacing: spacing.length ? [0, ...spacing] : [],
+      radius: radius.length ? [0, ...radius] : [],
+      fontSize: dims(/font.*size|text-size|fontsize/),
+      dimToken,
+      tolerancePx: cfg.tolerancePx,
+      scope: cfg.scope,
+      exclude: cfg.exclude,
+    },
+  };
+}
+
 export const tokensAnalyzer: Analyzer = {
   id: 'tokens-static',
   version: '1.0.0',
   limitsKey: 'analyzer.limits.tokens',
   run(i) {
     const r = report(this, ['css']);
-    const cfg = tokensConfig(i);
-    if (!cfg || (!cfg.source && !cfg.css.length)) return { report: r, exit: { kind: 'missing', reason: { key: 'analyzer.reason.noTokens' } } satisfies ExitSignal };
-    const comp = i.component === '.' ? '' : `${i.component}/`;
-    const at = (p: string) => (i.exists(p) ? p : i.exists(`${comp}${p}`) ? `${comp}${p}` : p);
-    const tokens: Token[] = [];
-    const sourceFiles = new Set<string>();
-    if (cfg.source) {
-      const rel = at(cfg.source);
-      sourceFiles.add(rel);
-      const text = i.read(rel);
-      if (text === null) return { report: r, exit: { kind: 'missing', reason: { key: 'analyzer.reason.tokensUnreadable', params: { path: cfg.source } } } };
-      if (/\.json$/i.test(rel)) {
-        try {
-          tokens.push(...dtcgTokens(JSON.parse(stripJsonComments(text).json)));
-        } catch (e) {
-          return { report: r, exit: { kind: 'tool_error', reason: { key: 'analyzer.reason.tokensUnparsable', params: { path: rel, detail: e instanceof Error ? e.message.slice(0, 200) : 'invalid' } } } };
-        }
-      } else if (/\.(css|scss|pcss)$/i.test(rel)) tokens.push(...cssTokens(text));
-      else return { report: r, exit: { kind: 'missing', reason: { key: 'analyzer.reason.tokensFormat', params: { path: rel } } } };
-    }
-    for (const c of cfg.css) {
-      const rel = at(c);
-      sourceFiles.add(rel);
-      tokens.push(...cssTokens(i.read(rel) ?? ''));
-    }
-    const colors = new Map<string, string>();
-    for (const t of tokens) if (t.type === 'color') for (const v of t.values) {
-      const n = normalizeColor(v);
-      if (n) colors.set(n, t.name);
-    }
-    const dims = (re: RegExp) => [...new Set(tokens.filter((t) => t.type === 'dimension' && re.test(t.name)).flatMap((t) => t.values.flatMap((v) => lengthLiterals(v).map((l) => l.px))))].sort((a, b) => a - b);
-    const spacing = cfg.spacingScalePx ?? dims(/space|spacing|gap|gutter/);
+    const loaded = loadTokenScale(i);
+    if ('exit' in loaded) return { report: r, exit: loaded.exit };
+    const { tokens, sourceFiles, colors, dimToken } = loaded.scale;
+    const cfg = { scope: loaded.scale.scope, exclude: loaded.scale.exclude, tolerancePx: loaded.scale.tolerancePx };
     const scales: [RegExp, number[]][] = [
-      [SPACING_PROPS, spacing.length ? [0, ...spacing] : []],
-      [RADIUS_PROPS, dims(/radius|rounded/).length ? [0, ...dims(/radius|rounded/)] : []],
-      [FONT_SIZE_PROPS, dims(/font.*size|text-size|fontsize/)],
+      [SPACING_PROPS, loaded.scale.spacing],
+      [RADIUS_PROPS, loaded.scale.radius],
+      [FONT_SIZE_PROPS, loaded.scale.fontSize],
     ];
-    const dimToken = new Map<number, string>();
-    for (const t of tokens) if (t.type === 'dimension') for (const v of t.values) for (const l of lengthLiterals(v)) if (!dimToken.has(l.px)) dimToken.set(l.px, t.name);
 
     // Every custom property the project defines anywhere counts as defined (a local --x is not a token, but exists).
     const defined = new Set(tokens.map((t) => t.name));

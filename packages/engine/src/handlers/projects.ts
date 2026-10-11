@@ -35,6 +35,7 @@ export const projectRemove: CommandHandler = async (payload, ctx) => {
   await ctx.services.projects.remove(projectId);
   // FR-02: its evidence folder and the contents only its snapshots used; the repository is never touched.
   await ctx.services.evidence.afterProjectRemoved(projectId);
+  await ctx.services.baselines.removeProject(projectId);
   return { removed: true };
 };
 

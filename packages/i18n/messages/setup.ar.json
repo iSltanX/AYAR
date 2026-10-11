@@ -58,5 +58,7 @@
   "setup.reason.managerMismatch": "يحتاج تجهيزًا: المشروع يطلب {tool} {required}",
   "setup.reason.dependenciesMissing": "يحتاج تجهيزًا: التبعيات غير مثبّتة في {component}",
   "setup.reason.adapterUntested": "يحتاج تجهيزًا: {tool} {version} خارج نطاق الإصدارات الذي اختُبر به محوّل عِيَار ({tested})؛ اعتمده مرة إن شئت",
-  "setup.reason.adapterVersionAccepted": "{tool} {version} معتمد لهذا المشروع خارج النطاق المختبر ({tested})"
+  "setup.reason.adapterVersionAccepted": "{tool} {version} معتمد لهذا المشروع خارج النطاق المختبر ({tested})",
+  "setup.reason.probeBrowserMissing": "يحتاج تجهيزًا: متصفح المسبار غير مثبّت في مجلد عِيَار",
+  "setup.action.installBrowser": "ثبّت متصفح المسبار (Chrome for Testing {version})"
 }

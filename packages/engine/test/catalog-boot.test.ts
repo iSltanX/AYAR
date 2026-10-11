@@ -26,8 +26,8 @@ describe('catalog at boot (C-08)', () => {
     expect(r.state).toBe('ready');
     expect(r.catalog?.checks).toHaveLength(41);
     const row = r.db!.get<{ version: string; hash: string; loaded_at: string }>('SELECT version, hash, loaded_at FROM catalog_meta');
-    expect(row).toEqual({ version: '1.1.0', hash: r.catalog!.hash, loaded_at: '2026-10-10T08:00:00.000Z' });
-    expect(r.steps.find((s) => s.step === 'catalog.load')).toMatchObject({ ok: true, detail: { version: '1.1.0', checks: 41, stale: 0 } });
+    expect(row).toEqual({ version: '1.2.0', hash: r.catalog!.hash, loaded_at: '2026-10-10T08:00:00.000Z' });
+    expect(r.steps.find((s) => s.step === 'catalog.load')).toMatchObject({ ok: true, detail: { version: '1.2.0', checks: 41, stale: 0 } });
     r.db!.close();
   });
 

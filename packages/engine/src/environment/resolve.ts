@@ -21,13 +21,18 @@ export async function fallbackPath(fs: Pick<FileSystem, 'stat'>, home: string): 
   return [...out, '/usr/bin', '/bin', '/usr/sbin', '/sbin'];
 }
 
-/** E-07: what keeps a version probe from installing or downloading anything. */
+/**
+ * E-07: what keeps a version probe from installing or downloading anything — and from calling home: Semgrep's
+ * `--version` asks semgrep.dev for the latest version from a home it has not seen (AT-31's monitor, D-DEV7-20).
+ */
 export const PROBE_ENV: Readonly<Record<string, string>> = {
   COREPACK_ENABLE_NETWORK: '0',
   MISE_AUTO_INSTALL: '0',
   MISE_EXEC_AUTO_INSTALL: '0',
   MISE_NOT_FOUND_AUTO_INSTALL: '0',
   ASDF_NODEJS_AUTO_ENABLE_COREPACK: '0',
+  SEMGREP_ENABLE_VERSION_CHECK: '0',
+  SEMGREP_SEND_METRICS: 'off',
 };
 export const PROBE_TIMEOUT_MS = 5000;
 

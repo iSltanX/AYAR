@@ -86,7 +86,7 @@ export function computeRefs(facts: readonly Fact[], declared: ProfileReferences)
   return {
     tokens: d('tokens') || has('references.tokens'),
     fonts: d('fonts'),
-    renderTarget: d('renderTarget') || extBuilt || has('type.staticSite'),
+    renderTarget: d('renderTarget') || extBuilt || has('type.staticSite') || has('ui.entryPages'),
     states: d('states'),
     budgets: d('budgets') || has('references.sizeBudgets'),
     permissionsPolicy: d('permissionsPolicy') || policy,

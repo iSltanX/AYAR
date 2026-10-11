@@ -1,21 +1,12 @@
 // Plan 20's expected results against what the engine found (AT-14, AT-16): for each expectation of a variant,
 // the outcome, the origin, and — when a finding is expected — the finding at its place with its rule, the tool's
 // rule and its proof; and in a clean variant, no finding that weighs on an outcome. What belongs to a later phase
-// (the probe's checks, DEV-7; the integrity checks and the guard's effect, DEV-9) is listed apart with why, never
-// counted as a pass.
+// (the integrity checks and the guard's effect, DEV-9) is listed apart with why, never counted as a pass.
 import type { CheckRunDetail, Finding, RunDetail } from '@ayar/protocol';
 import { ORIGIN, OUTCOME, PROOF, type Expectation } from './scan.ts';
 
-/** The checks whose runner is not DEV-6's: the probe (DEV-7) and the integrity checks (DEV-9). */
+/** The checks whose runner is a later phase's: the integrity checks (DEV-9). The probe's are DEV-7's, and checked. */
 export const LATER: Record<string, string> = {
-  'beh.ext.host': 'DEV-7',
-  'design.tokens.render': 'DEV-7',
-  'design.fonts.render': 'DEV-7',
-  'design.rtl.render': 'DEV-7',
-  'design.a11y': 'DEV-7',
-  'design.states': 'DEV-7',
-  'design.visual': 'DEV-7',
-  'perf.web': 'DEV-7',
   'integ.guard': 'DEV-9',
   'integ.state': 'DEV-9',
   'integ.reviews': 'DEV-9',

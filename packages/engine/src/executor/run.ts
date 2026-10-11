@@ -12,7 +12,7 @@
 // (9.10). Every state change is saved before its event is sent.
 import type { Catalog } from '@ayar/catalog';
 import { adapterById } from '@ayar/adapters';
-import type { CheckOutcome, CheckRunDetail, CheckRunView, CheckSpec, EvidenceRef, PlanItem, RawCheckResult, Reason, RunCounts, RunDetail, RunList, RunPlan, RunView, SideEffects, VerdictCounts } from '@ayar/protocol';
+import type { CheckOutcome, CheckRunDetail, CheckRunView, CheckSpec, EvidenceRef, JsonValue, ParsedReport, PlanItem, RawCheckResult, Reason, RunCounts, RunDetail, RunList, RunPlan, RunView, SideEffects, VerdictCounts } from '@ayar/protocol';
 import { RawCheckResult as RawSchema, RunPlan as PlanSchema } from '@ayar/protocol';
 import { createHash } from 'node:crypto';
 import { posix } from 'node:path';
@@ -47,6 +47,11 @@ import { streamSink, type OutputTotals } from './output.ts';
 import { NOGIT_LOG, prepare } from './prepare.ts';
 import type { ProcessResult, ProcessSupervisor, RunningProcess } from './process.ts';
 import { CompanionServices } from './services.ts';
+import type { BrowserService } from '../probe/browser.ts';
+import type { BaselineService, Capture } from '../probe/baselines.ts';
+import { buildJob, cellMeta } from '../probe/job.ts';
+import type { ProbeService } from '../probe/service.ts';
+import type { ProbeOutcome, VisualComparison } from '@ayar/probe';
 
 /** At most this many provisional findings are sent per execution (9.6 point 5: the final reading decides). */
 const PROVISIONAL_MAX = 200;
@@ -74,6 +79,10 @@ export interface RunServiceOptions {
   purity: PurityService;
   /** K4: a setup action of this project is running (its dependencies half installed): no run starts meanwhile. */
   setupActive?: (projectId: string) => boolean;
+  /** C-14 (DEV-7): the web probe, its browser, and the reference images. */
+  probe: ProbeService;
+  browsers: BrowserService;
+  baselines: BaselineService;
 }
 
 interface RunRow {
@@ -583,6 +592,10 @@ export class RunService {
     }
     // An analyzer (C-13) runs inside the engine, in a worker thread: no process, no folder, no service.
     if (spec.runner.kind === 'analyzer') return this.#runAnalyzer(active, e, ctx, spec);
+    // The web probe (C-14): its own process and browser (E-11), its companion services before it.
+    if (spec.runner.kind === 'probe') return this.#runProbe(active, e, ctx, spec);
+    // design.a11y.review (10.3): the human review, read from what was recorded; nothing runs.
+    if (spec.runner.kind === 'internal' && spec.runner.ids.includes('human-review')) return this.#runReview(e, ctx, spec);
 
     // Its folders (C-12 point 2): the raw reports and its TMPDIR, inside AYAR's tmp/, never in the evidence store.
     const tmpRoot = posix.join(layout.tmp, e.checkRunId);
@@ -785,6 +798,8 @@ export class RunService {
     if (r.sleepGaps.length) notes.push('run.note.sleepGap');
     if (outEnd.truncated || errEnd.truncated) notes.push('run.note.outputTruncated');
     if (template.suggestion) notes.push('adapter.note.directCallSuggested');
+    // 15.3 and A-14: the project's own command (or its companion service) is outside AYAR's no-network guarantee.
+    if (e.item.command || e.item.needs.services.length) notes.push('run.note.projectCommandNetwork');
     // C-15: a tool version outside its adapter's tested range was accepted once; the result says so.
     const av = await adapterVersion(spec, tool, (component, name) => packageVersion(ports.fs, ctx.root, component, name)).catch(() => null);
     if (av) inv.plan.toolVersions[av.adapter.tool] = av.version;
@@ -882,6 +897,252 @@ export class RunService {
       },
       close: () => w.close(),
     };
+  }
+
+  /**
+   * C-14: a probe check. The pages checks of one render target share one execution (D-DEV7-03): the first that runs
+   * measures what all of them need, and the others are judged again from it by their own rules (D-45). The probe
+   * runs in its own process (E-11) with AYAR's browser; a missing browser is «ناقص» with its setup action, never a
+   * download now. Its images go to the evidence as they are (pixels are not redacted, C-12 point 9; a «حساسة» state
+   * has none, G-29), its cell log and outcome redacted; then each capture is compared with its approved reference
+   * (G-28) off the engine's thread, and the check is judged.
+   */
+  async #runProbe(active: Active, e: Exec, ctx: CheckContext, spec: CheckSpec): Promise<void> {
+    const { db, ports, evidence, layout } = this.#o;
+    const runId = active.runId;
+    const cancelledReason = (): Reason => ({ key: active.cancel === 'app_quit' ? 'run.reason.appQuit' : 'run.reason.cancelledByUser' });
+    if (!this.#o.probe.available) return this.#finishCheck(e, 'unavailable', { key: 'probe.reason.noHost' }, null, []);
+    const browser = await this.#o.browsers.located();
+    if (!browser) return this.#finishCheck(e, 'missing', { key: 'setup.reason.probeBrowserMissing' }, null, []);
+    const group = [...new Set([spec.checkId, ...active.plan.items.filter((x) => x.sharedInvocationKey && x.sharedInvocationKey === e.item.sharedInvocationKey && x.component === spec.component).map((x) => x.checkId)])];
+    const profile = latestProfile(db, ctx.projectId);
+    const facts = (latestSnapshot(db, ctx.projectId)?.facts ?? []).filter((f) => f.component === spec.component || f.component === '.');
+    const built = await buildJob({ fs: ports.fs, root: ctx.root, spec, checks: group, declared: (profile?.content.references ?? {}), context: { uiLanguages: profile?.content.context.uiLanguages ?? null }, facts });
+    if (!built.ok) return this.#finishCheck(e, built.outcome, built.reason, null, []);
+    if (built.built.service && !spec.services.some((x) => x.id === built.built.service)) return this.#finishCheck(e, 'unavailable', { key: 'probe.reason.serviceNotDeclared', params: { service: built.built.service } }, null, []);
+
+    const tmpRoot = posix.join(layout.tmp, e.checkRunId);
+    const outDir = posix.join(tmpRoot, 'probe');
+    for (const d of [tmpRoot, outDir]) {
+      await ports.fs.mkdir(d, 0o700);
+      await ports.fs.chmod(d, 0o700);
+    }
+    // Companion services before it (FR-21); a cancel ends the wait at once.
+    const ctrl = new AbortController();
+    active.waiting.set(e.checkRunId, ctrl);
+    if (active.cancel || active.cancelledChecks.has(e.checkRunId)) ctrl.abort();
+    const { failed: failedService, held } = await active.services!.acquire(spec.services, ctrl.signal);
+    if (ctrl.signal.aborted || active.cancel || active.cancelledChecks.has(e.checkRunId)) {
+      active.waiting.delete(e.checkRunId);
+      await active.services!.release(held);
+      await ports.fs.remove(tmpRoot);
+      return this.#finishCheck(e, 'cancelled', cancelledReason(), null, []);
+    }
+    if (failedService) {
+      active.waiting.delete(e.checkRunId);
+      const log = active.services!.logOf(failedService);
+      await active.services!.release(held);
+      await ports.fs.remove(tmpRoot);
+      // The service's log is the evidence of why it did not become ready (AT-19: the port taken).
+      if (log) {
+        await evidence.store.open(ctx.projectId, runId, e.checkRunId);
+        await evidence.store.add({ projectId: ctx.projectId, runId, checkRunId: e.checkRunId, name: `service-${failedService}.log`, kind: 'service_log', data: new TextEncoder().encode(log), redacted: true });
+      }
+      return this.#finishCheck(e, 'unavailable', { key: 'run.reason.serviceNotReady', params: { service: failedService } }, null, []);
+    }
+
+    // The probe, cell by cell, with a true ratio of progress (FR-29).
+    const jobId = Buffer.from(ports.random.bytes(12)).toString('base64url');
+    const started = ports.clock.now();
+    const t0 = ports.clock.monotonicMs();
+    const run = await this.#o.probe
+      .execute(
+        { ...built.built.job, jobId, browser: { executablePath: browser.executablePath, version: browser.version }, outDir, axePath: this.#o.probe.axePath },
+        {
+          signal: AbortSignal.any([ctrl.signal, active.quit.signal]),
+          timeoutMs: spec.timeoutMin * 60_000,
+          onCell: (done, total) => {
+            const at = ports.clock.now().toISOString();
+            db.run('UPDATE check_runs SET last_activity_at = ? WHERE id = ?', at, e.checkRunId);
+            this.#o.events.emit('check.progress', { runId, checkRunId: e.checkRunId, step: done, total, lastActivityAt: at, processor: null, silentMs: 0, linesSeen: done });
+          },
+        },
+      )
+      .finally(() => active.waiting.delete(e.checkRunId));
+    active.collecting.add(e.checkRunId);
+    const serviceLogs = spec.services.map((x) => [x.id, active.services!.logOf(x.id)] as const);
+    await active.services!.release(held);
+
+    // Evidence: the images (as they are), the cell log and the outcome (redacted), the services' logs.
+    const redactor = this.#o.redaction.redactor();
+    await evidence.store.open(ctx.projectId, runId, e.checkRunId);
+    const refs: EvidenceRef[] = [];
+    const add = async (name: string, kind: string, data: Uint8Array, redacted = true) => {
+      const ref = await evidence.store.add({ projectId: ctx.projectId, runId, checkRunId: e.checkRunId, name, kind, data, redacted });
+      refs.push(ref);
+      return ref;
+    };
+    const metaOf = new Map(built.built.job.cells.map((c) => [c.index, c]));
+    const summary = run.summary;
+    const captures: Capture[] = [];
+    try {
+      for (const r of run.results) {
+        const c = metaOf.get(r.index);
+        if (!r.screenshot || !c || c.sensitive) continue; // G-29: never an image of a «حساسة» state
+        const data = await ports.fs.readFile(posix.join(outDir, r.screenshot.file)).catch(() => null);
+        if (!data) continue;
+        const ref = await add(`captures/${c.state}/${c.viewport.name}-${c.theme.value}-${c.lang.value}.png`.replace(/[^A-Za-z0-9._/-]/g, '_'), 'capture', data, false);
+        captures.push({ index: r.index, captureId: ref.id, path: evidence.store.absolute(ref.relPath), key: { state: c.state, viewport: c.viewport.name, theme: c.theme.value, lang: c.lang.value, platform: summary?.platform ?? `${process.platform}-${process.arch}`, browser: summary?.browserVersion ?? browser.version, density: summary?.density ?? 1, mode: summary?.mode ?? 'headless' } });
+      }
+      const lines = run.results.map((r) => JSON.stringify(redactor.redactJson(r as unknown as JsonValue))).join('\n');
+      await add('probe.jsonl', 'probe_log', new TextEncoder().encode(lines ? `${lines}\n` : ''));
+      for (const [id, text] of serviceLogs) if (text) await add(`service-${id}.log`, 'service_log', new TextEncoder().encode(text));
+    } catch (err) {
+      await ports.fs.remove(tmpRoot);
+      throw err;
+    }
+
+    // G-28: each capture against the approved reference of its key, in a worker thread.
+    const comparisons = await this.#compare(ctx, captures, outDir, add);
+    await ports.fs.remove(tmpRoot);
+
+    const outcome: ProbeOutcome = {
+      mode: built.built.job.mode,
+      targetKind: built.built.targetKind,
+      targetDir: built.built.targetDir,
+      cells: built.built.job.cells.map((c) => {
+        const m = cellMeta(c);
+        return { index: m.index, state: m.state, path: m.path, viewport: m.viewport, theme: m.theme, lang: m.lang, sensitive: m.sensitive };
+      }),
+      states: built.built.states,
+      results: run.results,
+      summary,
+      failure: run.failure,
+      comparisons,
+      conditions: { locale: built.built.job.locale, timezone: built.built.job.timezone, reducedMotion: true, density: summary?.density ?? 1 },
+    };
+    const outcomeRef = await add('probe.json', 'probe', new TextEncoder().encode(JSON.stringify(redactor.redactJson(outcome))));
+
+    const raw: RawCheckResult = {
+      checkRunId: e.checkRunId,
+      runId,
+      instance: e.instance,
+      checkId: spec.checkId,
+      component: spec.component,
+      attempt: this.#checkRow(e.checkRunId).attempt,
+      ended: run.failure?.code === 'cancelled' ? 'cancelled' : run.failure?.code === 'timed_out' ? 'timed_out' : 'exited',
+      exitCode: null,
+      signal: null,
+      spawnError: null,
+      startedAt: started.toISOString(),
+      finishedAt: ports.clock.now().toISOString(),
+      durationMs: Math.max(0, Math.round(ports.clock.monotonicMs() - t0)),
+      command: null,
+      envKeys: [],
+      toolVersions: { 'probe:web-probe': summary?.browserVersion ?? browser.version, ...(run.playwright ? { playwright: run.playwright } : {}) },
+      logs: { stdout: null, stderr: null },
+      reports: refs.filter((r) => r.kind === 'probe' || r.kind === 'probe_log'),
+      tail: [],
+      lastActivityAt: ports.clock.now().toISOString(),
+      sideEffects: null,
+      resources: { samples: 0, peakRssKb: 0, maxCpuPercent: 0, lastCpuPercent: 0 },
+      sleepGaps: [],
+      leftovers: { groupKilled: 0, tokenKilled: 0, escapeSuspected: [] },
+      notes: [],
+      sharedFrom: null,
+      internal: { runner: spec.runner.ids[0] ?? 'web-probe', version: summary?.browserVersion ?? browser.version },
+    };
+    const notes: string[] = [];
+    if (run.results.some((r) => r.blocked.length)) notes.push('probe.note.externalBlocked');
+    if (run.results.some((r) => r.allowed.length)) notes.push('probe.note.allowedHosts');
+    if (e.item.needs.services.length) notes.push('run.note.projectCommandNetwork');
+    raw.notes = notes;
+    // What the process itself says (7.3 rule 1): cancelled, timed out, or a probe that could not run.
+    if (run.failure?.code === 'cancelled' || active.cancel || active.cancelledChecks.has(e.checkRunId)) return this.#finishCheck(e, 'cancelled', cancelledReason(), raw, notes);
+    if (run.failure?.code === 'timed_out') return this.#finishCheck(e, 'timed_out', { key: 'run.reason.timeout', params: { minutes: spec.timeoutMin } }, raw, notes);
+    if (run.failure && ['unavailable', 'probe_failed', 'not_ready', 'probe_exited'].includes(run.failure.code)) return this.#finishCheck(e, 'unavailable', { key: 'probe.reason.processFailed', params: { detail: run.failure.detail.slice(0, 300) } }, raw, notes);
+
+    const req: JudgeRequest = { kind: 'probe', outcomePath: evidence.store.absolute(outcomeRef.relPath), files: ctx.inventory, facts };
+    const judgement = await this.#o.verdict.judge(spec, { projectId: ctx.projectId, root: ctx.root, req, signal: active.quit.signal });
+    if (judgement.outcome === 'cancelled') return this.#finishCheck(e, 'cancelled', { key: 'run.reason.appQuit' }, raw, notes);
+    const evidenceIds = refs.filter((r) => r.kind === 'probe' || r.kind === 'probe_log').map((r) => r.id);
+    if (judgement.report) evidenceIds.push((await evidence.store.add({ projectId: ctx.projectId, runId, checkRunId: e.checkRunId, name: 'parsed.json', kind: 'parsed', data: reportEvidence(redactor.redactJson(judgement.report)), redacted: true })).id);
+    e.judged = { req, evidenceIds };
+    this.#finishCheck(e, judgement.outcome, judgement.reason, raw, notes, undefined, undefined, { judgement, evidenceIds, reader: judgement.report ? { id: judgement.report.reader, version: judgement.report.readerVersion, formats: judgement.report.formats } : null });
+  }
+
+  /**
+   * design.a11y.review (10.3, S-22 «مراجعة الإتاحة البشرية ظاهرة دائمًا»): what no tool decides — the keyboard, the
+   * screen reader, the meaning — is a human review recorded with its decision, date and scope (DEV-9's
+   * review.record, target `check`, this instance). It holds while the files of its scope are unchanged since it was
+   * recorded; otherwise, or without one, the check «يحتاج مراجعة», never «اجتاز» by default.
+   */
+  async #runReview(e: Exec, ctx: CheckContext, spec: CheckSpec): Promise<void> {
+    const { db } = this.#o;
+    const row = db.get<{ id: string; decision: string; scope_json: string; snapshot_id: string | null; created_at: string }>(
+      "SELECT id, decision, scope_json, snapshot_id, created_at FROM reviews WHERE project_id = ? AND target_type = 'check' AND target_ref = ? ORDER BY created_at DESC, rowid DESC LIMIT 1",
+      ctx.projectId,
+      e.instance,
+    );
+    let why: string | null = 'none';
+    if (row) {
+      let files: string[] = [];
+      try {
+        const scoped = (JSON.parse(row.scope_json) as { files?: unknown }).files;
+        files = Array.isArray(scoped) ? scoped.filter((x): x is string => typeof x === 'string') : [];
+      } catch {
+        files = [];
+      }
+      const then = row.snapshot_id ? await this.#o.evidence.snapshots.load(row.snapshot_id).catch(() => null) : null;
+      const now = new Map(ctx.lastManifest.files.map((f) => [f[0], f[5]]));
+      const before = new Map((then?.files ?? []).map((f) => [f[0], f[5]]));
+      const changed = !then || files.some((f) => before.get(f) !== now.get(f));
+      why = changed ? 'expired' : row.decision === 'passed' ? null : `decision:${row.decision}`;
+    }
+    const report = { reader: 'human-review', readerVersion: '1.0.0', formats: [], tests: null, findings: [] as ParsedReport['findings'], findingsDropped: 0, signals: { noInputs: false, collectionError: false, configError: false, flaky: false, unresolved: 0 }, problems: [], info: { review: row?.id ?? null, recordedAt: row?.created_at ?? null } } satisfies ParsedReport;
+    if (why) report.findings.push({ rule: 'review.pending', toolRule: null, severity: null, proof: null, level: null, origin: 'project', message: why === 'none' ? 'no human accessibility review is recorded for this interface' : why === 'expired' ? 'the recorded review no longer holds: files of its scope changed since' : `the recorded review decided ${why.slice('decision:'.length)}`, location: null, anchor: { kind: 'text', value: `review|${e.instance}` }, expected: null, actual: null });
+    const judgement = this.#o.verdict.classifyReport(spec, { projectId: ctx.projectId, report, exit: { kind: 'ok' }, anchors: report.findings.map(() => createHash('sha256').update(`text\nreview|${e.instance}`).digest('hex')), guardTouches: false });
+    this.#finishCheck(e, judgement.outcome, judgement.reason, null, [], undefined, undefined, { judgement, evidenceIds: [], reader: { id: 'human-review', version: '1.0.0', formats: [] } });
+  }
+
+  /** G-28: the captures against their references (pixelmatch in a worker thread); the diffs kept as evidence. */
+  async #compare(ctx: CheckContext, captures: readonly Capture[], outDir: string, add: (name: string, kind: string, data: Uint8Array, redacted?: boolean) => Promise<EvidenceRef>): Promise<VisualComparison[]> {
+    const planned = this.#o.baselines.plan(ctx.projectId, captures);
+    const pairs = planned.filter((p) => p.referencePath).map((p, n) => ({ p, reference: p.referencePath!, capture: p.capture.path, diff: posix.join(outDir, `diff-${n}.png`) }));
+    let compared: { ratio: number; differs: boolean; diff: boolean; error: string | null }[] = [];
+    if (pairs.length) {
+      const r = await this.#o.verdict.pool.run({ kind: 'compare', root: ctx.root, pairs: pairs.map(({ reference, capture, diff }) => ({ reference, capture, diff })) }, { signal: AbortSignal.timeout(10 * 60_000) }).catch(() => null);
+      compared = r?.compared ?? pairs.map(() => ({ ratio: 1, differs: true, diff: false, error: 'comparison failed' }));
+    }
+    const out: VisualComparison[] = [];
+    const tokenFiles = this.#tokenFiles(ctx.projectId);
+    for (const p of planned) {
+      const k = pairs.findIndex((x) => x.p === p);
+      let comparison = p.comparison;
+      let diffRatio: number | null = null;
+      let diffId: string | null = null;
+      let changed: VisualComparison['changed'] = [];
+      if (k >= 0) {
+        const c = compared[k]!;
+        diffRatio = c.ratio;
+        comparison = c.differs ? 'differs' : 'match';
+        if (c.diff) {
+          const data = await this.#o.ports.fs.readFile(pairs[k]!.diff).catch(() => null);
+          if (data) diffId = (await add(`diffs/${p.capture.key.state}/${p.capture.key.viewport}-${p.capture.key.theme}-${p.capture.key.lang}.png`.replace(/[^A-Za-z0-9._/-]/g, '_'), 'capture_diff', data, false)).id;
+        }
+        if (comparison === 'differs') changed = await this.#o.baselines.changedSince(this.#o.baselines.snapshotOf(p.baselineId!), ctx.lastManifest, tokenFiles);
+      }
+      out.push({ index: p.capture.index, captureId: p.capture.captureId, key: p.capture.key, comparison, diffRatio, diffId, baselineId: p.baselineId, changed });
+    }
+    return out;
+  }
+
+  /** The design's token files (the declared reference, or discovery's), whose changes come first in a difference. */
+  #tokenFiles(projectId: string): string[] {
+    const declared = latestProfile(this.#o.db, projectId)?.content.references.tokens;
+    const v = declared && typeof declared === 'object' && !Array.isArray(declared) ? (declared as Record<string, unknown>).source ?? (declared as Record<string, unknown>).tokens : declared;
+    const discovered = (latestSnapshot(this.#o.db, projectId)?.facts ?? []).filter((f) => f.key === 'references.tokens').map((f) => (f.value as Record<string, unknown> | null)?.path);
+    return [...(typeof v === 'string' ? [v] : []), ...discovered.filter((x): x is string => typeof x === 'string')];
   }
 
   /** C-13: an analyzer runs inside the engine, in a worker thread that a cancel stops. */

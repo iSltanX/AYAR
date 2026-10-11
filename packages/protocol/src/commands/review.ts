@@ -1,5 +1,7 @@
 // Human review (C-16, D-35) and baseline approval (C-14). Implemented in DEV-9 and DEV-7.
+// Protocol 1.4 (DEV-7): baseline.approve names its project and the captures it approves (FR-35, D-27).
 import { Id } from '../common.ts';
+import { BaselineView } from '../domain/probe.ts';
 import { z } from '../zod.ts';
 import { defineCommand } from './define.ts';
 
@@ -21,7 +23,11 @@ export const reviewCommands = {
     audience: 'renderer',
     since: '1.0',
     implementedIn: 'DEV-7',
-    payload: z.strictObject({ captureIds: z.array(Id).min(1).max(1000) }),
-    result: z.unknown(),
+    /**
+     * The explicit approval of captures as reference images (FR-35, D-27): each becomes the active reference of its
+     * key, the previous one of that key is kept as replaced. Never called by AYAR on its own.
+     */
+    payload: z.strictObject({ projectId: Id, captureIds: z.array(Id).min(1).max(1000) }),
+    result: z.strictObject({ approved: z.array(BaselineView), replaced: z.int().nonnegative() }),
   }),
 };

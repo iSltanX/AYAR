@@ -53,7 +53,7 @@
     },
     {
       "id": "design.tokens.render",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "section": "design",
       "criterion": "design-system",
       "inIndex": true,
@@ -124,13 +124,19 @@
             }
           }
         ],
-        "sharesExecutionWith": [],
+        "sharesExecutionWith": [
+          "design.fonts.render",
+          "design.a11y",
+          "design.rtl.render",
+          "design.states",
+          "design.visual"
+        ],
         "alternativeTo": []
       },
       "sources": [
         "S-21"
       ],
-      "verifiedAt": "2026-10-09"
+      "verifiedAt": "2026-10-11"
     },
     {
       "id": "design.fonts.static",
@@ -184,7 +190,7 @@
     },
     {
       "id": "design.fonts.render",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "section": "design",
       "criterion": "fonts",
       "inIndex": true,
@@ -255,15 +261,21 @@
             }
           }
         ],
-        "sharesExecutionWith": [],
+        "sharesExecutionWith": [
+          "design.tokens.render",
+          "design.a11y",
+          "design.rtl.render",
+          "design.states",
+          "design.visual"
+        ],
         "alternativeTo": []
       },
       "sources": [],
-      "verifiedAt": "2026-10-09"
+      "verifiedAt": "2026-10-11"
     },
     {
       "id": "design.a11y",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "section": "design",
       "criterion": "accessibility",
       "inIndex": true,
@@ -326,7 +338,13 @@
             }
           }
         ],
-        "sharesExecutionWith": [],
+        "sharesExecutionWith": [
+          "design.tokens.render",
+          "design.fonts.render",
+          "design.rtl.render",
+          "design.states",
+          "design.visual"
+        ],
         "alternativeTo": []
       },
       "sources": [
@@ -334,7 +352,7 @@
         "S-22",
         "S-23"
       ],
-      "verifiedAt": "2026-10-09"
+      "verifiedAt": "2026-10-11"
     },
     {
       "id": "design.a11y.review",
@@ -437,7 +455,7 @@
     },
     {
       "id": "design.rtl.render",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "section": "design",
       "criterion": "direction",
       "inIndex": true,
@@ -511,17 +529,23 @@
             }
           }
         ],
-        "sharesExecutionWith": [],
+        "sharesExecutionWith": [
+          "design.tokens.render",
+          "design.fonts.render",
+          "design.a11y",
+          "design.states",
+          "design.visual"
+        ],
         "alternativeTo": []
       },
       "sources": [
         "S-21"
       ],
-      "verifiedAt": "2026-10-09"
+      "verifiedAt": "2026-10-11"
     },
     {
       "id": "design.states",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "section": "design",
       "criterion": "ui-states",
       "inIndex": true,
@@ -585,15 +609,21 @@
             }
           }
         ],
-        "sharesExecutionWith": [],
+        "sharesExecutionWith": [
+          "design.tokens.render",
+          "design.fonts.render",
+          "design.a11y",
+          "design.rtl.render",
+          "design.visual"
+        ],
         "alternativeTo": []
       },
       "sources": [],
-      "verifiedAt": "2026-10-09"
+      "verifiedAt": "2026-10-11"
     },
     {
       "id": "design.visual",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "section": "design",
       "criterion": "visual-stability",
       "inIndex": true,
@@ -656,13 +686,19 @@
             }
           }
         ],
-        "sharesExecutionWith": [],
+        "sharesExecutionWith": [
+          "design.tokens.render",
+          "design.fonts.render",
+          "design.a11y",
+          "design.rtl.render",
+          "design.states"
+        ],
         "alternativeTo": []
       },
       "sources": [
         "S-17"
       ],
-      "verifiedAt": "2026-10-09"
+      "verifiedAt": "2026-10-11"
     }
   ]
 }

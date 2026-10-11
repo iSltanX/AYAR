@@ -5,6 +5,7 @@
 import { constants, promises as fsp } from 'node:fs';
 import { request as httpRequest, type IncomingMessage } from 'node:http';
 import { request as httpsRequest } from 'node:https';
+import { createServer } from 'node:net';
 import { DownloadError, type Network } from '../ports/index.ts';
 
 const MAX_REDIRECTS = 5;
@@ -31,8 +32,20 @@ function get(url: URL, o: NetworkOptions, signal: AbortSignal | undefined): Prom
   });
 }
 
+/** A port is taken when this process cannot listen on it, on IPv4 or IPv6 loopback or on every address. */
+function portInUse(port: number): Promise<boolean> {
+  const tryListen = (host: string | undefined) =>
+    new Promise<boolean>((resolve) => {
+      const srv = createServer();
+      srv.once('error', (e: NodeJS.ErrnoException) => resolve(e.code === 'EADDRINUSE' || e.code === 'EACCES'));
+      srv.listen({ port, ...(host ? { host } : {}), exclusive: true }, () => srv.close(() => resolve(false)));
+    });
+  return (async () => (await tryListen('127.0.0.1')) || (await tryListen('::1').catch(() => false)) || (await tryListen(undefined)))();
+}
+
 export function nodeNetwork(o: NetworkOptions = {}): Network {
   return {
+    portInUse,
     ping(raw, timeoutMs) {
       return new Promise((resolve) => {
         let url: URL;

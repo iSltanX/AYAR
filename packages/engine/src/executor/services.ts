@@ -36,6 +36,8 @@ export interface CompanionServicesOptions {
 
 export class CompanionServices {
   readonly #running = new Map<string, Running>();
+  /** Services never started because a port they declare is taken by another program (AT-19): their log line. */
+  readonly #refused = new Map<string, string>();
   readonly #o: CompanionServicesOptions;
   #aborted = false;
 
@@ -57,8 +59,21 @@ export class CompanionServices {
     });
     for (const s of services) {
       if (this.#aborted || signal?.aborted) return { failed: failed ?? s.id, held };
+      if (this.#refused.has(s.id)) {
+        failed ??= s.id;
+        continue;
+      }
       let r = this.#running.get(s.id);
       if (!r) {
+        // AT-19: a port the service declares, already taken by another program, means it can never become ready —
+        // and an answer there would not be its own. Said in its log; nothing is started.
+        const taken = await this.#portTaken(s);
+        if (taken !== null) {
+          this.#refused.set(s.id, `[AYAR] port ${taken} is already in use by another program: the service ${s.id} was not started\n`);
+          failed ??= s.id;
+          continue;
+        }
+        if (this.#aborted || signal?.aborted) return { failed: failed ?? s.id, held };
         r = this.#start(s);
         this.#running.set(s.id, r);
       }
@@ -89,8 +104,15 @@ export class CompanionServices {
     }
   }
 
+  async #portTaken(s: CompanionService): Promise<number | null> {
+    for (const port of s.ports) if (await this.#o.ports.network.portInUse?.(port)) return port;
+    return null;
+  }
+
   /** The redacted log of a service so far, its last megabyte (kept as evidence of the checks that used it). */
   logOf(id: string): string {
+    const refused = this.#refused.get(id);
+    if (refused) return refused;
     const log = this.#running.get(id)?.log;
     if (!log) return '';
     return (log.dropped ? `[… ${log.dropped} earlier lines not kept]\n` : '') + log.lines.slice(log.head).join('');

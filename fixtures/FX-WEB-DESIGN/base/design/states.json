@@ -1,42 +1,42 @@
 {
-  "$comment": "الحالات المعلنة لـ FX-WEB-DESIGN: لكل حالة محاكاة شبكة وتوقع. الصيغة مؤقتة حتى تعتمدها DEV-6/DEV-7 في ملف المعايير.",
+  "$comment": "الحالات المعلنة لـ FX-WEB-DESIGN بصيغة مرجع «الحالات» في ملف المعايير (DEV-7: ProbeStates في packages/protocol). لكل حالة مسارها ومحاكاة شبكتها وتوقعاتها؛ والحالة «حساسة» لا تُلتقط لها صورة. التحميل بتأخير ثانيتين والخطأ برمز 500 (AT-19).",
   "states": [
     {
       "id": "default",
       "description": "قائمة العناصر محمّلة",
-      "url": "/",
-      "mock": { "/api/items": { "status": 200, "body_file": "mocks/items.json" } },
-      "expect": { "text": { "ar": "هاتف ذكي", "en": "Smartphone" }, "selector": "#app[data-state='default']" }
+      "path": "/",
+      "mock": [{ "url": "/api/items", "status": 200, "bodyFile": "mocks/items.json" }],
+      "expect": [{ "visible": "#app[data-state='default']" }, { "text": { "ar": "هاتف ذكي", "en": "Smartphone" }, "within": "#app" }]
     },
     {
       "id": "loading",
       "description": "تحميل بطيء: تظهر الهياكل ورسالة التحميل",
-      "url": "/",
-      "mock": { "/api/items": { "status": 200, "delay_ms": 8000, "body_file": "mocks/items.json" } },
-      "expect": { "text": { "ar": "جارٍ تحميل العناصر…", "en": "Loading items…" }, "selector": "#app[data-state='loading']" }
+      "path": "/",
+      "mock": [{ "url": "/api/items", "status": 200, "delayMs": 2000, "bodyFile": "mocks/items.json" }],
+      "expect": [{ "visible": "#app[data-state='loading']" }, { "text": { "ar": "جارٍ تحميل العناصر…", "en": "Loading items…" }, "within": "#app" }]
     },
     {
       "id": "error",
       "description": "فشل الخادم: تظهر رسالة الخطأ المتوقعة",
-      "url": "/",
-      "mock": { "/api/items": { "status": 500 } },
-      "expect": { "text": { "ar": "تعذّر تحميل العناصر", "en": "Could not load items" }, "selector": "#app[data-state='error'] [role='alert']" }
+      "path": "/",
+      "mock": [{ "url": "/api/items", "status": 500 }],
+      "expect": [{ "visible": "#app[data-state='error'] [role='alert']" }, { "text": { "ar": "تعذّر تحميل العناصر", "en": "Could not load items" }, "within": "#app[data-state='error'] [role='alert']" }]
     },
     {
       "id": "empty",
       "description": "قائمة فارغة",
-      "url": "/",
-      "mock": { "/api/items": { "status": 200, "body": [] } },
-      "expect": { "text": { "ar": "لا عناصر لعرضها", "en": "No items to show" }, "selector": "#app[data-state='empty']" }
+      "path": "/",
+      "mock": [{ "url": "/api/items", "status": 200, "body": [] }],
+      "expect": [{ "visible": "#app[data-state='empty']" }, { "text": { "ar": "لا عناصر لعرضها", "en": "No items to show" }, "within": "#app" }]
     },
     {
       "id": "account",
       "description": "لوحة الحساب تعرض رصيدًا وهميًّا",
-      "url": "/?panel=account",
+      "path": "/?panel=account",
       "sensitive": true,
-      "sensitive_reason": "تعرض بيانات مالية (وهمية هنا)، فلا تُلتقط لها صورة ولا تدخل المقارنة البصرية، وتظهر في المعرض بسببها",
-      "mock": { "/api/items": { "status": 200, "body_file": "mocks/items.json" } },
-      "expect": { "selector": "section.account[data-sensitive='true']" }
+      "reason": "تعرض بيانات مالية (وهمية هنا)، فلا تُلتقط لها صورة ولا تدخل المقارنة البصرية، وتظهر في المعرض بسببها",
+      "mock": [{ "url": "/api/items", "status": 200, "bodyFile": "mocks/items.json" }],
+      "expect": [{ "visible": "section.account[data-sensitive='true']" }]
     }
   ]
 }

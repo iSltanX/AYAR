@@ -71,6 +71,11 @@ function median(xs: readonly number[]): number | null {
  * shares an execution.
  */
 export function invocationKey(spec: CheckSpec): string | null {
+  // D-DEV7-03: the web probe's pages checks of one render target share one execution (their states, matrix and
+  // services are the target's; what each measures is judged by its own rules). perf.web measures apart (E-21).
+  if (spec.runner.kind === 'probe' && spec.runner.ids.includes('web-probe') && spec.checkId !== 'perf.web') {
+    return sha(canonicalJson({ probe: 'web-probe', component: spec.component, target: spec.referenceValues.renderTarget ?? null, services: spec.services }));
+  }
   if (!spec.command) return null;
   return sha(canonicalJson({ argv: spec.command.argv, cwd: spec.command.cwd, component: spec.component, env: spec.env, tool: spec.tool?.path ?? null, services: spec.services, runner: [...spec.runner.ids].sort() }));
 }
@@ -225,7 +230,9 @@ export function buildPlan(i: PlanInput): RunPlan {
     it.readiness = inner === 'not_applicable' ? 'not_applicable' : inner;
     if (inner === 'ready') continue;
     it.status = inner === 'untrusted' ? 'untrusted' : 'missing';
-    it.reasons = [...(r?.reasons ?? []), ...it.reasons];
+    // A check that runs because it was chosen (or added as a dependency) is not «not included» here: the reason
+    // shown first is what it lacks (AT-18 «ناقص إعداد بالبند الناقص تحديدًا»).
+    it.reasons = [...(r?.reasons ?? []).filter((x) => x.key !== 'setup.reason.notIncluded'), ...it.reasons];
   }
 
   // 4, after the readiness (9.4 point 5): «يشمل» — the covered check does not run again and inherits the covering

@@ -52,7 +52,9 @@ export interface ReportInput {
 
 export type JudgeRequest =
   | { kind: 'parse'; adapter: string; cwd: string; reports: ReportInput[]; stdoutPath: string | null; stderrPath: string | null; exit: ExitInfo; inventory: string[]; outputs: string[]; startedAt: number }
-  | { kind: 'analyze'; analyzer: string; files: string[]; facts: Fact[] };
+  | { kind: 'analyze'; analyzer: string; files: string[]; facts: Fact[] }
+  /** C-14 (DEV-7): the outcome of a probe execution (`probe.json` in the evidence), judged for one check. */
+  | { kind: 'probe'; outcomePath: string; files: string[]; facts: Fact[] };
 
 export interface JudgedFinding {
   finding: WeighedFinding;
@@ -140,7 +142,9 @@ export class VerdictService {
     const job: Job =
       o.req.kind === 'parse'
         ? { kind: 'parse', adapter: o.req.adapter, cwd: o.req.cwd, reports: o.req.reports, stdoutPath: o.req.stdoutPath, stderrPath: o.req.stderrPath, exit: o.req.exit, outputs: o.req.outputs, customSuccess: spec.customSuccess, inventory: o.req.inventory, startedAt: o.req.startedAt, ...base }
-        : { kind: 'analyze', analyzer: o.req.analyzer, files: o.req.files, references: spec.referenceValues, facts: o.req.facts, ...base };
+        : o.req.kind === 'probe'
+          ? { kind: 'probe', outcomePath: o.req.outcomePath, files: o.req.files, references: spec.referenceValues, facts: o.req.facts, ...base }
+          : { kind: 'analyze', analyzer: o.req.analyzer, files: o.req.files, references: spec.referenceValues, facts: o.req.facts, ...base };
     let result: JobResult;
     try {
       result = await this.#o.pool.run(job, { ...(o.signal ? { signal: o.signal } : {}), timeoutMs: JOB_TIMEOUT_MS });

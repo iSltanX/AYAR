@@ -22,6 +22,9 @@ import { runJob } from '../verdict/jobs.ts';
 import { workerPool } from '../verdict/pool.ts';
 import { VerdictService } from '../verdict/service.ts';
 import { loadToolRegistry } from '../tools/registry.ts';
+import { BaselineService } from '../probe/baselines.ts';
+import { BrowserService, type BrowserBuild } from '../probe/browser.ts';
+import { ProbeService } from '../probe/service.ts';
 import { ToolsService } from '../tools/service.ts';
 import type { EventBus } from './event-bus.ts';
 import type { RunGate } from './run-gate.ts';
@@ -51,6 +54,9 @@ export interface EngineServices {
   verdict: VerdictService;
   /** C-19 (DEV-6): the purity index of rounds and sections. */
   purity: PurityService;
+  /** C-14 (DEV-7): the probe's browser and the reference images. */
+  browsers: BrowserService;
+  baselines: BaselineService;
   /**
    * C-18 after the fact [D-DEV4-07]: redacts the stored rows again with the current rules (new sensitive values,
    * new user patterns), and the backups too (G-DEV4-01). A failure is logged, never fatal (re-review R4).
@@ -73,6 +79,8 @@ export interface ServicesInput {
   testLoginShell?: string | null;
   /** tools/cli's test hook: extra managed-tool entries (AT-35's local server), never shipped. */
   testToolRegistry?: readonly unknown[];
+  /** tools/cli's test hook: the probe browser's build from a loopback server (task 6's tests), never shipped. */
+  testBrowserBuild?: BrowserBuild | null;
   /** The module the verdict's worker threads start from (the engine's entry; C-13). */
   workerEntry?: URL | string;
 }
@@ -116,8 +124,11 @@ export function createServices(o: ServicesInput): EngineServices {
     path: async () => ((await environment.base()).env.PATH ?? '').split(':').filter(Boolean),
   });
   const supervisor = new ProcessSupervisor({ ports: o.ports, db: o.db, logger: o.logger });
+  const browsers = new BrowserService({ db: o.db, ports: o.ports, layout: o.layout, logger: o.logger, events: o.events, ...(o.testBrowserBuild ? { build: o.testBrowserBuild } : {}) });
+  const baselines = new BaselineService({ db: o.db, ports: o.ports, layout: o.layout, evidence, logger: o.logger });
+  const probe = new ProbeService({ host: o.ports.probe, logger: o.logger });
   let runs: RunService | null = null;
-  const setup = new SetupService({ db: o.db, catalog: o.catalog, ports: o.ports, layout: o.layout, logger: o.logger, events: o.events, profiles, projects, environment, tools, redaction, supervisor, runActive: (p) => runs?.busy(p) ?? false });
+  const setup = new SetupService({ db: o.db, catalog: o.catalog, ports: o.ports, layout: o.layout, logger: o.logger, events: o.events, profiles, projects, environment, tools, browsers, redaction, supervisor, runActive: (p) => runs?.busy(p) ?? false });
   const planner = new PlannerService({ db: o.db, catalog: o.catalog, ports: o.ports, profiles, setup });
   // C-13: the readers run in worker threads (two at a time), started from the engine's own entry module; if none
   // can start at all (a packaged archive a worker cannot load), in this thread, logged once.
@@ -127,6 +138,6 @@ export function createServices(o: ServicesInput): EngineServices {
   });
   const verdict = new VerdictService({ db: o.db, catalog: o.catalog, ports: o.ports, logger: o.logger, events: o.events, pool, hmacKey: o.hmacKey, redaction });
   const purity = new PurityService({ db: o.db, catalog: o.catalog, ports: o.ports, logger: o.logger, evidence });
-  runs = new RunService({ db: o.db, catalog: o.catalog, ports: o.ports, layout: o.layout, logger: o.logger, events: o.events, runGate: o.runGate, planner, projects, environment, redaction, evidence, tools, supervisor, verdict, purity, setupActive: (p) => setup.busyFor(p) });
-  return { redaction, profiles, projects, environment, tasks, evidence, tools, setup, planner, runs, verdict, purity, rescrubStored };
+  runs = new RunService({ db: o.db, catalog: o.catalog, ports: o.ports, layout: o.layout, logger: o.logger, events: o.events, runGate: o.runGate, planner, projects, environment, redaction, evidence, tools, supervisor, verdict, purity, setupActive: (p) => setup.busyFor(p), probe, browsers, baselines });
+  return { redaction, profiles, projects, environment, tasks, evidence, tools, setup, planner, runs, verdict, purity, browsers, baselines, rescrubStored };
 }

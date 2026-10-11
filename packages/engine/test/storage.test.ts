@@ -231,7 +231,7 @@ describe('migrations (14.1, 14.3, NFR-02, G-11)', () => {
     db.run("INSERT INTO projects (id, display_name, root_path, root_realpath, created_at) VALUES ('p', 'P', '/p', '/p', 'x')");
     db.run("INSERT INTO runs (id, display_id, project_id, kind, selection_json, plan_json, state) VALUES ('r', 'RUN-1', 'p', 'full', '{}', '{}', 'finished')");
     db.run("INSERT INTO check_runs (id, run_id, check_id, component, state) VALUES ('c', 'r', 'beh.unit', '.', 'finished')");
-    const r = await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.3.0' });
+    const r = await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.3.0', migrations: MIGRATIONS.slice(0, 3) });
     expect(r).toMatchObject({ from: 2, to: 3, applied: ['3-verdicts'] });
     expect(r.backup).toMatch(/pre-v2-to-v3\.db$/);
     const columns = (t: string) => db.all<{ name: string; notnull: number }>(`PRAGMA table_info(${t})`);
@@ -240,6 +240,19 @@ describe('migrations (14.1, 14.3, NFR-02, G-11)', () => {
     // A finding's effect is one of five; the old rows read as null.
     expect(db.get('SELECT findings_json, reader_json FROM check_runs WHERE id = ?', 'c')).toEqual({ findings_json: null, reader_json: null });
     expect(() => db.run("INSERT INTO findings (id, check_run_id, fingerprint, display_id, check_id, component, severity, proof, origin, title_key, effect) VALUES ('f', 'c', 'x', 'AYR-BEH-UNIT-0001', 'beh.unit', '.', 'high', 'proven', 'project', 't', 'ignored')")).toThrow();
+  });
+
+  it('migration 4 (DEV-7) adds the snapshot a reference image was approved on, nullable, and keeps the old rows', async () => {
+    const { db, layout } = await freshStore();
+    const clock = fakeClock();
+    await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.3.0', migrations: MIGRATIONS.slice(0, 3) });
+    db.run("INSERT INTO projects (id, display_name, root_path, root_realpath, created_at) VALUES ('p', 'P', '/p', '/p', 'x')");
+    db.run("INSERT INTO baselines (id, project_id, key_json, rel_path, sha256, approved_at, status) VALUES ('b', 'p', '{}', 'baselines/p/b.png', 'x', 'y', 'active')");
+    const r = await migrate(db, { fs, clock, backupsDir: layout.backups, appVersion: '0.4.0' });
+    expect(r).toMatchObject({ from: 3, to: 4, applied: ['4-probe-baselines'] });
+    expect(r.backup).toMatch(/pre-v3-to-v4\.db$/);
+    expect(db.all<{ name: string; notnull: number }>('PRAGMA table_info(baselines)').find((x) => x.name === 'snapshot_id')).toMatchObject({ notnull: 0 });
+    expect(db.get('SELECT snapshot_id, status FROM baselines WHERE id = ?', 'b')).toEqual({ snapshot_id: null, status: 'active' });
   });
 
   it('refuses a database written by a newer AYAR, without a backup or any change', async () => {

@@ -20,6 +20,7 @@ export * from './domain/runs.ts';
 export * from './domain/findings.ts';
 export * from './domain/purity.ts';
 export * from './domain/tools.ts';
+export * from './domain/probe.ts';
 export * from './bridge.ts';
 export * from './client.ts';
 export * from './ownership.ts';

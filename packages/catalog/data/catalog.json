@@ -1,6 +1,6 @@
 {
   "schema": "ayar-catalog/1",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "purityFormula": "purity/1",
   "staleAfterDays": 180,
   "timeouts": { "light": 2, "medium": 10, "heavy": 30, "very_heavy": 60 },

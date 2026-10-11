@@ -17,7 +17,8 @@ export type ActionSeed =
   | { kind: 'install_tool'; tool: string }
   | { kind: 'install_dependencies'; component: string; manager: string; ecosystem: 'npm' | 'PyPI' }
   | { kind: 'accept_tool_version'; tool: string; requiredSpec: string; requiredFrom: string; version: string; path: string | null }
-  | { kind: 'download_osv_db'; ecosystem: 'npm' | 'PyPI' };
+  | { kind: 'download_osv_db'; ecosystem: 'npm' | 'PyPI' }
+  | { kind: 'install_browser' };
 
 export interface InstanceReadiness {
   instance: string;
@@ -43,6 +44,8 @@ export interface ReadinessInput {
   tools: Pick<ToolsService, 'locate'>;
   /** Tools AYAR can install (the managed registry). */
   installable: (key: string) => boolean;
+  /** The installer an installable tool needs first, if any (uv for a Python environment, G-DEV6-01). */
+  installerOf?: (key: string) => string | undefined;
   allowNetwork: boolean;
   /** Ecosystems whose offline OSV database is present (data_assets). */
   osvDbs: ReadonlySet<string>;
@@ -53,6 +56,8 @@ export interface ReadinessInput {
    * Playwright's cache)? beh.e2e and perf.compat run the project's tests with it; the probe's browser is DEV-7's.
    */
   projectBrowser?: (component: string) => Promise<boolean>;
+  /** DEV-7: is the probe's own browser installed (C-11, a data asset in AYAR's folder)? */
+  probeBrowser?: () => Promise<boolean>;
   /** DEV-6: the version of a package installed for a component (its node_modules, or its .venv for Python). */
   packageVersion?: (component: string, name: string) => Promise<string | null>;
 }
@@ -177,6 +182,9 @@ export async function evaluateInstances(i: ReadinessInput): Promise<InstanceRead
         if (!tool) {
           // The first tool of the requirement AYAR can install (Betterleaks before Gitleaks, E-08).
           const first = managedReq.tools.find((k) => i.installable(k));
+          // A Python-environment install needs uv first (G-DEV6-01): its own action, before the tool's.
+          const installer = first ? i.installerOf?.(first) : undefined;
+          if (installer && !(await locate(installer))) need({ key: 'setup.reason.toolMissing', params: { tool: installer } }, { kind: 'install_tool', tool: installer });
           if (first) need({ key: 'setup.reason.toolMissing', params: { tool: first } }, { kind: 'install_tool', tool: first });
           else need({ key: 'setup.reason.toolMissing', params: { tool: managedReq.tools[0]! } });
         }
@@ -188,7 +196,11 @@ export async function evaluateInstances(i: ReadinessInput): Promise<InstanceRead
       }
       if (def?.requirements.some((r) => r.kind === 'dataAsset' && r.asset === 'browser')) {
         const projectsOwn = def.runner.kind === 'adapter' && def.runner.ids.includes('playwright');
-        if (!projectsOwn || !(await i.projectBrowser?.(spec.component))) need({ key: 'setup.reason.browserMissing' });
+        // The project's Playwright tests use the project's own browser (DEV-6); the probe uses AYAR's, installed
+        // by an explicit action with its size (C-11, DEV-7).
+        if (projectsOwn) {
+          if (!(await i.projectBrowser?.(spec.component))) need({ key: 'setup.reason.browserMissing' });
+        } else if (!(await i.probeBrowser?.())) need({ key: 'setup.reason.probeBrowserMissing' }, { kind: 'install_browser' });
       }
 
       // A project command: its runtime, its program, its dependencies.

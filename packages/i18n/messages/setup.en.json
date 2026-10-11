@@ -58,5 +58,7 @@
   "setup.reason.managerMismatch": "Needs setup: the project requires {tool} {required}",
   "setup.reason.dependenciesMissing": "Needs setup: dependencies are not installed in {component}",
   "setup.reason.adapterUntested": "Needs setup: {tool} {version} is outside the range AYAR's adapter was tested with ({tested}); accept it once if you wish",
-  "setup.reason.adapterVersionAccepted": "{tool} {version} accepted for this project outside the tested range ({tested})"
+  "setup.reason.adapterVersionAccepted": "{tool} {version} accepted for this project outside the tested range ({tested})",
+  "setup.reason.probeBrowserMissing": "Needs setup: the probe browser is not installed in AYAR's folder",
+  "setup.action.installBrowser": "Install the probe browser (Chrome for Testing {version})"
 }

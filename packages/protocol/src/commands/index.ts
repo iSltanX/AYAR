@@ -3,6 +3,7 @@ import { aiCheckCommands } from './ai-checks.ts';
 import { dataCommands } from './data.ts';
 import { environmentCommands } from './environment.ts';
 import { internalCommands } from './internal.ts';
+import { probeCommands } from './probe.ts';
 import { profileCommands } from './profile.ts';
 import { projectCommands } from './projects.ts';
 import { reportCommands } from './reports.ts';
@@ -24,6 +25,7 @@ export const COMMANDS = {
   ...runCommands,
   ...resultCommands,
   ...reviewCommands,
+  ...probeCommands,
   ...reportCommands,
   ...aiCheckCommands,
   ...toolCommands,

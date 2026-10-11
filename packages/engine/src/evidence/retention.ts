@@ -53,7 +53,9 @@ export async function deleteRuns(d: RetentionDeps, projectId: string, runIds: re
       const used =
         (d.db.get<{ n: number }>('SELECT count(*) AS n FROM runs WHERE snapshot_start_id = ? OR snapshot_end_id = ?', s, s)?.n ?? 0) +
         (d.db.get<{ n: number }>('SELECT count(*) AS n FROM rounds WHERE snapshot_id = ?', s)?.n ?? 0) +
-        (d.db.get<{ n: number }>('SELECT count(*) AS n FROM reviews WHERE snapshot_id = ?', s)?.n ?? 0);
+        (d.db.get<{ n: number }>('SELECT count(*) AS n FROM reviews WHERE snapshot_id = ?', s)?.n ?? 0) +
+        // DEV-7: a reference image's approval state (its later differences name the lines changed since).
+        (d.db.get<{ n: number }>('SELECT count(*) AS n FROM baselines WHERE snapshot_id = ?', s)?.n ?? 0);
       if (!used) d.db.run('DELETE FROM snapshots WHERE id = ?', s);
     }
   });

@@ -9,6 +9,7 @@
 // it was verified; one older than the catalog's staleness limit (180 days) is shown stale (NFR-06, AT-35).
 import { z } from '@ayar/protocol';
 import { ToolVerification } from '@ayar/protocol';
+import { SEMGREP_REQUIREMENTS, SEMGREP_REQUIREMENTS_SHA256 } from './semgrep-requirements.ts';
 
 export const ToolFile = z.strictObject({
   arch: z.enum(['arm64', 'x64']),
@@ -237,15 +238,76 @@ export function isStale(def: ManagedToolDef, now: Date, staleAfterDays: number):
 }
 
 /**
- * DEV-6 (D-DEV6-03): tools AYAR uses from the system inside the range its adapter was tested with (C-11 point 1),
- * and does not install yet. Semgrep: E-10 settled a managed install (an isolated Python environment from a
- * requirements file pinned by its 915 hashes, about 258 MB), which needs an install kind of its own in C-11 beyond
- * the single pinned file of these entries (G-DEV6-01); until then a Semgrep 1.x from 1.180.0 on the login PATH is
- * used, and without one sec.sast is «يحتاج تجهيزًا» with no action.
+ * C-11's second install kind (G-DEV6-01, DEV-7): a tool that is a Python program, installed as E-10 settled — a
+ * CPython that uv manages (python-build-standalone, its downloads checked by uv against the hashes it pins), a virtual
+ * environment beside it, and the tool's requirements installed with --require-hashes from a file AYAR ships, every
+ * file pinned by its hash; the version then read from the tool itself. Everything lives in AYAR's tools/ folder.
  */
-export const SYSTEM_ONLY_TOOLS: readonly (Pick<ManagedToolDef, 'key' | 'versionArgs' | 'versionPattern'> & { system: NonNullable<ManagedToolDef['system']> })[] = [
-  { key: 'semgrep', versionArgs: ['--version'], versionPattern: '^(\\d+\\.\\d+\\.\\d+)', system: { names: ['semgrep'], min: '1.180.0', belowMajor: 2 } },
+export const ManagedEnvDef = z.strictObject({
+  kind: z.literal('python-env'),
+  key: z.string().regex(/^[a-z][a-z0-9-]*$/),
+  version: z.string().regex(/^\d+\.\d+\.\d+$/),
+  license: z.string().min(1),
+  homepage: z.url({ protocol: /^https$/ }),
+  verifiedAt: z.iso.date(),
+  /** The CPython uv installs (its exact version). */
+  python: z.string().regex(/^3\.\d+\.\d+$/),
+  requirements: z.string().min(1),
+  /** The requirements' own hash: what AYAR ships is what was pinned. */
+  requirementsSha256: z.string().regex(/^[0-9a-f]{64}$/),
+  /** About this much on disk once installed (the preview's size). */
+  sizeBytes: z.int().positive(),
+  /** The program inside the environment. */
+  entry: z.string().regex(/^venv\/bin\/[a-z][a-z0-9-]*$/),
+  /**
+   * What AYAR runs: a launcher it writes at the install, which runs the entry with Python told to write no bytecode
+   * beside the installed files — their tree is hashed, and `tools.verify` would otherwise find it changed.
+   */
+  bin: z.string().regex(/^bin\/[a-z][a-z0-9-]*$/),
+  /** uv, the installer it needs (a managed or system one, C-11 point 1). */
+  installer: z.literal('uv'),
+  versionArgs: z.array(z.string()).min(1).max(4),
+  versionPattern: z.string(),
+  system: z.strictObject({ names: z.array(z.string().regex(/^[a-z][a-z0-9-]*$/)).min(1), min: z.string(), belowMajor: z.int().positive() }).nullable(),
+});
+export type ManagedEnvDef = z.infer<typeof ManagedEnvDef>;
+
+/**
+ * Semgrep 1.180.0 (E-10): Python 3.12.15 managed by uv, and 915 pinned hashes; about 318 MB installed (the Python
+ * 66 MB, the environment 252 MB). A Semgrep 1.x from 1.180.0 on the login PATH is used instead (C-11 point 1).
+ */
+export const BUILTIN_ENVS: readonly ManagedEnvDef[] = [
+  {
+    kind: 'python-env',
+    key: 'semgrep',
+    version: '1.180.0',
+    license: 'LGPL-2.1',
+    homepage: 'https://github.com/semgrep/semgrep',
+    verifiedAt: '2026-10-11',
+    python: '3.12.15',
+    requirements: SEMGREP_REQUIREMENTS,
+    requirementsSha256: SEMGREP_REQUIREMENTS_SHA256,
+    sizeBytes: 333_000_000,
+    entry: 'venv/bin/semgrep',
+    bin: 'bin/semgrep',
+    installer: 'uv',
+    versionArgs: ['--version'],
+    versionPattern: '^(\\d+\\.\\d+\\.\\d+)',
+    system: { names: ['semgrep'], min: '1.180.0', belowMajor: 2 },
+  },
 ];
+
+export function loadEnvRegistry(): Map<string, ManagedEnvDef> {
+  const out = new Map<string, ManagedEnvDef>();
+  for (const raw of BUILTIN_ENVS) {
+    const d = ManagedEnvDef.parse(raw);
+    out.set(d.key, d);
+  }
+  return out;
+}
+
+/** Tools used from the system only, inside their tested range (C-11 point 1): none since DEV-7 installs Semgrep. */
+export const SYSTEM_ONLY_TOOLS: readonly (Pick<ManagedToolDef, 'key' | 'versionArgs' | 'versionPattern'> & { system: NonNullable<ManagedToolDef['system']> })[] = [];
 
 export function machineArch(): 'arm64' | 'x64' {
   return process.arch === 'arm64' ? 'arm64' : 'x64';

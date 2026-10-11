@@ -57,6 +57,8 @@ export interface VariantOptions {
   later?: (variant: string, e: Expectation) => string | null;
   /** Only these expectations (a subset of a variant). */
   only?: (e: Expectation) => boolean;
+  /** A variant's precondition, after its profile is approved and before its run (DEV-7: references approved first). */
+  before?: (variant: string, ctx: { engine: EngineConnection; projectId: string; path: string }) => Promise<void>;
 }
 
 let seq = 0;
@@ -87,6 +89,7 @@ export async function runVariant(engine: EngineConnection, root: string, project
     ok(await engine.invoke('profile.update', { projectId, patch: { ...(extra ?? {}), checks } }));
     await approveAll(engine, projectId);
     if (o.acceptVersions) await acceptVersions(engine, projectId);
+    await o.before?.(variant, { engine, projectId, path: r.path });
     const bg = o.background?.(r.path) ?? null;
     const server = bg ? spawn(bg[0]!, bg.slice(1), { cwd: r.path, stdio: 'ignore' }) : null;
     if (server) await new Promise((res) => setTimeout(res, 500));
