@@ -239,19 +239,27 @@ describe('AT-36 (app): cold start, UI response, update rate, memory, idle proces
       // vanishes between two samples counts nothing) over the wall time between the samples.
       await new Promise((r) => setTimeout(r, 10_000));
       const idle: number[] = [];
+      // Who used the processor while idle: the seconds each process of the tree accumulated over the 20 intervals.
+      const idleBy = new Map<string, number>();
       let prev = { at: performance.now(), procs: tree(pid) };
       for (let i = 0; i < 20; i++) {
         await new Promise((r) => setTimeout(r, 1000));
         const now = { at: performance.now(), procs: tree(pid) };
         const before = new Map(prev.procs.map((p) => [p.pid, p.cpuSec]));
-        const used = now.procs.reduce((s, p) => s + (before.has(p.pid) ? Math.max(0, p.cpuSec - before.get(p.pid)!) : 0), 0);
+        let used = 0;
+        for (const p of now.procs) {
+          if (!before.has(p.pid)) continue;
+          const d = Math.max(0, p.cpuSec - before.get(p.pid)!);
+          used += d;
+          idleBy.set(p.comm, (idleBy.get(p.comm) ?? 0) + d);
+        }
         idle.push((used / ((now.at - prev.at) / 1000)) * 100);
         prev = now;
       }
       report['uiResponse'] = { samples: latencies.length, medianMs: Math.round(median(latencies) * 10) / 10, p95Ms: Math.round(p95(latencies) * 10) / 10, maxMs: Math.round(Math.max(...latencies) * 10) / 10 };
       report['updatesPerCheck'] = { checks: Object.keys(events).length, busiestSecond: busiest };
       report['memory'] = { samples: rss.length, peakFootprintMb: footprint.length ? Math.round(Math.max(...footprint)) : null, medianFootprintMb: footprint.length ? Math.round(median(footprint)) : null, peakRssMb: Math.round(Math.max(...rss)), medianRssMb: Math.round(median(rss)) };
-      report['idleCpu'] = { samples: idle.length, medianPercent: Math.round(median(idle) * 10) / 10, maxPercent: Math.round(Math.max(...idle) * 10) / 10 };
+      report['idleCpu'] = { samples: idle.length, medianPercent: Math.round(median(idle) * 10) / 10, maxPercent: Math.round(Math.max(...idle) * 10) / 10, secondsByProcess: Object.fromEntries([...idleBy].filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).map(([k, v]) => [k.replace(/^.*\//, ''), Math.round(v * 100) / 100])) };
       process.stderr.write(`${JSON.stringify({ uiResponse: report['uiResponse'], updatesPerCheck: report['updatesPerCheck'], memory: report['memory'], idleCpu: report['idleCpu'] })}\n`);
       expect(state).toBe('finished');
       if (JUDGE) {

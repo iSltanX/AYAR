@@ -48,14 +48,16 @@ export async function launch(dataDir: string): Promise<Launched> {
   return { app, page };
 }
 
-/** Runs the app directly (no Playwright, no inspector) and returns its exit code and output. */
-export function runDirect(args: string[], timeoutMs = 20_000): Promise<{ code: number | null; signal: string | null; output: string }> {
+/**
+ * Runs the app directly (no Playwright) and returns its exit code and output. Without the inspector the packaged app
+ * ignores --ayar-data-dir (and the release package always does, D-DEV13-06): a direct run that gets past the start-up
+ * guards would write in the user's folder, so a run meant to reach the data folder asks for the inspector
+ * (`--inspect=0`, which the derived test package allows), and the runs that test the guards (D-52) go without it.
+ */
+export function runDirect(args: string[], timeoutMs = 20_000, o: { inspector?: boolean } = {}): Promise<{ code: number | null; signal: string | null; output: string }> {
   return new Promise((resolve) => {
     const exe = PACKAGED_APP ? packagedExecutable(PACKAGED_APP) : ELECTRON;
-    // Without the inspector the packaged app ignores --ayar-data-dir (and the release package always does): a direct
-    // run that gets past the start-up guards would write in the user's folder, so the callers only use it for runs
-    // the guards end (D-52) or that never reach the data folder.
-    const argv = PACKAGED_APP ? args : [APP_DIR, ...args];
+    const argv = PACKAGED_APP ? [...(o.inspector ? ['--inspect=0'] : []), ...args] : [APP_DIR, ...args];
     const child = spawn(exe, argv, { env: baseEnv(), stdio: ['ignore', 'pipe', 'pipe'] });
     let output = '';
     child.stdout.on('data', (d: Buffer) => (output += d.toString()));

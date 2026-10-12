@@ -66,7 +66,7 @@ describe('engine supervision in the app (C-01, AT-13 part)', () => {
   });
 
   it('runs one instance only: a second launch on the same data exits and the first keeps its window', async () => {
-    const second = await runDirect([`--ayar-data-dir=${t.dataDir}`], 20_000);
+    const second = await runDirect([`--ayar-data-dir=${t.dataDir}`], 20_000, { inspector: true });
     expect(second.code).toBe(0);
     expect(await run.app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().length)).toBe(1);
   });
