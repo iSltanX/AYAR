@@ -447,7 +447,7 @@ export class RunService {
     const serviceEnv = computeChildEnv({ login: base.env, rules: this.#o.redaction.names(), allowSensitive: [], explicit: {} }).env;
     await ports.fs.mkdir(posix.join(this.#o.layout.tmp, runId), 0o700);
     active.services = new CompanionServices({ ports, supervisor: this.#o.supervisor, redaction: this.#o.redaction, projectRoot: root, env: serviceEnv, runId, tmpDir: posix.join(this.#o.layout.tmp, runId) });
-    const parallel = readSettings(db, ['run.parallel'])['run.parallel'] ?? 2;
+    const parallel = readSettings(db, ['run.parallel'])['run.parallel'] ?? 3;
     const sideEffects = readSettings(db, ['run.sideEffects'])['run.sideEffects'] ?? true;
     const declared = this.#declared(projectId, plan);
     // 9.12 point 2 (C-22, DEV-9): the guard compares the state with its bases before anything is judged, so its
