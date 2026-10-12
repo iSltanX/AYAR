@@ -217,22 +217,34 @@
                   ]
                 },
                 {
-                  "metavariable-regex": {
-                    "metavariable": "$FN",
-                    "regex": "^(exec|execSync|spawn|spawnSync)$"
-                  }
-                },
-                {
-                  "pattern": "$FN($CMD, ...)"
-                },
-                {
-                  "pattern-not": "spawn($CMD, $ARGS)"
-                },
-                {
-                  "pattern-not": "spawnSync($CMD, $ARGS)"
-                },
-                {
-                  "pattern-not": "spawn($CMD, $ARGS, {..., shell: false, ...})"
+                  "pattern-either": [
+                    {
+                      "patterns": [
+                        {
+                          "metavariable-regex": {
+                            "metavariable": "$FN",
+                            "regex": "^(exec|execSync)$"
+                          }
+                        },
+                        {
+                          "pattern": "$FN($CMD, ...)"
+                        }
+                      ]
+                    },
+                    {
+                      "patterns": [
+                        {
+                          "metavariable-regex": {
+                            "metavariable": "$FN",
+                            "regex": "^(spawn|spawnSync)$"
+                          }
+                        },
+                        {
+                          "pattern": "$FN($CMD, $ARGS, {..., shell: true, ...})"
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             },

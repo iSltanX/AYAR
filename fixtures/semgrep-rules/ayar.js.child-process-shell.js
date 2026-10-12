@@ -19,5 +19,7 @@ export function safe(dir, text) {
   // ok: ayar.js.child-process-shell
   spawn('ls', [dir]);
   // ok: ayar.js.child-process-shell
+  spawn(dir, ['--version'], { stdio: 'pipe' });
+  // ok: ayar.js.child-process-shell
   return /a+/.exec(text);
 }
