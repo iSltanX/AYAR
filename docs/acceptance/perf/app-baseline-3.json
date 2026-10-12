@@ -1,0 +1,57 @@
+{
+  "test": "AT-36 (app)",
+  "targets": {
+    "coldStartMs": 3000,
+    "uiResponseP95Ms": 100,
+    "updatesPerCheckPerSecond": 10,
+    "peakRssMb": 600,
+    "idleCpuPercent": 2
+  },
+  "repeat": 5,
+  "coldStart": {
+    "samples": [
+      343,
+      252,
+      546,
+      253,
+      257
+    ],
+    "medianMs": 257
+  },
+  "uiResponse": {
+    "samples": 90,
+    "medianMs": 1.4,
+    "p95Ms": 1.9,
+    "maxMs": 2.7
+  },
+  "updatesPerCheck": {
+    "checks": 38,
+    "busiestSecond": 3
+  },
+  "memory": {
+    "samples": 29,
+    "peakFootprintMb": 518,
+    "medianFootprintMb": 467,
+    "peakRssMb": 776,
+    "medianRssMb": 706
+  },
+  "idleCpu": {
+    "samples": 20,
+    "medianPercent": 0,
+    "maxPercent": 20.8
+  },
+  "machine": {
+    "macos": "27.0.1",
+    "chip": "Apple M4",
+    "cpus": 8,
+    "memoryGb": 16,
+    "loadavg": [
+      4,
+      4,
+      3.26
+    ],
+    "power": "'AC Power'",
+    "app": "/private/tmp/claude-501/-Volumes-iSltanXx-Projects-AYAR/b1be623a-e6d1-4278-b43e-36782090caa0/scratchpad/derived/AYAR.app",
+    "at": "2026-10-12T09:00:09.351Z"
+  }
+}

@@ -6,7 +6,7 @@
 |---|---|
 | [AT-report.md](AT-report.md) | تقرير القبول الواحد: AT-01 إلى AT-48، لكل اختبار النتيجة والدليل والتاريخ وcommit البناء، ثم بنود الخطة 25 واحدًا واحدًا |
 | [release.md](release.md) | حزمة الإصدار: كيف تُبنى وتُوقَّع، وما قُرئ منها (المعرّف، والصمامات، والتوقيع، والحجم)، وإعادة البناء من مستودع نظيف ومقارنتها، وحزمة الاختبار المشتقة (D-51) |
-| [perf/](perf/) | قياسات AT-36 بظروف الجهاز: `discovery-baseline.json` و`app-baseline.json` (القياس الأول الذي غذّى معايرة E-14)، ثم `discovery.json` و`app.json` (القبول على القيم المعايرة)، و`e18-parallel.json` (التوازي والمهل) و`e19-storage.json` (أحجام الأدلة) |
+| [perf/](perf/) | قياسات AT-36 بظروف الجهاز: `discovery-baseline.json` و`app-baseline.json` و`app-baseline-2.json` و`app-baseline-3.json` (خطوط الأساس التي غذّت معايرة E-14، والثلاثة لأن أداة القياس صُحّحت مرتين)، ثم `discovery.json` و`app.json` (القبول على القيم المعايرة)، و`e18-parallel.json` (التوازي والمهل، مع أطول تنفيذ لكل صنف موارد) و`e19-storage.json` (أحجام الأدلة لكل تشغيل بمجلداتها)؛ وحزمة الإصدار: `derive-for-acceptance.json` و`derive-control.json` (الاشتقاق) و`checks-release.json` و`checks-control.json` (AT-30 على الحزمة) و`reproduce.json` (إعادة البناء من مستودع نظيف) |
 | [owner-tests.md](owner-tests.md) | اختبارات جهاز المالك واليد البشرية الستة بخطواتها وأثرها المقروء |
 | [voiceover-checklist.md](voiceover-checklist.md) | قائمة VoiceOver ولوحة المفاتيح التي يوقّعها المالك (AT-40) |
 | [reader-task.md](reader-task.md) | مهمة القارئ غير المتخصص ونموذج تسجيلها (AT-43، J10) |

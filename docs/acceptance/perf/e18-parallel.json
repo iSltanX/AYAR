@@ -1,0 +1,151 @@
+{
+  "test": "E-18: parallelism",
+  "project": "FX-EXT",
+  "variant": "good",
+  "repeat": 2,
+  "machine": {
+    "macos": "27.0.1",
+    "chip": "Apple M4",
+    "cpus": 8,
+    "memoryGb": 16,
+    "loadavg": [
+      3.78,
+      3.9,
+      3.39
+    ],
+    "node": "v24.18.1",
+    "at": "2026-10-12T09:03:54.769Z"
+  },
+  "results": [
+    {
+      "parallel": 1,
+      "samples": [
+        {
+          "wallMs": 11865,
+          "latencyMedianMs": 0.3,
+          "latencyP95Ms": 1,
+          "latencyMaxMs": 1.9,
+          "loadavg1": 3.32,
+          "checks": 26,
+          "interference": []
+        },
+        {
+          "wallMs": 9018,
+          "latencyMedianMs": 0.2,
+          "latencyP95Ms": 0.5,
+          "latencyMaxMs": 0.9,
+          "loadavg1": 3.29,
+          "checks": 26,
+          "interference": []
+        }
+      ],
+      "medianWallMs": 10441.5,
+      "latencyP95Ms": 0.75,
+      "interference": []
+    },
+    {
+      "parallel": 2,
+      "samples": [
+        {
+          "wallMs": 5575,
+          "latencyMedianMs": 0.2,
+          "latencyP95Ms": 0.8,
+          "latencyMaxMs": 0.8,
+          "loadavg1": 3.59,
+          "checks": 26,
+          "interference": []
+        },
+        {
+          "wallMs": 5478,
+          "latencyMedianMs": 0.2,
+          "latencyP95Ms": 0.8,
+          "latencyMaxMs": 2.9,
+          "loadavg1": 3.51,
+          "checks": 26,
+          "interference": []
+        }
+      ],
+      "medianWallMs": 5526.5,
+      "latencyP95Ms": 0.8,
+      "interference": []
+    },
+    {
+      "parallel": 3,
+      "samples": [
+        {
+          "wallMs": 4668,
+          "latencyMedianMs": 0.3,
+          "latencyP95Ms": 1.1,
+          "latencyMaxMs": 3.7,
+          "loadavg1": 3.46,
+          "checks": 26,
+          "interference": []
+        },
+        {
+          "wallMs": 4659,
+          "latencyMedianMs": 0.2,
+          "latencyP95Ms": 0.5,
+          "latencyMaxMs": 0.6,
+          "loadavg1": 3.83,
+          "checks": 26,
+          "interference": []
+        }
+      ],
+      "medianWallMs": 4663.5,
+      "latencyP95Ms": 0.8,
+      "interference": []
+    },
+    {
+      "parallel": 4,
+      "samples": [
+        {
+          "wallMs": 4773,
+          "latencyMedianMs": 0.2,
+          "latencyP95Ms": 0.5,
+          "latencyMaxMs": 4.9,
+          "loadavg1": 3.83,
+          "checks": 26,
+          "interference": []
+        },
+        {
+          "wallMs": 5001,
+          "latencyMedianMs": 0.3,
+          "latencyP95Ms": 1,
+          "latencyMaxMs": 4.3,
+          "loadavg1": 3.78,
+          "checks": 26,
+          "interference": []
+        }
+      ],
+      "medianWallMs": 4887,
+      "latencyP95Ms": 0.75,
+      "interference": []
+    }
+  ],
+  "durations": {
+    "medium": {
+      "longestInstance": "sec.sast@.",
+      "longestMs": 3023,
+      "timeoutMin": 10,
+      "shareOfTimeout": 0.5
+    },
+    "light": {
+      "longestInstance": "sec.ext.permissions@.",
+      "longestMs": 565,
+      "timeoutMin": 2,
+      "shareOfTimeout": 0.5
+    },
+    "heavy": {
+      "longestInstance": "beh.e2e@.",
+      "longestMs": 2300,
+      "timeoutMin": 30,
+      "shareOfTimeout": 0.1
+    },
+    "very_heavy": {
+      "longestInstance": "perf.load@.",
+      "longestMs": 0,
+      "timeoutMin": 60,
+      "shareOfTimeout": 0
+    }
+  }
+}
