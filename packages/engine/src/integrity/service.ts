@@ -81,6 +81,11 @@ export function guardAsFinding(f: GuardFinding): { finding: ParsedFinding; ancho
 
 /** The reason of a guard whose base is gone: integrity could not be verified (11.4 rule 9). */
 const LOST_BASE: Reason = { key: 'integrity.reason.guardBaseLost' };
+/** The reason of a guard execution whose base cannot be shown whole (an older one, its evidence gone). */
+const UNVERIFIED_BASE: Reason = { key: 'integrity.reason.guardBaseUnverified' };
+
+/** How a guard execution's base stands: shown whole, lost, or not shown whole either way. */
+export type GuardBase = 'whole' | 'lost' | 'unverified';
 
 export class IntegrityService {
   readonly #o: IntegrityOptions;
@@ -334,21 +339,37 @@ export class IntegrityService {
     // The check each effect touches (C-22 «الربط»), for the page, even when that check did not run this time (DEV-12).
     const links = (ctx.result?.findings ?? []).slice(0, MAX_FINDINGS).map((f) => ({ rule: f.rule, path: f.path, line: f.line ?? null, check: f.check }));
     // A base that is gone leaves integrity unverified whatever the effects and their reviews: «يحتاج مراجعة» for the lost
-    // base, never a pass. The report keeps `baseLost`, so a judgement again after a review keeps it too (lostBase).
+    // base, never a pass. The report keeps `baseLost`, so a judgement again after a review keeps it too (guardBase).
     if (ctx.baseLost) return { judgement: this.judgement(spec, projectId, pairs, 'needs_review', LOST_BASE, { bases: ctx.baseSnapshotIds.length, compared: ctx.result?.compared ?? 0, carried: ctx.carried, links, baseLost: true }, { byEffects: false }), evidence };
-    if (!ctx.baseSnapshotIds.length) return { judgement: this.judgement(spec, projectId, [], 'passed', { key: 'integrity.reason.guardNoBaseline', params: { markers: ctx.markers.length } }, { bases: 0, markers: ctx.markers.length }), evidence };
+    if (!ctx.baseSnapshotIds.length) return { judgement: this.judgement(spec, projectId, [], 'passed', { key: 'integrity.reason.guardNoBaseline', params: { markers: ctx.markers.length } }, { bases: 0, markers: ctx.markers.length, baseLost: false }), evidence };
     const n = pairs.length;
     const outcome: CheckOutcome = n ? 'needs_review' : 'passed';
     const reason: Reason = n ? { key: 'integrity.reason.guardFindings', params: { count: n, files: ctx.result?.changed.length ?? 0 } } : { key: 'integrity.reason.guardClean', params: { files: ctx.result?.changed.length ?? 0 } };
-    return { judgement: this.judgement(spec, projectId, pairs, outcome, reason, { bases: ctx.baseSnapshotIds.length, compared: ctx.result?.compared ?? 0, carried: ctx.carried, links }), evidence };
+    return { judgement: this.judgement(spec, projectId, pairs, outcome, reason, { bases: ctx.baseSnapshotIds.length, compared: ctx.result?.compared ?? 0, carried: ctx.carried, links, baseLost: false }), evidence };
   }
 
   /**
-   * An execution judged again after a review (11.4 rule 7) whose guard had lost its base: whatever its effects' reviews
-   * say, it stays «يحتاج مراجعة» for the lost base. Known from its kept report, or from the reason it was given.
+   * How a guard execution's base stands (11.4 rule 9), for a judgement again after a review and for a review of the
+   * check itself. Whole only when shown so: by its kept report (`baseLost: false`, from this version on) or by its
+   * integrity evidence (`baseLost: false`, which older executions kept too). Lost when either says so, or its reason
+   * does. Otherwise (an older execution whose evidence is gone) it is not shown whole: unverified.
    */
-  lostBase(report: ParsedReport, reason: Reason | null): boolean {
-    return (report.reader === 'integrity' && report.info.check === 'integ.guard' && report.info.baseLost === true) || reason?.key === LOST_BASE.key;
+  async guardBase(checkRunId: string, report: ParsedReport | null, reason: Reason | null): Promise<GuardBase> {
+    if (reason?.key === LOST_BASE.key || report?.info.baseLost === true) return 'lost';
+    if (report?.info.baseLost === false) return 'whole';
+    const ref = this.#o.evidence.store.refsOf(checkRunId).find((e) => e.kind === 'integrity');
+    if (!ref) return 'unverified';
+    try {
+      const kept = JSON.parse(new TextDecoder().decode(await this.#o.readFile(this.#o.evidence.store.absolute(ref.relPath)))) as { baseLost?: unknown };
+      return kept.baseLost === false ? 'whole' : kept.baseLost === true ? 'lost' : 'unverified';
+    } catch {
+      return 'unverified';
+    }
+  }
+
+  /** The reason a guard execution keeps «يحتاج مراجعة» for, when its base is not whole: a new full scan is asked for. */
+  guardBaseReason(base: Exclude<GuardBase, 'whole'>): Reason {
+    return base === 'lost' ? LOST_BASE : UNVERIFIED_BASE;
   }
 
   /**

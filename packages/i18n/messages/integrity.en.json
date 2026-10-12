@@ -1,6 +1,7 @@
 {
   "integrity.reason.allExcluded": "Passed: all its effects ({count}) were excluded by your review as false alarms",
-  "integrity.reason.guardBaseLost": "Needs review: a base existed but its snapshot is gone, so integrity could not be verified",
+  "integrity.reason.guardBaseLost": "Needs review: there was a base to compare against and its snapshot is gone, so integrity could not be verified and no review settles it. Run a new full scan: it makes a new base that the scan after it verifies against",
+  "integrity.reason.guardBaseUnverified": "Needs review: the comparison base of this execution cannot be shown intact, so no review settles it. Run a new full scan: it makes a new base that the scan after it verifies against",
   "integrity.reason.guardNoBaseline": "Passed (no base to compare): the first round records an inventory only ({markers} existing suppression or skip markers)",
   "integrity.reason.guardFindings": "Needs review: {count, plural, one {# effect} other {# effects}} across {files} files changed since the base",
   "integrity.reason.guardClean": "Passed: no suppression, skip or reference change across {files} files changed since the base",
