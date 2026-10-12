@@ -14,7 +14,7 @@
 import { FuseState, FuseV1Options, flipFuses, getCurrentFuseWire } from '@electron/fuses';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { copyFileSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, readlinkSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 
 const argv = process.argv.slice(2);
@@ -48,15 +48,21 @@ sh('codesign', ['--force', '--sign', identity, keep, testApp]);
 sh('codesign', ['--verify', '--deep', '--strict', testApp]);
 const requirement = (app) => sh('codesign', ['-d', '-r-', app]).split('\n').find((l) => l.startsWith('designated =>')) ?? '';
 
-// Every file compared; the differing Mach-O files compared again with their signatures stripped.
+// Both trees walked, so a file or a link that is in one package only is seen (DEV-13 review R1-09); links compared by
+// their targets; every file compared; the differing Mach-O files compared again with their signatures stripped.
 const walk = (root, rel = '') =>
   readdirSync(join(root, rel), { withFileTypes: true }).flatMap((d) => {
     const r = join(rel, d.name);
-    if (d.isSymbolicLink()) return [];
-    return d.isDirectory() ? walk(root, r) : [r];
+    if (d.isSymbolicLink()) return [[r, readlinkSync(join(root, r))]];
+    return d.isDirectory() ? walk(root, r) : [[r, null]];
   });
+const releaseEntries = new Map(walk(releaseApp));
+const derivedEntries = new Map(walk(testApp));
+const onlyRelease = [...releaseEntries.keys()].filter((k) => !derivedEntries.has(k));
+const onlyDerived = [...derivedEntries.keys()].filter((k) => !releaseEntries.has(k));
+const linkDifferences = [...releaseEntries].filter(([k, target]) => derivedEntries.has(k) && derivedEntries.get(k) !== target).map(([k]) => k);
 const hash = (f) => createHash('sha256').update(readFileSync(f)).digest('hex');
-const files = walk(releaseApp);
+const files = [...releaseEntries].filter(([k, target]) => target === null && derivedEntries.get(k) === null).map(([k]) => k);
 const differing = files.filter((f) => hash(join(releaseApp, f)) !== hash(join(testApp, f)));
 const tmp = mkdtempSync(join(outDir, 'strip-'));
 const stripped = {};
@@ -89,7 +95,8 @@ const wire = async (app) => {
 const fuses = { release: await wire(releaseApp), derived: await wire(testApp) };
 const flippedAsAsked = fuseNames.every((n) => fuses.derived[n] === 'ENABLE') && Object.keys(fuses.release).every((n) => fuseNames.includes(n) || fuses.release[n] === fuses.derived[n]);
 const frameworkDiff = stripped[FRAMEWORK]?.differingBytes ?? 0;
-const ok = flippedAsAsked && otherBytes === 0 && frameworkDiff === fuseNames.length && requirement(releaseApp) === requirement(testApp);
+const sameTree = onlyRelease.length === 0 && onlyDerived.length === 0 && linkDifferences.length === 0;
+const ok = sameTree && flippedAsAsked && otherBytes === 0 && frameworkDiff === fuseNames.length && requirement(releaseApp) === requirement(testApp);
 
 const report = {
   releaseApp: resolve(releaseApp),
@@ -97,6 +104,10 @@ const report = {
   identity,
   fusesFlipped: fuseNames,
   filesCompared: files.length,
+  linksCompared: [...releaseEntries.values()].filter((t) => t !== null).length,
+  onlyRelease,
+  onlyDerived,
+  linkDifferences,
   differingFiles: differing,
   afterStrippingSignatures: stripped,
   fuses,

@@ -26,4 +26,8 @@ NEW_APP="$CLONE/repo/apps/desktop/out/AYAR-darwin-arm64/AYAR.app"
 SIZE="$(du -sh "$CLONE" | cut -f1)"
 # AYAR_KEEP_REBUILT=<folder>: keep a copy of the rebuilt package there (to look into a difference), since the clone goes.
 if [ -n "${AYAR_KEEP_REBUILT:-}" ]; then rm -rf "$AYAR_KEEP_REBUILT"; mkdir -p "$(dirname "$AYAR_KEEP_REBUILT")"; ditto "$NEW_APP" "$AYAR_KEEP_REBUILT"; fi
-"$NODE" "$(dirname "$0")/compare-packages.mjs" --a "$REF_APP" --b "$NEW_APP" --json "$REPORT" --note "clone of $COMMIT, npm ci, npm run package; clone size $SIZE, removed"
+# The reference package's own commit and the state of its working tree (DEV-13 review R1-11): the two builds compared
+# must come from the same commit, and the reference from a clean tree.
+REF_COMMIT="$(git -C "$(dirname "$REF_APP")" rev-parse HEAD 2>/dev/null || echo unknown)"
+REF_DIRTY="$(git -C "$(dirname "$REF_APP")" status --porcelain 2>/dev/null | wc -l | tr -d ' ')"
+"$NODE" "$(dirname "$0")/compare-packages.mjs" --a "$REF_APP" --b "$NEW_APP" --json "$REPORT" --note "reference built from $REF_COMMIT in its working tree ($REF_DIRTY uncommitted files); rebuilt from a clone of $COMMIT, npm ci, npm run package; clone size $SIZE, removed"

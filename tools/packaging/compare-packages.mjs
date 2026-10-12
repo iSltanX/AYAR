@@ -65,6 +65,11 @@ const differing = [];
 const signatureOnly = [];
 /** Mach-O files whose bytes match once stripped but whose cdhash differs: bundles whose seal covers signed files. */
 const sealedOverSignatures = [];
+/**
+ * The only files whose cdhash may differ that way (D-DEV13-08): the bundle's executable and the two frameworks, whose
+ * seals hash the signed helpers, dylibs and ShipIt they contain. Any other file is a difference (DEV-13 review R2-11).
+ */
+const SEALED_OVER_SIGNATURES = new Set(['Contents/MacOS/AYAR', 'Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework', 'Contents/Frameworks/Squirrel.framework/Versions/A/Squirrel']);
 for (const f of common) {
   if (f.includes('_CodeSignature/')) {
     if (sha(join(a, f)) !== sha(join(b, f))) signatureOnly.push(f);
@@ -76,7 +81,7 @@ for (const f of common) {
     const ca = cdhash(pa);
     const cb = cdhash(join(b, f));
     if (ca && ca === cb) signatureOnly.push(f);
-    else if (sameStripped(pa, join(b, f))) sealedOverSignatures.push({ file: f, cdhashA: ca, cdhashB: cb });
+    else if (SEALED_OVER_SIGNATURES.has(f) && sameStripped(pa, join(b, f))) sealedOverSignatures.push({ file: f, cdhashA: ca, cdhashB: cb });
     else differing.push({ file: f, cdhashA: ca, cdhashB: cb, sizeA: statSync(pa).size, sizeB: statSync(join(b, f)).size });
   } else differing.push({ file: f, sizeA: statSync(pa).size, sizeB: statSync(join(b, f)).size });
 }
