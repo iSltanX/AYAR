@@ -115,6 +115,8 @@ interface Span {
 }
 
 const MARKER_RE = /⟦redacted:[^⟧\n]*⟧/g;
+/** LINE_SPLIT_MARKER with a word joiner inside: what a literal marker in a tool's output is stored as. */
+export const DEFUSED_SPLIT_MARKER = '⟦split\u2060⟧';
 
 /** Where the markers of an earlier redaction sit in `text`, in order. */
 function markerRanges(text: string): [number, number][] {
@@ -127,7 +129,12 @@ function markerRanges(text: string): [number, number][] {
  * twice changes nothing); a span that touches a marker takes the whole marker, and anything else in it is still
  * redacted (review m3: `password=<secret>⟧` is not a marker, and is redacted).
  */
-function patternSpans(text: string, p: CompiledPattern, markers: readonly [number, number][] = markerRanges(text)): Span[] {
+/**
+ * The spans of a pattern: the secret itself (its group, when the pattern has one), or with `whole` the entire match,
+ * keyword included, which is what a line cut must keep in one piece (DEV-13 review R3-05: a cut between `api_key =`
+ * and its value left the value matched by nothing, and stored).
+ */
+function patternSpans(text: string, p: CompiledPattern, markers: readonly [number, number][] = markerRanges(text), whole = false): Span[] {
   const spans: Span[] = [];
   p.regex.lastIndex = 0;
   for (const m of text.matchAll(p.regex)) {
@@ -140,6 +147,10 @@ function patternSpans(text: string, p: CompiledPattern, markers: readonly [numbe
       start = m.index + offset;
       end = start + g.length;
       if (p.minEntropy !== undefined && entropy(g) < p.minEntropy) continue;
+      if (whole) {
+        start = m.index;
+        end = m.index + m[0].length;
+      }
     }
     if (end <= start) continue;
     for (const [a, b] of markers) {
@@ -332,7 +343,7 @@ export class LineRedactor {
     const window = text.slice(0, MAX_LINE_CHARS + SPLIT_LOOKAHEAD_CHARS);
     const spans: Span[] = knownSpans(window, this.#r.rules.known);
     const markers = markerRanges(window);
-    for (const p of [...this.#r.rules.highConfidence, ...this.#r.rules.user]) spans.push(...patternSpans(window, p, markers));
+    for (const p of [...this.#r.rules.highConfidence, ...this.#r.rules.user]) spans.push(...patternSpans(window, p, markers, true));
     spans.sort((a, b) => a.start - b.start);
     const cut = MAX_LINE_CHARS;
     let start = -1;
@@ -349,7 +360,10 @@ export class LineRedactor {
     return cut;
   }
 
-  #line(line: string): string[] {
+  #line(raw: string): string[] {
+    // The split marker as a tool may print it itself is defused, so that reading undoes the redactor's own cuts alone
+    // and never joins two lines of the output, or two halves of a secret, that were apart (DEV-13 review R3-10).
+    const line = raw.includes(LINE_SPLIT_MARKER) ? raw.split(LINE_SPLIT_MARKER).join(DEFUSED_SPLIT_MARKER) : raw;
     try {
       return [this.#redactLine(line)];
     } catch {
