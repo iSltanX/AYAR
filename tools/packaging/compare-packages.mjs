@@ -3,7 +3,7 @@
 // same bundles), the same Electron files, and the same cdhash of every signed Mach-O (the signature's CMS blob
 // carries its signing time and is expected to differ). Exit 0 when repeatable, 1 otherwise.
 //   node tools/packaging/compare-packages.mjs --a <.app> --b <.app> [--json <report>] [--note <text>]
-import { execFileSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -32,14 +32,11 @@ const isMachO = (f) => {
   const fd = readFileSync(f).subarray(0, 4).toString('hex');
   return ['cffaedfe', 'feedfacf', 'cafebabe'].includes(fd);
 };
+// codesign prints its description on stderr, so both streams are read (the first version read stdout alone and saw
+// no cdhash at all, which made every signed file "differ" with null on both sides).
 const cdhash = (f) => {
-  try {
-    const out = execFileSync('codesign', ['-dvvv', f], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
-    return /CDHash=([0-9a-f]+)/.exec(out)?.[1] ?? null;
-  } catch (e) {
-    const out = `${e.stdout ?? ''}${e.stderr ?? ''}`;
-    return /CDHash=([0-9a-f]+)/.exec(out)?.[1] ?? null;
-  }
+  const r = spawnSync('codesign', ['-dvvv', f], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+  return /CDHash=([0-9a-f]+)/.exec(`${r.stdout ?? ''}${r.stderr ?? ''}`)?.[1] ?? null;
 };
 const filesA = walk(a).sort();
 const filesB = walk(b).sort();
