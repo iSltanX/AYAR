@@ -18,6 +18,10 @@ const opt = (name, fallback) => {
 const source = resolve(root, opt('source', 'apps/desktop/icon/AppIcon-light-1024.png'));
 const out = resolve(root, opt('out', 'apps/desktop/dist/icon'));
 if (!existsSync(source)) throw new Error(`icon source missing: ${source}`);
+// Apple's template keeps the canvas outside the tile transparent; an opaque corner means the export was flattened on a
+// background, and macOS 26's icon mask would show it as a rim around the tile (D-DEV13-07).
+const corner = execFileSync('sips', ['-g', 'hasAlpha', source], { encoding: 'utf8' });
+if (!/hasAlpha:\s*yes/.test(corner)) throw new Error(`icon source has no alpha channel (its margins must be transparent): ${source}`);
 const set = mkdtempSync(join(tmpdir(), 'ayar-icon-'));
 const iconset = join(set, 'AppIcon.iconset');
 mkdirSync(iconset);
