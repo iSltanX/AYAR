@@ -40,8 +40,8 @@ const log = (s: string) => process.stderr.write(`self-check: ${s}\n`);
 /** The maintainer's additions to the proposed profile for this repository. */
 const PROFILE_PATCH = {
   references: {
-    // FR-36: what the repository's own commands write (the builds' output and the package).
-    outputs: ['apps/desktop/dist', 'apps/desktop/out', 'packages/catalog/dist', 'packages/i18n/dist', 'tools/dashboard/dist', 'coverage'],
+    // FR-36: what the repository's build writes (code.build checks the declared outputs exist afterwards).
+    outputs: ['apps/desktop/dist'],
   },
   custom: {
     // The packages type-check through the root script (TypeScript 7's native binary and `npm run --workspaces`,
@@ -55,6 +55,9 @@ const INTENTIONAL: { test: (path: string, checkId: string) => boolean; note: str
   { test: (p) => p.startsWith('fixtures/'), note: 'مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار' },
   { test: (p) => p.startsWith('spikes/'), note: 'نتائج تجربة بيئة (E-22): علامات AYAR_CHECK_TOKEN لعمليات تجريبية، لا أسرار' },
   { test: (p, c) => c === 'sec.secrets.files' && /\/test\//.test(p), note: 'قيمة على شكل سر في اختبار الإخفاء أو الواجهة (تُركَّب وقت التشغيل من أجزاء أو تُستعمل لإثبات التنقيح)، لا سر' },
+  { test: (p, c) => c === 'sec.sast' && /(^|\/)test\//.test(p), note: 'شيفرة اختبار تشغّل أدوات وعمليات تجريبية عمدًا (أوامر صدفة متغيرة، وFunction لبناء ادعاء نموذج مزيف)، لا تُشحن' },
+  { test: (p, c) => c === 'sec.sast' && p.startsWith('tools/packaging/'), note: 'أداة تغليف تشغّل الملف التنفيذي للحزمة المبنية بمسارها، لا تُشحن' },
+  { test: (p, c) => c === 'sec.sast' && p === 'packages/engine/src/node/network.ts', note: 'التحقق من شهادة TLS معطّل في طلب جاهزية واحد إلى localhost وحده (خدمة مرافقة بشهادة ذاتية، FR-21)؛ لا بيانات تُرسل ولا مضيف خارجي يُقبل (المضيف يُفحص قبله)' },
 ];
 
 /** Why a required check that did not run on this repository does not run, by instance. */
@@ -62,7 +65,9 @@ const EXPLANATIONS: { test: (instance: string) => boolean; reason: string }[] = 
   { test: (i) => i.startsWith('code.types@'), reason: 'لا محوّل للأنواع يعرف TypeScript 7 الأصلي (@typescript/native) ولا سكربت الجذر الذي يشغّل مساحات العمل (E-13)؛ يغطيه الفحص المخصص «typecheck» (npm run typecheck) في الملف نفسه' },
   { test: (i) => i.startsWith('beh.unit@') && i !== 'beh.unit@.', reason: 'اختبارات كل الحزم تُشغَّل من الجذر (vitest run على مساحات العمل) ولا سكربت اختبار في الحزمة نفسها؛ يغطيها beh.unit@. في الجذر' },
   { test: (i) => i === 'design.a11y@apps/desktop', reason: 'واجهة Electron لا تُقدَّم عبر رابط (لا renderTarget)؛ axe يفحص كل شاشة على الحزمة المشتقة في اختبارات E2E (AT-40)' },
-  { test: (i) => i === 'sec.deps@.' || i === 'sec.sast@.', reason: 'تُجهَّز أدواتهما في هذا الفحص بإجراءات التجهيز نفسها التي يعرضها التطبيق؛ وإن غاب التجهيز فلا شبكة' },
+  { test: (i) => i === 'sec.sast@.', reason: 'تُجهَّز أداته في هذا الفحص بإجراء التجهيز نفسه الذي يعرضه التطبيق؛ وإن غاب التجهيز فلا شبكة' },
+  { test: (i) => i === 'sec.deps@.', reason: 'osv-scanner يمسح الجذر كله فيبلغ ملفات قفل PyPI داخل مشاريع الاختبار (fixtures/) ويطلب قاعدتها، والجاهزية تعرض قواعد الأنظمة التي اكتشفتها المكوّنات وحدها (npm)، فيخرج 127 «قاعدة ناقصة» (G-DEV13-06)' },
+  { test: (i) => i === 'design.rtl.static@.', reason: 'صفحة الواجهة في src/renderer (جذر Vite) خارج المجلدات التي يقرأ منها الاكتشاف صفحات الدخول، والاتجاه يُضبط وقت التشغيل بحسب اللغة؛ الاتجاه يُثبت في E2E (AT-28 وAT-41)' },
 ];
 
 const temp = realpathSync(mkdtempSync(join(tmpdir(), 'ayar-DEV-13-self-')));
