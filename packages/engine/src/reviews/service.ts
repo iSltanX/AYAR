@@ -13,7 +13,7 @@
 // A review expires when a file of its scope changes (11.4 rule 6): integ.reviews says so at the next run, and the
 // check goes back to «يحتاج مراجعة». Nothing here writes into the repository.
 import type { Catalog } from '@ayar/catalog';
-import type { A11yReviewItem, CheckOutcome, CheckSpec, FindingLocation, ParsedReport, ReviewDecision, ReviewRecord, ReviewRecorded, ReviewTarget, VerdictCounts } from '@ayar/protocol';
+import type { A11yReviewItem, CheckOutcome, CheckSpec, FindingLocation, ParsedReport, Reason, ReviewDecision, ReviewRecord, ReviewRecorded, ReviewTarget, VerdictCounts } from '@ayar/protocol';
 import { A11Y_REVIEW_ITEMS, ParsedReport as ReportSchema } from '@ayar/protocol';
 import type { EvidenceService } from '../evidence/service.ts';
 import { CommandError } from '../host/errors.ts';
@@ -27,7 +27,7 @@ import { recordAudit } from '../storage/audit.ts';
 import type { Db } from '../storage/db.ts';
 import type { TasksService } from '../tasks/service.ts';
 import type { RunService } from '../executor/run.ts';
-import type { VerdictService } from '../verdict/service.ts';
+import type { Judgement, VerdictService } from '../verdict/service.ts';
 
 const ALLOWED: Record<ReviewTarget['type'], readonly ReviewDecision[]> = {
   check: ['accept', 'reject'],
@@ -234,7 +234,7 @@ export class ReviewsService {
    */
   async #rejudge(projectId: string, runId: string, checkRunId: string, checkId: string, component: string, profileVersion: number | null): Promise<void> {
     const { db } = this.#o;
-    const c = db.get<{ outcome: string | null; review_id: string | null }>('SELECT outcome, review_id FROM check_runs WHERE id = ?', checkRunId);
+    const c = db.get<{ outcome: string | null; review_id: string | null; outcome_reason: string | null }>('SELECT outcome, review_id, outcome_reason FROM check_runs WHERE id = ?', checkRunId);
     if (!c || !['passed', 'failed', 'warning', 'needs_review', 'flaky'].includes(c.outcome ?? '')) return;
     // A check a human review already decided keeps that decision (G-17).
     if (c.review_id && db.get<{ target_type: string }>('SELECT target_type FROM reviews WHERE id = ?', c.review_id)?.target_type === 'check') return;
@@ -251,7 +251,10 @@ export class ReviewsService {
     if (rows.length !== report.findings.length) return; // the rows and the report no longer align: judged at the next run
     const spec = this.#specOf(projectId, profileVersion, `${checkId}@${component}`);
     if (!spec) return;
-    const j = this.#o.verdict.reclassify(spec, { projectId, report, fingerprints: rows.map((r) => r.fingerprint) });
+    const classified = this.#o.verdict.reclassify(spec, { projectId, report, fingerprints: rows.map((r) => r.fingerprint) });
+    // A guard whose base was lost stays «يحتاج مراجعة» for it, whatever its effects' reviews say (11.4 rule 9).
+    const kept = c.outcome_reason ? (JSON.parse(c.outcome_reason) as Reason) : null;
+    const j: Judgement = this.#o.integrity.lostBase(report, kept) ? { ...classified, outcome: 'needs_review', reason: { key: 'integrity.reason.guardBaseLost' } } : classified;
     db.transaction(() => {
       rows.forEach((r, i) => {
         const f = j.findings[i];

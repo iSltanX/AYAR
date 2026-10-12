@@ -1,8 +1,10 @@
 // C-22 (integ.guard, 11.4 rule 9): when the guard had a base to compare against and its snapshot is gone (a manifest
 // blob lost, a snapshot removed), integrity cannot be verified: the check is «يحتاج مراجعة» with that reason, never
 // «اجتاز». Found while following the audit of 2026-10-12: judgement() turned a «needs review» with no effect into a
-// pass «all its effects (0) were excluded by your review».
-import type { ReportBuilt, RunDetail } from '@ayar/protocol';
+// pass «all its effects (0) were excluded by your review». And a lost base stays unverified after its carried effects
+// are reviewed as false alarms: the execution, judged again from its report (11.4 rule 7), neither passes nor lets the
+// round be «نقي».
+import type { ReportBuilt, ResultsPage, RunDetail } from '@ayar/protocol';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
@@ -44,4 +46,50 @@ describe('C-22: a lost base is never a pass', () => {
       await engine.close();
     }
   }, 360_000);
+
+  it('the base lost with a carried effect: reviewing every effect as a false alarm leaves integ.guard unverified, and the round never «نقي»', async () => {
+    const project = join(root, 'project');
+    mkdirSync(join(project, 'src'), { recursive: true });
+    mkdirSync(join(project, 'test'), { recursive: true });
+    writeFileSync(join(project, 'package.json'), JSON.stringify({ name: 'aud-guard-review', version: '1.0.0', type: 'module' }));
+    writeFileSync(join(project, 'src', 'value.js'), 'export const value = 1;\n');
+    const testFile = join(project, 'test', 'value.test.js');
+    writeFileSync(testFile, "import { test } from 'node:test';\ntest('value', () => {});\n");
+    const dataDir = join(root, 'AYAR');
+    const engine = await connectEngine({ dataDir, env: { AYAR_TEST_LOGIN_SHELL: loginShell(root, { path: '/opt/homebrew/bin:/usr/bin:/bin' }) } });
+    try {
+      await engine.waitForEvent('engine.health');
+      const { projectId } = await addProject(engine, project);
+      ok(await engine.invoke('profile.update', { projectId, patch: { custom: { pass: { argv: ['node', '-e', 'process.exit(0)'], cwd: '.', timeoutMin: 1, success: { exitCode: 0 } } } } }));
+      await approveAll(engine, projectId);
+      const full = async () => waitRun(engine, (await startRun(engine, (await plan(engine, projectId, { kind: 'full' })).id)).runId, 300_000);
+      // Round 1, then a skipped test: the guard records the effect against its base.
+      await full();
+      writeFileSync(testFile, "import { test } from 'node:test';\ntest.skip('value', () => {});\n");
+      const effect = await waitRun(engine, (await startRun(engine, (await plan(engine, projectId, { kind: 'group', instances: ['custom.pass@.', 'integ.guard@.'] })).id)).runId);
+      expect(check(effect, 'integ.guard@.')).toMatchObject({ outcome: 'needs_review', outcomeReason: { key: 'integrity.reason.guardFindings' } });
+      // Every base snapshot is lost (their manifests gone from the store), the skip still in place.
+      const db = new DatabaseSync(join(dataDir, 'ayar.db'), { readOnly: true });
+      const shas = (db.prepare('SELECT manifest_blob_sha AS sha FROM snapshots WHERE project_id = ?').all(projectId) as { sha: string }[]).map((r) => r.sha);
+      db.close();
+      for (const sha of shas) rmSync(join(dataDir, 'snapshots', 'blobs', sha.slice(0, 2), `${sha}.gz`), { force: true });
+      const lost = await full();
+      const guard = check(lost, 'integ.guard@.');
+      expect(guard.outcome).toBe('needs_review');
+      expect(lost.purity?.verdict).not.toBe('pure');
+      // The carried effect reviewed as a false alarm: the execution is judged again from its report.
+      const page = ok<ResultsPage>(await engine.invoke('results.query', { projectId, filters: { runId: lost.run.runId, includeExcluded: true, limit: 1000 } }));
+      const carried = page.findings.filter((f) => f.checkId === 'integ.guard');
+      expect(carried.length).toBeGreaterThan(0);
+      for (const f of carried) ok(await engine.invoke('review.record', { target: { type: 'finding', id: f.id }, decision: 'false_positive', note: 'reviewed: a false alarm' }));
+      const after = ok<RunDetail>(await engine.invoke('run.get', { runId: lost.run.runId }));
+      expect(check(after, 'integ.guard@.')).toMatchObject({ outcome: 'needs_review', outcomeReason: { key: 'integrity.reason.guardBaseLost' } });
+      expect(after.purity?.verdict).not.toBe('pure');
+      expect(after.purity?.incompleteReasons).toContainEqual({ key: 'purity.reason.integrityCheck', params: { check: 'integ.guard', outcome: 'needs_review' } });
+      const b = ok<ReportBuilt>(await engine.invoke('report.build', { target: { kind: 'run', runId: lost.run.runId }, options: { lang: 'ar', scope: 'wholeRun' } }));
+      expect(b.report.integrity.checks.find((c) => c.checkId === 'integ.guard')).toMatchObject({ outcome: 'needs_review', reason: { key: 'integrity.reason.guardBaseLost' } });
+    } finally {
+      await engine.close();
+    }
+  }, 600_000);
 });
