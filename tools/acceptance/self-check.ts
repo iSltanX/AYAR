@@ -17,7 +17,7 @@
 // network once for `npm ci`, the managed Semgrep and the OSV databases (ORG-09).
 import type { ProfileView, ResultsPage, RunDetail } from '@ayar/protocol';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -50,14 +50,31 @@ const PROFILE_PATCH = {
   },
 };
 
+/** The finding a review entry is matched against: where it is, its check, its rule and its line. */
+type Seen = { path: string; checkId: string; ruleId: string; line: number | null };
+
+/**
+ * The one line of packages/engine/src/node/network.ts that turns TLS verification off, found in the clone at run time:
+ * the review covers that rule on that line alone (DEV-13 review R1-07), so a new finding anywhere else in the file, or
+ * the line moved by an edit, is reviewed again.
+ */
+const tlsOffLine = (root: string): number | null => {
+  const lines = readFileSync(join(root, 'packages/engine/src/node/network.ts'), 'utf8').split('\n');
+  const at = lines.flatMap((l, i) => (l.includes('rejectUnauthorized: false') ? [i + 1] : []));
+  return at.length === 1 ? at[0]! : null;
+};
+
+/** Set from the clone before the first scan. */
+let tlsOff: number | null = null;
+
 /** The findings a maintainer records as false alarms, by where they are, with the note recorded on each. */
-const INTENTIONAL: { test: (path: string, checkId: string) => boolean; note: string }[] = [
-  { test: (p) => p.startsWith('fixtures/'), note: 'مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار' },
-  { test: (p) => p.startsWith('spikes/'), note: 'نتائج تجربة بيئة (E-22): علامات AYAR_CHECK_TOKEN لعمليات تجريبية، لا أسرار' },
-  { test: (p, c) => c === 'sec.secrets.files' && /\/test\//.test(p), note: 'قيمة على شكل سر في اختبار الإخفاء أو الواجهة (تُركَّب وقت التشغيل من أجزاء أو تُستعمل لإثبات التنقيح)، لا سر' },
-  { test: (p, c) => c === 'sec.sast' && /(^|\/)test\//.test(p), note: 'شيفرة اختبار تشغّل أدوات وعمليات تجريبية عمدًا (أوامر صدفة متغيرة، وFunction لبناء ادعاء نموذج مزيف)، لا تُشحن' },
-  { test: (p, c) => c === 'sec.sast' && p.startsWith('tools/packaging/'), note: 'أداة تغليف تشغّل الملف التنفيذي للحزمة المبنية بمسارها، لا تُشحن' },
-  { test: (p, c) => c === 'sec.sast' && p === 'packages/engine/src/node/network.ts', note: 'التحقق من شهادة TLS معطّل في طلب جاهزية واحد إلى localhost وحده (خدمة مرافقة بشهادة ذاتية، FR-21)؛ لا بيانات تُرسل ولا مضيف خارجي يُقبل (المضيف يُفحص قبله)' },
+const INTENTIONAL: { test: (f: Seen) => boolean; note: string }[] = [
+  { test: ({ path: p }) => p.startsWith('fixtures/'), note: 'مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار' },
+  { test: ({ path: p }) => p.startsWith('spikes/'), note: 'نتائج تجربة بيئة (E-22): علامات AYAR_CHECK_TOKEN لعمليات تجريبية، لا أسرار' },
+  { test: ({ path: p, checkId: c }) => c === 'sec.secrets.files' && /\/test\//.test(p), note: 'قيمة على شكل سر في اختبار الإخفاء أو الواجهة (تُركَّب وقت التشغيل من أجزاء أو تُستعمل لإثبات التنقيح)، لا سر' },
+  { test: ({ path: p, checkId: c }) => c === 'sec.sast' && /(^|\/)test\//.test(p), note: 'شيفرة اختبار تشغّل أدوات وعمليات تجريبية عمدًا (أوامر صدفة متغيرة، وFunction لبناء ادعاء نموذج مزيف)، لا تُشحن' },
+  { test: ({ path: p, checkId: c }) => c === 'sec.sast' && p.startsWith('tools/packaging/'), note: 'أداة تغليف تشغّل الملف التنفيذي للحزمة المبنية بمسارها، لا تُشحن' },
+  { test: (f) => f.checkId === 'sec.sast' && f.path === 'packages/engine/src/node/network.ts' && f.ruleId === 'ayar.js.tls-reject-unauthorized' && f.line !== null && f.line === tlsOff, note: 'التحقق من شهادة TLS معطّل في طلب جاهزية واحد إلى localhost وحده (خدمة مرافقة بشهادة ذاتية، FR-21)؛ لا بيانات تُرسل ولا مضيف خارجي يُقبل (المضيف يُفحص قبله)' },
 ];
 
 /** Why a required check that did not run on this repository does not run, by instance. */
@@ -66,7 +83,7 @@ const EXPLANATIONS: { test: (instance: string) => boolean; reason: string }[] = 
   { test: (i) => i.startsWith('beh.unit@') && i !== 'beh.unit@.', reason: 'اختبارات كل الحزم تُشغَّل من الجذر (vitest run على مساحات العمل) ولا سكربت اختبار في الحزمة نفسها؛ يغطيها beh.unit@. في الجذر' },
   { test: (i) => i === 'design.a11y@apps/desktop', reason: 'واجهة Electron لا تُقدَّم عبر رابط (لا renderTarget)؛ axe يفحص كل شاشة على الحزمة المشتقة في اختبارات E2E (AT-40)' },
   { test: (i) => i === 'sec.sast@.', reason: 'تُجهَّز أداته في هذا الفحص بإجراء التجهيز نفسه الذي يعرضه التطبيق؛ وإن غاب التجهيز فلا شبكة' },
-  { test: (i) => i === 'sec.deps@.', reason: 'osv-scanner يمسح الجذر كله فيبلغ ملفات قفل PyPI داخل مشاريع الاختبار (fixtures/) ويطلب قاعدتها، والجاهزية تعرض قواعد الأنظمة التي اكتشفتها المكوّنات وحدها (npm)، فيخرج 127 «قاعدة ناقصة» (G-DEV13-06)' },
+  { test: (i) => i === 'sec.deps@.', reason: 'osv-scanner يمسح الجذر كله فيبلغ ملفات قفل PyPI داخل مشاريع الاختبار (fixtures/) ويطلب قاعدتها، والجاهزية تعرض قواعد الأنظمة التي اكتشفتها المكوّنات وحدها (npm)، فيخرج 127 «قاعدة ناقصة» (G-DEV13-06)؛ وملف القفل في جذر عِيَار وحده فُحص بـ osv-scanner دون اتصال بقاعدة npm المنزّلة، فلا ثغرة معروفة (docs/acceptance/self-check/deps-osv.json، مراجعة DEV-13 R1-04)' },
   { test: (i) => i === 'design.rtl.static@.', reason: 'صفحة الواجهة في src/renderer (جذر Vite) خارج المجلدات التي يقرأ منها الاكتشاف صفحات الدخول، والاتجاه يُضبط وقت التشغيل بحسب اللغة؛ الاتجاه يُثبت في E2E (AT-28 وAT-41)' },
 ];
 
@@ -76,6 +93,7 @@ try {
   log(`clone of ${commit.slice(0, 7)} from ${sourceRepo}`);
   execFileSync('git', ['clone', '--quiet', '--no-local', sourceRepo, repo], { stdio: 'pipe' });
   execFileSync('git', ['-C', repo, 'checkout', '--quiet', commit], { stdio: 'pipe' });
+  tlsOff = tlsOffLine(repo);
   log('npm ci');
   execFileSync('/opt/homebrew/bin/npm', ['ci', '--no-audit', '--no-fund'], { cwd: repo, stdio: 'pipe', env: { ...process.env, PATH: `/opt/homebrew/bin:${process.env.PATH ?? ''}` } });
 
@@ -128,7 +146,7 @@ try {
   for (const f of first.findings) {
     if (f.effect !== 'violation') continue;
     const path = f.location?.path ?? '';
-    const rule = INTENTIONAL.find((r) => r.test(path, f.checkId));
+    const rule = INTENTIONAL.find((r) => r.test({ path, checkId: f.checkId, ruleId: f.ruleId, line: f.location?.line ?? null }));
     if (!rule) continue;
     const r = ok<{ finding: { excluded: boolean } | null }>(await engine.invoke('review.record', { target: { type: 'finding', id: f.id }, decision: 'false_positive', note: rule.note }));
     reviews.push({ displayId: f.displayId, checkId: f.checkId, path, note: rule.note, excluded: r.finding?.excluded ?? false });
