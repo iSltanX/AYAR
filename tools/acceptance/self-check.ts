@@ -38,7 +38,14 @@ try {
   process.stderr.write(`self-check: ${p.items.length} plan items; running…\n`);
   const started = Date.now();
   const d: RunDetail = await waitRun(engine, (await startRun(engine, p.id)).runId, timeoutMs);
-  const results = ok<ResultsPage>(await engine.invoke('results.query', { projectId, filters: { runId: d.run.runId, includeExcluded: true, limit: 2000 } }));
+  // Every finding of the run, a page of 1,000 (the protocol's largest) at a time.
+  const findings: ResultsPage['findings'] = [];
+  for (let offset = 0; ; offset += 1000) {
+    const page = ok<ResultsPage>(await engine.invoke('results.query', { projectId, filters: { runId: d.run.runId, includeExcluded: true, limit: 1000, offset } }));
+    findings.push(...page.findings);
+    if (findings.length >= page.total || page.findings.length === 0) break;
+  }
+  const results = { findings };
   const report = ok<{ human: { text: string }; report: unknown }>(await engine.invoke('report.build', { target: { kind: 'run', runId: d.run.runId }, options: { lang: 'ar' } }));
   await engine.close();
 
