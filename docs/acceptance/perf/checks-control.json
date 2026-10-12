@@ -1,7 +1,7 @@
 {
   "label": "control",
   "app": "/private/tmp/claude-501/-Volumes-iSltanXx-Projects-AYAR/66b9e49c-e47c-4441-bfa7-7b614188f1e8/scratchpad/control/AYAR.app",
-  "at": "2026-10-12T12:16:11.709Z",
+  "at": "2026-10-12T14:17:45.637Z",
   "expect": "open",
   "fuses": {
     "RunAsNode": "ENABLE",
@@ -21,7 +21,7 @@
       "signal": "SIGKILL",
       "killedByUs": true,
       "output": [
-        "Debugger listening on ws://127.0.0.1:53367/464cc3f4-7cbf-469e-9970-c4d154bd5404",
+        "Debugger listening on ws://127.0.0.1:62576/2ba8560c-0600-4acc-8352-e0dd00ecb3ca",
         "For help, see: https://nodejs.org/learn/getting-started/debugging"
       ],
       "open": true
@@ -31,7 +31,7 @@
       "signal": "SIGKILL",
       "killedByUs": true,
       "output": [
-        "Debugger listening on ws://127.0.0.1:9229/ba560936-b819-457a-8d37-017dbe013dad",
+        "Debugger listening on ws://127.0.0.1:9229/55a24dfd-dd0c-41c3-a749-da7844c20ef9",
         "For help, see: https://nodejs.org/learn/getting-started/debugging"
       ],
       "open": true
@@ -80,7 +80,7 @@
       "signal": "SIGKILL",
       "killedByUs": true,
       "output": [
-        "[91813:1012/151603.775487:ERROR:electron/shell/common/node_bindings.cc:492] Most NODE_OPTIONs are not supported in packaged apps. See documentation for more details."
+        "[5507:1012/171737.679688:ERROR:electron/shell/common/node_bindings.cc:492] Most NODE_OPTIONs are not supported in packaged apps. See documentation for more details."
       ],
       "readByElectron": true,
       "requireRan": false,

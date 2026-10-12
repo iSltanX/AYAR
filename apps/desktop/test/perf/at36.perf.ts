@@ -134,7 +134,8 @@ describe('AT-36 (app): cold start, UI response, update rate, memory, idle proces
         const own = tempDataDir();
         const started = Date.now();
         const r = await launch(own.dataDir);
-        await r.page.getByRole('button', { name: 'اختر مجلدًا…' }).waitFor({ state: 'visible', timeout: 30_000 });
+        // A fresh launch follows the system language (the owner's machine was Arabic for E-14 and English for the final run).
+        await r.page.getByRole('button', { name: /اختر مجلدًا…|Choose a folder…/ }).waitFor({ state: 'visible', timeout: 30_000 });
         const inPage = await r.page.evaluate(() => Math.round(performance.now()));
         const wall = Date.now() - started;
         // The page's own clock starts when the renderer is created; the process started a little before it.

@@ -1,7 +1,7 @@
 {
   "repo": "/Volumes/iSltanXx/Projects/AYAR",
-  "commit": "0bda166145272a978e946a8cae9b3b2196b0364c",
-  "at": "2026-10-12T11:58:03.562Z",
+  "commit": "ab9efe0685d10887b39fb40af00e55d2f448e0fb",
+  "at": "2026-10-12T14:14:40.823Z",
   "discovery": {
     "facts": 110,
     "components": 10
@@ -43,8 +43,8 @@
       "ok": true,
       "result": {
         "action": {
-          "id": "set_eb895bc8eedd5239fe56d34739c85bf9",
-          "projectId": "prj_qaZAOGANDEGqTg3HPfcHkQ",
+          "id": "set_32cec7686748667d4f5d0917d9cab61a",
+          "projectId": "prj_A1p7LzOZFvO2X8CwndmzJA",
           "kind": "install_tool",
           "instances": [
             "sec.deps@."
@@ -89,8 +89,8 @@
           },
           "state": "done",
           "resultReasons": [],
-          "confirmedAt": "2026-10-12T11:41:14.806Z",
-          "finishedAt": "2026-10-12T11:41:55.537Z"
+          "confirmedAt": "2026-10-12T13:58:42.901Z",
+          "finishedAt": "2026-10-12T13:59:32.964Z"
         },
         "readiness": [
           {
@@ -105,7 +105,7 @@
               }
             ],
             "actions": [
-              "set_9f52b40345623c0412bb9ef4bc2c18b9"
+              "set_516ea97b451e7dc4ae042420183982df"
             ]
           }
         ],
@@ -119,12 +119,12 @@
             "homepage": "https://github.com/google/osv-scanner",
             "source": "managed",
             "status": "installed",
-            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-FH1tLV/AYAR/tools/osv-scanner/2.6.0/osv-scanner",
+            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-K3I2AW/AYAR/tools/osv-scanner/2.6.0/osv-scanner",
             "installedVersion": "2.6.0",
             "sha256": "tree:01ee8b20d9062890986ec58d64520f33fb55dfbe7eafd4d7c6677c2f7c0a06b3",
             "sizeBytes": 55130242,
-            "installedAt": "2026-10-12T11:41:55.401Z",
-            "verifiedAt": "2026-10-12T11:41:55.401Z",
+            "installedAt": "2026-10-12T13:59:32.853Z",
+            "verifiedAt": "2026-10-12T13:59:32.853Z",
             "verifiedOk": true,
             "verification": {
               "kind": "sha256"
@@ -134,7 +134,7 @@
             "stale": false
           },
           "downloadedBytes": 55130242,
-          "durationMs": 40595
+          "durationMs": 49952
         }
       }
     },
@@ -150,8 +150,8 @@
       "ok": true,
       "result": {
         "action": {
-          "id": "set_9f52b40345623c0412bb9ef4bc2c18b9",
-          "projectId": "prj_qaZAOGANDEGqTg3HPfcHkQ",
+          "id": "set_516ea97b451e7dc4ae042420183982df",
+          "projectId": "prj_A1p7LzOZFvO2X8CwndmzJA",
           "kind": "download_osv_db",
           "instances": [
             "sec.deps@."
@@ -171,7 +171,7 @@
           },
           "preview": {
             "command": [
-              "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-FH1tLV/AYAR/tools/osv-scanner/2.6.0/osv-scanner",
+              "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-K3I2AW/AYAR/tools/osv-scanner/2.6.0/osv-scanner",
               "scan",
               "source",
               "-r",
@@ -201,8 +201,8 @@
           },
           "state": "done",
           "resultReasons": [],
-          "confirmedAt": "2026-10-12T11:41:55.542Z",
-          "finishedAt": "2026-10-12T11:42:10.773Z"
+          "confirmedAt": "2026-10-12T13:59:32.968Z",
+          "finishedAt": "2026-10-12T13:59:57.142Z"
         },
         "readiness": [
           {
@@ -221,8 +221,8 @@
           }
         ],
         "log": {
-          "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-FH1tLV/AYAR/logs/setup/set_9f52b40345623c0412bb9ef4bc2c18b9-2026-10-12T114155555Z.log",
-          "sha256": "42abe9ac819a8babeb33ad9f159231a870c989d21fa914732b466cb741e7797d"
+          "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-K3I2AW/AYAR/logs/setup/set_516ea97b451e7dc4ae042420183982df-2026-10-12T135932979Z.log",
+          "sha256": "4422527e66b48878af1b6a46537ee4d6d62c16b857b792583c728f92ba23bef8"
         },
         "install": null
       }
@@ -239,8 +239,8 @@
       "ok": true,
       "result": {
         "action": {
-          "id": "set_1ce6aa5f213644bd0b10a340a41889b1",
-          "projectId": "prj_qaZAOGANDEGqTg3HPfcHkQ",
+          "id": "set_2bc929698d10d3e5bee5ffd37201859d",
+          "projectId": "prj_A1p7LzOZFvO2X8CwndmzJA",
           "kind": "install_tool",
           "instances": [
             "sec.sast@."
@@ -285,8 +285,8 @@
           },
           "state": "done",
           "resultReasons": [],
-          "confirmedAt": "2026-10-12T11:42:10.777Z",
-          "finishedAt": "2026-10-12T11:42:13.656Z"
+          "confirmedAt": "2026-10-12T13:59:57.145Z",
+          "finishedAt": "2026-10-12T14:00:00.316Z"
         },
         "readiness": [
           {
@@ -301,7 +301,7 @@
               }
             ],
             "actions": [
-              "set_4d985cfea5bc41d3c505a39c962e40b4"
+              "set_5806148defb0f32fdfdae9e6045ce067"
             ]
           }
         ],
@@ -315,12 +315,12 @@
             "homepage": "https://github.com/astral-sh/uv",
             "source": "managed",
             "status": "installed",
-            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-FH1tLV/AYAR/tools/uv/0.13.0/uv-aarch64-apple-darwin/uv",
+            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-K3I2AW/AYAR/tools/uv/0.13.0/uv-aarch64-apple-darwin/uv",
             "installedVersion": "0.13.0",
             "sha256": "tree:41dde061849c12bf6613cf6dac303ff45cdf5aeb9dc574c87cab6f5cf394dfa1",
             "sizeBytes": 14692549,
-            "installedAt": "2026-10-12T11:42:13.529Z",
-            "verifiedAt": "2026-10-12T11:42:13.529Z",
+            "installedAt": "2026-10-12T14:00:00.200Z",
+            "verifiedAt": "2026-10-12T14:00:00.200Z",
             "verifiedOk": true,
             "verification": {
               "kind": "developer_id",
@@ -331,7 +331,7 @@
             "stale": false
           },
           "downloadedBytes": 14692549,
-          "durationMs": 2753
+          "durationMs": 3055
         }
       }
     },
@@ -347,8 +347,8 @@
       "ok": true,
       "result": {
         "action": {
-          "id": "set_4d985cfea5bc41d3c505a39c962e40b4",
-          "projectId": "prj_qaZAOGANDEGqTg3HPfcHkQ",
+          "id": "set_5806148defb0f32fdfdae9e6045ce067",
+          "projectId": "prj_A1p7LzOZFvO2X8CwndmzJA",
           "kind": "install_tool",
           "instances": [
             "sec.sast@."
@@ -393,8 +393,8 @@
           },
           "state": "done",
           "resultReasons": [],
-          "confirmedAt": "2026-10-12T11:42:13.661Z",
-          "finishedAt": "2026-10-12T11:43:49.747Z"
+          "confirmedAt": "2026-10-12T14:00:00.319Z",
+          "finishedAt": "2026-10-12T14:01:38.198Z"
         },
         "readiness": [
           {
@@ -422,12 +422,12 @@
             "homepage": "https://github.com/semgrep/semgrep",
             "source": "managed",
             "status": "installed",
-            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-FH1tLV/AYAR/tools/semgrep/1.180.0/bin/semgrep",
+            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-K3I2AW/AYAR/tools/semgrep/1.180.0/bin/semgrep",
             "installedVersion": "1.180.0",
-            "sha256": "tree:26064a453d48b2b1a9f6c31dee3a580348989c277f9ef28009984d9fa04642dd",
+            "sha256": "tree:d31c6851f22194509cee9b4f6163fd15e223dd0aa19ab2773dc375b5321ba34b",
             "sizeBytes": 333000000,
-            "installedAt": "2026-10-12T11:43:49.500Z",
-            "verifiedAt": "2026-10-12T11:43:49.500Z",
+            "installedAt": "2026-10-12T14:01:37.973Z",
+            "verifiedAt": "2026-10-12T14:01:37.973Z",
             "verifiedOk": true,
             "verification": {
               "kind": "sha256"
@@ -437,7 +437,7 @@
             "stale": false
           },
           "downloadedBytes": 333000000,
-          "durationMs": 95833
+          "durationMs": 97646
         }
       }
     },
@@ -453,8 +453,8 @@
       "ok": true,
       "result": {
         "action": {
-          "id": "set_3c9fce03bae263b4439e85c037913fca",
-          "projectId": "prj_qaZAOGANDEGqTg3HPfcHkQ",
+          "id": "set_c1746ae1dd987903a9088bd1ad9a36fc",
+          "projectId": "prj_A1p7LzOZFvO2X8CwndmzJA",
           "kind": "install_tool",
           "instances": [
             "code.refs.external@.",
@@ -501,8 +501,8 @@
           },
           "state": "done",
           "resultReasons": [],
-          "confirmedAt": "2026-10-12T11:43:49.751Z",
-          "finishedAt": "2026-10-12T11:43:51.464Z"
+          "confirmedAt": "2026-10-12T14:01:38.201Z",
+          "finishedAt": "2026-10-12T14:01:40.459Z"
         },
         "readiness": [
           {
@@ -555,12 +555,12 @@
             "homepage": "https://github.com/lycheeverse/lychee",
             "source": "managed",
             "status": "installed",
-            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-FH1tLV/AYAR/tools/lychee/0.24.2/lychee-aarch64-apple-darwin/lychee",
+            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-K3I2AW/AYAR/tools/lychee/0.24.2/lychee-aarch64-apple-darwin/lychee",
             "installedVersion": "0.24.2",
             "sha256": "tree:51d0d5e58edc63389fa7644bfef0327d80ce071394b9cf863b47be54eecedfa3",
             "sizeBytes": 6992530,
-            "installedAt": "2026-10-12T11:43:51.330Z",
-            "verifiedAt": "2026-10-12T11:43:51.330Z",
+            "installedAt": "2026-10-12T14:01:40.337Z",
+            "verifiedAt": "2026-10-12T14:01:40.337Z",
             "verifiedOk": true,
             "verification": {
               "kind": "sha256"
@@ -570,17 +570,17 @@
             "stale": false
           },
           "downloadedBytes": 6992530,
-          "durationMs": 1580
+          "durationMs": 2136
         }
       }
     }
   ],
   "firstScan": {
-    "runId": "run_8S3lqJaz02ytMg0Ox1VJcg",
-    "durationMs": 427079,
+    "runId": "run_yfZ4X0AfUEoMJztL_0LkeQ",
+    "durationMs": 391922,
     "verdict": "blocked",
-    "findings": 76,
-    "blockingOpen": 55
+    "findings": 77,
+    "blockingOpen": 56
   },
   "reviews": [
     {
@@ -950,7 +950,7 @@
     {
       "displayId": "AYR-SEC-SECR-0004",
       "checkId": "sec.secrets.files",
-      "path": "fixtures/FX-EXT/variants/secret/overlay/src/config.ts",
+      "path": "fixtures/FX-EXT/project.json",
       "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
       "excluded": true
     },
@@ -964,7 +964,7 @@
     {
       "displayId": "AYR-SEC-SECR-0006",
       "checkId": "sec.secrets.files",
-      "path": "fixtures/FX-EXT/project.json",
+      "path": "fixtures/FX-EXT/variants/secret/overlay/src/config.ts",
       "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
       "excluded": true
     },
@@ -985,35 +985,35 @@
     {
       "displayId": "AYR-SEC-SECR-0009",
       "checkId": "sec.secrets.files",
-      "path": "packages/engine/test/redaction.test.ts",
-      "note": "قيمة على شكل سر في اختبار الإخفاء أو الواجهة (تُركَّب وقت التشغيل من أجزاء أو تُستعمل لإثبات التنقيح)، لا سر",
+      "path": "fixtures/SANITY.md",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
       "excluded": true
     },
     {
       "displayId": "AYR-SEC-SECR-0010",
       "checkId": "sec.secrets.files",
-      "path": "packages/engine/test/reports-cards.test.ts",
+      "path": "packages/engine/test/environment.test.ts",
       "note": "قيمة على شكل سر في اختبار الإخفاء أو الواجهة (تُركَّب وقت التشغيل من أجزاء أو تُستعمل لإثبات التنقيح)، لا سر",
       "excluded": true
     },
     {
       "displayId": "AYR-SEC-SECR-0011",
       "checkId": "sec.secrets.files",
-      "path": "packages/engine/test/reports-cards.test.ts",
+      "path": "packages/engine/test/redaction.test.ts",
       "note": "قيمة على شكل سر في اختبار الإخفاء أو الواجهة (تُركَّب وقت التشغيل من أجزاء أو تُستعمل لإثبات التنقيح)، لا سر",
       "excluded": true
     },
     {
       "displayId": "AYR-SEC-SECR-0012",
       "checkId": "sec.secrets.files",
-      "path": "fixtures/SANITY.md",
-      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "path": "packages/engine/test/reports-cards.test.ts",
+      "note": "قيمة على شكل سر في اختبار الإخفاء أو الواجهة (تُركَّب وقت التشغيل من أجزاء أو تُستعمل لإثبات التنقيح)، لا سر",
       "excluded": true
     },
     {
       "displayId": "AYR-SEC-SECR-0013",
       "checkId": "sec.secrets.files",
-      "path": "packages/engine/test/environment.test.ts",
+      "path": "packages/engine/test/reports-cards.test.ts",
       "note": "قيمة على شكل سر في اختبار الإخفاء أو الواجهة (تُركَّب وقت التشغيل من أجزاء أو تُستعمل لإثبات التنقيح)، لا سر",
       "excluded": true
     },
@@ -1051,7 +1051,7 @@
     "formula": "purity/1",
     "scope": {
       "kind": "round",
-      "roundId": "rnd_lsjrLXSuYdv7uoO5mJpHqg"
+      "roundId": "rnd_DSxfPI7ghw4tyiEkmZRiiA"
     },
     "verdict": "incomplete",
     "karat": 11,
@@ -1149,7 +1149,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_K5YjsPS5oNE5IF0ZXWH4vQ"
+        "checkRunId": "chk_ilFN-I19uHK_GcaGxMqlUw"
       },
       {
         "instance": "beh.unit@apps/desktop",
@@ -1160,7 +1160,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_Ip36ssnHYwXz3FFWcTOxhQ"
+        "checkRunId": "chk_ehGfjRkl6J-j5MQ3v62pNw"
       },
       {
         "instance": "beh.unit@packages/adapters",
@@ -1171,7 +1171,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_PGWETy2bW0A8wW8Hm6YZ-w"
+        "checkRunId": "chk_v7Wyr_vcW9EPhNLYKGES7Q"
       },
       {
         "instance": "beh.unit@packages/analyzers",
@@ -1182,7 +1182,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_y3R59qCZlbXaZJ5jkOip6Q"
+        "checkRunId": "chk_MWabcOyiLI5eMhKulsyxxQ"
       },
       {
         "instance": "beh.unit@packages/catalog",
@@ -1193,7 +1193,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_BXX0o6oJeo7ZLTOnEYIi_Q"
+        "checkRunId": "chk_-baZ0cPTq5EqDlwwBz40YA"
       },
       {
         "instance": "beh.unit@packages/engine",
@@ -1204,7 +1204,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_Yi6mVjt5jzt5pgJVeZdqHA"
+        "checkRunId": "chk_pw8XQc-MJRNgVCMnIutl_Q"
       },
       {
         "instance": "beh.unit@packages/i18n",
@@ -1215,7 +1215,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_Tci9HxBjP9mRpsb1m7e65g"
+        "checkRunId": "chk_ejrzHZ-uNA-Ax5KbRFHTmw"
       },
       {
         "instance": "beh.unit@packages/probe",
@@ -1226,7 +1226,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_968IYxD5ukFphVuCBZx2Gw"
+        "checkRunId": "chk_j_PZp2Qb0yXoz5sfqPN5Zw"
       },
       {
         "instance": "beh.unit@packages/protocol",
@@ -1237,7 +1237,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_b37oRSdZCCEIDUHr0w5ZfA"
+        "checkRunId": "chk_yx9NxvRHF-Ga9vZ-JAjjKg"
       },
       {
         "instance": "beh.unit@tools/cli",
@@ -1248,7 +1248,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_WDh2YO3w8fP480iPxmS2kw"
+        "checkRunId": "chk_GtR15hpMwTvo1pgBAZm1dQ"
       },
       {
         "instance": "code.build@.",
@@ -1259,7 +1259,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_wvgsO31fbWtB_3xi5Fo5Aw"
+        "checkRunId": "chk_HBO840MlZSdIMafKpVlZpg"
       },
       {
         "instance": "code.build@apps/desktop",
@@ -1270,7 +1270,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_LCjfMk2AohnZRXOsFOUfKQ"
+        "checkRunId": "chk_Et3P-KzVqXPtVRnNWpZk7Q"
       },
       {
         "instance": "code.build@packages/catalog",
@@ -1281,7 +1281,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_cOKm2JRIrHsZLvLZLhTSLA"
+        "checkRunId": "chk_jHe2aSAzYGmXmccLrXhMFQ"
       },
       {
         "instance": "code.lint@.",
@@ -1292,7 +1292,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_U_3y42g2QH7r5egL2kI_Ag"
+        "checkRunId": "chk_s5Ha2FzkWfY_IWpHcXB-ng"
       },
       {
         "instance": "code.refs.local@.",
@@ -1303,7 +1303,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_yDE4KpAuVvvftEvL0pFh3w"
+        "checkRunId": "chk_-W2iIhQnO6EstNSXOfc7jw"
       },
       {
         "instance": "code.refs.local@apps/desktop",
@@ -1314,7 +1314,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_tXAFTg1A9MogNRQq5A3akA"
+        "checkRunId": "chk_3p0i-i6CjFDMGN_ySv-Cdg"
       },
       {
         "instance": "code.refs.local@packages/protocol",
@@ -1325,7 +1325,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_73VfecnHW4Gy3-FfBQAOOw"
+        "checkRunId": "chk_2AxmyYL9YL8FTHJCVrXwoQ"
       },
       {
         "instance": "code.types@.",
@@ -1336,7 +1336,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_Ft0zxLocj_mPH_ofuaxMQQ"
+        "checkRunId": "chk_3jWrFJ6zp7TgHK-qeIHjxw"
       },
       {
         "instance": "code.types@apps/desktop",
@@ -1347,7 +1347,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_9scaFef8qv0FEZR5S3hzaw"
+        "checkRunId": "chk_bODAOTf3a_YQEWPczmdkTg"
       },
       {
         "instance": "code.types@packages/adapters",
@@ -1358,7 +1358,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_8g0kGfjYPBimfkU7RYcWaA"
+        "checkRunId": "chk_ecCa44TTr8kA5uELgRnh1A"
       },
       {
         "instance": "code.types@packages/analyzers",
@@ -1369,7 +1369,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_LJ4H3chrKUdVmBm6xxB7Jg"
+        "checkRunId": "chk_gBO5cfFK3E6b38FHdja7NQ"
       },
       {
         "instance": "code.types@packages/catalog",
@@ -1380,7 +1380,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_cAJM0IpIUFVWVgRQxGjH-Q"
+        "checkRunId": "chk_ZLGXsXeNpSfbjxMXCDSlKw"
       },
       {
         "instance": "code.types@packages/engine",
@@ -1391,7 +1391,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_mtGas4OvJvAKx3nkr85z9w"
+        "checkRunId": "chk_7QlslcDY2dn9Buy-mrRvog"
       },
       {
         "instance": "code.types@packages/i18n",
@@ -1402,7 +1402,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_PUaTZA8LqAECOGEF84rcGw"
+        "checkRunId": "chk_4oKUilJkLRBza46MtmwvTQ"
       },
       {
         "instance": "code.types@packages/probe",
@@ -1413,7 +1413,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_Jj1EaJpR6FwAB326XqgOlA"
+        "checkRunId": "chk_8syRy0AjGgKLw00cxir4ew"
       },
       {
         "instance": "code.types@packages/protocol",
@@ -1424,7 +1424,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_F9EgZg5IbBuh6_S9qNKPfw"
+        "checkRunId": "chk_dRMjmvLc_2bCB92gw2xFJw"
       },
       {
         "instance": "code.types@tools/cli",
@@ -1435,7 +1435,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_4_TYrv-mTRT1yvaSPoMe1A"
+        "checkRunId": "chk__RRt6nvusyj0SJlv4spRcw"
       },
       {
         "instance": "design.a11y.review@apps/desktop",
@@ -1446,7 +1446,7 @@
         "outcome": "needs_review",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_bR4vTu0icUNFx5BJKkDX8w"
+        "checkRunId": "chk_McXAaUEVjJF_RPPcvnSa6g"
       },
       {
         "instance": "design.a11y@apps/desktop",
@@ -1457,7 +1457,7 @@
         "outcome": "missing",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_Rp29FSRaZ8ftVPDYwmas5Q"
+        "checkRunId": "chk_bZjP-YAmsm-zYtaUZ1sErg"
       },
       {
         "instance": "design.rtl.static@.",
@@ -1468,7 +1468,7 @@
         "outcome": "missing",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_T2UwqyG82WNUK2iS0XHgMw"
+        "checkRunId": "chk_k4adYnlSTvbEKnkB6JVrpA"
       },
       {
         "instance": "design.tokens.static@.",
@@ -1479,7 +1479,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_uy8_01R5Qb5hhUpCtTQz4w"
+        "checkRunId": "chk_YZ2wQo0Q8-Wf7FA-BdyF6A"
       },
       {
         "instance": "sec.deps@.",
@@ -1490,7 +1490,7 @@
         "outcome": "missing",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_WC5KRuPujAaAw_m22opPJg"
+        "checkRunId": "chk_djhdtjj9vU3qP5fhj6jbAw"
       },
       {
         "instance": "sec.sast@.",
@@ -1501,7 +1501,7 @@
         "outcome": "needs_review",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_rHUxDNUcqMSsTX5oZ_cdFQ"
+        "checkRunId": "chk_WVLiZOqGFLnZH54anA9mmA"
       },
       {
         "instance": "sec.secrets.files@.",
@@ -1512,7 +1512,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_ApQJZ6nqsr0O6RuigGN7XQ"
+        "checkRunId": "chk_EvyDqct05DdT6CR1h4h2Uw"
       }
     ],
     "counts": {
@@ -1604,12 +1604,12 @@
         "adapter:custom-command": "1.0.0"
       },
       "environmentSource": null,
-      "snapshotId": "snp_WnitAsTSZgH1VWjS2bVVow",
-      "commit": "0bda166145272a978e946a8cae9b3b2196b0364c",
-      "computedAt": "2026-10-12T11:58:03.341Z"
+      "snapshotId": "snp_QtuOB3cOa_o3vlhY9jbU7w",
+      "commit": "ab9efe0685d10887b39fb40af00e55d2f448e0fb",
+      "computedAt": "2026-10-12T14:14:40.604Z"
     }
   },
-  "durationMs": 423608,
+  "durationMs": 387033,
   "outcomes": {
     "passed": 14,
     "failed": 0,
@@ -1635,7 +1635,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 464
+      "durationMs": 373
     },
     {
       "instance": "design.tokens.static@packages/adapters",
@@ -2279,7 +2279,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 163
+      "durationMs": 151
     },
     {
       "instance": "design.a11y.review@packages/adapters",
@@ -2402,7 +2402,7 @@
         "key": "analyzer.reason.noRtl"
       },
       "readiness": "ready",
-      "durationMs": 240
+      "durationMs": 241
     },
     {
       "instance": "design.rtl.static@apps/desktop",
@@ -2942,7 +2942,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 3677
+      "durationMs": 3039
     },
     {
       "instance": "sec.deps@.",
@@ -2953,7 +2953,7 @@
         "key": "adapter.reason.osvDbMissing"
       },
       "readiness": "ready",
-      "durationMs": 11003
+      "durationMs": 9332
     },
     {
       "instance": "sec.sast@.",
@@ -2967,7 +2967,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 314704
+      "durationMs": 278749
     },
     {
       "instance": "sec.ext.manifest@.",
@@ -3261,7 +3261,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 3863
+      "durationMs": 3117
     },
     {
       "instance": "code.build@apps/desktop",
@@ -3275,7 +3275,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 3168
+      "durationMs": 2629
     },
     {
       "instance": "code.build@packages/adapters",
@@ -3317,7 +3317,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 637
+      "durationMs": 502
     },
     {
       "instance": "code.build@packages/engine",
@@ -3415,7 +3415,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 15021
+      "durationMs": 12444
     },
     {
       "instance": "code.types@packages/adapters",
@@ -3541,7 +3541,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 198444
+      "durationMs": 175367
     },
     {
       "instance": "code.lint@apps/desktop",
@@ -3681,7 +3681,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 412
+      "durationMs": 397
     },
     {
       "instance": "code.refs.local@apps/desktop",
@@ -3695,7 +3695,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 345
+      "durationMs": 318
     },
     {
       "instance": "code.refs.local@packages/adapters",
@@ -3793,7 +3793,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 287
+      "durationMs": 264
     },
     {
       "instance": "code.refs.local@tools/cli",
@@ -4013,12 +4013,12 @@
       "reason": {
         "key": "verdict.reason.testsPassed",
         "params": {
-          "passed": 826,
-          "total": 837
+          "passed": 827,
+          "total": 838
         }
       },
       "readiness": "ready",
-      "durationMs": 392462
+      "durationMs": 361039
     },
     {
       "instance": "beh.unit@apps/desktop",
@@ -5314,7 +5314,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 28585
+      "durationMs": 24070
     }
   ],
   "findings": 76,

@@ -1,8 +1,8 @@
 {
   "a": "/Volumes/iSltanXx/Projects/AYAR-wt/DEV-13/apps/desktop/out/AYAR-darwin-arm64/AYAR.app",
-  "b": "/private/tmp/claude-501/-Volumes-iSltanXx-Projects-AYAR/66b9e49c-e47c-4441-bfa7-7b614188f1e8/scratchpad/rebuilt/AYAR.app",
-  "at": "2026-10-12T10:46:51.228Z",
-  "note": "clone of 731c3f441dc29924d69a98c518c5a78588343059, npm ci, npm run package (reproduce.sh, kept copy); clone size 1.1G, removed",
+  "b": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-reproduce-na8C24/repo/apps/desktop/out/AYAR-darwin-arm64/AYAR.app",
+  "at": "2026-10-12T13:58:34.564Z",
+  "note": "clone of ab9efe0685d10887b39fb40af00e55d2f448e0fb, npm ci, npm run package; clone size 1.1G, removed",
   "files": {
     "a": 265,
     "b": 265,
@@ -10,12 +10,12 @@
     "onlyB": []
   },
   "asarSha256": {
-    "a": "beeaa3c1c80c5df6c9abf5df6591d8e0adb1242966154bd3ff838b98612819c8",
-    "b": "beeaa3c1c80c5df6c9abf5df6591d8e0adb1242966154bd3ff838b98612819c8"
+    "a": "b930097654b18d4b9b55176b9b6413bacde849025edc5e2c6e8acd126cc15c2b",
+    "b": "b930097654b18d4b9b55176b9b6413bacde849025edc5e2c6e8acd126cc15c2b"
   },
   "bundleCdhash": {
-    "a": "a4b2df9395d1d69eb18e9ed3e1d9a4b390aad846",
-    "b": "809d6dbcef170ee4b514be6647c1f244dbdd6702"
+    "a": "cf479114d3707cb76f664cedcdb9a53a75dbe8b7",
+    "b": "376041c75ce4fdccf7f8590f7a83a2e0461a124a"
   },
   "signatureOnlyDifferences": [
     "Contents/Frameworks/AYAR Helper (GPU).app/Contents/MacOS/AYAR Helper (GPU)",
@@ -35,18 +35,18 @@
   "sealedOverSignatures": [
     {
       "file": "Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework",
-      "cdhashA": "17e90ed37f5fe2572f06b32e2377b5cdc32b7e39",
-      "cdhashB": "02ff6f2f3f346d47f3043adf4f92a74625152c77"
+      "cdhashA": "64deeef65a56be1ae22ef30f36b8379e5c85e6d5",
+      "cdhashB": "3d9151f4da985be82ea5ab0f37300210c4ee3f65"
     },
     {
       "file": "Contents/Frameworks/Squirrel.framework/Versions/A/Squirrel",
-      "cdhashA": "15d09851f9a5186a9076f13f6c5c3bf41f511c57",
-      "cdhashB": "05a3ba256b27770d5d67955aa22febc1b064c14c"
+      "cdhashA": "b14ac18c9952f39ea46bbd6092bb3ad49ac36af6",
+      "cdhashB": "80a989c0e5d4bc7c9638fad2c2dbc7322fe14793"
     },
     {
       "file": "Contents/MacOS/AYAR",
-      "cdhashA": "a4b2df9395d1d69eb18e9ed3e1d9a4b390aad846",
-      "cdhashB": "809d6dbcef170ee4b514be6647c1f244dbdd6702"
+      "cdhashA": "cf479114d3707cb76f664cedcdb9a53a75dbe8b7",
+      "cdhashB": "376041c75ce4fdccf7f8590f7a83a2e0461a124a"
     }
   ],
   "differing": [],

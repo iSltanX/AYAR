@@ -7,13 +7,13 @@
     "cpus": 8,
     "memoryGb": 16,
     "loadavg": [
-      3.04,
-      3.98,
-      8.38
+      3.83,
+      6.11,
+      16.72
     ],
     "power": "'AC Power'",
     "node": "v24.18.1",
-    "at": "2026-10-12T12:17:19.069Z"
+    "at": "2026-10-12T13:50:17.326Z"
   },
   "repeat": 5,
   "results": [
@@ -23,19 +23,26 @@
         "files": 1000,
         "bytes": 128079,
         "seed": 1,
-        "ms": 86
+        "ms": 69
       },
       "samples": [
         {
-          "firstProgressMs": 17,
-          "doneMs": 32,
+          "firstProgressMs": 15,
+          "doneMs": 31,
           "filesSeen": 1000,
           "progressEvents": 1,
           "facts": 6
         },
         {
           "firstProgressMs": 10,
-          "doneMs": 17,
+          "doneMs": 18,
+          "filesSeen": 1000,
+          "progressEvents": 1,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 10,
+          "doneMs": 16,
           "filesSeen": 1000,
           "progressEvents": 1,
           "facts": 6
@@ -50,13 +57,6 @@
         {
           "firstProgressMs": 10,
           "doneMs": 16,
-          "filesSeen": 1000,
-          "progressEvents": 1,
-          "facts": 6
-        },
-        {
-          "firstProgressMs": 9,
-          "doneMs": 15,
           "filesSeen": 1000,
           "progressEvents": 1,
           "facts": 6
@@ -74,48 +74,48 @@
         "files": 10000,
         "bytes": 1315125,
         "seed": 1,
-        "ms": 771
+        "ms": 696
       },
       "samples": [
         {
-          "firstProgressMs": 110,
-          "doneMs": 142,
+          "firstProgressMs": 107,
+          "doneMs": 138,
           "filesSeen": 10000,
           "progressEvents": 1,
           "facts": 6
         },
         {
-          "firstProgressMs": 84,
-          "doneMs": 105,
-          "filesSeen": 10000,
-          "progressEvents": 1,
-          "facts": 6
-        },
-        {
-          "firstProgressMs": 81,
-          "doneMs": 100,
-          "filesSeen": 10000,
-          "progressEvents": 1,
-          "facts": 6
-        },
-        {
-          "firstProgressMs": 98,
-          "doneMs": 119,
-          "filesSeen": 10000,
-          "progressEvents": 1,
-          "facts": 6
-        },
-        {
-          "firstProgressMs": 84,
+          "firstProgressMs": 82,
           "doneMs": 103,
+          "filesSeen": 10000,
+          "progressEvents": 1,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 78,
+          "doneMs": 97,
+          "filesSeen": 10000,
+          "progressEvents": 1,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 82,
+          "doneMs": 102,
+          "filesSeen": 10000,
+          "progressEvents": 1,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 80,
+          "doneMs": 99,
           "filesSeen": 10000,
           "progressEvents": 1,
           "facts": 6
         }
       ],
       "median": {
-        "firstProgressMs": 84,
-        "doneMs": 105
+        "firstProgressMs": 82,
+        "doneMs": 102
       },
       "note": null
     },
@@ -125,40 +125,40 @@
         "files": 50000,
         "bytes": 6718729,
         "seed": 1,
-        "ms": 3816
+        "ms": 3595
       },
       "samples": [
         {
-          "firstProgressMs": 203,
-          "doneMs": 759,
-          "filesSeen": 50000,
-          "progressEvents": 4,
-          "facts": 6
-        },
-        {
-          "firstProgressMs": 201,
-          "doneMs": 587,
-          "filesSeen": 50000,
-          "progressEvents": 3,
-          "facts": 6
-        },
-        {
-          "firstProgressMs": 200,
-          "doneMs": 509,
-          "filesSeen": 50000,
-          "progressEvents": 3,
-          "facts": 6
-        },
-        {
-          "firstProgressMs": 200,
-          "doneMs": 477,
+          "firstProgressMs": 202,
+          "doneMs": 588,
           "filesSeen": 50000,
           "progressEvents": 3,
           "facts": 6
         },
         {
           "firstProgressMs": 201,
-          "doneMs": 589,
+          "doneMs": 480,
+          "filesSeen": 50000,
+          "progressEvents": 3,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 201,
+          "doneMs": 471,
+          "filesSeen": 50000,
+          "progressEvents": 3,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 200,
+          "doneMs": 468,
+          "filesSeen": 50000,
+          "progressEvents": 3,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 200,
+          "doneMs": 521,
           "filesSeen": 50000,
           "progressEvents": 3,
           "facts": 6
@@ -166,7 +166,7 @@
       ],
       "median": {
         "firstProgressMs": 201,
-        "doneMs": 587
+        "doneMs": 480
       },
       "note": null
     }
@@ -178,8 +178,8 @@
       "firstProgressMs": 300
     },
     "measured": {
-      "firstProgressMs": 84,
-      "doneMs": 105
+      "firstProgressMs": 82,
+      "doneMs": 102
     },
     "passed": true
   }
