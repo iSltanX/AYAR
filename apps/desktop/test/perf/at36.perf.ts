@@ -30,8 +30,12 @@ type Invoke = { ok: boolean; result?: unknown; error?: { code: string } };
 const REPEAT = Number(process.env.AYAR_PERF_REPEAT ?? 5);
 const JUDGE = process.env.AYAR_PERF_JUDGE === '1';
 const OUT = process.env.AYAR_PERF_OUT ?? fileURLToPath(new URL('../../../../docs/acceptance/perf/app.json', import.meta.url));
-/** The targets as calibrated in E-14 (DEV-13); the baseline pass records them beside the measurement. */
-const TARGETS = { coldStartMs: 3000, uiResponseP95Ms: 100, updatesPerCheckPerSecond: 10, peakRssMb: 600, idleCpuPercent: 2 };
+/**
+ * The targets as calibrated in E-14 (DEV-13); the baseline pass records them beside the measurement. Memory is the
+ * physical footprint of the app's processes, not their RSS (D-DEV13-11: RSS counts the framework pages the Electron
+ * helpers share once per process).
+ */
+const TARGETS = { coldStartMs: 3000, uiResponseP95Ms: 100, updatesPerCheckPerSecond: 10, peakFootprintMb: 600, idleCpuPercent: 2 };
 
 /** «اعتمد الكل» over the bridge, as tools/cli's approveAll does through the protocol. */
 async function approveAll(invoke: <T>(c: string, p: unknown) => Promise<{ ok: boolean; result: T }>, projectId: string): Promise<void> {
@@ -266,7 +270,8 @@ describe('AT-36 (app): cold start, UI response, update rate, memory, idle proces
       if (JUDGE) {
         expect(p95(latencies)).toBeLessThanOrEqual(TARGETS.uiResponseP95Ms);
         expect(busiest).toBeLessThanOrEqual(TARGETS.updatesPerCheckPerSecond);
-        expect(footprint.length ? Math.max(...footprint) : Math.max(...rss)).toBeLessThanOrEqual(TARGETS.peakRssMb);
+        // Without a footprint reading, RSS is held to the same target: stricter, never looser.
+        expect(footprint.length ? Math.max(...footprint) : Math.max(...rss)).toBeLessThanOrEqual(TARGETS.peakFootprintMb);
         expect(median(idle)).toBeLessThanOrEqual(TARGETS.idleCpuPercent);
       }
       await until(() => Promise.resolve(true), () => true, 1);
