@@ -12,7 +12,7 @@
 | المتطلب المعيّن | `identifier "com.bysltan.ayar" and certificate leaf = H"86526c3ec084f4676eecbd8d298c35eab3278364"` |
 | الصمامات (15.2، D-53) | RunAsNode، وEnableNodeOptionsEnvironmentVariable، وEnableNodeCliInspectArguments، وGrantFileProtocolExtraPrivileges، وEnableCookieEncryption معطلة؛ وEnableEmbeddedAsarIntegrityValidation وOnlyLoadAppFromAsar مفعّلان |
 | محتوى الأرشيف | `dist/` (engine، main، preload، renderer) و`package.json` وحدهما: 160 مدخلًا |
-| الأيقونة | `AppIcon-light` المعتمدة (D-48) من Figma `30:1445` بدقة 1024، تُحوَّل إلى `.icns` في البناء (`tools/packaging/make-icns.mjs`)؛ والنسخة الداكنة `30:1439` محفوظة بجانبها لاستعمال لاحق (D-DEV13-03) |
+| الأيقونة | `AppIcon-light` المعتمدة (D-48) من Figma `30:1445`: تُرسم عند 1024 من طبقات الإطار نفسها (البلاطة 824 من 1024 بنصف قطر 185 وتدرّجها، واللمعة، ورمز AYAR بصيغة SVG في `apps/desktop/icon/`) بهوامش شفافة بـ `tools/packaging/render-appicon.mjs`، ثم إلى `.icns` في البناء (`tools/packaging/make-icns.mjs`، ويرفض مصدرًا بلا قناة ألفا). التصدير الأول كان مسطّحًا على أبيض فأظهر قناع macOS 26 حافة بيضاء حول البلاطة (D-DEV13-07). والنسخة الداكنة `30:1439` تُرسم بالطريقة نفسها وتبقى محفوظة دون استعمال (D-DEV13-03) |
 | الحجم | نحو 337 ميغابايت على القرص |
 | commit البناء | يُذكر في [AT-report.md](AT-report.md) |
 
@@ -40,4 +40,4 @@
 
 ## 4. إعادة البناء من مستودع نظيف (الخطة 25)
 
-`tools/packaging/reproduce.sh <repo> <commit> <reference .app> <report.json>`: استنساخ الـcommit إلى مجلد مؤقت، و`npm ci` من ملف القفل، و`npm run package` بالهوية نفسها، ثم `compare-packages.mjs`: قائمة الملفات، وبصمة `app.asar` بايتًا ببايت (ما يشحنه عِيَار كله: المحرك والواجهة وpreload والعملية الرئيسية)، وملفات Electron، وcdhash كل Mach-O موقّع. ما يُتوقع أن يختلف هو كتلة توقيع CMS وحدها (تحمل وقت التوقيع)؛ وcdhash، وهو ما يتحقق منه النظام، لا يختلف. النتيجة في التقرير.
+`tools/packaging/reproduce.sh <repo> <commit> <reference .app> <report.json>`: استنساخ الـcommit إلى مجلد مؤقت، و`npm ci` من ملف القفل، و`npm run package` بالهوية نفسها، ثم `compare-packages.mjs`: قائمة الملفات، وبصمة `app.asar` بايتًا ببايت (ما يشحنه عِيَار كله: المحرك والواجهة وpreload والعملية الرئيسية)، وكل ملف آخر بايتًا ببايت، وكل Mach-O بعد نزع توقيعه. ما يُتوقع أن يختلف هو كتلة توقيع CMS وحدها (تحمل وقت التوقيع). وcdhash كل ملف تنفيذي طرفي (المساعدون الأربعة، وchrome_crashpad_handler، والمكتبات، وShipIt، وMantle، وReactiveObjC) متساوٍ بين البناءين؛ أما cdhash الحزمة وإطار Electron وSquirrel فيختلف بالضرورة لأن ختم مواردها يبصم المكتبات والمساعدين المضمّنين ملفات كاملة بتوقيعها، فيتبع وقت التوقيع (D-DEV13-08)، ويُسجَّل في التقرير «مختوم فوق التوقيعات» لا اختلافًا. النتيجة في التقرير.

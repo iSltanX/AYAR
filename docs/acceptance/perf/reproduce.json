@@ -1,0 +1,54 @@
+{
+  "a": "/Volumes/iSltanXx/Projects/AYAR-wt/DEV-13/apps/desktop/out/AYAR-darwin-arm64/AYAR.app",
+  "b": "/private/tmp/claude-501/-Volumes-iSltanXx-Projects-AYAR/66b9e49c-e47c-4441-bfa7-7b614188f1e8/scratchpad/rebuilt/AYAR.app",
+  "at": "2026-10-12T10:46:51.228Z",
+  "note": "clone of 731c3f441dc29924d69a98c518c5a78588343059, npm ci, npm run package (reproduce.sh, kept copy); clone size 1.1G, removed",
+  "files": {
+    "a": 265,
+    "b": 265,
+    "onlyA": [],
+    "onlyB": []
+  },
+  "asarSha256": {
+    "a": "beeaa3c1c80c5df6c9abf5df6591d8e0adb1242966154bd3ff838b98612819c8",
+    "b": "beeaa3c1c80c5df6c9abf5df6591d8e0adb1242966154bd3ff838b98612819c8"
+  },
+  "bundleCdhash": {
+    "a": "a4b2df9395d1d69eb18e9ed3e1d9a4b390aad846",
+    "b": "809d6dbcef170ee4b514be6647c1f244dbdd6702"
+  },
+  "signatureOnlyDifferences": [
+    "Contents/Frameworks/AYAR Helper (GPU).app/Contents/MacOS/AYAR Helper (GPU)",
+    "Contents/Frameworks/AYAR Helper (Plugin).app/Contents/MacOS/AYAR Helper (Plugin)",
+    "Contents/Frameworks/AYAR Helper (Renderer).app/Contents/MacOS/AYAR Helper (Renderer)",
+    "Contents/Frameworks/AYAR Helper.app/Contents/MacOS/AYAR Helper",
+    "Contents/Frameworks/Electron Framework.framework/Versions/A/Helpers/chrome_crashpad_handler",
+    "Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/libffmpeg.dylib",
+    "Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/libvk_swiftshader.dylib",
+    "Contents/Frameworks/Electron Framework.framework/Versions/A/_CodeSignature/CodeResources",
+    "Contents/Frameworks/Mantle.framework/Versions/A/Mantle",
+    "Contents/Frameworks/ReactiveObjC.framework/Versions/A/ReactiveObjC",
+    "Contents/Frameworks/Squirrel.framework/Versions/A/Resources/ShipIt",
+    "Contents/Frameworks/Squirrel.framework/Versions/A/_CodeSignature/CodeResources",
+    "Contents/_CodeSignature/CodeResources"
+  ],
+  "sealedOverSignatures": [
+    {
+      "file": "Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework",
+      "cdhashA": "17e90ed37f5fe2572f06b32e2377b5cdc32b7e39",
+      "cdhashB": "02ff6f2f3f346d47f3043adf4f92a74625152c77"
+    },
+    {
+      "file": "Contents/Frameworks/Squirrel.framework/Versions/A/Squirrel",
+      "cdhashA": "15d09851f9a5186a9076f13f6c5c3bf41f511c57",
+      "cdhashB": "05a3ba256b27770d5d67955aa22febc1b064c14c"
+    },
+    {
+      "file": "Contents/MacOS/AYAR",
+      "cdhashA": "a4b2df9395d1d69eb18e9ed3e1d9a4b390aad846",
+      "cdhashB": "809d6dbcef170ee4b514be6647c1f244dbdd6702"
+    }
+  ],
+  "differing": [],
+  "ok": true
+}

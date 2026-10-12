@@ -1,0 +1,86 @@
+{
+  "label": "release",
+  "app": "/Volumes/iSltanXx/Projects/AYAR-wt/DEV-13/apps/desktop/out/AYAR-darwin-arm64/AYAR.app",
+  "at": "2026-10-12T09:36:17.741Z",
+  "expect": "closed",
+  "fuses": {
+    "RunAsNode": "DISABLE",
+    "EnableCookieEncryption": "DISABLE",
+    "EnableNodeOptionsEnvironmentVariable": "DISABLE",
+    "EnableNodeCliInspectArguments": "DISABLE",
+    "EnableEmbeddedAsarIntegrityValidation": "ENABLE",
+    "OnlyLoadAppFromAsar": "ENABLE",
+    "LoadBrowserProcessSpecificV8Snapshot": "DISABLE",
+    "GrantFileProtocolExtraPrivileges": "DISABLE",
+    "WasmTrapHandlers": "ENABLE"
+  },
+  "fusesMatch152": true,
+  "checks": {
+    "inspect": {
+      "code": null,
+      "signal": "SIGKILL",
+      "killedByUs": true,
+      "output": [],
+      "open": false
+    },
+    "sigusr1": {
+      "code": null,
+      "signal": "SIGUSR1",
+      "killedByUs": false,
+      "output": [],
+      "open": false
+    },
+    "remoteDebuggingPort": {
+      "code": 78,
+      "signal": null,
+      "killedByUs": false,
+      "output": [
+        "AYAR: refusing remote debugging switches without the inspector (D-52)"
+      ],
+      "open": false,
+      "guardExit78": true
+    },
+    "remoteDebuggingPipe": {
+      "code": 78,
+      "signal": null,
+      "killedByUs": false,
+      "output": [
+        "AYAR: refusing remote debugging switches without the inspector (D-52)"
+      ],
+      "open": false,
+      "guardExit78": true
+    },
+    "remoteDebuggingAddress": {
+      "code": 78,
+      "signal": null,
+      "killedByUs": false,
+      "output": [
+        "AYAR: refusing remote debugging switches without the inspector (D-52)"
+      ],
+      "open": false,
+      "guardExit78": true
+    },
+    "runAsNode": {
+      "code": null,
+      "signal": "SIGKILL",
+      "killedByUs": true,
+      "output": [
+        "sandbox_extension_issue_file failed for /Volumes/iSltanXx/Projects/AYAR-wt/DEV-13/apps/desktop/out/AYAR-darwin-arm64/AYAR.app/Contents/Frameworks/AYAR Helper.app/Contents/Resources: 1 (Operation not permitted)"
+      ],
+      "open": false
+    },
+    "nodeOptions": {
+      "code": null,
+      "signal": "SIGKILL",
+      "killedByUs": true,
+      "output": [],
+      "readByElectron": false,
+      "requireRan": false,
+      "open": false
+    }
+  },
+  "openPaths": [],
+  "guardOk": true,
+  "fuseGatedOk": true,
+  "ok": true
+}

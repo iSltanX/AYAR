@@ -1,0 +1,99 @@
+{
+  "label": "control",
+  "app": "/private/tmp/claude-501/-Volumes-iSltanXx-Projects-AYAR/66b9e49c-e47c-4441-bfa7-7b614188f1e8/scratchpad/control/AYAR.app",
+  "at": "2026-10-12T09:36:42.388Z",
+  "expect": "open",
+  "fuses": {
+    "RunAsNode": "ENABLE",
+    "EnableCookieEncryption": "DISABLE",
+    "EnableNodeOptionsEnvironmentVariable": "ENABLE",
+    "EnableNodeCliInspectArguments": "ENABLE",
+    "EnableEmbeddedAsarIntegrityValidation": "ENABLE",
+    "OnlyLoadAppFromAsar": "ENABLE",
+    "LoadBrowserProcessSpecificV8Snapshot": "DISABLE",
+    "GrantFileProtocolExtraPrivileges": "DISABLE",
+    "WasmTrapHandlers": "ENABLE"
+  },
+  "fusesMatch152": false,
+  "checks": {
+    "inspect": {
+      "code": null,
+      "signal": "SIGKILL",
+      "killedByUs": true,
+      "output": [
+        "Debugger listening on ws://127.0.0.1:52884/5fb63ce4-a009-41cf-8271-a1b0635615f3",
+        "For help, see: https://nodejs.org/learn/getting-started/debugging"
+      ],
+      "open": true
+    },
+    "sigusr1": {
+      "code": null,
+      "signal": "SIGKILL",
+      "killedByUs": true,
+      "output": [
+        "Debugger listening on ws://127.0.0.1:9229/8f0f77f4-1a28-46bd-ae34-1c462b2a1d39",
+        "For help, see: https://nodejs.org/learn/getting-started/debugging"
+      ],
+      "open": true
+    },
+    "remoteDebuggingPort": {
+      "code": 78,
+      "signal": null,
+      "killedByUs": false,
+      "output": [
+        "AYAR: refusing remote debugging switches without the inspector (D-52)"
+      ],
+      "open": false,
+      "guardExit78": true
+    },
+    "remoteDebuggingPipe": {
+      "code": 78,
+      "signal": null,
+      "killedByUs": false,
+      "output": [
+        "AYAR: refusing remote debugging switches without the inspector (D-52)"
+      ],
+      "open": false,
+      "guardExit78": true
+    },
+    "remoteDebuggingAddress": {
+      "code": 78,
+      "signal": null,
+      "killedByUs": false,
+      "output": [
+        "AYAR: refusing remote debugging switches without the inspector (D-52)"
+      ],
+      "open": false,
+      "guardExit78": true
+    },
+    "runAsNode": {
+      "code": 0,
+      "signal": null,
+      "killedByUs": false,
+      "output": [
+        "RUN_AS_NODE_OK"
+      ],
+      "open": true
+    },
+    "nodeOptions": {
+      "code": null,
+      "signal": "SIGKILL",
+      "killedByUs": true,
+      "output": [
+        "[32489:1012/123634.444450:ERROR:electron/shell/common/node_bindings.cc:492] Most NODE_OPTIONs are not supported in packaged apps. See documentation for more details."
+      ],
+      "readByElectron": true,
+      "requireRan": false,
+      "open": true
+    }
+  },
+  "openPaths": [
+    "inspect",
+    "sigusr1",
+    "runAsNode",
+    "nodeOptions"
+  ],
+  "guardOk": true,
+  "fuseGatedOk": true,
+  "ok": true
+}

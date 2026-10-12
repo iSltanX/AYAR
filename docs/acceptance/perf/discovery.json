@@ -1,0 +1,186 @@
+{
+  "test": "AT-36 (engine): discovery of the synthetic repositories",
+  "machine": {
+    "platform": "darwin 27.0.0",
+    "macos": "27.0.1",
+    "chip": "Apple M4",
+    "cpus": 8,
+    "memoryGb": 16,
+    "loadavg": [
+      4.56,
+      5.01,
+      5.27
+    ],
+    "power": "'AC Power'",
+    "node": "v24.18.1",
+    "at": "2026-10-12T09:37:50.167Z"
+  },
+  "repeat": 5,
+  "results": [
+    {
+      "files": 1000,
+      "generated": {
+        "files": 1000,
+        "bytes": 128079,
+        "seed": 1,
+        "ms": 82
+      },
+      "samples": [
+        {
+          "firstProgressMs": 16,
+          "doneMs": 32,
+          "filesSeen": 1000,
+          "progressEvents": 1,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 10,
+          "doneMs": 18,
+          "filesSeen": 1000,
+          "progressEvents": 1,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 10,
+          "doneMs": 16,
+          "filesSeen": 1000,
+          "progressEvents": 1,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 9,
+          "doneMs": 16,
+          "filesSeen": 1000,
+          "progressEvents": 1,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 9,
+          "doneMs": 15,
+          "filesSeen": 1000,
+          "progressEvents": 1,
+          "facts": 6
+        }
+      ],
+      "median": {
+        "firstProgressMs": 10,
+        "doneMs": 16
+      },
+      "note": null
+    },
+    {
+      "files": 10000,
+      "generated": {
+        "files": 10000,
+        "bytes": 1315125,
+        "seed": 1,
+        "ms": 791
+      },
+      "samples": [
+        {
+          "firstProgressMs": 113,
+          "doneMs": 146,
+          "filesSeen": 10000,
+          "progressEvents": 1,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 84,
+          "doneMs": 106,
+          "filesSeen": 10000,
+          "progressEvents": 1,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 81,
+          "doneMs": 101,
+          "filesSeen": 10000,
+          "progressEvents": 1,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 86,
+          "doneMs": 106,
+          "filesSeen": 10000,
+          "progressEvents": 1,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 80,
+          "doneMs": 99,
+          "filesSeen": 10000,
+          "progressEvents": 1,
+          "facts": 6
+        }
+      ],
+      "median": {
+        "firstProgressMs": 84,
+        "doneMs": 106
+      },
+      "note": null
+    },
+    {
+      "files": 50000,
+      "generated": {
+        "files": 50000,
+        "bytes": 6718729,
+        "seed": 1,
+        "ms": 4105
+      },
+      "samples": [
+        {
+          "firstProgressMs": 202,
+          "doneMs": 607,
+          "filesSeen": 50000,
+          "progressEvents": 3,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 201,
+          "doneMs": 517,
+          "filesSeen": 50000,
+          "progressEvents": 3,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 200,
+          "doneMs": 496,
+          "filesSeen": 50000,
+          "progressEvents": 3,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 200,
+          "doneMs": 510,
+          "filesSeen": 50000,
+          "progressEvents": 3,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 200,
+          "doneMs": 524,
+          "filesSeen": 50000,
+          "progressEvents": 3,
+          "facts": 6
+        }
+      ],
+      "median": {
+        "firstProgressMs": 200,
+        "doneMs": 517
+      },
+      "note": null
+    }
+  ],
+  "acceptance": {
+    "targets": {
+      "files": 10000,
+      "doneMs": 5000,
+      "firstProgressMs": 300
+    },
+    "measured": {
+      "firstProgressMs": 84,
+      "doneMs": 106
+    },
+    "passed": true
+  }
+}
