@@ -12,7 +12,7 @@
 | المتطلب المعيّن | `identifier "com.bysltan.ayar" and certificate leaf = H"86526c3ec084f4676eecbd8d298c35eab3278364"` |
 | الصمامات (15.2، D-53) | RunAsNode، وEnableNodeOptionsEnvironmentVariable، وEnableNodeCliInspectArguments، وGrantFileProtocolExtraPrivileges، وEnableCookieEncryption معطلة؛ وEnableEmbeddedAsarIntegrityValidation وOnlyLoadAppFromAsar مفعّلان |
 | محتوى الأرشيف | `dist/` (engine، main، preload، renderer) و`package.json` وحدهما: 160 مدخلًا |
-| الأيقونة | `AppIcon-light` المعتمدة (D-48) من Figma `30:1445`: تُرسم عند 1024 من طبقات الإطار نفسها (البلاطة 824 من 1024 بنصف قطر 185 وتدرّجها، واللمعة، ورمز AYAR بصيغة SVG في `apps/desktop/icon/`) بهوامش شفافة بـ `tools/packaging/render-appicon.mjs`، ثم إلى `.icns` في البناء (`tools/packaging/make-icns.mjs`، ويرفض مصدرًا بلا قناة ألفا). التصدير الأول كان مسطّحًا على أبيض فأظهر قناع macOS 26 حافة بيضاء حول البلاطة (D-DEV13-07). والنسخة الداكنة `30:1439` تُرسم بالطريقة نفسها وتبقى محفوظة دون استعمال (D-DEV13-03) |
+| الأيقونة | التكوين الذي اعتمده المالك (D-DEV13-10): بلاطة Apple (824 من 1024، استدارة 185) بأسود الشعار، وفتحة عش دائرية عاجية قطرها 600، ورمز AYAR المعتمد (D-48، SVG في `apps/desktop/icon/`) يطل منها بعُرفه فوق حافتها ومنقاره داخلها وجسمه مستندًا إلى أسفلها؛ مسطّحة بلا تدرّج ولا ظل، وبهوامش شفافة، تُرسم عند 1024 بـ `tools/packaging/render-appicon.mjs` ثم إلى `.icns` في البناء (`tools/packaging/make-icns.mjs`، ويرفض مصدرًا بلا قناة ألفا). التصدير الأول لإطار Figma `30:1445` كان مسطّحًا على أبيض فأظهر قناع macOS 26 حافة بيضاء حول البلاطة (D-DEV13-07). والمظهران الفاتح والداكن بالأيقونة نفسها (D-DEV13-03) |
 | الحجم | نحو 337 ميغابايت على القرص |
 | commit البناء | يُذكر في [AT-report.md](AT-report.md) |
 
