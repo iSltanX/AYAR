@@ -63,9 +63,15 @@ export const ReportHead = z.strictObject({
   versions: z.strictObject({ ayar: z.string(), profile: z.int().nullable(), profileHash: z.string().nullable(), catalog: z.string(), template: z.literal(MODEL_REPORT_TEMPLATE), tools: z.record(z.string(), z.string()) }),
   environment: z.strictObject({ source: z.string().nullable(), os: z.string(), node: z.string().nullable(), python: z.string().nullable(), packageManager: z.string().nullable() }),
   state: z.strictObject({
+    /** The branch and the commit the run recorded when it started (18.1), never the project's later head (AUD-07). */
     branch: z.string().nullable(),
     commit: z.string().nullable(),
+    /** Protocol 1.8 (AUD-07): the run recorded its Git head; false for an older run that did not (branch and commit null). */
+    recorded: z.boolean(),
+    /** Git's uncommitted changes: AYAR never runs Git in a project (D-38) and does not measure them, so null (unknown). */
     dirty: z.boolean().nullable(),
+    /** Protocol 1.8 (AUD-05): the source changed during the run (integ.state's measure); null when the inventory could not tell. */
+    changedDuringRun: z.boolean().nullable(),
     snapshotId: Id.nullable(),
     /** Protocol 1.6 (DEV-11): the state against the latest complete round's (D-31's rule); absent with no round. */
     sinceRound: z.enum(['same', 'changed']).optional(),

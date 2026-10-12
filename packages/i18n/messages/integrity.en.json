@@ -6,6 +6,7 @@
   "integrity.reason.guardClean": "Passed: no suppression, skip or reference change across {files} files changed since the base",
   "integrity.reason.stateChanged": "Needs review: the state changed during the scan ({count} files outside the declared outputs)",
   "integrity.reason.stateStable": "Passed: no source file changed during the scan",
+  "integrity.reason.stateUnverified": "Unavailable: the inventory was incomplete, so the state cannot be shown stable (not observed: {depth} folders past the depth limit, {unreadable} unreadable paths{truncated, select, yes {, and what lies past the file limit} other {}})",
   "integrity.reason.noReviews": "Not applicable: no recorded reviews",
   "integrity.reason.reviewsExpired": "Needs review: {count} of {total} reviews expired because files in their scope changed",
   "integrity.reason.reviewsValid": "Passed: the recorded reviews ({count}) still hold",

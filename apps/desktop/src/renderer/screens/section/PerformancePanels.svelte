@@ -13,7 +13,7 @@
   import { groupBy, loadPanelData, messageParts, type CheckData } from '../../app/panels.ts';
   import { sizeText } from '../../app/results.ts';
   import type { SectionModel } from '../../app/sections.ts';
-  import { reasonsOf } from '../../app/specs.ts';
+  import { commandLineText, reasonsOf } from '../../app/specs.ts';
   import Panel from './Panel.svelte';
 
   interface Props {
@@ -126,7 +126,7 @@
       <Panel title={t(checkId === 'perf.load' ? 'sectionui.performance.load' : 'sectionui.performance.recovery')} {checkId} result={s.included ? resultOf(d) : undefined} {tags} testid={checkId === 'perf.load' ? 'panel-load' : 'panel-recovery'}>
         <dl class="facts">
           <dt>{t(checkId === 'perf.load' ? 'sectionui.performance.scenario' : 'sectionui.performance.command')}</dt>
-          <dd>{s.command ? s.command.argv.join(' ') : t(checkId === 'perf.load' ? 'sectionui.performance.noScenario' : 'sectionui.performance.noCommand')}</dd>
+          <dd>{s.command ? commandLineText(s.command.argv, s.command.cwd) : t(checkId === 'perf.load' ? 'sectionui.performance.noScenario' : 'sectionui.performance.noCommand')}</dd>
           <dt>{t(checkId === 'perf.load' ? 'sectionui.performance.thresholds' : 'sectionui.performance.criterion')}</dt>
           <dd>{d?.exec.check.outcomeReason ? reasonText(t, lang, d.exec.check.outcomeReason) : (d?.findings ?? []).map((f) => messageParts(f.message).head).join(' · ') || '—'}</dd>
         </dl>

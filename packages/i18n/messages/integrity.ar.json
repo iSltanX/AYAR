@@ -6,6 +6,7 @@
   "integrity.reason.guardClean": "اجتاز: لا إسكات ولا تخطٍّ ولا تعديل مرجع في {files} ملفًا متغيرًا منذ الأساس",
   "integrity.reason.stateChanged": "يحتاج مراجعة: تغيرت الحالة أثناء الفحص ({count} ملف خارج المخرجات المعلنة)",
   "integrity.reason.stateStable": "اجتاز: لم يتغير ملف مصدر أثناء الفحص",
+  "integrity.reason.stateUnverified": "تعذّر: الجرد ناقص فلا يُثبت ثبات الحالة (لم يُرصد: {depth} مجلد بعد حد العمق، و{unreadable} مسار تعذرت قراءته{truncated, select, yes {، وما بعد حد عدد الملفات} other {}})",
   "integrity.reason.noReviews": "غير منطبق: لا مراجعات مسجلة",
   "integrity.reason.reviewsExpired": "يحتاج مراجعة: {count} من {total} مراجعة انتهت صلاحيتها بتغيّر ملفات نطاقها",
   "integrity.reason.reviewsValid": "اجتاز: المراجعات المسجلة ({count}) سارية",

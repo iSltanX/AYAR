@@ -27,7 +27,7 @@ import type { CheckOutcome, CheckSpec, FindingLocation, JsonValue, ParsedFinding
 import { createHash } from 'node:crypto';
 import type { WeighedFinding } from '../classifier/classify.ts';
 import type { EvidenceService } from '../evidence/service.ts';
-import type { Manifest, ManifestEntry } from '../evidence/snapshot.ts';
+import type { InventoryGaps, Manifest, ManifestEntry } from '../evidence/snapshot.ts';
 import type { Logger } from '../ports/index.ts';
 import type { Db } from '../storage/db.ts';
 import { fingerprintOf, type JudgedFinding, type Judgement, type VerdictService } from '../verdict/service.ts';
@@ -337,16 +337,21 @@ export class IntegrityService {
     return { judgement: this.judgement(spec, projectId, pairs, outcome, reason, { bases: ctx.baseSnapshotIds.length, compared: ctx.result?.compared ?? 0, carried: ctx.carried, links }), evidence };
   }
 
-  /** integ.state at the end (9.9, 11.4 rule 8): the files that changed outside the declared outputs. */
-  stateJudgement(spec: CheckSpec, projectId: string, changed: readonly string[]): Judgement {
+  /**
+   * integ.state at the end (9.9, 11.4 rule 8): the files that changed outside the declared outputs. Inventories with
+   * gaps (AUD-04: past the depth or entry limit, unreadable) show no stability where they did not look: with no change
+   * seen, the check is «تعذّر», naming what was not observed — never «اجتاز» — and a change seen is reported all the same.
+   */
+  stateJudgement(spec: CheckSpec, projectId: string, changed: readonly string[], gaps: InventoryGaps | null = null): Judgement {
     const pairs = changed.slice(0, MAX_FINDINGS).map((path) => {
       const value = `state|${path}`;
       const finding: ParsedFinding = { rule: 'state.changed', toolRule: null, severity: null, proof: null, level: null, origin: 'project', message: `changed during the run: ${path}`, location: { path }, anchor: { kind: 'text', value }, expected: null, actual: null };
       return { finding, anchor: integrityAnchor(value) };
     });
-    return changed.length
-      ? this.judgement(spec, projectId, pairs, 'needs_review', { key: 'integrity.reason.stateChanged', params: { count: changed.length } }, { changed: changed.length })
-      : this.judgement(spec, projectId, [], 'passed', { key: 'integrity.reason.stateStable' }, { changed: 0 });
+    const unobserved: Record<string, JsonValue> = gaps ? { gapDepth: gaps.depth, gapUnreadable: gaps.unreadable, gapTruncated: gaps.truncated } : {};
+    if (changed.length) return this.judgement(spec, projectId, pairs, 'needs_review', { key: 'integrity.reason.stateChanged', params: { count: changed.length } }, { changed: changed.length, ...unobserved });
+    if (gaps) return this.judgement(spec, projectId, [], 'unavailable', { key: 'integrity.reason.stateUnverified', params: { depth: gaps.depth, unreadable: gaps.unreadable, truncated: gaps.truncated ? 'yes' : 'no' } }, { changed: 0, ...unobserved });
+    return this.judgement(spec, projectId, [], 'passed', { key: 'integrity.reason.stateStable' }, { changed: 0 });
   }
 
   /** integ.reviews at the end (11.4 rule 6): each recorded review against the files of its scope now. */

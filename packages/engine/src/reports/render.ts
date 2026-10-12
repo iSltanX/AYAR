@@ -7,6 +7,7 @@
 // write the same identifiers, counts, scope and verdict in the forms parity.ts reads back.
 import { createTranslator, formatDuration, type MessageKey, type Translate } from '@ayar/i18n';
 import type { CheckOutcome, Lang, Report, ReportCheck, ReportClaim, ReportFinding } from '@ayar/protocol';
+import { shellLine } from '../executor/command-line.ts';
 import { fenced, inline } from './boundaries.ts';
 
 export type Rendered = { text: string; sections: Record<string, number> };
@@ -133,7 +134,11 @@ export class Renderer {
     const h = report.head;
     out.push(`- ${t('report.model.context.type', { types: inline(h.project.ecosystems.join(' · ') || t('report.unknown')) })}`);
     out.push(`- ${t('report.model.context.env', { os: h.environment.os, node: h.environment.node ?? '—', python: h.environment.python ?? '—', manager: inline(h.environment.packageManager ?? '—') })}`);
-    out.push(`- ${t('report.model.context.state', { branch: inline(h.state.branch ?? '—'), commit: h.state.commit?.slice(0, 12) ?? '—', dirty: h.state.dirty === null ? t('report.unknown') : h.state.dirty ? t('report.yes') : t('report.no') })}`);
+    // AUD-05, AUD-07: the head the run recorded (or that it recorded none), Git's uncommitted changes, and the run's own
+    // stability, each as known, «غير معروف» when not.
+    const yesNo = (v: boolean | null) => (v === null ? t('report.unknown') : v ? t('report.yes') : t('report.no'));
+    const state = { dirty: yesNo(h.state.dirty), changed: yesNo(h.state.changedDuringRun) };
+    out.push(`- ${h.state.recorded ? t('report.model.context.state', { branch: inline(h.state.branch ?? '—'), commit: h.state.commit?.slice(0, 12) ?? '—', ...state }) : t('report.model.context.stateUnrecorded', state)}`);
     out.push(`- ${t('report.model.context.versions', { profile: h.versions.profile ?? '—', catalog: h.versions.catalog, run: h.run?.displayId ?? '—', date: h.run?.startedAt?.slice(0, 10) ?? created.slice(0, 10) })}`);
     out.push(`- ${this.verdictLine(report)} · ${this.scopeLine(report)}`);
     out.push(`- ${t('report.label.counts')}:`, ...this.countsBlock(report));
@@ -182,7 +187,7 @@ export class Renderer {
     out.push('');
     mark('verification');
     out.push(t('report.model.verification.heading'));
-    const commands = [...new Set(report.checks.filter((c) => c.command && (issues.some((f) => f.checkRunId === c.checkRunId) || !issues.length)).map((c) => `\`${inline((c.command!.cwd && c.command!.cwd !== '.' ? `cd ${c.command!.cwd} && ` : '') + c.command!.argv.join(' '))}\``))].slice(0, 20);
+    const commands = [...new Set(report.checks.filter((c) => c.command && (issues.some((f) => f.checkRunId === c.checkRunId) || !issues.length)).map((c) => `\`${inline(shellLine(c.command!.argv, c.command!.cwd))}\``))].slice(0, 20);
     out.push(`- ${t('report.model.verification.local', { commands: commands.length ? commands.join(' · ') : t('report.model.verification.noCommands') })}`);
     const recheck = [...new Set((issues.length ? issues.map((f) => f.checkId) : report.checks.map((c) => c.checkId)).filter((id) => !id.startsWith('integ.')))];
     out.push(`- ${t('report.model.verification.ayar', { checks: recheck.map((c) => `\`${c}\``).join(', ') || '—', run: report.head.run?.displayId ?? '—' })}`);

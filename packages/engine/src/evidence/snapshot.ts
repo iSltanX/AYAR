@@ -116,6 +116,8 @@ export class SnapshotService {
     const previous = allowed && o.previous ? new Map(o.previous.files.map((f) => [f[0], f])) : null;
     const files: ManifestEntry[] = [];
     const skipped: Manifest['skipped'] = [];
+    /** Files listed but not read (AUD-04): recorded as skipped «unreadable» after the hashing, in order. */
+    const unreadable: string[] = [];
     const pinned: string[] = [];
     let entries = 0;
     let truncated = false;
@@ -168,7 +170,11 @@ export class SnapshotService {
         }
         if (e.kind !== 'file' && e.kind !== 'symlink') continue;
         if (ignored(here, crel, false)) continue;
-        const st = await fs.lstat(full(crel)).catch(() => null);
+        // A file gone since the listing is not part of the state; one that cannot be read is a gap (AUD-04).
+        const st = await fs.lstat(full(crel)).catch(() => {
+          unreadable.push(crel);
+          return null;
+        });
         if (st && (st.isFile || st.isSymbolicLink)) work.push({ rel: crel, st });
       }
     }
@@ -211,8 +217,10 @@ export class SnapshotService {
           return [rel, data.length, key[1], key[2], key[3], `sha256:${b.sha256}`, 'text', true];
         }
         return [rel, data.length, key[1], key[2], key[3], `sha256:${sha(data)}`, 'text', false];
-      } catch {
-        return null; // vanished or unreadable between the listing and the read: not part of this state
+      } catch (e) {
+        // Vanished between the listing and the read: not part of this state. Unreadable: a gap in it (AUD-04).
+        if ((e as { code?: unknown } | null)?.code !== 'ENOENT') unreadable.push(rel);
+        return null;
       }
     };
     try {
@@ -231,6 +239,7 @@ export class SnapshotService {
       throw e;
     }
     files.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
+    skipped.push(...unreadable.sort().map((path) => ({ path, reason: 'unreadable' as const })));
     return {
       schema: 'ayar-snapshot/1',
       fsType,
@@ -301,6 +310,35 @@ export class SnapshotService {
     if (!entry[7] || !entry[5].startsWith('sha256:')) return null;
     return new TextDecoder().decode(await this.#d.blobs.get(entry[5].slice('sha256:'.length)));
   }
+}
+
+/** What inventories did not observe for want of means (AUD-04): folders past the depth limit, unreadable paths, entries past the limit. */
+export interface InventoryGaps {
+  depth: number;
+  unreadable: number;
+  truncated: boolean;
+  /** A few of the paths, for the evidence. */
+  paths: string[];
+}
+
+/**
+ * AUD-04: the gaps of inventories, apart from what they leave out on purpose (.gitignore, dependency and cache folders).
+ * Two inventories that agree show the state stable only where both looked: with a gap, no change seen proves nothing.
+ * Null when every inventory saw the whole project.
+ */
+export function inventoryGaps(...manifests: readonly Manifest[]): InventoryGaps | null {
+  const depth = new Set<string>();
+  const unreadable = new Set<string>();
+  let truncated = false;
+  for (const m of manifests) {
+    truncated ||= m.truncated;
+    for (const s of m.skipped) {
+      if (s.reason === 'depth') depth.add(s.path);
+      else if (s.reason === 'unreadable') unreadable.add(s.path);
+    }
+  }
+  if (!depth.size && !unreadable.size && !truncated) return null;
+  return { depth: depth.size, unreadable: unreadable.size, truncated, paths: [...depth, ...unreadable].sort().slice(0, 20) };
 }
 
 export interface DiffOptions {

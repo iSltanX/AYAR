@@ -96,7 +96,7 @@ function report(o: Partial<Report> = {}): Report {
       counts: { passed: 13, failed: 2, missing: 3 },
       versions: { ayar: '0.1.0', profile: 3, profileHash: 'abc', catalog: '1.3.0', template: 'model-report/1', tools: { vitest: '5.0.3' } },
       environment: { source: 'login_shell', os: 'darwin 25.0.0', node: '24.16.0', python: null, packageManager: 'pnpm 12.8.1' },
-      state: { branch: 'main', commit: 'abcdef1234567', dirty: false, snapshotId: 'snp_1' },
+      state: { branch: 'main', commit: 'abcdef1234567', recorded: true, dirty: null, changedDuringRun: false, snapshotId: 'snp_1' },
       createdAt: '2026-10-11T10:08:00.000Z',
     },
     checks,

@@ -27,6 +27,31 @@ export interface GitInfo {
   remoteHost: string | null;
 }
 
+/** The Git head a run recorded when it started (runs.git_json, 18.1); `repository: false` outside a repository. */
+export interface RunGit {
+  repository: boolean;
+  branch: string | null;
+  commit: string | null;
+}
+
+/**
+ * runs.git_json read back (AUD-07), or null when the run recorded none (an older run): a report then says so, and
+ * never borrows the project's later head. A row from before `repository` was kept named a repository's head.
+ */
+export function parseRunGit(json: string | null): RunGit | null {
+  if (!json) return null;
+  try {
+    const g = JSON.parse(json) as { repository?: unknown; branch?: unknown; commit?: unknown };
+    return {
+      repository: g.repository !== false,
+      branch: typeof g.branch === 'string' ? g.branch : null,
+      commit: typeof g.commit === 'string' && /^[0-9a-f]{7,64}$/.test(g.commit) ? g.commit : null,
+    };
+  } catch {
+    return null;
+  }
+}
+
 async function readText(fs: DiscoveryFs, path: string): Promise<string | null> {
   try {
     const st = await fs.lstat(path);

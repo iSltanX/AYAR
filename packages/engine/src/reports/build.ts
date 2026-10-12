@@ -10,7 +10,9 @@ import { PurityResult as PuritySchema, RunPlan as PlanSchema, type PurityResult,
 import { release } from 'node:os';
 import { posix } from 'node:path';
 import { advisorFactsFromSnapshot } from '../advisor/facts.ts';
+import { parseRunGit } from '../discovery/git.ts';
 import type { EvidenceService } from '../evidence/service.ts';
+import { shellLine } from '../executor/command-line.ts';
 import type { Manifest } from '../evidence/snapshot.ts';
 import { CommandError } from '../host/errors.ts';
 import type { IntegrityService } from '../integrity/service.ts';
@@ -76,6 +78,7 @@ interface RunRow {
   round_id: string | null;
   state_changed: number | null;
   cancel_reason: string | null;
+  git_json: string | null;
 }
 
 interface CheckRow {
@@ -198,7 +201,7 @@ export class ReportBuilder {
   }
 
   #run(runId: string): RunRow {
-    const r = this.#d.db.get<RunRow>('SELECT id, display_id, project_id, kind, plan_json, profile_version, profile_hash, catalog_version, state, started_at, finished_at, snapshot_start_id, snapshot_end_id, counts_json, verdict, purity_json, round_id, state_changed, cancel_reason FROM runs WHERE id = ?', runId);
+    const r = this.#d.db.get<RunRow>('SELECT id, display_id, project_id, kind, plan_json, profile_version, profile_hash, catalog_version, state, started_at, finished_at, snapshot_start_id, snapshot_end_id, counts_json, verdict, purity_json, round_id, state_changed, cancel_reason, git_json FROM runs WHERE id = ?', runId);
     if (!r) throw new CommandError('not_found', { reason: 'run' });
     return r;
   }
@@ -372,7 +375,8 @@ export class ReportBuilder {
     const snapshot = latestSnapshot(db, projectId);
     const facts = snapshot?.facts ?? [];
     const obj = (v: unknown): Record<string, unknown> => (v !== null && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {});
-    const git = obj(facts.find((f) => f.key === 'git.repository')?.value);
+    // AUD-07: the Git head the run recorded when it started — never the project's now; a run that recorded none says so.
+    const git = parseRunGit(run.git_json);
     const tools: Record<string, string> = {};
     for (const c of rows) {
       const raw = c.raw_json ? (JSON.parse(c.raw_json) as RawCheckResult) : null;
@@ -398,7 +402,17 @@ export class ReportBuilder {
       counts,
       versions: { ayar: ENGINE_VERSION, profile: run.profile_version, profileHash: run.profile_hash, catalog: run.catalog_version ?? this.#d.catalog.version, template: 'model-report/1', tools },
       environment: { source: purity?.meta.environmentSource ?? null, os: `${process.platform} ${release()}`, node, python, packageManager },
-      state: { branch: typeof git.branch === 'string' ? git.branch : null, commit: typeof git.commit === 'string' ? git.commit : null, dirty: run.state_changed === null ? null : run.state_changed === 1, snapshotId: run.snapshot_end_id ?? run.snapshot_start_id, ...(sinceRound ? { sinceRound } : {}) },
+      // AUD-05: Git's uncommitted changes are not the run's stability. AYAR never runs Git in a project (D-38) and does
+      // not measure the former: unknown. The latter is integ.state's measure, unknown when the inventory was partial.
+      state: {
+        branch: git?.branch ?? null,
+        commit: git?.commit ?? null,
+        recorded: git !== null,
+        dirty: null,
+        changedDuringRun: run.state_changed === null ? null : run.state_changed === 1,
+        snapshotId: run.snapshot_end_id ?? run.snapshot_start_id,
+        ...(sinceRound ? { sinceRound } : {}),
+      },
       createdAt: this.#d.ports.clock.now().toISOString(),
     };
   }
@@ -422,7 +436,8 @@ export class ReportBuilder {
     const ruleId = f.rule_id ?? '';
     const raw = c?.raw_json ? (JSON.parse(c.raw_json) as RawCheckResult) : null;
     const command = raw?.command ?? (c?.command_json ? { argv: JSON.parse(c.command_json) as string[], cwd: c.cwd_rel ?? c.component } : null);
-    const commandText = command ? `${command.cwd && command.cwd !== '.' ? `cd ${command.cwd} && ` : ''}${command.argv.join(' ')}` : null;
+    // AUD-06: a line a shell reads back as the same words, in the same folder.
+    const commandText = command ? shellLine(command.argv, command.cwd) : null;
     const def = this.#d.catalog.check(f.check_id);
     const source = def?.sources[0] ? this.#d.catalog.sources.find((s) => s.id === def.sources[0]) : undefined;
     const fix: ReportFinding['fix'] = RULES_WITH_FIX.has(ruleId) ? { kind: 'suggested', key: `catalog.rule.${ruleId}.fix`, evidence: `${f.display_id}: ${location?.path ?? ''}${location?.line ? `:${location.line}` : ''}` } : { kind: 'diagnose', steps: ['report.diagnose.reproduce', 'report.diagnose.isolate', 'report.diagnose.evidence'] };

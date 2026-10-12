@@ -12,6 +12,7 @@
   import TextField from '../../components/TextField.svelte';
   import { useLocale } from '../../lib/locale.ts';
   import { attempt, copyText } from '../../app/client.ts';
+  import { commandLineText } from '../../app/specs.ts';
   import { useApp } from '../../app/state.svelte.ts';
 
   let { projectId, profile, onupdated }: { projectId: string; profile: ProfileView; onupdated: (p: ProfileView) => void } = $props();
@@ -60,7 +61,7 @@
         {#each services as [n, s] (n)}
           <tr>
             <td><bdi dir="ltr">{n}</bdi></td>
-            <td><CommandBlock command={s.argv.join(' ')} runsCode oncopy={copyText} /></td>
+            <td><CommandBlock command={commandLineText(s.argv, s.cwd)} runsCode oncopy={copyText} /></td>
             <td class="small">{#if s.readyUrl}{t('configui.services.answers')} <span class="val"><bdi dir="ltr">{s.readyUrl.replace(/^https?:\/\//, '')}</bdi></span>{:else}{t('configui.services.logLine')} <span class="val"><bdi dir="ltr">{s.readyPattern}</bdi></span>{/if}</td>
             <td class="num">{t('configui.services.seconds', { count: s.readyTimeoutSec })}</td>
             <td><span class="val">{running ? t('configui.services.maybeRunning') : t('configui.services.stopped')}</span></td>
