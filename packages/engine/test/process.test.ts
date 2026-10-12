@@ -41,22 +41,71 @@ const spec = (marker: string) => ({
   onStderr: () => {},
 });
 
-describe('time asleep (FR-26; AT-13 on the owner\'s Apple Silicon machine)', () => {
-  it('reads a sample tick 40 s late on both clocks as a sleep gap, left out of the timeout and the duration', async () => {
-    // Apple Silicon through sleep: both clocks jump, the wall clock has no lead, only the tick is late.
+describe('time asleep (FR-26; AT-13 on the owner\'s Apple Silicon machine; DEV-13 review R3-01 to R3-03)', () => {
+  const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  /** Ports whose n-th listProcesses call (1: the launch baseline, 2: the first sample, …) waits, or never answers. */
+  const slowList = (slowAt: (n: number) => number | 'hang'): EnginePorts => {
+    let n = 0;
+    return {
+      ...nodePorts,
+      processes: {
+        ...nodePorts.processes,
+        listProcesses: async () => {
+          const s = slowAt(++n);
+          if (s === 'hang') await new Promise(() => {});
+          else if (s > 0) await delay(s);
+          return nodePorts.processes.listProcesses();
+        },
+      },
+    };
+  };
+
+  it('reads a sample timer that fires 40 s late as a sleep gap, left out of the timeout and the duration', async () => {
+    // Apple Silicon through sleep: both clocks move on 40 s while the sample timer waits (a second after the first sample).
     const real = nodePorts.clock;
-    let ticks = 0;
-    const jump = () => (ticks >= 1 ? 40_000 : 0);
-    const jumping = { ...real, monotonicMs: () => real.monotonicMs() + jump(), now: () => new Date(real.now().getTime() + jump()) };
-    const supervisor = new ProcessSupervisor({ ports: { ...nodePorts, clock: jumping }, db, logger: quiet });
+    let sampledAt: number | undefined;
+    const offset = () => (sampledAt !== undefined && real.monotonicMs() >= sampledAt + 1000 ? 40_000 : 0);
+    const clock = { now: () => new Date(real.now().getTime() + offset()), monotonicMs: () => real.monotonicMs() + offset() };
+    const supervisor = new ProcessSupervisor({ ports: { ...nodePorts, clock }, db, logger: quiet });
     const marker = join(root, 'marker-sleep');
-    const proc = supervisor.start({ ...spec(marker), argv: ['/bin/sh', '-c', `echo ran > "${marker}"; sleep 5`], timeoutMs: 30_000, idleTimeoutMs: 20_000, onSample: () => void ticks++ });
-    const r = await proc.done;
+    const onSample = () => void (sampledAt ??= real.monotonicMs());
+    const r = await supervisor.start({ ...spec(marker), argv: ['/bin/sh', '-c', `echo ran > "${marker}"; sleep 5`], timeoutMs: 30_000, idleTimeoutMs: 20_000, onSample }).done;
     expect(r.ended).toBe('exited');
     expect(r.sleepGaps.length).toBe(1);
     expect(r.sleepGaps[0]!.ms).toBeGreaterThan(SLEEP_GAP_MIN_MS);
     expect(r.durationMs).toBeLessThan(20_000);
   }, 30_000);
+
+  it('R3-01: a sample that takes 6.5 s is not a sleep gap', async () => {
+    const supervisor = new ProcessSupervisor({ ports: slowList((n) => (n === 2 ? 6500 : 0)), db, logger: quiet });
+    const r = await supervisor.start({ ...spec(join(root, 'm1')), argv: ['/bin/sh', '-c', 'sleep 12'], timeoutMs: 60_000 }).done;
+    expect(r.ended).toBe('exited');
+    expect(r.sleepGaps).toEqual([]);
+    expect(r.durationMs).toBeGreaterThan(11_000);
+  }, 60_000);
+
+  it('R3-03: a wall-clock jump alone (NTP, by hand) is not sleep, and the duration is never negative', async () => {
+    const real = nodePorts.clock;
+    let ticks = 0;
+    const clock = { now: () => new Date(real.now().getTime() + (ticks >= 1 ? 600_000 : 0)), monotonicMs: () => real.monotonicMs() };
+    const supervisor = new ProcessSupervisor({ ports: { ...nodePorts, clock }, db, logger: quiet });
+    const r = await supervisor.start({ ...spec(join(root, 'm2')), argv: ['/bin/sh', '-c', 'sleep 5'], timeoutMs: 60_000, onSample: () => void ticks++ }).done;
+    expect(r.ended).toBe('exited');
+    expect(r.sleepGaps).toEqual([]);
+    expect(r.durationMs).toBeGreaterThanOrEqual(4_000);
+  }, 30_000);
+
+  it('R3-02: a cancel is acted on while a sample hangs', async () => {
+    const supervisor = new ProcessSupervisor({ ports: slowList((n) => (n === 3 ? 'hang' : 0)), db, logger: quiet });
+    const proc = supervisor.start({ ...spec(join(root, 'm3')), argv: ['/bin/sh', '-c', 'sleep 120'], timeoutMs: 60_000 });
+    await delay(6000);
+    const t0 = Date.now();
+    proc.stop('cancel');
+    const r = await Promise.race([proc.done, delay(15_000).then(() => null)]);
+    expect(r).not.toBeNull();
+    expect(r!.ended).toBe('cancelled');
+    expect(Date.now() - t0).toBeLessThan(15_000);
+  }, 40_000);
 });
 
 describe('a stop at the edge of a launch (9.7)', () => {
