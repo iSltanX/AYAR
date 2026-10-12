@@ -95,7 +95,7 @@ describe('design.tokens.static and design.fonts.static (FX-WEB-DESIGN)', () => {
     expect(v('off-scale-spacing')).toEqual([['tokens.off-scale', 'styles/app.css', 87]]);
     expect(v('undefined-var')).toEqual([['tokens.undefined-var', 'styles/app.css', 94]]);
   });
-  it('counts a property a component sets inline or from its script as defined, and a var() with a fallback as not undefined (DEV-13)', () => {
+  it('counts a property a component sets inline or from its script as defined, and an undefined var() as undefined even with a fallback (DEV-13, review R3-06)', () => {
     const dir = mkdtempSync(join(tmpdir(), 'ayar-DEV-13-tokens-'));
     try {
       mkdirSync(join(dir, 'src'));
@@ -109,7 +109,10 @@ describe('design.tokens.static and design.fonts.static (FX-WEB-DESIGN)', () => {
 </style>
 `);
       const r = run('tokens-static', input(dir, { checkId: 'design.tokens.static', references: { tokens: { declared: { css: 'src/none.css' } } } }));
-      expect(found(r).filter(([rule]) => rule === 'tokens.undefined-var')).toEqual([['tokens.undefined-var', 'src/Bar.svelte', 7]]);
+      const undefinedVars = r.report.findings.filter((f) => f.rule === 'tokens.undefined-var');
+      expect(undefinedVars.map((f) => f.actual)).toEqual(['--control-width', '--radius-missing']);
+      expect(undefinedVars[0]!.message).toMatch(/fallback/);
+      expect(undefinedVars[1]!.message).not.toMatch(/fallback/);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }

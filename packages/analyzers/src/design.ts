@@ -271,8 +271,13 @@ export const tokensAnalyzer: Analyzer = {
           const line = s.line - 1 + (d.source?.start?.line ?? 1);
           const location = { path: file, line };
           const anchor = { kind: 'code' as const, value: '' };
-          // A var() with a fallback («var(--x, 240px)») names what holds without the property, so it is not an undefined use.
-          for (const m of d.value.matchAll(/var\(\s*(--[\w-]+)\s*([,)])/g)) if (m[2] === ')' && !defined.has(m[1]!)) pushFinding(r, finding({ rule: 'tokens.undefined-var', message: `var(${m[1]}) is not defined by the tokens nor in the styles`, location, anchor, actual: m[1]! }));
+          // A var() no token nor style defines is undefined, fallback or not: «var(--radius-tagg, 4px)» hides a misspelt
+          // token behind a fixed value (DEV-13 review R3-06), so the message says the fallback is what shows.
+          for (const m of d.value.matchAll(/var\(\s*(--[\w-]+)\s*([,)])/g)) {
+            if (defined.has(m[1]!)) continue;
+            const message = `var(${m[1]}) is not defined by the tokens nor in the styles${m[2] === ',' ? ': its fallback is what shows' : ''}`;
+            pushFinding(r, finding({ rule: 'tokens.undefined-var', message, location, anchor, actual: m[1]! }));
+          }
           if (COLOR_PROPS.test(prop) && colors.size) {
             for (const lit of colorLiterals(d.value)) {
               const n = normalizeColor(lit);
