@@ -291,7 +291,7 @@
   .license-text {
     margin: 0;
     padding: var(--space-12);
-    border-radius: var(--radius-tag);
+    border-radius: 4px;
     background: var(--bg-sunken);
     font: var(--type-mono);
     color: var(--text-primary);
@@ -430,7 +430,7 @@
   }
   .val {
     padding: 1px var(--space-8);
-    border-radius: var(--radius-tag);
+    border-radius: 4px;
     background: var(--bg-sunken);
     font: var(--type-body-small);
     color: var(--text-secondary);

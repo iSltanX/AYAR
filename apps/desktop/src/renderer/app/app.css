@@ -50,7 +50,7 @@ body {
   max-inline-size: 100%;
   padding: 1px var(--space-8);
   overflow: hidden;
-  border-radius: var(--radius-tag);
+  border-radius: 4px;
   background: var(--bg-sunken);
   font: var(--type-body-small);
   color: var(--text-secondary);

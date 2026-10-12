@@ -395,7 +395,7 @@
   }
   .pill {
     padding: 2px var(--space-8);
-    border-radius: var(--radius-tag);
+    border-radius: 4px;
     background: var(--bg-sunken);
     color: var(--text-secondary);
   }
