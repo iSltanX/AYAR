@@ -9,7 +9,8 @@
 #   sh tools/packaging/reproduce.sh <repo> <commit> <reference .app> <report.json> [identity]
 #
 # Needs network for npm ci (the Electron binary comes from npm's cache when present). The clone is removed at the
-# end; its size is printed for the cleanup record (AGENTS.md 10).
+# end; its size is printed for the cleanup record (AGENTS.md 10). AYAR_KEEP_REBUILT=<folder> keeps a copy of the
+# rebuilt package for inspection.
 set -eu
 REPO="$1"; COMMIT="$2"; REF_APP="$3"; REPORT="$4"; IDENTITY="${5:-AYAR Local Code Signing}"
 NODE=/opt/homebrew/bin/node
@@ -23,4 +24,6 @@ git -C "$CLONE/repo" checkout --quiet "$COMMIT"
 ( cd "$CLONE/repo/apps/desktop" && AYAR_SIGN_IDENTITY="$IDENTITY" "$NPM" run package >"$CLONE/package.log" 2>&1 )
 NEW_APP="$CLONE/repo/apps/desktop/out/AYAR-darwin-arm64/AYAR.app"
 SIZE="$(du -sh "$CLONE" | cut -f1)"
+# AYAR_KEEP_REBUILT=<folder>: keep a copy of the rebuilt package there (to look into a difference), since the clone goes.
+if [ -n "${AYAR_KEEP_REBUILT:-}" ]; then rm -rf "$AYAR_KEEP_REBUILT"; mkdir -p "$(dirname "$AYAR_KEEP_REBUILT")"; ditto "$NEW_APP" "$AYAR_KEEP_REBUILT"; fi
 "$NODE" "$(dirname "$0")/compare-packages.mjs" --a "$REF_APP" --b "$NEW_APP" --json "$REPORT" --note "clone of $COMMIT, npm ci, npm run package; clone size $SIZE, removed"
