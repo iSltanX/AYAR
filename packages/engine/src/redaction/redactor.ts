@@ -9,10 +9,12 @@
 // a line longer than 64 Ki characters is cut with ⟦split⟧, never through a match. A line that cannot be
 // scanned is not written: ⟦redacted:unscannable⟧ stands in for it. The second pass (secondPass) re-scans text
 // on its way out (fix prompt, export) and refuses it if a high-confidence pattern is still there.
+import { LINE_SPLIT_MARKER } from '@ayar/adapters';
 import type { RedactionData } from '@ayar/catalog';
 
 export const REDACTED = (rule: string): string => `⟦redacted:${rule}⟧`;
-export const LINE_SPLIT_MARKER = '⟦split⟧';
+// The marker the readers undo before parsing a stored report (packages/adapters, read/guards.ts): one source for both.
+export { LINE_SPLIT_MARKER };
 export const MAX_LINE_CHARS = 64 * 1024;
 /** How far past a cut point a line must be known before it is cut, so no secret is cut in two. */
 export const SPLIT_LOOKAHEAD_CHARS = 16 * 1024;

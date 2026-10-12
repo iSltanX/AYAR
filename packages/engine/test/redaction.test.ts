@@ -2,6 +2,7 @@
 // carry buffer, long-line splitting, private-key blocks across lines, the second pass, and the sensitive-name
 // list with the G-35 exceptions. The fake secrets are assembled from parts at run time so that no
 // secret-shaped literal sits in the repository.
+import { readJson } from '@ayar/adapters';
 import { loadCatalog } from '@ayar/catalog';
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
@@ -43,6 +44,16 @@ const anySecret = fc.oneof(...Object.entries(SECRET_GENERATORS).map(([rule, g]) 
 const filler = fc.array(fc.constantFrom('نص ', 'سجل ', ' . ', ': ', 'خطأ ', ' (', ') ', '\t'), { maxLength: 30 }).map((a) => a.join(''));
 /** The part of a secret that must not survive: for an assignment, the value after `=`. */
 const secretCore = (s: { rule: string; value: string }) => (s.rule === 'password-assignment' ? s.value.slice('password='.length) : s.rule === 'keyword-high-entropy' ? s.value.slice('with token '.length) : s.value);
+
+describe('a stored report longer than a line (DEV-13, AYAR on its own repository)', () => {
+  it('is cut with the marker on its way in and read whole by the readers', () => {
+    const long = JSON.stringify({ files: Array.from({ length: 3000 }, (_, n) => ({ filePath: `src/file-${n}.ts`, messages: [], errorCount: 0 })) });
+    expect(long.length).toBeGreaterThan(MAX_LINE_CHARS);
+    const stored = redactor().redactText(long).text;
+    expect(stored).toContain(LINE_SPLIT_MARKER);
+    expect(readJson(stored, 'eslint.json')).toMatchObject({ ok: true });
+  });
+});
 
 describe('catalog patterns (layer 2)', () => {
   it('has a generator for every high-confidence pattern, and each generated secret is caught', () => {

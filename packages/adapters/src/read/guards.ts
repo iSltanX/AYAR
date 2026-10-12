@@ -19,6 +19,16 @@ export const REPORT_LIMITS = {
 
 export type Read<T> = { ok: true; value: T } | { ok: false; problem: ReportProblem };
 
+/**
+ * The redaction (C-18, D-46) stores every report with its lines bounded: a line longer than 64 Ki characters is cut
+ * with this marker and a newline, never through a match. A report is read from that stored copy, so the cut is
+ * undone before parsing — a single-line JSON report of a real project (ESLint on a repository, Vitest's run of a
+ * thousand tests) is longer than that, and read as cut it is «malformed» at character 65,537 (found by AYAR on its
+ * own repository, DEV-13).
+ */
+export const LINE_SPLIT_MARKER = '⟦split⟧';
+export const unsplit = (text: string): string => (text.includes(LINE_SPLIT_MARKER) ? text.split(`${LINE_SPLIT_MARKER}\n`).join('') : text);
+
 export const problem = (code: ReportProblem['code'], file: string, detail: string): { ok: false; problem: ReportProblem } => ({ ok: false, problem: { code, file, detail: detail.slice(0, 1000) } });
 
 /** The deepest nesting of a JSON text, scanned without parsing (strings and escapes skipped); stops past `limit`. */
@@ -46,7 +56,8 @@ export function jsonDepth(text: string, limit: number): number {
 }
 
 /** A JSON report, within the limits: empty, too deep or malformed is a problem of its own. */
-export function readJson(text: string, file: string, o: { maxDepth?: number } = {}): Read<unknown> {
+export function readJson(raw: string, file: string, o: { maxDepth?: number } = {}): Read<unknown> {
+  const text = unsplit(raw);
   const limit = o.maxDepth ?? REPORT_LIMITS.maxJsonDepth;
   if (!text.trim()) return problem('empty', file, 'empty report');
   const depth = jsonDepth(text, limit);
@@ -59,7 +70,8 @@ export function readJson(text: string, file: string, o: { maxDepth?: number } = 
 }
 
 /** JSON written to a tool's output among other lines (`$ pyright --outputjson` from the package manager, a banner). */
-export function readJsonInText(text: string, file: string, o: { maxDepth?: number; open?: '{' | '[' } = {}): Read<unknown> {
+export function readJsonInText(raw: string, file: string, o: { maxDepth?: number; open?: '{' | '[' } = {}): Read<unknown> {
+  const text = unsplit(raw);
   const direct = text.trim();
   if (!direct) return problem('empty', file, 'no output');
   if (direct.startsWith('{') || direct.startsWith('[')) {
@@ -81,10 +93,10 @@ export function readJsonInText(text: string, file: string, o: { maxDepth?: numbe
 }
 
 /** JSON lines (mypy `-O json`): one object per line; a line that is not JSON is skipped and counted. */
-export function readJsonLines(text: string, file: string): Read<{ values: unknown[]; skipped: number }> {
+export function readJsonLines(raw: string, file: string): Read<{ values: unknown[]; skipped: number }> {
   const values: unknown[] = [];
   let skipped = 0;
-  for (const line of text.split('\n')) {
+  for (const line of unsplit(raw).split('\n')) {
     const t = line.trim();
     if (!t.startsWith('{')) {
       if (t) skipped++;

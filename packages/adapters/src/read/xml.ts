@@ -2,7 +2,7 @@
 // document type declaration is refused outright (`dtd`), so no entity can be declared, let alone expanded; only the
 // five predefined entities and character references are decoded; an unknown entity, a tag that does not close, or a
 // nesting deeper than the limit is a problem of its own. Comments and processing instructions are skipped.
-import { problem, REPORT_LIMITS, type Read } from './guards.ts';
+import { problem, REPORT_LIMITS, unsplit, type Read } from './guards.ts';
 
 export interface XmlElement {
   name: string;
@@ -45,7 +45,8 @@ function safeCodePoint(n: number, line: number): string {
 const NAME = /^[A-Za-z_:][A-Za-z0-9_:.-]*/;
 
 /** Parses an XML report within the limits; the root element, or the problem. */
-export function readXml(text: string, file: string, o: { maxDepth?: number } = {}): Read<XmlElement> {
+export function readXml(raw: string, file: string, o: { maxDepth?: number } = {}): Read<XmlElement> {
+  const text = unsplit(raw);
   const maxDepth = o.maxDepth ?? REPORT_LIMITS.maxXmlDepth;
   if (!text.trim()) return problem('empty', file, 'empty report');
   try {
