@@ -326,7 +326,8 @@ describe('the results (screens 7 and 8)', () => {
   it('AT-29: draws logs as text — no markup runs, no colour codes, controls as marks, a long line without freezing', async () => {
     await run.page.getByRole('tab', { name: 'الفحوص' }).click();
     const unit = run.page.locator('.check').filter({ hasText: 'beh.unit' });
-    await unit.getByRole('button', { name: 'السجل' }).click();
+    // The row's own «السجل», by its exact name: a note on the row («افتح السجل», a sleep gap, an output cut) has one too.
+    await unit.getByRole('button', { name: 'السجل', exact: true }).click();
     await run.page.waitForSelector('#ayar-inspector .lines .line', { timeout: 15_000 });
     const started = Date.now();
     const shown = await run.page.evaluate(() => {

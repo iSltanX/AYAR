@@ -4,10 +4,10 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { ProcessSupervisor, SLEEP_GAP_MIN_MS } from '../src/executor/process.ts';
+import { appBundleOf, ProcessSupervisor, SLEEP_GAP_MIN_MS } from '../src/executor/process.ts';
 import { nodeFileSystem } from '../src/node/fs.ts';
 import { nodePorts } from '../src/node/ports.ts';
-import type { EnginePorts } from '../src/ports/index.ts';
+import type { EnginePorts, ProcessInfo } from '../src/ports/index.ts';
 import { ensureDataDir } from '../src/storage/data-dir.ts';
 import { openDatabase, type Db } from '../src/storage/db.ts';
 import { migrate } from '../src/storage/migrations.ts';
@@ -146,4 +146,43 @@ describe('a stop at the edge of a launch (9.7)', () => {
     expect(r.escalation[0]!.atMs).toBeLessThan(1500);
     expect(Date.now() - t0).toBeLessThan(5000);
   }, 20_000);
+});
+
+describe('E-22\'s escape rule on a working machine (AT-29)', () => {
+  it('a new helper of an application already running is the application\'s; one of an application that was not running, or of no application, is an escape', async () => {
+    const uid = process.getuid!();
+    const fake = (pid: number, ppid: number, command: string): ProcessInfo => ({ pid, ppid, pgid: pid, uid, cpu: 0, cpuTimeMs: 0, rssKb: 0, startTime: `Mon Oct 12 10:00:${String(pid % 60).padStart(2, '0')} 2026`, command });
+    // Pids above any real one: nothing here is ever signalled (no environment, so no token).
+    const browser = fake(9_000_001, 9_000_000, '/Applications/Fake Browser.app/Contents/MacOS/Fake Browser');
+    const born = [
+      fake(9_000_002, 1, '/Applications/Fake Browser.app/Contents/Frameworks/Fake Browser Framework.framework/Helpers/chrome_crashpad_handler'),
+      fake(9_000_003, 1, '/Applications/Not Running.app/Contents/MacOS/agent'),
+      fake(9_000_004, 1, '/Users/someone/.local/bin/escaped-daemon'),
+      fake(9_000_005, 1, '/System/Library/CoreServices/something'),
+    ];
+    // The machine's own launchd children stay out, so what the rule sees is exactly the fixture's.
+    let n = 0;
+    const ports: EnginePorts = {
+      ...nodePorts,
+      processes: {
+        ...nodePorts.processes,
+        listProcesses: async () => [...(await nodePorts.processes.listProcesses()).filter((p) => p.ppid !== 1), browser, ...(n++ === 0 ? [] : born)],
+        launchdJobs: () => Promise.resolve([]),
+      },
+    };
+    const supervisor = new ProcessSupervisor({ ports, db, logger: quiet });
+    const r = await supervisor.start({ ...spec(join(root, 'marker-3')), argv: ['/bin/sh', '-c', 'exit 0'] }).done;
+    expect(r.ended).toBe('exited');
+    expect(r.leftovers.escapeSuspected).toEqual([
+      { kind: 'launchd_child', name: 'agent' },
+      { kind: 'launchd_child', name: 'escaped-daemon' },
+    ]);
+  }, 20_000);
+
+  it('names the outermost application bundle of an executable, or none', () => {
+    expect(appBundleOf('/Applications/Google Chrome.app/Contents/Frameworks/X.framework/Helpers/Y Helper.app/Contents/MacOS/Y Helper')).toBe('/Applications/Google Chrome.app');
+    expect(appBundleOf('/Users/me/Apps/Tool.app/Contents/MacOS/tool')).toBe('/Users/me/Apps/Tool.app');
+    expect(appBundleOf('/usr/local/bin/node')).toBeNull();
+    expect(appBundleOf('/opt/x.app')).toBeNull();
+  });
 });
