@@ -15,7 +15,8 @@
 //   project's own processes are children of the engine and are excluded by their AYAR_CHECK_TOKEN environment, read
 //   with ps -E): the physical footprint the system charges each process (/usr/bin/footprint, what Activity Monitor
 //   shows as Memory) and, beside it, the RSS sum (which counts shared framework pages once per process); then the
-//   processor share of the tree over 20 idle seconds afterwards.
+//   processor share of the tree over 20 idle seconds afterwards, from the growth of its processes' accumulated
+//   processor time between one-second samples (ps's %cpu is a decaying average that still carries the scan).
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { cpus, loadavg, tmpdir, totalmem } from 'node:os';
@@ -62,16 +63,22 @@ const machine = () => ({
   at: new Date().toISOString(),
 });
 
-/** AYAR's process tree (pid and its descendants) with RSS in MB and %CPU, the project's checks excluded. */
-function tree(rootPid: number): { pid: number; rssMb: number; cpu: number; comm: string }[] {
-  const lines = execFileSync('ps', ['-axo', 'pid=,ppid=,rss=,%cpu=,comm='], { encoding: 'utf8' }).trim().split('\n');
+/** ps's accumulated processor time ([[dd-]hh:]mm:ss.cc) in seconds. */
+const cpuSeconds = (time: string): number => {
+  const [days, rest] = time.includes('-') ? time.split('-') : ['0', time];
+  return rest!.split(':').reduce((s, part) => s * 60 + Number(part), 0) + Number(days) * 86_400;
+};
+
+/** AYAR's process tree (pid and its descendants) with RSS in MB and accumulated processor seconds, the project's checks excluded. */
+function tree(rootPid: number): { pid: number; rssMb: number; cpuSec: number; comm: string }[] {
+  const lines = execFileSync('ps', ['-axo', 'pid=,ppid=,rss=,time=,comm='], { encoding: 'utf8' }).trim().split('\n');
   const rows = lines.map((l) => {
-    const m = /^\s*(\d+)\s+(\d+)\s+(\d+)\s+([\d.]+)\s+(.*)$/.exec(l);
-    return m ? { pid: Number(m[1]), ppid: Number(m[2]), rssMb: Number(m[3]) / 1024, cpu: Number(m[4]), comm: m[5]! } : null;
+    const m = /^\s*(\d+)\s+(\d+)\s+(\d+)\s+([\d:.-]+)\s+(.*)$/.exec(l);
+    return m ? { pid: Number(m[1]), ppid: Number(m[2]), rssMb: Number(m[3]) / 1024, cpuSec: cpuSeconds(m[4]!), comm: m[5]! } : null;
   });
   const byParent = new Map<number, typeof rows>();
   for (const r of rows) if (r) byParent.set(r.ppid, [...(byParent.get(r.ppid) ?? []), r]);
-  const out: { pid: number; rssMb: number; cpu: number; comm: string }[] = [];
+  const out: { pid: number; rssMb: number; cpuSec: number; comm: string }[] = [];
   const walk = (pid: number) => {
     for (const r of byParent.get(pid) ?? []) {
       if (!r) continue;
@@ -83,12 +90,12 @@ function tree(rootPid: number): { pid: number; rssMb: number; cpu: number; comm:
         env = '';
       }
       if (env.includes('AYAR_CHECK_TOKEN=')) continue;
-      out.push({ pid: r.pid, rssMb: r.rssMb, cpu: r.cpu, comm: r.comm });
+      out.push({ pid: r.pid, rssMb: r.rssMb, cpuSec: r.cpuSec, comm: r.comm });
       walk(r.pid);
     }
   };
   const root = rows.find((r) => r?.pid === rootPid);
-  if (root) out.push({ pid: root.pid, rssMb: root.rssMb, cpu: root.cpu, comm: root.comm });
+  if (root) out.push({ pid: root.pid, rssMb: root.rssMb, cpuSec: root.cpuSec, comm: root.comm });
   walk(rootPid);
   return out;
 }
@@ -227,17 +234,24 @@ describe('AT-36 (app): cold start, UI response, update rate, memory, idle proces
           busiest = Math.max(busiest, j - i);
         }
       }
-      // Idle: 30 seconds after the scan, the processor share of the whole tree (ps %cpu is a recent average).
+      // Idle: ten seconds after the scan, the processor share of the whole tree over each of 20 one-second
+      // intervals: the growth of the tree's accumulated processor time (per process, so a process that appears or
+      // vanishes between two samples counts nothing) over the wall time between the samples.
       await new Promise((r) => setTimeout(r, 10_000));
       const idle: number[] = [];
+      let prev = { at: performance.now(), procs: tree(pid) };
       for (let i = 0; i < 20; i++) {
-        idle.push(tree(pid).reduce((s, r) => s + r.cpu, 0));
         await new Promise((r) => setTimeout(r, 1000));
+        const now = { at: performance.now(), procs: tree(pid) };
+        const before = new Map(prev.procs.map((p) => [p.pid, p.cpuSec]));
+        const used = now.procs.reduce((s, p) => s + (before.has(p.pid) ? Math.max(0, p.cpuSec - before.get(p.pid)!) : 0), 0);
+        idle.push((used / ((now.at - prev.at) / 1000)) * 100);
+        prev = now;
       }
       report['uiResponse'] = { samples: latencies.length, medianMs: Math.round(median(latencies) * 10) / 10, p95Ms: Math.round(p95(latencies) * 10) / 10, maxMs: Math.round(Math.max(...latencies) * 10) / 10 };
       report['updatesPerCheck'] = { checks: Object.keys(events).length, busiestSecond: busiest };
       report['memory'] = { samples: rss.length, peakFootprintMb: footprint.length ? Math.round(Math.max(...footprint)) : null, medianFootprintMb: footprint.length ? Math.round(median(footprint)) : null, peakRssMb: Math.round(Math.max(...rss)), medianRssMb: Math.round(median(rss)) };
-      report['idleCpu'] = { samples: idle.length, medianPercent: Math.round(median(idle) * 10) / 10, maxPercent: Math.max(...idle) };
+      report['idleCpu'] = { samples: idle.length, medianPercent: Math.round(median(idle) * 10) / 10, maxPercent: Math.round(Math.max(...idle) * 10) / 10 };
       process.stderr.write(`${JSON.stringify({ uiResponse: report['uiResponse'], updatesPerCheck: report['updatesPerCheck'], memory: report['memory'], idleCpu: report['idleCpu'] })}\n`);
       expect(state).toBe('finished');
       if (JUDGE) {

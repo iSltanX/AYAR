@@ -3,15 +3,16 @@
 // project through the engine (as tools/cli spawns it, with the fixtures toolchain on the login PATH, like the
 // engine's own acceptance tests) at run.parallel 1, 2 and 3: the wall time of each scan, the engine's answer time
 // to a request every 100 ms while it runs (the UI's responsiveness), the processor load, and whether the outcomes
-// are the same at every setting (no interference between the checks). Criterion (plan 22): the highest throughput
-// without a degraded UI or interfering tests.
+// are the same at every setting (no interference between the checks), and the longest execution of each resource
+// class beside the catalog's timeout for that class (the default timeouts E-18 also fixes). Criterion (plan 22): the
+// highest throughput without a degraded UI or interfering tests.
 //
 //   node tools/perf/parallel.ts --out docs/acceptance/perf/e18-parallel.json [--project FX-EXT --variant good] [--repeat 2]
 //
 // Everything lives in a temporary folder (ayar-DEV-13-e18-*) removed at the end.
 import type { RunDetail } from '@ayar/protocol';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { cpus, homedir, loadavg, tmpdir, totalmem } from 'node:os';
 import { dirname, join } from 'node:path';
 import { performance } from 'node:perf_hooks';
@@ -61,6 +62,18 @@ const p95 = (xs: number[]): number => {
 };
 const machine = () => ({ macos: execFileSync('sw_vers', ['-productVersion'], { encoding: 'utf8' }).trim(), chip: execFileSync('sysctl', ['-n', 'machdep.cpu.brand_string'], { encoding: 'utf8' }).trim(), cpus: cpus().length, memoryGb: Math.round(totalmem() / 2 ** 30), loadavg: loadavg().map((x) => Math.round(x * 100) / 100), node: process.version, at: new Date().toISOString() });
 
+/** The catalog's resource class of every check, and the timeout (minutes) of each class (packages/catalog/data). */
+const CATALOG_DATA = join(ROOT, 'packages/catalog/data');
+const classOf = new Map<string, string>();
+for (const f of readdirSync(join(CATALOG_DATA, 'checks'))) {
+  if (!f.endsWith('.json')) continue;
+  const section = JSON.parse(readFileSync(join(CATALOG_DATA, 'checks', f), 'utf8')) as { checks: { id: string; resourceClass: string }[] };
+  for (const c of section.checks) classOf.set(c.id, c.resourceClass);
+}
+const timeoutsMin = (JSON.parse(readFileSync(join(CATALOG_DATA, 'catalog.json'), 'utf8')) as { timeouts: Record<string, number> }).timeouts;
+/** The longest execution seen per resource class across all the samples, with the check that took it. */
+const longest = new Map<string, { instance: string; ms: number }>();
+
 const temp = realpathSync(mkdtempSync(join(tmpdir(), 'ayar-DEV-13-e18-')));
 const results: Record<string, unknown>[] = [];
 try {
@@ -95,6 +108,11 @@ try {
       const outcomes = outcomesOf(d);
       reference ??= outcomes;
       const interference = Object.keys(outcomes).filter((k) => outcomes[k] !== reference![k]);
+      for (const c of d.checks) {
+        const cls = classOf.get(c.checkId) ?? 'unknown';
+        const ms = c.durationMs ?? 0;
+        if ((longest.get(cls)?.ms ?? -1) < ms) longest.set(cls, { instance: c.instance, ms });
+      }
       samples.push({ wallMs, latencyMedianMs: Math.round(median(latencies) * 10) / 10, latencyP95Ms: Math.round(p95(latencies) * 10) / 10, latencyMaxMs: Math.round(Math.max(...latencies) * 10) / 10, loadavg1: Math.round(loadavg()[0]! * 100) / 100, checks: d.checks.length, interference });
       process.stderr.write(`parallel ${parallel} #${i + 1}: ${wallMs} ms, latency p95 ${p95(latencies).toFixed(1)} ms, outcomes differ: ${interference.length}\n`);
     }
@@ -104,7 +122,8 @@ try {
 } finally {
   rmSync(temp, { recursive: true, force: true });
 }
-const report = { test: 'E-18: parallelism', project, variant, repeat, machine: machine(), results };
+const durations = Object.fromEntries([...longest].map(([cls, l]) => [cls, { longestInstance: l.instance, longestMs: l.ms, timeoutMin: timeoutsMin[cls] ?? null, shareOfTimeout: timeoutsMin[cls] ? Math.round((l.ms / (timeoutsMin[cls] * 60_000)) * 1000) / 10 : null }]));
+const report = { test: 'E-18: parallelism', project, variant, repeat, machine: machine(), results, durations };
 mkdirSync(dirname(join(ROOT, out)), { recursive: true });
 writeFileSync(join(ROOT, out), `${JSON.stringify(report, null, 2)}\n`);
-console.log(JSON.stringify(results.map((r) => ({ parallel: r.parallel, medianWallMs: r.medianWallMs, latencyP95Ms: r.latencyP95Ms, interference: r.interference })), null, 2));
+console.log(JSON.stringify({ results: results.map((r) => ({ parallel: r.parallel, medianWallMs: r.medianWallMs, latencyP95Ms: r.latencyP95Ms, interference: r.interference })), durations }, null, 2));

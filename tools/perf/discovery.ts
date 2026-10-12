@@ -5,7 +5,11 @@
 // discovery.done, with the median, and the machine's conditions. The first pass is E-14's baseline (recorded, not
 // judged); the acceptance pass compares the medians with the calibrated targets.
 //
-//   node tools/perf/discovery.ts --out docs/acceptance/perf/discovery.json [--repeat 5] [--sizes 1000,10000,50000]
+//   node tools/perf/discovery.ts --out docs/acceptance/perf/discovery.json [--repeat 5] [--sizes 1000,10000,50000] [--judge]
+//
+// With --judge (the acceptance pass), the 10,000-file medians are compared with NFR-01's targets as calibrated in
+// E-14 (DEV-13): discovery done within 5,000 ms and the first progress within 300 ms; the process exits 1 if either is
+// above its target.
 //
 // Everything it makes lives in a temporary folder (ayar-DEV-13-perf-*) removed at the end.
 import { execFileSync } from 'node:child_process';
@@ -25,6 +29,9 @@ const opt = (name: string, fallback: string): string => {
 const out = opt('out', 'docs/acceptance/perf/discovery.json');
 const repeat = Number(opt('repeat', '5'));
 const sizes = opt('sizes', '1000,10000,50000').split(',').map(Number);
+const judge = argv.includes('--judge');
+/** NFR-01's discovery targets for 10,000 files, as calibrated in E-14 (docs/tracking/env-decisions.md, DEV-13). */
+const TARGETS = { files: 10_000, doneMs: 5000, firstProgressMs: 300 };
 
 const median = (xs: number[]): number => {
   const s = [...xs].sort((a, b) => a - b);
@@ -81,7 +88,16 @@ try {
 } finally {
   rmSync(temp, { recursive: true, force: true });
 }
-const report = { test: 'AT-36 (engine): discovery of the synthetic repositories', machine: machine(), repeat, results };
+const judged = judge
+  ? (() => {
+      const r = results.find((x) => x.files === TARGETS.files) as { median: { firstProgressMs: number | null; doneMs: number } } | undefined;
+      if (!r) return { targets: TARGETS, verdict: 'no 10,000-file measurement', passed: false };
+      const passed = r.median.doneMs <= TARGETS.doneMs && r.median.firstProgressMs !== null && r.median.firstProgressMs <= TARGETS.firstProgressMs;
+      return { targets: TARGETS, measured: r.median, passed };
+    })()
+  : null;
+const report = { test: 'AT-36 (engine): discovery of the synthetic repositories', machine: machine(), repeat, results, ...(judged ? { acceptance: judged } : {}) };
 mkdirSync(dirname(join(ROOT, out)), { recursive: true });
 writeFileSync(join(ROOT, out), `${JSON.stringify(report, null, 2)}\n`);
-console.log(JSON.stringify(report.results.map((r) => ({ files: r.files, median: r.median })), null, 2));
+console.log(JSON.stringify({ results: report.results.map((r) => ({ files: r.files, median: r.median })), ...(judged ? { acceptance: judged } : {}) }, null, 2));
+if (judged && !judged.passed) process.exit(1);
