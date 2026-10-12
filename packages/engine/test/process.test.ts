@@ -4,7 +4,7 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { ProcessSupervisor } from '../src/executor/process.ts';
+import { ProcessSupervisor, SLEEP_GAP_MIN_MS } from '../src/executor/process.ts';
 import { nodeFileSystem } from '../src/node/fs.ts';
 import { nodePorts } from '../src/node/ports.ts';
 import type { EnginePorts } from '../src/ports/index.ts';
@@ -39,6 +39,24 @@ const spec = (marker: string) => ({
   idleTimeoutMs: null,
   onStdout: () => {},
   onStderr: () => {},
+});
+
+describe('time asleep (FR-26; AT-13 on the owner\'s Apple Silicon machine)', () => {
+  it('reads a sample tick 40 s late on both clocks as a sleep gap, left out of the timeout and the duration', async () => {
+    // Apple Silicon through sleep: both clocks jump, the wall clock has no lead, only the tick is late.
+    const real = nodePorts.clock;
+    let ticks = 0;
+    const jump = () => (ticks >= 1 ? 40_000 : 0);
+    const jumping = { ...real, monotonicMs: () => real.monotonicMs() + jump(), now: () => new Date(real.now().getTime() + jump()) };
+    const supervisor = new ProcessSupervisor({ ports: { ...nodePorts, clock: jumping }, db, logger: quiet });
+    const marker = join(root, 'marker-sleep');
+    const proc = supervisor.start({ ...spec(marker), argv: ['/bin/sh', '-c', `echo ran > "${marker}"; sleep 5`], timeoutMs: 30_000, idleTimeoutMs: 20_000, onSample: () => void ticks++ });
+    const r = await proc.done;
+    expect(r.ended).toBe('exited');
+    expect(r.sleepGaps.length).toBe(1);
+    expect(r.sleepGaps[0]!.ms).toBeGreaterThan(SLEEP_GAP_MIN_MS);
+    expect(r.durationMs).toBeLessThan(20_000);
+  }, 30_000);
 });
 
 describe('a stop at the edge of a launch (9.7)', () => {

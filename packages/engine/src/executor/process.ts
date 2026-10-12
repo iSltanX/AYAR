@@ -2,8 +2,10 @@
 // cleaning needs after a crash (the token, the temporary folder); right after, its pid, group and start time as
 // the system reports them. It runs without a shell, in its own group, stdin closed, with AYAR_CHECK_TOKEN in its
 // environment, which its descendants inherit. Every 2 s its group and descendants are sampled (processor time and
-// memory), so a silent but busy check is told from an idle one (point 7). The timeouts use the monotonic clock,
-// so time asleep does not count; the wall clock's lead is recorded as a sleep gap. Ending it — cancel, timeout,
+// memory), so a silent but busy check is told from an idle one (point 7). Time asleep (FR-26) is left out of the
+// timeouts and the duration: on Intel the monotonic clock stops through sleep and the wall clock's lead over it is
+// the gap; on Apple Silicon the monotonic clock runs through sleep, so the gap is the lateness of the sample tick
+// that follows (its timer cannot fire while the machine sleeps). Found by AT-13 on the owner's machine (DEV-13). Ending it — cancel, timeout,
 // idle — escalates SIGINT, 5 s, SIGTERM, 5 s, SIGKILL on the group (SIGTERM, 2 s, SIGKILL when the app quits).
 // After the leader exits, what is left of the group is killed, then every process of the user that carries the
 // token (setsid, double fork) is ended (E-22), and a new launchd child outside the system folders or a new
@@ -19,7 +21,7 @@ export const ESCALATION_STEP_MS = 5000;
 export const QUICK_STEP_MS = 2000;
 /** A group using less processor than this between two samples is quiet (C-12 point 7). */
 export const BUSY_CPU_PERCENT = 2;
-/** A wall-clock lead over the monotonic clock beyond this between two samples is time asleep (FR-26). */
+/** A wall-clock lead over the monotonic clock, or a sample tick this late, between two samples is time asleep (FR-26). */
 export const SLEEP_GAP_MIN_MS = 5000;
 /** E-22: executables in these folders are the system's; a new launchd child elsewhere is a possible escape. */
 export const SYSTEM_PREFIXES = ['/System/', '/usr/libexec/', '/Library/Apple/', '/Library/Application Support/', '/usr/sbin/', '/sbin/'];
@@ -256,22 +258,36 @@ export class ProcessSupervisor {
     // The watch loop: samples, timeouts, cancel. It sleeps until the next sample or a wake-up.
     let lastWall = this.#clock.now().getTime();
     let lastMono = startMono;
+    // Time asleep so far (FR-26): left out of the timeouts and of the duration.
+    let sleptMs = 0;
     const cpuBefore = new Map<number, number>();
     let ending: EndReason | null = null;
     while (!exited) {
       // A stop asked before this loop could be woken (during the launch) is acted on at once, not a sample later.
+      let timerFired = false;
       if (!stopMode()) {
         await new Promise<void>((r) => {
           wakeLoop = r;
-          setTimeout(r, SAMPLE_INTERVAL_MS).unref?.();
+          setTimeout(() => {
+            timerFired = true;
+            r();
+          }, SAMPLE_INTERVAL_MS).unref?.();
         });
       }
       if (exited) break;
       const nowMono = this.#clock.monotonicMs();
       const nowWall = this.#clock.now().getTime();
-      // FR-26: the wall clock ran ahead of the monotonic one: the machine slept.
-      const gap = nowWall - lastWall - (nowMono - lastMono);
-      if (gap > SLEEP_GAP_MIN_MS) result.sleepGaps.push({ at: new Date(nowWall - gap).toISOString(), ms: Math.round(gap) });
+      // FR-26: the wall clock ran ahead of the monotonic one (Intel), or the sample timer fired far later than its
+      // period with no early wake-up (Apple Silicon, whose monotonic clock runs through sleep): the machine slept.
+      const wallLead = nowWall - lastWall - (nowMono - lastMono);
+      const tickLate = timerFired ? nowMono - lastMono - SAMPLE_INTERVAL_MS : 0;
+      const gap = Math.max(wallLead, tickLate);
+      if (gap > SLEEP_GAP_MIN_MS) {
+        result.sleepGaps.push({ at: new Date(nowWall - gap).toISOString(), ms: Math.round(gap) });
+        sleptMs += gap;
+        // The time asleep is not idleness of the check: the idle limit counts from the wake-up.
+        lastBusy = Math.max(lastBusy, nowMono);
+      }
       lastWall = nowWall;
       const interval = nowMono - lastMono;
       lastMono = nowMono;
@@ -292,7 +308,7 @@ export class ProcessSupervisor {
       }
       const mode = stopMode();
       if (mode) ending = 'cancelled';
-      else if (spec.timeoutMs !== null && nowMono - startMono >= spec.timeoutMs) ending = 'timed_out';
+      else if (spec.timeoutMs !== null && nowMono - startMono - sleptMs >= spec.timeoutMs) ending = 'timed_out';
       // Idle: neither output nor processor activity for the idle limit (a busy silent check is never idle).
       else if (spec.idleTimeoutMs !== null && nowMono - Math.max(lastOutputOf(), lastBusy) >= spec.idleTimeoutMs) ending = 'idle_timed_out';
       if (ending) {
@@ -313,7 +329,7 @@ export class ProcessSupervisor {
     result.leftovers.escapeSuspected = await this.#escapes(base, new Set(swept.killed.map((p) => p.pid)));
     this.#endLedger(ledgerId);
     const endMono = this.#clock.monotonicMs();
-    result.durationMs = Math.round(endMono - startMono);
+    result.durationMs = Math.round(endMono - startMono - sleptMs);
     result.finishedAt = this.#clock.now();
     result.lastActivityAt = new Date(result.startedAt.getTime() + Math.round(lastOutputOf() - startMono));
     return result;
