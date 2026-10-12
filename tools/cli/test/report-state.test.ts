@@ -146,6 +146,65 @@ describe('AUD-07: a report names the Git head its run recorded', () => {
   }, 60_000);
 });
 
+describe('AUD-07 follow-up: the head\'s environment and project context are the run\'s', () => {
+  const declared = (project: string) => {
+    writeFileSync(join(project, 'package.json'), JSON.stringify({ name: 'aud-report-state', version: '1.0.0', type: 'module', packageManager: 'npm@10.9.0' }));
+    writeFileSync(join(project, '.nvmrc'), '22\n');
+  };
+
+  it('the package manager, the declared Node and the project\'s types stay the run\'s after the project changes', async () => {
+    await withProject(async (c) => {
+      const d = await runCustom(c, { pass: { argv: ['node', '-e', 'process.exit(0)'] } });
+      const before = (await build(c, d.run.runId)).report.head;
+      expect(before.environment).toMatchObject({ packageManager: 'npm 10.9.0', node: '22', python: null, recorded: true });
+      expect(before.project.ecosystems).not.toContain('python');
+      // The project moves on: another package manager, another Node, a Python component; a new discovery reads it.
+      writeFileSync(join(c.project, 'package.json'), JSON.stringify({ name: 'aud-report-state', version: '1.0.0', type: 'module', packageManager: 'pnpm@9.0.0' }));
+      writeFileSync(join(c.project, '.nvmrc'), '20\n');
+      writeFileSync(join(c.project, 'pyproject.toml'), '[project]\nname = "later"\nversion = "0.1.0"\nrequires-python = ">=3.12"\n');
+      await rescan(c.engine, c.projectId);
+      for (const lang of ['en', 'ar'] as const) {
+        const after = await build(c, d.run.runId, lang);
+        expect(after.report.head.environment, lang).toEqual(before.environment);
+        expect(after.report.head.project.ecosystems, lang).toEqual(before.project.ecosystems);
+        expect(after.report.head.versions.ayar, lang).toBe(before.versions.ayar);
+        expect(after.model.text, lang).not.toContain('pnpm');
+      }
+    }, declared);
+  }, 60_000);
+
+  it('the system and AYAR\'s version are the ones recorded with the run; a run that recorded none says so', async () => {
+    await withProject(async (c) => {
+      const d = await runCustom(c, { pass: { argv: ['node', '-e', 'process.exit(0)'] } });
+      const db = new DatabaseSync(join(c.dataDir, 'ayar.db'));
+      try {
+        // As if the run had been made on another system by another version of AYAR.
+        const env = JSON.parse((db.prepare('SELECT env_json AS e FROM runs WHERE id = ?').get(d.run.runId) as { e: string }).e) as Record<string, unknown>;
+        db.prepare('UPDATE runs SET env_json = ? WHERE id = ?').run(JSON.stringify({ ...env, os: 'darwin 99.0.0', ayar: '9.9.9' }), d.run.runId);
+      } finally {
+        db.close();
+      }
+      const recorded = await build(c, d.run.runId);
+      expect(recorded.report.head.environment.os).toBe('darwin 99.0.0');
+      expect(recorded.report.head.versions.ayar).toBe('9.9.9');
+      expect(recorded.model.text).toContain('darwin 99.0.0');
+      const db2 = new DatabaseSync(join(c.dataDir, 'ayar.db'));
+      try {
+        db2.prepare('UPDATE runs SET env_json = NULL WHERE id = ?').run(d.run.runId);
+      } finally {
+        db2.close();
+      }
+      for (const lang of ['en', 'ar'] as const) {
+        const older = await build(c, d.run.runId, lang);
+        expect(older.report.head.environment, lang).toMatchObject({ recorded: false, os: null, node: null, python: null, packageManager: null });
+        expect(older.report.head.project.ecosystems, lang).toEqual([]);
+        expect(older.report.head.versions.ayar, lang).toBeNull();
+        expect(older.model.text, lang).toContain(lang === 'ar' ? 'لم يسجّلها هذا التشغيل' : 'this run did not record it');
+      }
+    }, declared);
+  }, 60_000);
+});
+
 describe('AUD-05: a modified work tree is never called clean', () => {
   it('an uncommitted change before the run: Git state unknown, the run unchanged; a change during the run is told apart', async () => {
     await withProject(async (c) => {
@@ -209,15 +268,32 @@ describe('AUD-04: an incomplete inventory never proves the state stable', () => 
       ok(await c.engine.invoke('settings.set', { key: 'discovery.maxDepth', value: 1 }));
       for (const [name, x] of [['mutate', mutate], ['noop', noop]] as const) {
         const d = await runCustom(c, { [name]: x }, ['integ.state@.']);
-        expect(check(d, 'integ.state@.'), name).toMatchObject({ outcome: 'unavailable', outcomeReason: { key: 'integrity.reason.stateUnverified', params: { depth: 1, unreadable: 0, truncated: 'no' } } });
+        expect(check(d, 'integ.state@.'), name).toMatchObject({ outcome: 'unavailable', outcomeReason: { key: 'integrity.reason.stateUnverified', params: { depth: 1, unreadable: 0, truncated: 'no', depthLimit: 1, examples: 'deep/nested' } } });
         expect(d.run.stateChanged, name).toBe(false);
         const b = await build(c, d.run.runId, 'ar');
         expect(b.report.head.state.changedDuringRun, name).toBeNull();
         expect(b.report.integrity.checks.find((x) => x.checkId === 'integ.state'), name).toMatchObject({ outcome: 'unavailable' });
-        expect(b.human.text, name).toContain('الجرد ناقص فلا يُثبت ثبات الحالة');
+        expect(b.human.text, name).toContain('لم يغطِّ الجرد المشروع كله، فلا يُثبت ثبات الحالة. لم يُرصد 1 مجلد أعمق من حد الجرد (1 مستوى)');
+        expect(b.human.text, name).toContain('ومنها: deep/nested');
       }
       expect(readFileSync(join(c.project, 'deep', 'nested', 'value.js'), 'utf8')).toContain('value = 2');
     }, deep);
+  }, 60_000);
+
+  it('at the default limit (12 levels), a deeper folder is named as not observed, and why', async () => {
+    const levels = Array.from({ length: 14 }, (_, i) => `l${i + 1}`);
+    await withProject(
+      async (c) => {
+        const d = await runCustom(c, { noop }, ['integ.state@.']);
+        expect(check(d, 'integ.state@.')).toMatchObject({ outcome: 'unavailable', outcomeReason: { key: 'integrity.reason.stateUnverified', params: { depth: 1, depthLimit: 12, examples: levels.slice(0, 13).join('/') } } });
+        const en = await build(c, d.run.runId, 'en');
+        expect(en.human.text).toContain("1 folders deeper than the inventory’s limit (12 levels)");
+      },
+      (project) => {
+        mkdirSync(join(project, ...levels), { recursive: true });
+        writeFileSync(join(project, ...levels, 'deep.js'), 'export const deep = 1;\n');
+      },
+    );
   }, 60_000);
 
   it('a whole inventory detects the same change, and passes when nothing changed; a folder left out on purpose is no gap', async () => {

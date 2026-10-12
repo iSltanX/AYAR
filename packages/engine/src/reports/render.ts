@@ -133,7 +133,8 @@ export class Renderer {
     out.push(t('report.model.context.heading'));
     const h = report.head;
     out.push(`- ${t('report.model.context.type', { types: inline(h.project.ecosystems.join(' · ') || t('report.unknown')) })}`);
-    out.push(`- ${t('report.model.context.env', { os: h.environment.os, node: h.environment.node ?? '—', python: h.environment.python ?? '—', manager: inline(h.environment.packageManager ?? '—') })}`);
+    // The environment the run recorded; an older run that recorded none says so (AUD-07 follow-up).
+    out.push(`- ${h.environment.recorded ? t('report.model.context.env', { os: h.environment.os ?? t('report.unknown'), node: h.environment.node ?? '—', python: h.environment.python ?? '—', manager: inline(h.environment.packageManager ?? '—') }) : t('report.model.context.envUnrecorded')}`);
     // AUD-05, AUD-07: the head the run recorded (or that it recorded none), Git's uncommitted changes, and the run's own
     // stability, each as known, «غير معروف» when not.
     const yesNo = (v: boolean | null) => (v === null ? t('report.unknown') : v ? t('report.yes') : t('report.no'));

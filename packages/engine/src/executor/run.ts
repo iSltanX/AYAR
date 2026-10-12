@@ -15,6 +15,7 @@ import { adapterById } from '@ayar/adapters';
 import type { CheckOutcome, CheckReport, CheckRunDetail, CheckRunView, CheckSpec, EvidenceRef, JsonValue, ParsedReport, PlanItem, RawCheckResult, Reason, RunCounts, RunDetail, RunList, RunPlan, RunView, SideEffects, VerdictCounts } from '@ayar/protocol';
 import { A11Y_REVIEW_ITEMS, RawCheckResult as RawSchema, RunPlan as PlanSchema } from '@ayar/protocol';
 import { createHash } from 'node:crypto';
+import { release } from 'node:os';
 import { posix } from 'node:path';
 import { parseRunGit, type RunGit } from '../discovery/git.ts';
 import { computeChildEnv } from '../environment/child-env.ts';
@@ -32,6 +33,7 @@ import { approvalsOf, latestProfile } from '../profile/store.ts';
 import { stateSinceRound } from '../purity/since-round.ts';
 import { reviewItems } from '../reviews/service.ts';
 import type { PlannerService } from '../planner/service.ts';
+import type { RunEnvironment } from '../projects/context.ts';
 import type { ProjectsService } from '../projects/service.ts';
 import type { PurityService } from '../purity/service.ts';
 import type { RedactionCounts, Redactor } from '../redaction/redactor.ts';
@@ -44,6 +46,7 @@ import type { DataLayout } from '../storage/data-dir.ts';
 import type { Db } from '../storage/db.ts';
 import { readSettings } from '../storage/settings.ts';
 import type { ToolsService } from '../tools/service.ts';
+import { ENGINE_VERSION } from '../version.ts';
 import { reportEvidence, type JudgeRequest, type Judgement, type ReportInput, type VerdictService } from '../verdict/service.ts';
 import { resolveInvocation } from './invocation.ts';
 import { streamSink, type OutputTotals } from './output.ts';
@@ -443,6 +446,11 @@ export class RunService {
 
     // Services of this run share the child environment of the login shell, without sensitive variables.
     const base = await this.#o.environment.base();
+    // 12.1, 12.3, 11.9: the environment of the run — the system, AYAR, the environment's source — and the project's types
+    // and declared toolchain as the same fresh reading found them, kept with the run for its reports (AUD-07 follow-up).
+    const context = this.#o.projects.lastContext(projectId) ?? { ecosystems: [], node: null, python: null, packageManager: null };
+    const environment: RunEnvironment = { os: `${process.platform} ${release()}`, ayar: ENGINE_VERSION, source: base.source, ...context };
+    db.run('UPDATE runs SET env_json = ? WHERE id = ?', JSON.stringify(environment), runId);
     const serviceEnv = computeChildEnv({ login: base.env, rules: this.#o.redaction.names(), allowSensitive: [], explicit: {} }).env;
     await ports.fs.mkdir(posix.join(this.#o.layout.tmp, runId), 0o700);
     active.services = new CompanionServices({ ports, supervisor: this.#o.supervisor, redaction: this.#o.redaction, projectRoot: root, env: serviceEnv, runId, tmpDir: posix.join(this.#o.layout.tmp, runId) });
@@ -630,7 +638,8 @@ export class RunService {
       judgement = g.judgement;
       extra = g.evidence;
     } else if (spec.checkId === 'integ.state') {
-      judgement = integ.stateJudgement(spec, ctx.projectId, changedOutsideDeclared, gaps);
+      const s = evidence.settings();
+      judgement = integ.stateJudgement(spec, ctx.projectId, changedOutsideDeclared, gaps, { depth: s.maxDepth, entries: s.maxEntries });
       extra = { changed: changedOutsideDeclared, ...(gaps ? { gaps } : {}) };
     } else if (spec.checkId === 'integ.reviews') judgement = await integ.reviewsJudgement(spec, ctx.projectId, endManifest);
     else if (spec.checkId === 'integ.model-claims') judgement = integ.claimsJudgement(spec, ctx.projectId, runId);

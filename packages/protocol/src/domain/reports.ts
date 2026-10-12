@@ -60,8 +60,14 @@ export const ReportHead = z.strictObject({
   karat: z.int().min(0).max(24).nullable(),
   narrow: z.boolean(),
   counts: z.partialRecord(CheckOutcome, z.int().nonnegative()),
-  versions: z.strictObject({ ayar: z.string(), profile: z.int().nullable(), profileHash: z.string().nullable(), catalog: z.string(), template: z.literal(MODEL_REPORT_TEMPLATE), tools: z.record(z.string(), z.string()) }),
-  environment: z.strictObject({ source: z.string().nullable(), os: z.string(), node: z.string().nullable(), python: z.string().nullable(), packageManager: z.string().nullable() }),
+  /** Protocol 1.8: `ayar` is the version of AYAR the run was made with (null for an older run that did not record it). */
+  versions: z.strictObject({ ayar: z.string().nullable(), profile: z.int().nullable(), profileHash: z.string().nullable(), catalog: z.string(), template: z.literal(MODEL_REPORT_TEMPLATE), tools: z.record(z.string(), z.string()) }),
+  /**
+   * The environment of the run as it recorded it when it started (protocol 1.8): the system, the environment's source,
+   * Node and Python as its tools reported them (else as the project declared them), and the package manager. An
+   * older run that recorded none has `recorded: false` and these null, never the machine's or the project's now.
+   */
+  environment: z.strictObject({ recorded: z.boolean(), source: z.string().nullable(), os: z.string().nullable(), node: z.string().nullable(), python: z.string().nullable(), packageManager: z.string().nullable() }),
   state: z.strictObject({
     /** The branch and the commit the run recorded when it started (18.1), never the project's later head (AUD-07). */
     branch: z.string().nullable(),

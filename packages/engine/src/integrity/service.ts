@@ -300,8 +300,11 @@ export class IntegrityService {
 
   // ── the four checks at the end of the run ─────────────────────────────────────────────────────────────────
 
-  /** A judgement for an integrity check: every finding «review» (suspected), the outcome given, no classifier. */
-  judgement(spec: CheckSpec, projectId: string, pairs: readonly { finding: ParsedFinding; anchor: string }[], outcome: CheckOutcome, reason: Reason, info: Record<string, JsonValue> = {}): Judgement {
+  /**
+   * A judgement for an integrity check: every finding «review» (suspected), the outcome given, no classifier. With
+   * `byEffects: false` the outcome does not come from the effects (a lost base): excluding them changes nothing.
+   */
+  judgement(spec: CheckSpec, projectId: string, pairs: readonly { finding: ParsedFinding; anchor: string }[], outcome: CheckOutcome, reason: Reason, info: Record<string, JsonValue> = {}, o: { byEffects?: boolean } = {}): Judgement {
     const book = this.#o.catalog.rules;
     const prints = pairs.map((p) => fingerprintOf(spec.checkId, p.finding, p.anchor));
     const excluded = this.#o.verdict.falseAlarms(projectId, prints);
@@ -313,8 +316,9 @@ export class IntegrityService {
     });
     const live = findings.filter((f) => f.finding.effect !== 'excluded').length;
     const counts = { violations: 0, warnings: 0, review: live, notes: 0, excludedByReview: findings.length - live };
-    // An integrity check whose every effect a review excluded as a false alarm passes (D-35).
-    const finalOutcome: CheckOutcome = outcome === 'needs_review' && live === 0 ? 'passed' : outcome;
+    // An integrity check whose every effect a review excluded as a false alarm passes (D-35): effects there were, and
+    // they were the reason. «Needs review» with no effect, or for a base lost, is never a pass.
+    const finalOutcome: CheckOutcome = outcome === 'needs_review' && (o.byEffects ?? true) && findings.length > 0 && live === 0 ? 'passed' : outcome;
     const finalReason: Reason = finalOutcome !== outcome ? { key: 'integrity.reason.allExcluded', params: { count: findings.length } } : reason;
     const report: ParsedReport = { reader: 'integrity', readerVersion: INTEGRITY_VERSION, formats: [], tests: null, findings: pairs.map((p) => p.finding), findingsDropped: 0, signals: { noInputs: false, collectionError: false, configError: false, flaky: false, unresolved: 0 }, problems: [], info: { ...info, check: spec.checkId } };
     return { outcome: finalOutcome, reason: finalReason, origin: null, counts, findings, report };
@@ -325,11 +329,11 @@ export class IntegrityService {
     const pairs = (ctx.result?.findings ?? []).map(guardAsFinding);
     const evidence = { bases: ctx.baseSnapshotIds, baseLost: ctx.baseLost, compared: ctx.result?.compared ?? 0, changed: ctx.result?.changed ?? [], deleted: ctx.result?.deleted ?? [], truncated: ctx.result?.truncated ?? false, markers: ctx.markers, carried: ctx.carried, effects: ctx.result?.findings ?? [] };
     if (!ctx.baseSnapshotIds.length) {
-      if (ctx.baseLost) return { judgement: this.judgement(spec, projectId, pairs, 'needs_review', { key: 'integrity.reason.guardBaseLost' }, { bases: 0, carried: ctx.carried }), evidence };
+      if (ctx.baseLost) return { judgement: this.judgement(spec, projectId, pairs, 'needs_review', { key: 'integrity.reason.guardBaseLost' }, { bases: 0, carried: ctx.carried }, { byEffects: false }), evidence };
       return { judgement: this.judgement(spec, projectId, [], 'passed', { key: 'integrity.reason.guardNoBaseline', params: { markers: ctx.markers.length } }, { bases: 0, markers: ctx.markers.length }), evidence };
     }
     const n = pairs.length;
-    if (ctx.baseLost && !n) return { judgement: this.judgement(spec, projectId, [], 'needs_review', { key: 'integrity.reason.guardBaseLost' }, { bases: ctx.baseSnapshotIds.length }), evidence };
+    if (ctx.baseLost && !n) return { judgement: this.judgement(spec, projectId, [], 'needs_review', { key: 'integrity.reason.guardBaseLost' }, { bases: ctx.baseSnapshotIds.length }, { byEffects: false }), evidence };
     const outcome: CheckOutcome = n ? 'needs_review' : 'passed';
     const reason: Reason = n ? { key: 'integrity.reason.guardFindings', params: { count: n, files: ctx.result?.changed.length ?? 0 } } : { key: 'integrity.reason.guardClean', params: { files: ctx.result?.changed.length ?? 0 } };
     // The check each effect touches (C-22 «الربط»), for the page, even when that check did not run this time (DEV-12).
@@ -342,7 +346,7 @@ export class IntegrityService {
    * gaps (AUD-04: past the depth or entry limit, unreadable) show no stability where they did not look: with no change
    * seen, the check is «تعذّر», naming what was not observed — never «اجتاز» — and a change seen is reported all the same.
    */
-  stateJudgement(spec: CheckSpec, projectId: string, changed: readonly string[], gaps: InventoryGaps | null = null): Judgement {
+  stateJudgement(spec: CheckSpec, projectId: string, changed: readonly string[], gaps: InventoryGaps | null = null, limits: { depth: number; entries: number } | null = null): Judgement {
     const pairs = changed.slice(0, MAX_FINDINGS).map((path) => {
       const value = `state|${path}`;
       const finding: ParsedFinding = { rule: 'state.changed', toolRule: null, severity: null, proof: null, level: null, origin: 'project', message: `changed during the run: ${path}`, location: { path }, anchor: { kind: 'text', value }, expected: null, actual: null };
@@ -350,7 +354,11 @@ export class IntegrityService {
     });
     const unobserved: Record<string, JsonValue> = gaps ? { gapDepth: gaps.depth, gapUnreadable: gaps.unreadable, gapTruncated: gaps.truncated } : {};
     if (changed.length) return this.judgement(spec, projectId, pairs, 'needs_review', { key: 'integrity.reason.stateChanged', params: { count: changed.length } }, { changed: changed.length, ...unobserved });
-    if (gaps) return this.judgement(spec, projectId, [], 'unavailable', { key: 'integrity.reason.stateUnverified', params: { depth: gaps.depth, unreadable: gaps.unreadable, truncated: gaps.truncated ? 'yes' : 'no' } }, { changed: 0, ...unobserved });
+    // The reason says what was not seen and why: the inventory's limits as set (depth 12 by default), and a few paths.
+    if (gaps) {
+      const params = { depth: gaps.depth, unreadable: gaps.unreadable, truncated: gaps.truncated ? 'yes' : 'no', depthLimit: limits?.depth ?? 0, entriesLimit: limits?.entries ?? 0, examples: gaps.paths.slice(0, 3).join(', ') || '—' };
+      return this.judgement(spec, projectId, [], 'unavailable', { key: 'integrity.reason.stateUnverified', params }, { changed: 0, ...unobserved, unobservedPaths: gaps.paths });
+    }
     return this.judgement(spec, projectId, [], 'passed', { key: 'integrity.reason.stateStable' }, { changed: 0 });
   }
 

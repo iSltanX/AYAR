@@ -52,6 +52,7 @@
   "report.model.context.heading": "## سياق المشروع",
   "report.model.context.type": "النوع والتقنيات: {types}",
   "report.model.context.env": "بيئة الفحص: {os} · Node {node} · Python {python} · مدير الحزم: {manager}",
+  "report.model.context.envUnrecorded": "بيئة الفحص: لم يسجّلها هذا التشغيل",
   "report.model.context.state": "الحالة المفحوصة: الفرع {branch} · الالتزام {commit} · تغييرات غير ملتزمة: {dirty} · تغيّر المصدر أثناء الفحص: {changed}",
   "report.model.context.stateUnrecorded": "الحالة المفحوصة: لم يسجّل هذا التشغيل فرعه ولا التزامه · تغييرات غير ملتزمة: {dirty} · تغيّر المصدر أثناء الفحص: {changed}",
   "report.model.context.versions": "ملف المعايير: الإصدار {profile} · الكتالوج: {catalog} · التشغيل: {run} بتاريخ {date}",
