@@ -1,0 +1,54 @@
+{
+  "a": "/Volumes/iSltanXx/Projects/AYAR-wt/DEV-13/apps/desktop/out/AYAR-darwin-arm64/AYAR.app",
+  "b": "/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-reproduce-GFyQ7O/repo/apps/desktop/out/AYAR-darwin-arm64/AYAR.app",
+  "at": "2026-10-12T16:01:18.476Z",
+  "note": "reference built from f323e233ce95bb01907fb1eb1cc4050679d2d369 in its working tree (6 uncommitted files); rebuilt from a clone of f323e233ce95bb01907fb1eb1cc4050679d2d369, npm ci, npm run package; clone size 1.1G, removed",
+  "files": {
+    "a": 265,
+    "b": 265,
+    "onlyA": [],
+    "onlyB": []
+  },
+  "asarSha256": {
+    "a": "e785236ab04025f0eb94c63281e6f08df0da2106a0891cc8816b8a417dd7c121",
+    "b": "e785236ab04025f0eb94c63281e6f08df0da2106a0891cc8816b8a417dd7c121"
+  },
+  "bundleCdhash": {
+    "a": "e53e5299a0e4d7ba9ecee712daf4aebe27f81f26",
+    "b": "2160b913f24eb636d9d47ce6861559116cc94fa2"
+  },
+  "signatureOnlyDifferences": [
+    "Contents/Frameworks/AYAR Helper (GPU).app/Contents/MacOS/AYAR Helper (GPU)",
+    "Contents/Frameworks/AYAR Helper (Plugin).app/Contents/MacOS/AYAR Helper (Plugin)",
+    "Contents/Frameworks/AYAR Helper (Renderer).app/Contents/MacOS/AYAR Helper (Renderer)",
+    "Contents/Frameworks/AYAR Helper.app/Contents/MacOS/AYAR Helper",
+    "Contents/Frameworks/Electron Framework.framework/Versions/A/Helpers/chrome_crashpad_handler",
+    "Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/libffmpeg.dylib",
+    "Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/libvk_swiftshader.dylib",
+    "Contents/Frameworks/Electron Framework.framework/Versions/A/_CodeSignature/CodeResources",
+    "Contents/Frameworks/Mantle.framework/Versions/A/Mantle",
+    "Contents/Frameworks/ReactiveObjC.framework/Versions/A/ReactiveObjC",
+    "Contents/Frameworks/Squirrel.framework/Versions/A/Resources/ShipIt",
+    "Contents/Frameworks/Squirrel.framework/Versions/A/_CodeSignature/CodeResources",
+    "Contents/_CodeSignature/CodeResources"
+  ],
+  "sealedOverSignatures": [
+    {
+      "file": "Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework",
+      "cdhashA": "8d35ef3364c91c4a183a71e2c2a43287dd84bac4",
+      "cdhashB": "7944e9b324e91248f61c9cfa2ccfbc5ada6c6680"
+    },
+    {
+      "file": "Contents/Frameworks/Squirrel.framework/Versions/A/Squirrel",
+      "cdhashA": "6aaa5152a9f4e74a3a7025851e621c21c3afa095",
+      "cdhashB": "7755f93bb9ecae8551daa7b01cc5131bedbdb0ce"
+    },
+    {
+      "file": "Contents/MacOS/AYAR",
+      "cdhashA": "e53e5299a0e4d7ba9ecee712daf4aebe27f81f26",
+      "cdhashB": "2160b913f24eb636d9d47ce6861559116cc94fa2"
+    }
+  ],
+  "differing": [],
+  "ok": true
+}

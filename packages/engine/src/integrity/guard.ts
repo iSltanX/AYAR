@@ -24,6 +24,13 @@ export interface GuardFinding {
   check: string | null;
   /** The pattern that matched (for the evidence). */
   pattern: string;
+  /**
+   * The run that first found the effect (G-DEV12-05, DEV-13): an effect nobody reviewed is carried into the next
+   * rounds, whose base already holds the change, until a review on its check holds or the marker is gone.
+   */
+  firstSeen?: { runId: string; at: string };
+  /** For an effect that is a file's changed content (a snapshot, a reference, an AYAR file, a threshold): the file's hash after the change, so a carried effect lapses once the file changes again. */
+  fileHash?: string;
 }
 
 /** A marker that exists in a file (the first round's inventory, 10.3: «تسجل جردة فقط»). */
@@ -107,7 +114,7 @@ const THRESHOLD_KEYS: { re: RegExp; check: string; pattern: string }[] = [
 ];
 const AXE_DISABLE = /disableRules|\brules\s*:\s*\{[^}]*enabled\s*:\s*false/;
 
-const bounded = (s: string): string => s.trim().replace(/\s+/g, ' ').slice(0, MAX_ANCHOR);
+export const bounded = (s: string): string => s.trim().replace(/\s+/g, ' ').slice(0, MAX_ANCHOR);
 const isTestFile = (p: string): boolean => TEST_FILE.test(p);
 const testCheckOf = (p: string): string => (E2E_PATH.test(p) || /\.e2e\./.test(p) ? 'beh.e2e' : 'beh.unit');
 
@@ -217,15 +224,15 @@ export async function guard(input: GuardInput): Promise<GuardResult> {
       const first = b !== null && a !== null ? (changedPairs(b, a)[0] ?? addedLines(b, a)[0] ?? null) : null;
       const line = first ? ('line' in first ? first.line : null) : null;
       const anchor = first ? bounded('after' in first ? first.after : first.text) : `changed ${path}`;
-      push({ rule: 'guard.snapshot-changed', path, line, anchor, message: `snapshot changed: ${path}`, before: first && 'before' in first ? bounded(first.before) : null, after: first ? bounded('after' in first ? first.after : first.text) : null, check, pattern: 'snapshot changed' });
+      push({ rule: 'guard.snapshot-changed', path, line, anchor, message: `snapshot changed: ${path}`, before: first && 'before' in first ? bounded(first.before) : null, after: first ? bounded('after' in first ? first.after : first.text) : null, check, pattern: 'snapshot changed', fileHash: now[5] });
       continue;
     }
     if (!isNew && input.referencePaths?.includes(path)) {
-      push({ rule: 'guard.reference-changed', path, line: null, anchor: `changed ${path}`, message: `reference image changed: ${path}`, before: prev[5], after: now[5], check: 'design.visual', pattern: 'reference changed' });
+      push({ rule: 'guard.reference-changed', path, line: null, anchor: `changed ${path}`, message: `reference image changed: ${path}`, before: prev[5], after: now[5], check: 'design.visual', pattern: 'reference changed', fileHash: now[5] });
       continue;
     }
     if (AYAR_FILE.test(path)) {
-      push({ rule: 'guard.reference-changed', path, line: null, anchor: isNew ? `added ${path}` : `changed ${path}`, message: `AYAR file ${isNew ? 'added' : 'changed'} in the repository: ${path}`, before: prev?.[5] ?? null, after: now[5], check: null, pattern: 'ayar file' });
+      push({ rule: 'guard.reference-changed', path, line: null, anchor: isNew ? `added ${path}` : `changed ${path}`, message: `AYAR file ${isNew ? 'added' : 'changed'} in the repository: ${path}`, before: prev?.[5] ?? null, after: now[5], check: null, pattern: 'ayar file', fileHash: now[5] });
       continue;
     }
     if (now[6] !== 'text' || now[1] > MAX_FILE_CHARS) continue;
@@ -255,7 +262,7 @@ export async function guard(input: GuardInput): Promise<GuardResult> {
         const lowered = loweredNumbers(pair.before, pair.after);
         if (!lowered.length) continue;
         const check = /vitest|jest|\.coveragerc|pyproject|setup\.cfg/.test(path) ? 'beh.unit' : /stryker/.test(path) ? 'beh.mutation' : /size-limit/.test(path) ? 'code.size' : /k6/.test(path) ? 'perf.load' : key.check;
-        push({ rule: 'guard.threshold-lowered', path, line: pair.line, anchor: bounded(pair.after), message: lowered.map((x) => `${x.key} ${x.from} → ${x.to}`).join(', '), before: bounded(pair.before), after: bounded(pair.after), check, pattern: key.pattern });
+        push({ rule: 'guard.threshold-lowered', path, line: pair.line, anchor: bounded(pair.after), message: lowered.map((x) => `${x.key} ${x.from} → ${x.to}`).join(', '), before: bounded(pair.before), after: bounded(pair.after), check, pattern: key.pattern, fileHash: now[5] });
       }
       // Thresholds that moved as a block (an object rewritten): compare the whole file's numbers too.
       if (CONFIG_FILE.test(path) && !findings.some((f) => f.path === path && f.rule === 'guard.threshold-lowered')) {
@@ -263,10 +270,10 @@ export async function guard(input: GuardInput): Promise<GuardResult> {
         if (lowered.length) {
           const line = after.split('\n').findIndex((l) => lowered.some((x) => l.includes(x.key))) + 1;
           const check = /vitest|jest|\.coveragerc|pyproject|setup\.cfg/.test(path) ? 'beh.unit' : /stryker/.test(path) ? 'beh.mutation' : /size-limit/.test(path) ? 'code.size' : /k6/.test(path) ? 'perf.load' : null;
-          push({ rule: 'guard.threshold-lowered', path, line: line || null, anchor: bounded(after.split('\n')[line - 1] ?? 'thresholds'), message: lowered.map((x) => `${x.key} ${x.from} → ${x.to}`).join(', '), before: null, after: null, check, pattern: 'thresholds' });
+          push({ rule: 'guard.threshold-lowered', path, line: line || null, anchor: bounded(after.split('\n')[line - 1] ?? 'thresholds'), message: lowered.map((x) => `${x.key} ${x.from} → ${x.to}`).join(', '), before: null, after: null, check, pattern: 'thresholds', fileHash: now[5] });
         }
       }
-      if (AXE_DISABLE.test(after) && !AXE_DISABLE.test(before)) push({ rule: 'guard.threshold-lowered', path, line: after.split('\n').findIndex((l) => AXE_DISABLE.test(l)) + 1 || null, anchor: 'disableRules', message: 'axe rules disabled', before: null, after: null, check: 'design.a11y', pattern: 'axe disableRules' });
+      if (AXE_DISABLE.test(after) && !AXE_DISABLE.test(before)) push({ rule: 'guard.threshold-lowered', path, line: after.split('\n').findIndex((l) => AXE_DISABLE.test(l)) + 1 || null, anchor: 'disableRules', message: 'axe rules disabled', before: null, after: null, check: 'design.a11y', pattern: 'axe disableRules', fileHash: now[5] });
     }
   }
   return { findings, compared, changed, deleted, truncated };

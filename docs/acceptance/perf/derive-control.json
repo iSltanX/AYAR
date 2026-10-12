@@ -1,0 +1,67 @@
+{
+  "releaseApp": "/Volumes/iSltanXx/Projects/AYAR-wt/DEV-13/apps/desktop/out/AYAR-darwin-arm64/AYAR.app",
+  "derivedApp": "/Users/abutalal/.cache/ayar-DEV-13-chain/control/AYAR.app",
+  "identity": "AYAR Local Code Signing",
+  "fusesFlipped": [
+    "RunAsNode",
+    "EnableNodeOptionsEnvironmentVariable",
+    "EnableNodeCliInspectArguments"
+  ],
+  "filesCompared": 265,
+  "linksCompared": 14,
+  "onlyRelease": [],
+  "onlyDerived": [],
+  "linkDifferences": [],
+  "differingFiles": [
+    "Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework",
+    "Contents/MacOS/AYAR",
+    "Contents/_CodeSignature/CodeResources"
+  ],
+  "afterStrippingSignatures": {
+    "Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework": {
+      "sizeA": 201109944,
+      "sizeB": 201109944,
+      "differingBytes": 3,
+      "offsets": [
+        157950238,
+        157950240,
+        157950241
+      ]
+    },
+    "Contents/MacOS/AYAR": {
+      "sizeA": 33540,
+      "sizeB": 33540,
+      "differingBytes": 0,
+      "offsets": []
+    }
+  },
+  "fuses": {
+    "release": {
+      "RunAsNode": "DISABLE",
+      "EnableCookieEncryption": "DISABLE",
+      "EnableNodeOptionsEnvironmentVariable": "DISABLE",
+      "EnableNodeCliInspectArguments": "DISABLE",
+      "EnableEmbeddedAsarIntegrityValidation": "ENABLE",
+      "OnlyLoadAppFromAsar": "ENABLE",
+      "LoadBrowserProcessSpecificV8Snapshot": "DISABLE",
+      "GrantFileProtocolExtraPrivileges": "DISABLE",
+      "WasmTrapHandlers": "ENABLE"
+    },
+    "derived": {
+      "RunAsNode": "ENABLE",
+      "EnableCookieEncryption": "DISABLE",
+      "EnableNodeOptionsEnvironmentVariable": "ENABLE",
+      "EnableNodeCliInspectArguments": "ENABLE",
+      "EnableEmbeddedAsarIntegrityValidation": "ENABLE",
+      "OnlyLoadAppFromAsar": "ENABLE",
+      "LoadBrowserProcessSpecificV8Snapshot": "DISABLE",
+      "GrantFileProtocolExtraPrivileges": "DISABLE",
+      "WasmTrapHandlers": "ENABLE"
+    }
+  },
+  "designatedRequirement": {
+    "release": "designated => identifier \"com.bysltan.ayar\" and certificate leaf = H\"86526c3ec084f4676eecbd8d298c35eab3278364\"",
+    "derived": "designated => identifier \"com.bysltan.ayar\" and certificate leaf = H\"86526c3ec084f4676eecbd8d298c35eab3278364\""
+  },
+  "ok": true
+}

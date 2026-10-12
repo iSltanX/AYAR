@@ -16,6 +16,12 @@
 //
 // Nothing here changes the outcome of another check except by the guard's attached findings (7.3 rule 8) and the
 // reviews' expiry (11.4 rule 6); a model claim never changes a result (D-41).
+//
+// G-DEV12-05 (DEV-13): the base of a new round is the last round's snapshot, which already holds every change the
+// guard flagged in that round. So an effect nobody reviewed is carried forward: the effects of the project's last
+// integ.guard execution come back as findings of this run while the marker they point at is still in the file (or
+// the file is still gone or still changed) and no accept review on the touched check, recorded after the effect was
+// first seen, still holds. A review that holds settles the effect; one that expired brings it back with the review.
 import type { Catalog } from '@ayar/catalog';
 import type { CheckOutcome, CheckSpec, FindingLocation, JsonValue, ParsedFinding, ParsedReport, PlanItem, Reason } from '@ayar/protocol';
 import { createHash } from 'node:crypto';
@@ -25,7 +31,7 @@ import type { Manifest, ManifestEntry } from '../evidence/snapshot.ts';
 import type { Logger } from '../ports/index.ts';
 import type { Db } from '../storage/db.ts';
 import { fingerprintOf, type JudgedFinding, type Judgement, type VerdictService } from '../verdict/service.ts';
-import { guard, markersIn, type GuardFinding, type GuardMarker, type GuardResult } from './guard.ts';
+import { bounded, guard, markersIn, type GuardFinding, type GuardMarker, type GuardResult } from './guard.ts';
 
 export const INTEGRITY_RUNNERS = ['integrity-guard', 'state-snapshot', 'model-claims', 'reviews'] as const;
 export const INTEGRITY_VERSION = '1.0.0';
@@ -44,6 +50,8 @@ export interface GuardContext {
   byInstance: Map<string, GuardFinding[]>;
   /** Effects whose check is unknown: the round's summary («ما لا يُعرف فحصه»). */
   unattributed: GuardFinding[];
+  /** How many of the effects were carried from the previous guard execution, unreviewed (G-DEV12-05). */
+  carried: number;
   /** 11.4 rule 6: reviews on a check instance whose scope changed since: the instance goes back to «يحتاج مراجعة». */
   expiredReviews: Map<string, { reviewId: string; changed: string[] }>;
 }
@@ -54,6 +62,8 @@ export interface IntegrityOptions {
   logger: Logger;
   evidence: EvidenceService;
   verdict: VerdictService;
+  /** Reads a stored evidence file (the previous guard execution's integrity.json, G-DEV12-05). */
+  readFile: (path: string) => Promise<Uint8Array>;
 }
 
 /** The anchor of an integrity finding: a text anchor, as jobs.ts hashes one (C-15). */
@@ -86,7 +96,7 @@ export class IntegrityService {
    */
   async prepare(o: { projectId: string; runId: string; plan: { items: PlanItem[] }; startManifest: Manifest; declared: (p: string) => boolean }): Promise<GuardContext> {
     const { db, evidence } = this.#o;
-    const ctx: GuardContext = { baseSnapshotIds: [], baseLost: false, result: null, markers: [], byInstance: new Map(), unattributed: [], expiredReviews: new Map() };
+    const ctx: GuardContext = { baseSnapshotIds: [], baseLost: false, result: null, markers: [], byInstance: new Map(), unattributed: [], expiredReviews: new Map(), carried: 0 };
     // 11.4 rule 6: the latest review of each check instance, against the files of its scope as they are now.
     const nowHashes = new Map(o.startManifest.files.map((f) => [f[0], f[5]]));
     const latestReviews = new Map<string, { id: string; scope_json: string; snapshot_id: string | null }>();
@@ -126,10 +136,19 @@ export class IntegrityService {
     };
     const referencePaths = db.all<{ rel_path: string }>("SELECT rel_path FROM baselines WHERE project_id = ? AND status = 'active'", o.projectId).map((r) => r.rel_path);
     const currentText = read(o.startManifest);
+    const firstSeenAt = db.get<{ started_at: string | null }>('SELECT started_at FROM runs WHERE id = ?', o.runId)?.started_at ?? new Date().toISOString();
     if (!bases.size) {
       // The first round: an inventory of the markers, nothing compared.
-      if (hadBase) ctx.baseLost = true;
-      else {
+      if (hadBase) {
+        ctx.baseLost = true;
+        // The base is gone, but the unreviewed effects of the last guard execution are not (G-DEV12-05).
+        const carried = await this.#carriedEffects({ projectId: o.projectId, runId: o.runId, startManifest: o.startManifest, currentText, seen: new Set() });
+        if (carried.length) {
+          ctx.carried = carried.length;
+          ctx.result = { findings: carried, compared: 0, changed: [], deleted: [], truncated: false };
+          this.#attribute(ctx, carried, o.plan.items);
+        }
+      } else {
         for (const f of o.startManifest.files) {
           if (f[6] !== 'text' || !f[7]) continue;
           if (!/\.(test|spec)\.[cm]?[jt]sx?$|test_[^/]*\.py$|_test\.py$|\.(ts|tsx|js|jsx|mjs|cjs|py)$/.test(f[0])) continue;
@@ -174,19 +193,93 @@ export class IntegrityService {
         ctx.baseLost = true;
       }
     }
+    for (const f of all) f.firstSeen ??= { runId: o.runId, at: firstSeenAt };
+    // G-DEV12-05: the unreviewed effects of the previous guard execution, still in place, join this run's.
+    const carried = await this.#carriedEffects({ projectId: o.projectId, runId: o.runId, startManifest: o.startManifest, currentText, seen });
+    ctx.carried = carried.length;
+    all.push(...carried);
     ctx.result = { findings: all, compared, changed: [...changed].sort(), deleted: [...deleted].sort(), truncated };
-    // The instance an effect touches: its check, in the component whose folder holds the path (the deepest).
-    const components = [...new Set(o.plan.items.map((i) => i.component))].sort((a, b) => b.length - a.length);
-    for (const f of all) {
+    this.#attribute(ctx, all, o.plan.items);
+    return ctx;
+  }
+
+  /** The instance an effect touches: its check, in the component whose folder holds the path (the deepest). */
+  #attribute(ctx: GuardContext, effects: readonly GuardFinding[], items: readonly PlanItem[]): void {
+    const components = [...new Set(items.map((i) => i.component))].sort((a, b) => b.length - a.length);
+    for (const f of effects) {
       if (!f.check) {
         ctx.unattributed.push(f);
         continue;
       }
       const comp = components.find((c) => c !== '.' && (f.path === c || f.path.startsWith(`${c}/`))) ?? '.';
-      const instance = o.plan.items.find((i) => i.checkId === f.check && i.component === comp)?.instance ?? o.plan.items.find((i) => i.checkId === f.check)?.instance ?? `${f.check}@${comp}`;
+      const instance = items.find((i) => i.checkId === f.check && i.component === comp)?.instance ?? items.find((i) => i.checkId === f.check)?.instance ?? `${f.check}@${comp}`;
       ctx.byInstance.set(instance, [...(ctx.byInstance.get(instance) ?? []), f]);
     }
-    return ctx;
+  }
+
+  /**
+   * G-DEV12-05: the effects of the project's last finished integ.guard execution (its integrity.json evidence) that
+   * are still unreviewed and still in place. Never throws: what cannot be read carries nothing (and is logged).
+   */
+  async #carriedEffects(o: { projectId: string; runId: string; startManifest: Manifest; currentText: (path: string) => Promise<string | null>; seen: Set<string> }): Promise<GuardFinding[]> {
+    const { db, evidence } = this.#o;
+    const prev = db.get<{ id: string; run_id: string; started_at: string | null }>(
+      "SELECT c.id, c.run_id, r.started_at FROM check_runs c JOIN runs r ON r.id = c.run_id WHERE r.project_id = ? AND c.check_id = 'integ.guard' AND c.state = 'finished' AND c.run_id <> ? ORDER BY c.finished_at DESC, c.rowid DESC LIMIT 1",
+      o.projectId,
+      o.runId,
+    );
+    if (!prev) return [];
+    const ref = evidence.store.refsOf(prev.id).find((e) => e.kind === 'integrity');
+    if (!ref) return [];
+    let effects: GuardFinding[] = [];
+    try {
+      const parsed = JSON.parse(new TextDecoder().decode(await this.#o.readFile(evidence.store.absolute(ref.relPath)))) as { effects?: unknown };
+      effects = Array.isArray(parsed.effects) ? (parsed.effects as GuardFinding[]).filter((f) => f && typeof f.rule === 'string' && typeof f.path === 'string' && typeof f.anchor === 'string') : [];
+    } catch (e) {
+      this.#o.logger.log('warn', 'the previous guard evidence could not be read; no effect carried', { error: e instanceof Error ? e.message.slice(0, 300) : String(e) });
+      return [];
+    }
+    const nowHashes = new Map(o.startManifest.files.map((f) => [f[0], f[5]]));
+    const present = new Set(o.startManifest.files.map((f) => f[0]));
+    const out: GuardFinding[] = [];
+    for (const f of effects) {
+      const key = `${f.rule}|${f.path}|${f.line ?? ''}|${f.anchor}`;
+      if (o.seen.has(key)) continue;
+      const firstSeen = f.firstSeen ?? { runId: prev.run_id, at: prev.started_at ?? '' };
+      // Still in place? A deleted file still gone; a changed or added file still there; a marker line still in the text.
+      let stillThere: boolean;
+      if (f.fileHash) stillThere = nowHashes.get(f.path) === f.fileHash;
+      else if (f.anchor.startsWith('deleted ')) stillThere = !present.has(f.path);
+      else if (f.anchor.startsWith('changed ') || f.anchor.startsWith('added ')) stillThere = present.has(f.path);
+      else {
+        const text = present.has(f.path) ? await o.currentText(f.path) : null;
+        stillThere = text === null ? present.has(f.path) : text.split('\n').some((l) => bounded(l) === f.anchor);
+      }
+      if (!stillThere) continue;
+      // Reviewed? The latest accept review on the touched check (or on integ.guard itself), recorded after the effect
+      // was first seen, that still holds.
+      if (f.check) {
+        const rows = db.all<{ id: string; decision: string; scope_json: string; snapshot_id: string | null; target_ref: string }>(
+          "SELECT id, decision, scope_json, snapshot_id, target_ref FROM reviews WHERE project_id = ? AND target_type = 'check' AND (target_ref = ? OR target_ref LIKE ? OR target_ref LIKE 'integ.guard@%') AND created_at >= ? ORDER BY created_at DESC, rowid DESC",
+          o.projectId,
+          f.check,
+          `${f.check}@%`,
+          firstSeen.at,
+        );
+        const latestByTarget = new Map<string, (typeof rows)[number]>();
+        for (const r of rows) if (!latestByTarget.has(r.target_ref)) latestByTarget.set(r.target_ref, r);
+        let settled = false;
+        for (const r of latestByTarget.values()) {
+          if (r.decision !== 'accept' && r.decision !== 'passed') continue;
+          const expired = await this.reviewExpired(r, nowHashes).catch(() => ({ expired: true, changed: [] as string[] }));
+          if (!expired.expired) settled = true;
+        }
+        if (settled) continue;
+      }
+      o.seen.add(key);
+      out.push({ ...f, firstSeen });
+    }
+    return out;
   }
 
   /**
@@ -230,9 +323,9 @@ export class IntegrityService {
   /** integ.guard at the end: all effects, or the first round's inventory. */
   guardJudgement(spec: CheckSpec, projectId: string, ctx: GuardContext): { judgement: Judgement; evidence: Record<string, unknown> } {
     const pairs = (ctx.result?.findings ?? []).map(guardAsFinding);
-    const evidence = { bases: ctx.baseSnapshotIds, baseLost: ctx.baseLost, compared: ctx.result?.compared ?? 0, changed: ctx.result?.changed ?? [], deleted: ctx.result?.deleted ?? [], truncated: ctx.result?.truncated ?? false, markers: ctx.markers, effects: ctx.result?.findings ?? [] };
+    const evidence = { bases: ctx.baseSnapshotIds, baseLost: ctx.baseLost, compared: ctx.result?.compared ?? 0, changed: ctx.result?.changed ?? [], deleted: ctx.result?.deleted ?? [], truncated: ctx.result?.truncated ?? false, markers: ctx.markers, carried: ctx.carried, effects: ctx.result?.findings ?? [] };
     if (!ctx.baseSnapshotIds.length) {
-      if (ctx.baseLost) return { judgement: this.judgement(spec, projectId, [], 'needs_review', { key: 'integrity.reason.guardBaseLost' }, { bases: 0 }), evidence };
+      if (ctx.baseLost) return { judgement: this.judgement(spec, projectId, pairs, 'needs_review', { key: 'integrity.reason.guardBaseLost' }, { bases: 0, carried: ctx.carried }), evidence };
       return { judgement: this.judgement(spec, projectId, [], 'passed', { key: 'integrity.reason.guardNoBaseline', params: { markers: ctx.markers.length } }, { bases: 0, markers: ctx.markers.length }), evidence };
     }
     const n = pairs.length;
@@ -241,7 +334,7 @@ export class IntegrityService {
     const reason: Reason = n ? { key: 'integrity.reason.guardFindings', params: { count: n, files: ctx.result?.changed.length ?? 0 } } : { key: 'integrity.reason.guardClean', params: { files: ctx.result?.changed.length ?? 0 } };
     // The check each effect touches (C-22 «الربط»), for the page, even when that check did not run this time (DEV-12).
     const links = (ctx.result?.findings ?? []).slice(0, MAX_FINDINGS).map((f) => ({ rule: f.rule, path: f.path, line: f.line ?? null, check: f.check }));
-    return { judgement: this.judgement(spec, projectId, pairs, outcome, reason, { bases: ctx.baseSnapshotIds.length, compared: ctx.result?.compared ?? 0, links }), evidence };
+    return { judgement: this.judgement(spec, projectId, pairs, outcome, reason, { bases: ctx.baseSnapshotIds.length, compared: ctx.result?.compared ?? 0, carried: ctx.carried, links }), evidence };
   }
 
   /** integ.state at the end (9.9, 11.4 rule 8): the files that changed outside the declared outputs. */

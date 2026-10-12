@@ -1,0 +1,14 @@
+{
+  "test": "AYAR dependencies: known vulnerabilities (sec.deps evidence, DEV-13 review R1-04)",
+  "commit": "f323e233ce95bb01907fb1eb1cc4050679d2d369",
+  "scanner": "osv-scanner version: 2.6.0",
+  "lockfile": "package-lock.json",
+  "packagesScanned": 507,
+  "database": {
+    "ecosystem": "npm",
+    "modified": "2026-10-12T14:48:39.399Z",
+    "offline": true
+  },
+  "vulnerable": [],
+  "at": "2026-10-12T16:17:22.824Z"
+}

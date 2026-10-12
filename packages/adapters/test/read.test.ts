@@ -5,7 +5,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { cleanMessage, jsonDepth, normalizePath, readJson, readJsonInText, readJsonLines, readJUnit, readSarif, readXml, REPORT_LIMITS, stripAnsi, visibleBidi } from '../src/index.ts';
+import { cleanMessage, jsonDepth, LINE_SPLIT_MARKER, normalizePath, readJson, readJsonInText, readJsonLines, readJUnit, readSarif, readXml, REPORT_LIMITS, stripAnsi, visibleBidi } from '../src/index.ts';
 
 const FX = new URL('../../../fixtures/FX-REPORTS/', import.meta.url).pathname;
 const base = (f: string) => readFileSync(join(FX, 'base/reports', f), 'utf8');
@@ -23,6 +23,15 @@ describe('the limits (G-DEV1-05)', () => {
     expect(readJson(`${'['.repeat(64)}${']'.repeat(64)}`, 'r.json').ok).toBe(true);
   });
 
+  it('reads a report whose stored copy was cut into 64 Ki lines by the redaction (DEV-13, AYAR on itself)', () => {
+    const long = JSON.stringify({ results: [{ name: 'x'.repeat(70_000), ok: true }] });
+    const cut = `${long.slice(0, 65_536)}${LINE_SPLIT_MARKER}\n${long.slice(65_536)}`;
+    expect(readJson(cut, 'r.json')).toMatchObject({ ok: true, value: { results: [{ ok: true }] } });
+    expect(readJsonInText(`banner\n${cut}`, 'out.txt')).toMatchObject({ ok: true });
+    expect(readJsonLines(`{"a":1}\n${cut}`, 'r.jsonl')).toMatchObject({ ok: true, value: { values: [{ a: 1 }, { results: [{ ok: true }] }] } });
+    const xml = `<testsuite name="${'y'.repeat(70_000)}"><testcase name="t"/></testsuite>`;
+    expect(readXml(`${xml.slice(0, 65_536)}${LINE_SPLIT_MARKER}\n${xml.slice(65_536)}`, 'j.xml')).toMatchObject({ ok: true });
+  });
   it('tells an empty report, a malformed one and a deep one apart', () => {
     expect(readJson('  ', 'r.json')).toMatchObject({ ok: false, problem: { code: 'empty' } });
     expect(readJson('{"a":', 'r.json')).toMatchObject({ ok: false, problem: { code: 'malformed' } });

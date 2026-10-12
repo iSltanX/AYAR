@@ -2,6 +2,9 @@
 // and place, none in the sound variant (the negative control), and the limits: no reference, no judgement («ناقص
 // إعداد»); the main file unreadable, «تعذّر»; a suggestion never a violation.
 import type { JsonValue } from '@ayar/protocol';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { analyzerById, anchorsOf, coverageGaps, families, lcovGaps, measureFunctions, normalizeColor, parseSize, slug, stripJsonComments, untestedUnits, validVersion, type AnalyzerResult } from '../src/index.ts';
 import { fact, input, materialize } from './support.ts';
@@ -91,6 +94,28 @@ describe('design.tokens.static and design.fonts.static (FX-WEB-DESIGN)', () => {
     expect(v('hardcoded-color')).toEqual([['tokens.off-scale', 'styles/app.css', 101]]);
     expect(v('off-scale-spacing')).toEqual([['tokens.off-scale', 'styles/app.css', 87]]);
     expect(v('undefined-var')).toEqual([['tokens.undefined-var', 'styles/app.css', 94]]);
+  });
+  it('counts a property a component sets inline or from its script as defined, and an undefined var() as undefined even with a fallback (DEV-13, review R3-06)', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'ayar-DEV-13-tokens-'));
+    try {
+      mkdirSync(join(dir, 'src'));
+      writeFileSync(join(dir, 'src', 'Bar.svelte'), `<script>
+  let el;
+  $effect(() => el.style.setProperty('--progress', '0.5'));
+</script>
+<div bind:this={el} style:--position={30} style="--ratio: 1.5"><span class="fill"></span></div>
+<style>
+  .fill { width: calc(var(--progress) * 100%); inset-inline-start: calc(var(--position) * 1%); aspect-ratio: var(--ratio); inline-size: var(--control-width, 240px); border-radius: var(--radius-missing); }
+</style>
+`);
+      const r = run('tokens-static', input(dir, { checkId: 'design.tokens.static', references: { tokens: { declared: { css: 'src/none.css' } } } }));
+      const undefinedVars = r.report.findings.filter((f) => f.rule === 'tokens.undefined-var');
+      expect(undefinedVars.map((f) => f.actual)).toEqual(['--control-width', '--radius-missing']);
+      expect(undefinedVars[0]!.message).toMatch(/fallback/);
+      expect(undefinedVars[1]!.message).not.toMatch(/fallback/);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
   it('finds the missing @font-face file, and the font from a remote host as a warning', () => {
     expect(found(run('fonts-static', input(fx('FX-WEB-DESIGN', 'silent-font-fallback'), { checkId: 'design.fonts.static', references: DESIGN })))).toEqual([['fonts.face-missing', 'styles/app.css', 7]]);

@@ -1,0 +1,22 @@
+{
+  "guide.title": "User guide",
+  "guide.intro": "AYAR measures your software project against declared standards and proves every violation with evidence. Everything it shows comes from checks that actually ran on your machine; nothing leaves it.",
+  "guide.s1.title": "1. Add a project",
+  "guide.s1.body": "From the Projects screen, choose the project folder or drag it onto the window. AYAR discovers its type, tools and tests by reading alone; nothing runs at this step. If the folder is in a protected location, it explains the permission before the system asks for it.",
+  "guide.s2.title": "2. Approve the standards profile",
+  "guide.s2.body": "After discovery AYAR proposes a standards profile: the checks that fit, with their commands exactly as it will run them. Review each command and approve it once. No command runs without your approval, and anything that changes later comes back to you before it runs.",
+  "guide.s3.title": "3. Set up what is missing",
+  "guide.s3.body": "A check whose tool or dependencies are missing shows “needs setup” and counts as neither a pass nor a failure. The setup panel shows the command and where it writes before anything runs, and nothing is downloaded without your confirmation.",
+  "guide.s4.title": "4. Run the full scan",
+  "guide.s4.body": "From the Run button, start the full scan, a section, or a single check. Follow the live rows: state, step, duration and processor activity. No verdict appears before the last check ends, and you can cancel at any time.",
+  "guide.s5.title": "5. Read the results and the karat",
+  "guide.s5.body": "The purity card shows the verdict, the karat out of 24, and its scope. 24 means every required check passed. Missing, unavailable and flaky checks are not counted: the karat rises only with evidence.",
+  "guide.s6.title": "6. “For you” and “For the model”",
+  "guide.s6.body": "The “For you” tab explains what happened, what it means and what to do now, in plain language. The “For the model” tab is a structured form for the coding assistant you use. “Copy for the model” always copies that form, whichever tab is open, with secrets redacted.",
+  "guide.s7.title": "7. Fix, then re-check",
+  "guide.s7.body": "After a fix, use “Re-run failed” or “Re-run incomplete”. The integrity guard notices fixes by evasion, such as a skipped test, a silenced rule or a lowered threshold, and holds the check at “needs review” until you review it with a note.",
+  "guide.s8.title": "8. Model checks and task cards",
+  "guide.s8.body": "For what no tool can judge, such as reviewing logic that has no tests, AYAR generates an instructions file you hand to your model. What comes back is shown as a claim, not a result, and changes no karat until a local check proves it. Task cards close on evidence alone.",
+  "guide.s9.title": "9. Privacy",
+  "guide.s9.body": "No network by default, and no usage measurements. Tools are downloaded on your request and verified by their checksums. Secrets are redacted from logs, reports and exports, and sensitive environment variables reach no check unless you allow them."
+}

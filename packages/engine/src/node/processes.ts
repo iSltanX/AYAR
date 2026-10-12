@@ -8,6 +8,8 @@ const run = promisify(execFile);
 /** ps(1) in the C locale and UTC: lstart reads the same whoever asks (C-12: "مطابقة وقت بدئه"). */
 const PS_ENV = { LC_ALL: 'C', TZ: 'UTC' };
 const PS_MAX_BUFFER = 64 * 1024 * 1024;
+/** A ps or launchctl that does not answer in this time is killed: the watch loop and the cleanup never wait on it (R3-02). */
+const PS_TIMEOUT_MS = 10_000;
 
 /**
  * After a check's leader exits, how long its output may still arrive before the pipes are closed: a detached
@@ -91,7 +93,7 @@ export const nodeProcessControl: ProcessControl = {
     }
   },
   async listProcesses() {
-    const { stdout } = await run('/bin/ps', ['-A', '-o', 'pid=,ppid=,pgid=,uid=,time=,%cpu=,rss=,lstart=,comm='], { env: PS_ENV, maxBuffer: PS_MAX_BUFFER });
+    const { stdout } = await run('/bin/ps', ['-A', '-o', 'pid=,ppid=,pgid=,uid=,time=,%cpu=,rss=,lstart=,comm='], { env: PS_ENV, maxBuffer: PS_MAX_BUFFER, timeout: PS_TIMEOUT_MS, killSignal: 'SIGKILL' });
     const out: ProcessInfo[] = [];
     for (const line of stdout.split('\n')) {
       const p = parsePsLine(line);
@@ -108,7 +110,7 @@ export const nodeProcessControl: ProcessControl = {
     const list = wanted.join(',');
     const read = async (withEnv: boolean) => {
       try {
-        const { stdout } = await run('/bin/ps', [...(withEnv ? ['-E'] : []), '-ww', '-o', 'pid=,command=', '-p', list], { env: PS_ENV, maxBuffer: PS_MAX_BUFFER });
+        const { stdout } = await run('/bin/ps', [...(withEnv ? ['-E'] : []), '-ww', '-o', 'pid=,command=', '-p', list], { env: PS_ENV, maxBuffer: PS_MAX_BUFFER, timeout: PS_TIMEOUT_MS, killSignal: 'SIGKILL' });
         return stdout;
       } catch (e) {
         // ps exits 1 when some of the pids are gone; what it printed is still right.
@@ -134,7 +136,7 @@ export const nodeProcessControl: ProcessControl = {
   },
   async launchdJobs() {
     try {
-      const { stdout } = await run('/bin/launchctl', ['list'], { env: PS_ENV, maxBuffer: PS_MAX_BUFFER });
+      const { stdout } = await run('/bin/launchctl', ['list'], { env: PS_ENV, maxBuffer: PS_MAX_BUFFER, timeout: PS_TIMEOUT_MS, killSignal: 'SIGKILL' });
       return stdout
         .split('\n')
         .slice(1)

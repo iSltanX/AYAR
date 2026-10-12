@@ -167,7 +167,7 @@
         "typescript"
       ],
       "severity": "ERROR",
-      "message": "A shell command is built from a value that is not a constant (child_process exec, or spawn with shell: true).",
+      "message": "A shell command is built from a value that is not a constant (child_process exec, or spawn/execFile whose options may turn a shell on: a shell key that is not false, a spread, or options that are not a literal).",
       "patterns": [
         {
           "pattern-either": [
@@ -176,29 +176,376 @@
                 {
                   "pattern-either": [
                     {
-                      "pattern-inside": "$CP = require('$MOD');\n...\n"
+                      "patterns": [
+                        {
+                          "pattern-either": [
+                            {
+                              "pattern-inside": "$CP = require('$MOD');\n...\n"
+                            },
+                            {
+                              "pattern-inside": "import $CP from '$MOD';\n...\n"
+                            },
+                            {
+                              "pattern-inside": "import * as $CP from '$MOD';\n...\n"
+                            }
+                          ]
+                        },
+                        {
+                          "pattern-either": [
+                            {
+                              "pattern": "$CP.exec($CMD, ...)"
+                            },
+                            {
+                              "pattern": "$CP.execSync($CMD, ...)"
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
-                      "pattern-inside": "import $CP from '$MOD';\n...\n"
+                      "patterns": [
+                        {
+                          "pattern-either": [
+                            {
+                              "pattern-inside": "import { ..., $FN, ... } from '$MOD';\n...\n"
+                            },
+                            {
+                              "pattern-inside": "const { ..., $FN, ... } = require('$MOD');\n...\n"
+                            }
+                          ]
+                        },
+                        {
+                          "metavariable-regex": {
+                            "metavariable": "$FN",
+                            "regex": "^(exec|execSync)$"
+                          }
+                        },
+                        {
+                          "pattern": "$FN($CMD, ...)"
+                        }
+                      ]
                     },
                     {
-                      "pattern-inside": "import * as $CP from '$MOD';\n...\n"
+                      "pattern": "require('$MOD').exec($CMD, ...)"
+                    },
+                    {
+                      "pattern": "require('$MOD').execSync($CMD, ...)"
                     }
                   ]
                 },
                 {
+                  "pattern-not": "$X.$F(\"...\", ...)"
+                },
+                {
+                  "pattern-not": "$F(\"...\", ...)"
+                }
+              ]
+            },
+            {
+              "patterns": [
+                {
                   "pattern-either": [
                     {
-                      "pattern": "$CP.exec($CMD, ...)"
+                      "pattern-either": [
+                        {
+                          "patterns": [
+                            {
+                              "pattern-either": [
+                                {
+                                  "pattern-inside": "$CP = require('$MOD');\n...\n"
+                                },
+                                {
+                                  "pattern-inside": "import $CP from '$MOD';\n...\n"
+                                },
+                                {
+                                  "pattern-inside": "import * as $CP from '$MOD';\n...\n"
+                                }
+                              ]
+                            },
+                            {
+                              "pattern": "$CP.$FN($CMD, $ARGS, {..., shell: $S, ...})"
+                            }
+                          ]
+                        },
+                        {
+                          "patterns": [
+                            {
+                              "pattern-either": [
+                                {
+                                  "pattern-inside": "import { ..., $FN, ... } from '$MOD';\n...\n"
+                                },
+                                {
+                                  "pattern-inside": "const { ..., $FN, ... } = require('$MOD');\n...\n"
+                                }
+                              ]
+                            },
+                            {
+                              "pattern": "$FN($CMD, $ARGS, {..., shell: $S, ...})"
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
-                      "pattern": "$CP.execSync($CMD, ...)"
+                      "pattern-either": [
+                        {
+                          "patterns": [
+                            {
+                              "pattern-either": [
+                                {
+                                  "pattern-inside": "$CP = require('$MOD');\n...\n"
+                                },
+                                {
+                                  "pattern-inside": "import $CP from '$MOD';\n...\n"
+                                },
+                                {
+                                  "pattern-inside": "import * as $CP from '$MOD';\n...\n"
+                                }
+                              ]
+                            },
+                            {
+                              "pattern": "$CP.$FN($CMD, $ARGS, {..., ...$R, ...})"
+                            }
+                          ]
+                        },
+                        {
+                          "patterns": [
+                            {
+                              "pattern-either": [
+                                {
+                                  "pattern-inside": "import { ..., $FN, ... } from '$MOD';\n...\n"
+                                },
+                                {
+                                  "pattern-inside": "const { ..., $FN, ... } = require('$MOD');\n...\n"
+                                }
+                              ]
+                            },
+                            {
+                              "pattern": "$FN($CMD, $ARGS, {..., ...$R, ...})"
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
-                      "pattern": "$CP.spawn($CMD, $ARGS, {..., shell: true, ...})"
+                      "patterns": [
+                        {
+                          "pattern-either": [
+                            {
+                              "patterns": [
+                                {
+                                  "pattern-either": [
+                                    {
+                                      "pattern-inside": "$CP = require('$MOD');\n...\n"
+                                    },
+                                    {
+                                      "pattern-inside": "import $CP from '$MOD';\n...\n"
+                                    },
+                                    {
+                                      "pattern-inside": "import * as $CP from '$MOD';\n...\n"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "pattern": "$CP.$FN($CMD, $ARGS, $OPTS)"
+                                }
+                              ]
+                            },
+                            {
+                              "patterns": [
+                                {
+                                  "pattern-either": [
+                                    {
+                                      "pattern-inside": "import { ..., $FN, ... } from '$MOD';\n...\n"
+                                    },
+                                    {
+                                      "pattern-inside": "const { ..., $FN, ... } = require('$MOD');\n...\n"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "pattern": "$FN($CMD, $ARGS, $OPTS)"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "pattern-not": "$CP.$FN($CMD, $ARGS, {...})"
+                        },
+                        {
+                          "pattern-not": "$FN($CMD, $ARGS, {...})"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "metavariable-regex": {
+                    "metavariable": "$FN",
+                    "regex": "^(spawn|spawnSync|execFile|execFileSync)$"
+                  }
+                },
+                {
+                  "pattern-not": "$CP.$FN($CMD, $ARGS, {..., shell: false, ...})"
+                },
+                {
+                  "pattern-not": "$FN($CMD, $ARGS, {..., shell: false, ...})"
+                },
+                {
+                  "pattern-either": [
+                    {
+                      "patterns": [
+                        {
+                          "pattern-either": [
+                            {
+                              "patterns": [
+                                {
+                                  "pattern-either": [
+                                    {
+                                      "pattern-inside": "$CP = require('$MOD');\n...\n"
+                                    },
+                                    {
+                                      "pattern-inside": "import $CP from '$MOD';\n...\n"
+                                    },
+                                    {
+                                      "pattern-inside": "import * as $CP from '$MOD';\n...\n"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "pattern": "$CP.$FN($CMD, ...)"
+                                }
+                              ]
+                            },
+                            {
+                              "patterns": [
+                                {
+                                  "pattern-either": [
+                                    {
+                                      "pattern-inside": "import { ..., $FN, ... } from '$MOD';\n...\n"
+                                    },
+                                    {
+                                      "pattern-inside": "const { ..., $FN, ... } = require('$MOD');\n...\n"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "pattern": "$FN($CMD, ...)"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "metavariable-regex": {
+                            "metavariable": "$CMD",
+                            "regex": "^(?!(?:\"[^\"\\\\]*\"|'[^'\\\\]*')$)"
+                          }
+                        }
+                      ]
                     },
                     {
-                      "pattern": "$CP.spawnSync($CMD, $ARGS, {..., shell: true, ...})"
+                      "patterns": [
+                        {
+                          "pattern-either": [
+                            {
+                              "patterns": [
+                                {
+                                  "pattern-either": [
+                                    {
+                                      "pattern-inside": "$CP = require('$MOD');\n...\n"
+                                    },
+                                    {
+                                      "pattern-inside": "import $CP from '$MOD';\n...\n"
+                                    },
+                                    {
+                                      "pattern-inside": "import * as $CP from '$MOD';\n...\n"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "pattern": "$CP.$FN(\"...\", [..., $E, ...], ...)"
+                                }
+                              ]
+                            },
+                            {
+                              "patterns": [
+                                {
+                                  "pattern-either": [
+                                    {
+                                      "pattern-inside": "import { ..., $FN, ... } from '$MOD';\n...\n"
+                                    },
+                                    {
+                                      "pattern-inside": "const { ..., $FN, ... } = require('$MOD');\n...\n"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "pattern": "$FN(\"...\", [..., $E, ...], ...)"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "metavariable-regex": {
+                            "metavariable": "$E",
+                            "regex": "^(?!(?:\"[^\"\\\\]*\"|'[^'\\\\]*')$)"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "patterns": [
+                        {
+                          "pattern-either": [
+                            {
+                              "patterns": [
+                                {
+                                  "pattern-either": [
+                                    {
+                                      "pattern-inside": "$CP = require('$MOD');\n...\n"
+                                    },
+                                    {
+                                      "pattern-inside": "import $CP from '$MOD';\n...\n"
+                                    },
+                                    {
+                                      "pattern-inside": "import * as $CP from '$MOD';\n...\n"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "pattern": "$CP.$FN(\"...\", $ARGS, ...)"
+                                }
+                              ]
+                            },
+                            {
+                              "patterns": [
+                                {
+                                  "pattern-either": [
+                                    {
+                                      "pattern-inside": "import { ..., $FN, ... } from '$MOD';\n...\n"
+                                    },
+                                    {
+                                      "pattern-inside": "const { ..., $FN, ... } = require('$MOD');\n...\n"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "pattern": "$FN(\"...\", $ARGS, ...)"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "pattern-not": "$CP.$FN(\"...\", [...], ...)"
+                        },
+                        {
+                          "pattern-not": "$FN(\"...\", [...], ...)"
+                        }
+                      ]
                     }
                   ]
                 }
@@ -209,38 +556,63 @@
                 {
                   "pattern-either": [
                     {
-                      "pattern-inside": "import { ..., $FN, ... } from '$MOD';\n...\n"
+                      "patterns": [
+                        {
+                          "pattern-either": [
+                            {
+                              "pattern-inside": "$CP = require('$MOD');\n...\n"
+                            },
+                            {
+                              "pattern-inside": "import $CP from '$MOD';\n...\n"
+                            },
+                            {
+                              "pattern-inside": "import * as $CP from '$MOD';\n...\n"
+                            }
+                          ]
+                        },
+                        {
+                          "pattern": "$CP.$FN($CMD, {..., shell: $S, ...})"
+                        }
+                      ]
                     },
                     {
-                      "pattern-inside": "const { ..., $FN, ... } = require('$MOD');\n...\n"
+                      "patterns": [
+                        {
+                          "pattern-either": [
+                            {
+                              "pattern-inside": "import { ..., $FN, ... } from '$MOD';\n...\n"
+                            },
+                            {
+                              "pattern-inside": "const { ..., $FN, ... } = require('$MOD');\n...\n"
+                            }
+                          ]
+                        },
+                        {
+                          "pattern": "$FN($CMD, {..., shell: $S, ...})"
+                        }
+                      ]
                     }
                   ]
                 },
                 {
                   "metavariable-regex": {
                     "metavariable": "$FN",
-                    "regex": "^(exec|execSync|spawn|spawnSync)$"
+                    "regex": "^(spawn|spawnSync|execFile|execFileSync)$"
                   }
                 },
                 {
-                  "pattern": "$FN($CMD, ...)"
+                  "pattern-not": "$CP.$FN($CMD, {..., shell: false, ...})"
                 },
                 {
-                  "pattern-not": "spawn($CMD, $ARGS)"
+                  "pattern-not": "$FN($CMD, {..., shell: false, ...})"
                 },
                 {
-                  "pattern-not": "spawnSync($CMD, $ARGS)"
+                  "pattern-not": "$CP.$FN(\"...\", ...)"
                 },
                 {
-                  "pattern-not": "spawn($CMD, $ARGS, {..., shell: false, ...})"
+                  "pattern-not": "$FN(\"...\", ...)"
                 }
               ]
-            },
-            {
-              "pattern": "require('$MOD').exec($CMD, ...)"
-            },
-            {
-              "pattern": "require('$MOD').execSync($CMD, ...)"
             }
           ]
         },
@@ -249,12 +621,6 @@
             "metavariable": "$MOD",
             "regex": "^(node:)?child_process$"
           }
-        },
-        {
-          "pattern-not": "$X.$F(\"...\", ...)"
-        },
-        {
-          "pattern-not": "$F(\"...\", ...)"
         }
       ],
       "metadata": {

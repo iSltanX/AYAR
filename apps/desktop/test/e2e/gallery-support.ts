@@ -30,4 +30,8 @@ export async function showGallery(page: Page, opts: { lang: 'ar' | 'en' | 'both'
   await page.click(`[data-testid="theme-${opts.theme}"]`);
   await page.selectOption('[data-testid="section"]', opts.section ?? 'all');
   await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  // A language switch loads the faces of its script only now (Arabic after Latin): layout is measured once they are in,
+  // or a keyboard walk compares positions across a font swap (seen once in the final verify of DEV-13).
+  await page.evaluate(() => document.fonts.ready.then(() => undefined));
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 }

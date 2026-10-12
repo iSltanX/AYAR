@@ -78,7 +78,13 @@ export class Dispatcher {
       }
       return { response: { kind: 'response', id: cmd.id, ok: true, result: checked.data }, crash: null };
     } catch (e) {
-      if (e instanceof CommandError) return fail(e.error);
+      if (e instanceof CommandError) {
+        // A refusal the handler meant (busy, plan_stale, not_found, …) is part of the engine's story: logged with the
+        // command and the code, never a value of the payload, so an action that silently did nothing can be traced.
+        const reason = typeof e.error.details === 'object' && e.error.details && 'reason' in e.error.details ? (e.error.details as { reason?: unknown }).reason : undefined;
+        this.#logger().log('info', 'command refused', { command: cmd.command, code: e.error.code, reason: typeof reason === 'string' ? reason : '' });
+        return fail(e.error);
+      }
       if (e instanceof StorageError) return fail(protocolError(e.code, e.details));
       const err = e instanceof Error ? e : new Error(String(e));
       return fail(protocolError('internal', { command: cmd.command }), err);

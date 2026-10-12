@@ -153,7 +153,7 @@ export function createServices(o: ServicesInput): EngineServices {
   });
   const verdict = new VerdictService({ db: o.db, catalog: o.catalog, ports: o.ports, logger: o.logger, events: o.events, pool, hmacKey: o.hmacKey, redaction });
   const purity = new PurityService({ db: o.db, catalog: o.catalog, ports: o.ports, logger: o.logger, evidence });
-  const integrity = new IntegrityService({ db: o.db, catalog: o.catalog, logger: o.logger, evidence, verdict });
+  const integrity = new IntegrityService({ db: o.db, catalog: o.catalog, logger: o.logger, evidence, verdict, readFile: (path) => o.ports.fs.readFile(path) });
   runs = new RunService({ db: o.db, catalog: o.catalog, ports: o.ports, layout: o.layout, logger: o.logger, events: o.events, runGate: o.runGate, planner, projects, environment, redaction, evidence, tools, supervisor, verdict, purity, setupActive: (p) => setup.busyFor(p), probe, browsers, baselines, integrity, afterRun: (runId, projectId) => tasksVerify?.(runId, projectId) ?? Promise.resolve() });
   const reviews = new ReviewsService({ db: o.db, catalog: o.catalog, ports: o.ports, logger: o.logger, evidence, purity, verdict, integrity, tasks, projects, runs });
   const reports = new ReportsService({ db: o.db, catalog: o.catalog, ports: o.ports, logger: o.logger, evidence, redaction, purity, verdict, projects, profiles, tasks, runs, integrity });

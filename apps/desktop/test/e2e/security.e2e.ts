@@ -220,7 +220,7 @@ describe('remote debugging guard (D-52)', () => {
     async (flag) => {
       const own = tempDataDir();
       try {
-        const r = await runDirect([flag, `--ayar-data-dir=${own.dataDir}`]);
+        const r = await runDirect([flag, `--ayar-data-dir=${own.dataDir}`], 20_000);
         expect(r.code).toBe(78);
         expect(r.output).toContain('refusing remote debugging');
         expect(r.output).not.toContain('DevTools listening');

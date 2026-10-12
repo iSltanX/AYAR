@@ -1,0 +1,5600 @@
+{
+  "repo": "/Volumes/iSltanXx/Projects/AYAR",
+  "commit": "f323e233ce95bb01907fb1eb1cc4050679d2d369",
+  "at": "2026-10-12T16:17:16.864Z",
+  "discovery": {
+    "facts": 110,
+    "components": 10
+  },
+  "proposedChecks": 319,
+  "approvedChecks": 320,
+  "profileAdditions": {
+    "references": {
+      "outputs": [
+        "apps/desktop/dist"
+      ]
+    },
+    "custom": {
+      "typecheck": {
+        "argv": [
+          "npm",
+          "run",
+          "typecheck"
+        ],
+        "cwd": ".",
+        "timeoutMin": 30,
+        "success": {
+          "exitCode": 0
+        },
+        "title": "الأنواع: npm run typecheck (TypeScript 7 وsvelte-check)"
+      }
+    }
+  },
+  "setup": [
+    {
+      "kind": "install_tool",
+      "target": {
+        "tool": "osv-scanner",
+        "version": "2.6.0",
+        "requiredSpec": null,
+        "ecosystem": null,
+        "component": null
+      },
+      "ok": true,
+      "result": {
+        "action": {
+          "id": "set_952d22bcfa9c7ebf39e14467a7a5a2ca",
+          "projectId": "prj_qGJdSlvmVAH-wiLQWgd6rg",
+          "kind": "install_tool",
+          "instances": [
+            "sec.deps@."
+          ],
+          "title": {
+            "key": "setup.action.installTool",
+            "params": {
+              "tool": "osv-scanner",
+              "version": "2.6.0"
+            }
+          },
+          "target": {
+            "tool": "osv-scanner",
+            "version": "2.6.0",
+            "requiredSpec": null,
+            "ecosystem": null,
+            "component": null
+          },
+          "preview": {
+            "command": null,
+            "cwd": null,
+            "network": {
+              "host": "github.com",
+              "url": "https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_darwin_arm64"
+            },
+            "sizeBytes": 55130242,
+            "writes": [
+              {
+                "location": "ayar",
+                "path": "tools/osv-scanner/2.6.0/"
+              }
+            ],
+            "runsScripts": false,
+            "warnings": [
+              {
+                "key": "setup.warning.pinnedHash",
+                "params": {
+                  "sha256": "98c460dcd37de25819babd757d04542045b6243113e209edcd4d89fedb0256b4"
+                }
+              }
+            ]
+          },
+          "state": "done",
+          "resultReasons": [],
+          "confirmedAt": "2026-10-12T16:01:25.784Z",
+          "finishedAt": "2026-10-12T16:02:29.624Z"
+        },
+        "readiness": [
+          {
+            "instance": "sec.deps@.",
+            "readiness": "needs_setup",
+            "reasons": [
+              {
+                "key": "setup.reason.osvDbMissing",
+                "params": {
+                  "ecosystem": "npm"
+                }
+              }
+            ],
+            "actions": [
+              "set_4c7c0a77ce17f805af31b3312b74a85a"
+            ]
+          }
+        ],
+        "log": null,
+        "install": {
+          "status": "installed",
+          "tool": {
+            "key": "osv-scanner",
+            "version": "2.6.0",
+            "license": "Apache-2.0",
+            "homepage": "https://github.com/google/osv-scanner",
+            "source": "managed",
+            "status": "installed",
+            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-mW7Hwg/AYAR/tools/osv-scanner/2.6.0/osv-scanner",
+            "installedVersion": "2.6.0",
+            "sha256": "tree:01ee8b20d9062890986ec58d64520f33fb55dfbe7eafd4d7c6677c2f7c0a06b3",
+            "sizeBytes": 55130242,
+            "installedAt": "2026-10-12T16:02:29.512Z",
+            "verifiedAt": "2026-10-12T16:02:29.512Z",
+            "verifiedOk": true,
+            "verification": {
+              "kind": "sha256"
+            },
+            "signatureChecked": null,
+            "catalogVerifiedAt": "2026-10-10",
+            "stale": false
+          },
+          "downloadedBytes": 55130242,
+          "durationMs": 63728
+        }
+      }
+    },
+    {
+      "kind": "download_osv_db",
+      "target": {
+        "tool": "osv-scanner",
+        "version": null,
+        "requiredSpec": null,
+        "ecosystem": "npm",
+        "component": null
+      },
+      "ok": true,
+      "result": {
+        "action": {
+          "id": "set_4c7c0a77ce17f805af31b3312b74a85a",
+          "projectId": "prj_qGJdSlvmVAH-wiLQWgd6rg",
+          "kind": "download_osv_db",
+          "instances": [
+            "sec.deps@."
+          ],
+          "title": {
+            "key": "setup.action.downloadOsvDb",
+            "params": {
+              "ecosystem": "npm"
+            }
+          },
+          "target": {
+            "tool": "osv-scanner",
+            "version": null,
+            "requiredSpec": null,
+            "ecosystem": "npm",
+            "component": null
+          },
+          "preview": {
+            "command": [
+              "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-mW7Hwg/AYAR/tools/osv-scanner/2.6.0/osv-scanner",
+              "scan",
+              "source",
+              "-r",
+              "<template>",
+              "--download-offline-databases",
+              "--offline-vulnerabilities",
+              "--no-call-analysis=all",
+              "--format",
+              "json",
+              "--output-file",
+              "<tmp>/osv.json"
+            ],
+            "cwd": null,
+            "network": {
+              "host": "osv-vulnerabilities.storage.googleapis.com",
+              "url": "https://osv-vulnerabilities.storage.googleapis.com/npm/all.zip"
+            },
+            "sizeBytes": 228589568,
+            "writes": [
+              {
+                "location": "ayar",
+                "path": "osv-db/"
+              }
+            ],
+            "runsScripts": false,
+            "warnings": []
+          },
+          "state": "done",
+          "resultReasons": [],
+          "confirmedAt": "2026-10-12T16:02:29.628Z",
+          "finishedAt": "2026-10-12T16:02:48.438Z"
+        },
+        "readiness": [
+          {
+            "instance": "sec.deps@.",
+            "readiness": "ready",
+            "reasons": [
+              {
+                "key": "setup.reason.ready.managed",
+                "params": {
+                  "tool": "osv-scanner",
+                  "version": "2.6.0"
+                }
+              }
+            ],
+            "actions": []
+          }
+        ],
+        "log": {
+          "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-mW7Hwg/AYAR/logs/setup/set_4c7c0a77ce17f805af31b3312b74a85a-2026-10-12T160229638Z.log",
+          "sha256": "785045a303ed392ee32aa97a73c75d54aaf3b2054ba53a441f121966bff82882"
+        },
+        "install": null
+      }
+    },
+    {
+      "kind": "install_tool",
+      "target": {
+        "tool": "uv",
+        "version": "0.13.0",
+        "requiredSpec": null,
+        "ecosystem": null,
+        "component": null
+      },
+      "ok": true,
+      "result": {
+        "action": {
+          "id": "set_f6860725c39af94e783c34b2f2afdd6b",
+          "projectId": "prj_qGJdSlvmVAH-wiLQWgd6rg",
+          "kind": "install_tool",
+          "instances": [
+            "sec.sast@."
+          ],
+          "title": {
+            "key": "setup.action.installTool",
+            "params": {
+              "tool": "uv",
+              "version": "0.13.0"
+            }
+          },
+          "target": {
+            "tool": "uv",
+            "version": "0.13.0",
+            "requiredSpec": null,
+            "ecosystem": null,
+            "component": null
+          },
+          "preview": {
+            "command": null,
+            "cwd": null,
+            "network": {
+              "host": "github.com",
+              "url": "https://github.com/astral-sh/uv/releases/download/0.13.0/uv-aarch64-apple-darwin.tar.gz"
+            },
+            "sizeBytes": 14692549,
+            "writes": [
+              {
+                "location": "ayar",
+                "path": "tools/uv/0.13.0/"
+              }
+            ],
+            "runsScripts": false,
+            "warnings": [
+              {
+                "key": "setup.warning.pinnedHash",
+                "params": {
+                  "sha256": "a9c1b29002cf3c83f07fa9cd8a887a3be0107d90e23189721221e7257db8e3d6"
+                }
+              }
+            ]
+          },
+          "state": "done",
+          "resultReasons": [],
+          "confirmedAt": "2026-10-12T16:02:48.442Z",
+          "finishedAt": "2026-10-12T16:02:51.384Z"
+        },
+        "readiness": [
+          {
+            "instance": "sec.sast@.",
+            "readiness": "needs_setup",
+            "reasons": [
+              {
+                "key": "setup.reason.toolMissing",
+                "params": {
+                  "tool": "semgrep"
+                }
+              }
+            ],
+            "actions": [
+              "set_c06aee667d50ccb327e9cb6829e55880"
+            ]
+          }
+        ],
+        "log": null,
+        "install": {
+          "status": "installed",
+          "tool": {
+            "key": "uv",
+            "version": "0.13.0",
+            "license": "MIT OR Apache-2.0",
+            "homepage": "https://github.com/astral-sh/uv",
+            "source": "managed",
+            "status": "installed",
+            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-mW7Hwg/AYAR/tools/uv/0.13.0/uv-aarch64-apple-darwin/uv",
+            "installedVersion": "0.13.0",
+            "sha256": "tree:41dde061849c12bf6613cf6dac303ff45cdf5aeb9dc574c87cab6f5cf394dfa1",
+            "sizeBytes": 14692549,
+            "installedAt": "2026-10-12T16:02:51.266Z",
+            "verifiedAt": "2026-10-12T16:02:51.266Z",
+            "verifiedOk": true,
+            "verification": {
+              "kind": "developer_id",
+              "teamId": "2DC432GLL2"
+            },
+            "signatureChecked": true,
+            "catalogVerifiedAt": "2026-10-10",
+            "stale": false
+          },
+          "downloadedBytes": 14692549,
+          "durationMs": 2824
+        }
+      }
+    },
+    {
+      "kind": "install_tool",
+      "target": {
+        "tool": "semgrep",
+        "version": "1.180.0",
+        "requiredSpec": null,
+        "ecosystem": null,
+        "component": null
+      },
+      "ok": true,
+      "result": {
+        "action": {
+          "id": "set_c06aee667d50ccb327e9cb6829e55880",
+          "projectId": "prj_qGJdSlvmVAH-wiLQWgd6rg",
+          "kind": "install_tool",
+          "instances": [
+            "sec.sast@."
+          ],
+          "title": {
+            "key": "setup.action.installTool",
+            "params": {
+              "tool": "semgrep",
+              "version": "1.180.0"
+            }
+          },
+          "target": {
+            "tool": "semgrep",
+            "version": "1.180.0",
+            "requiredSpec": null,
+            "ecosystem": null,
+            "component": null
+          },
+          "preview": {
+            "command": null,
+            "cwd": null,
+            "network": {
+              "host": "pypi.org",
+              "url": "https://pypi.org/simple/semgrep/"
+            },
+            "sizeBytes": 333000000,
+            "writes": [
+              {
+                "location": "ayar",
+                "path": "tools/semgrep/1.180.0/"
+              }
+            ],
+            "runsScripts": false,
+            "warnings": [
+              {
+                "key": "setup.warning.pinnedHash",
+                "params": {
+                  "sha256": "1abe5140d104f5a72aa212e8e44500656f62e4debfc42c97f4fcea93ea7d0477"
+                }
+              }
+            ]
+          },
+          "state": "done",
+          "resultReasons": [],
+          "confirmedAt": "2026-10-12T16:02:51.388Z",
+          "finishedAt": "2026-10-12T16:04:48.516Z"
+        },
+        "readiness": [
+          {
+            "instance": "sec.sast@.",
+            "readiness": "ready",
+            "reasons": [
+              {
+                "key": "setup.reason.ready.managed",
+                "params": {
+                  "tool": "semgrep",
+                  "version": "1.180.0"
+                }
+              }
+            ],
+            "actions": []
+          }
+        ],
+        "log": null,
+        "install": {
+          "status": "installed",
+          "tool": {
+            "key": "semgrep",
+            "version": "1.180.0",
+            "license": "LGPL-2.1",
+            "homepage": "https://github.com/semgrep/semgrep",
+            "source": "managed",
+            "status": "installed",
+            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-mW7Hwg/AYAR/tools/semgrep/1.180.0/bin/semgrep",
+            "installedVersion": "1.180.0",
+            "sha256": "tree:0f5e347eb9478641eb4b4bc9bb6fb5871db221e3d1320b8c7642b5d814b69bf8",
+            "sizeBytes": 333000000,
+            "installedAt": "2026-10-12T16:04:48.325Z",
+            "verifiedAt": "2026-10-12T16:04:48.325Z",
+            "verifiedOk": true,
+            "verification": {
+              "kind": "sha256"
+            },
+            "signatureChecked": null,
+            "catalogVerifiedAt": "2026-10-11",
+            "stale": false
+          },
+          "downloadedBytes": 333000000,
+          "durationMs": 116932
+        }
+      }
+    },
+    {
+      "kind": "install_tool",
+      "target": {
+        "tool": "lychee",
+        "version": "0.24.2",
+        "requiredSpec": null,
+        "ecosystem": null,
+        "component": null
+      },
+      "ok": true,
+      "result": {
+        "action": {
+          "id": "set_231170d59f896fb389de06a56b0c09ac",
+          "projectId": "prj_qGJdSlvmVAH-wiLQWgd6rg",
+          "kind": "install_tool",
+          "instances": [
+            "code.refs.external@.",
+            "code.refs.external@apps/desktop",
+            "code.refs.external@packages/protocol"
+          ],
+          "title": {
+            "key": "setup.action.installTool",
+            "params": {
+              "tool": "lychee",
+              "version": "0.24.2"
+            }
+          },
+          "target": {
+            "tool": "lychee",
+            "version": "0.24.2",
+            "requiredSpec": null,
+            "ecosystem": null,
+            "component": null
+          },
+          "preview": {
+            "command": null,
+            "cwd": null,
+            "network": {
+              "host": "github.com",
+              "url": "https://github.com/lycheeverse/lychee/releases/download/lychee-v0.24.2/lychee-aarch64-apple-darwin.tar.gz"
+            },
+            "sizeBytes": 6992530,
+            "writes": [
+              {
+                "location": "ayar",
+                "path": "tools/lychee/0.24.2/"
+              }
+            ],
+            "runsScripts": false,
+            "warnings": [
+              {
+                "key": "setup.warning.pinnedHash",
+                "params": {
+                  "sha256": "c9d3740ea2d891854d37116c9fba840f37b6e7c89d330e7db84ac333631c4977"
+                }
+              }
+            ]
+          },
+          "state": "done",
+          "resultReasons": [],
+          "confirmedAt": "2026-10-12T16:04:48.519Z",
+          "finishedAt": "2026-10-12T16:04:50.451Z"
+        },
+        "readiness": [
+          {
+            "instance": "code.refs.external@.",
+            "readiness": "not_included",
+            "reasons": [
+              {
+                "key": "setup.reason.notIncluded"
+              },
+              {
+                "key": "setup.reason.networkNotAllowed"
+              }
+            ],
+            "actions": []
+          },
+          {
+            "instance": "code.refs.external@apps/desktop",
+            "readiness": "not_included",
+            "reasons": [
+              {
+                "key": "setup.reason.notIncluded"
+              },
+              {
+                "key": "setup.reason.networkNotAllowed"
+              }
+            ],
+            "actions": []
+          },
+          {
+            "instance": "code.refs.external@packages/protocol",
+            "readiness": "not_included",
+            "reasons": [
+              {
+                "key": "setup.reason.notIncluded"
+              },
+              {
+                "key": "setup.reason.networkNotAllowed"
+              }
+            ],
+            "actions": []
+          }
+        ],
+        "log": null,
+        "install": {
+          "status": "installed",
+          "tool": {
+            "key": "lychee",
+            "version": "0.24.2",
+            "license": "MIT OR Apache-2.0",
+            "homepage": "https://github.com/lycheeverse/lychee",
+            "source": "managed",
+            "status": "installed",
+            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-mW7Hwg/AYAR/tools/lychee/0.24.2/lychee-aarch64-apple-darwin/lychee",
+            "installedVersion": "0.24.2",
+            "sha256": "tree:51d0d5e58edc63389fa7644bfef0327d80ce071394b9cf863b47be54eecedfa3",
+            "sizeBytes": 6992530,
+            "installedAt": "2026-10-12T16:04:50.327Z",
+            "verifiedAt": "2026-10-12T16:04:50.327Z",
+            "verifiedOk": true,
+            "verification": {
+              "kind": "sha256"
+            },
+            "signatureChecked": null,
+            "catalogVerifiedAt": "2026-10-10",
+            "stale": false
+          },
+          "downloadedBytes": 6992530,
+          "durationMs": 1808
+        }
+      }
+    }
+  ],
+  "firstScan": {
+    "runId": "run_eMDt9RXc2zyhlsoLsqr4Mw",
+    "durationMs": 372943,
+    "verdict": "blocked",
+    "findings": 83,
+    "blockingOpen": 62
+  },
+  "reviews": [
+    {
+      "displayId": "AYR-COD-REFL-0018",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-ADAPTERS/variants/lychee--bad/overlay/lychee/README.md",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0019",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-ADAPTERS/variants/lychee--needs-review/overlay/lychee/README.md",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0020",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-ADAPTERS/variants/lychee--timeout/overlay/lychee/README.md",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0021",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-EXT/base/options.html",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0022",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-EXT/base/options.html",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0023",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-EXT/base/popup.html",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0024",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-EXT/base/popup.html",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0025",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-EXT/variants/missing-dir/overlay/popup.html",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0026",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-EXT/variants/missing-dir/overlay/popup.html",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0027",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-EXT/variants/missing-dir/overlay/popup.html",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0028",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-NOTEST/variants/broken-anchor/overlay/README.md",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0029",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-NOTEST/variants/broken-anchor/overlay/README.md",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0030",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-NOTEST/variants/broken-md-link/overlay/README.md",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0031",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-NOTEST/variants/broken-md-link/overlay/README.md",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0032",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-NOTEST/variants/missing-image/overlay/docs/index.html",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0033",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-NOTEST/variants/missing-image/overlay/docs/index.html",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0034",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-NOTEST/variants/missing-image/overlay/docs/index.html",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0035",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-WEB-DESIGN/variants/external-font-host/overlay/index.html",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0036",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-WEB-DESIGN/variants/external-font-host/overlay/index.html",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0037",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-WEB-DESIGN/variants/external-font-host/overlay/index.html",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0038",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-WEB-DESIGN/variants/hardcoded-color/overlay/styles/app.css",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0039",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-WEB-DESIGN/variants/hardcoded-color/overlay/styles/app.css",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0040",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-WEB-DESIGN/variants/off-scale-spacing/overlay/styles/app.css",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0041",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-WEB-DESIGN/variants/off-scale-spacing/overlay/styles/app.css",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0042",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-WEB-DESIGN/variants/silent-font-fallback/overlay/styles/app.css",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0043",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-WEB-DESIGN/variants/silent-font-fallback/overlay/styles/app.css",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0044",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-WEB-DESIGN/variants/undefined-var/overlay/styles/app.css",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-COD-REFL-0045",
+      "checkId": "code.refs.local",
+      "path": "fixtures/FX-WEB-DESIGN/variants/undefined-var/overlay/styles/app.css",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-DSN-TOKS-0002",
+      "checkId": "design.tokens.static",
+      "path": "fixtures/FX-WEB-DESIGN/variants/undefined-var/overlay/styles/app.css",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0046",
+      "checkId": "sec.sast",
+      "path": "fixtures/FX-ADAPTERS/variants/semgrep--bad/overlay/semgrep/src/a.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0047",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.child-process-shell.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0048",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.child-process-shell.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0049",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.child-process-shell.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0050",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.child-process-shell.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0051",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.child-process-shell.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0052",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.child-process-shell.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0053",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.child-process-shell.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0054",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.child-process-shell.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0055",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.child-process-shell.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0056",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.child-process-shell.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0057",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.child-process-shell.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0058",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.eval-dynamic.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0059",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.eval-dynamic.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0060",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.eval-dynamic.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0061",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.function-constructor.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0062",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.function-constructor.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0068",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.node-tls-env.ts",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0070",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.tls-reject-unauthorized.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0071",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.py.eval-dynamic.py",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0072",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.py.eval-dynamic.py",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0073",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.py.os-system-dynamic.py",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0074",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.py.os-system-dynamic.py",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0076",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.py.subprocess-shell-true.py",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0077",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.py.subprocess-shell-true.py",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0078",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.py.tls-verify-disabled.py",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0079",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.py.tls-verify-disabled.py",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0082",
+      "checkId": "sec.sast",
+      "path": "packages/engine/src/node/network.ts",
+      "note": "التحقق من شهادة TLS معطّل في طلب جاهزية واحد إلى localhost وحده (خدمة مرافقة بشهادة ذاتية، FR-21)؛ لا بيانات تُرسل ولا مضيف خارجي يُقبل (المضيف يُفحص قبله)",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0083",
+      "checkId": "sec.sast",
+      "path": "packages/engine/test/advisor.test.ts",
+      "note": "شيفرة اختبار تشغّل أدوات وعمليات تجريبية عمدًا (أوامر صدفة متغيرة، وFunction لبناء ادعاء نموذج مزيف)، لا تُشحن",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SECR-0003",
+      "checkId": "sec.secrets.files",
+      "path": "fixtures/FX-ADAPTERS/variants/gitleaks--bad/overlay/gitleaks/src/a.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SECR-0004",
+      "checkId": "sec.secrets.files",
+      "path": "fixtures/FX-EXT/project.json",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SECR-0005",
+      "checkId": "sec.secrets.files",
+      "path": "fixtures/FX-EXT/project.json",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SECR-0006",
+      "checkId": "sec.secrets.files",
+      "path": "fixtures/FX-EXT/variants/secret/overlay/src/config.ts",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SECR-0007",
+      "checkId": "sec.secrets.files",
+      "path": "fixtures/FX-EXT/variants/secret-in-test-log/overlay/src/lib/connect.test.ts",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SECR-0008",
+      "checkId": "sec.secrets.files",
+      "path": "fixtures/sanity-results/FX-EXT.json",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SECR-0009",
+      "checkId": "sec.secrets.files",
+      "path": "packages/engine/test/redaction.test.ts",
+      "note": "قيمة على شكل سر في اختبار الإخفاء أو الواجهة (تُركَّب وقت التشغيل من أجزاء أو تُستعمل لإثبات التنقيح)، لا سر",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SECR-0010",
+      "checkId": "sec.secrets.files",
+      "path": "packages/engine/test/environment.test.ts",
+      "note": "قيمة على شكل سر في اختبار الإخفاء أو الواجهة (تُركَّب وقت التشغيل من أجزاء أو تُستعمل لإثبات التنقيح)، لا سر",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SECR-0011",
+      "checkId": "sec.secrets.files",
+      "path": "packages/engine/test/reports-cards.test.ts",
+      "note": "قيمة على شكل سر في اختبار الإخفاء أو الواجهة (تُركَّب وقت التشغيل من أجزاء أو تُستعمل لإثبات التنقيح)، لا سر",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SECR-0012",
+      "checkId": "sec.secrets.files",
+      "path": "packages/engine/test/reports-cards.test.ts",
+      "note": "قيمة على شكل سر في اختبار الإخفاء أو الواجهة (تُركَّب وقت التشغيل من أجزاء أو تُستعمل لإثبات التنقيح)، لا سر",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SECR-0013",
+      "checkId": "sec.secrets.files",
+      "path": "spikes/E-22-process-escape/results/run.json",
+      "note": "نتائج تجربة بيئة (E-22): علامات AYAR_CHECK_TOKEN لعمليات تجريبية، لا أسرار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SECR-0014",
+      "checkId": "sec.secrets.files",
+      "path": "spikes/E-22-process-escape/results/run.json",
+      "note": "نتائج تجربة بيئة (E-22): علامات AYAR_CHECK_TOKEN لعمليات تجريبية، لا أسرار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SECR-0015",
+      "checkId": "sec.secrets.files",
+      "path": "spikes/E-22-process-escape/results/run.json",
+      "note": "نتائج تجربة بيئة (E-22): علامات AYAR_CHECK_TOKEN لعمليات تجريبية، لا أسرار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SECR-0016",
+      "checkId": "sec.secrets.files",
+      "path": "spikes/E-22-process-escape/results/run.json",
+      "note": "نتائج تجربة بيئة (E-22): علامات AYAR_CHECK_TOKEN لعمليات تجريبية، لا أسرار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SECR-0017",
+      "checkId": "sec.secrets.files",
+      "path": "fixtures/SANITY.md",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    }
+  ],
+  "verdict": "incomplete",
+  "purity": {
+    "formula": "purity/1",
+    "scope": {
+      "kind": "round",
+      "roundId": "rnd_KyJ0MiSC7B8YTfGDS38h6A"
+    },
+    "verdict": "incomplete",
+    "karat": 11,
+    "p": 0.4727272727272727,
+    "criteriaCount": 11,
+    "checksCount": 34,
+    "narrow": false,
+    "narrowThreshold": 3,
+    "criteria": [
+      {
+        "id": "accessibility",
+        "section": "design",
+        "n": 2,
+        "passed": 0,
+        "share": 0
+      },
+      {
+        "id": "behavior",
+        "section": "behavior",
+        "n": 10,
+        "passed": 1,
+        "share": 0.1
+      },
+      {
+        "id": "build",
+        "section": "code",
+        "n": 3,
+        "passed": 3,
+        "share": 1
+      },
+      {
+        "id": "design-system",
+        "section": "design",
+        "n": 1,
+        "passed": 1,
+        "share": 1
+      },
+      {
+        "id": "direction",
+        "section": "design",
+        "n": 1,
+        "passed": 0,
+        "share": 0
+      },
+      {
+        "id": "lint",
+        "section": "code",
+        "n": 1,
+        "passed": 1,
+        "share": 1
+      },
+      {
+        "id": "references",
+        "section": "code",
+        "n": 3,
+        "passed": 3,
+        "share": 1
+      },
+      {
+        "id": "secrets",
+        "section": "security",
+        "n": 1,
+        "passed": 1,
+        "share": 1
+      },
+      {
+        "id": "security-patterns",
+        "section": "security",
+        "n": 1,
+        "passed": 0,
+        "share": 0
+      },
+      {
+        "id": "types",
+        "section": "code",
+        "n": 10,
+        "passed": 1,
+        "share": 0.1
+      },
+      {
+        "id": "vulnerabilities",
+        "section": "security",
+        "n": 1,
+        "passed": 0,
+        "share": 0
+      }
+    ],
+    "checks": [
+      {
+        "instance": "beh.unit@.",
+        "checkId": "beh.unit",
+        "component": ".",
+        "criterion": "behavior",
+        "blocking": true,
+        "outcome": "passed",
+        "reviewed": false,
+        "credit": 1,
+        "checkRunId": "chk_56IRSgmdI4UhWrZvmHolXQ"
+      },
+      {
+        "instance": "beh.unit@apps/desktop",
+        "checkId": "beh.unit",
+        "component": "apps/desktop",
+        "criterion": "behavior",
+        "blocking": true,
+        "outcome": "unavailable",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_nDA-PbXfW0GW7ZFuwH4nUA"
+      },
+      {
+        "instance": "beh.unit@packages/adapters",
+        "checkId": "beh.unit",
+        "component": "packages/adapters",
+        "criterion": "behavior",
+        "blocking": true,
+        "outcome": "unavailable",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_WA3QL0-B6KmN0y3c2jHw0w"
+      },
+      {
+        "instance": "beh.unit@packages/analyzers",
+        "checkId": "beh.unit",
+        "component": "packages/analyzers",
+        "criterion": "behavior",
+        "blocking": true,
+        "outcome": "unavailable",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_aKmOjfNhr-AfA11woYvDFQ"
+      },
+      {
+        "instance": "beh.unit@packages/catalog",
+        "checkId": "beh.unit",
+        "component": "packages/catalog",
+        "criterion": "behavior",
+        "blocking": true,
+        "outcome": "unavailable",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_R0pB8ocSh497N5apAhiJiA"
+      },
+      {
+        "instance": "beh.unit@packages/engine",
+        "checkId": "beh.unit",
+        "component": "packages/engine",
+        "criterion": "behavior",
+        "blocking": true,
+        "outcome": "unavailable",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_lsv0FN7vKFeOv0bNsMKhXQ"
+      },
+      {
+        "instance": "beh.unit@packages/i18n",
+        "checkId": "beh.unit",
+        "component": "packages/i18n",
+        "criterion": "behavior",
+        "blocking": true,
+        "outcome": "unavailable",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_V383ZZjAr99yMsltO2677A"
+      },
+      {
+        "instance": "beh.unit@packages/probe",
+        "checkId": "beh.unit",
+        "component": "packages/probe",
+        "criterion": "behavior",
+        "blocking": true,
+        "outcome": "unavailable",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_On0hE1aSZU__xwPcMUaecw"
+      },
+      {
+        "instance": "beh.unit@packages/protocol",
+        "checkId": "beh.unit",
+        "component": "packages/protocol",
+        "criterion": "behavior",
+        "blocking": true,
+        "outcome": "unavailable",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_lHVB2dvS6_fB8PVjxaGYZA"
+      },
+      {
+        "instance": "beh.unit@tools/cli",
+        "checkId": "beh.unit",
+        "component": "tools/cli",
+        "criterion": "behavior",
+        "blocking": true,
+        "outcome": "unavailable",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_ItH8ptZUfWNAdiDQ0jAOzQ"
+      },
+      {
+        "instance": "code.build@.",
+        "checkId": "code.build",
+        "component": ".",
+        "criterion": "build",
+        "blocking": true,
+        "outcome": "passed",
+        "reviewed": false,
+        "credit": 1,
+        "checkRunId": "chk_NqCXnkuH4lJHf810vuWdAg"
+      },
+      {
+        "instance": "code.build@apps/desktop",
+        "checkId": "code.build",
+        "component": "apps/desktop",
+        "criterion": "build",
+        "blocking": true,
+        "outcome": "passed",
+        "reviewed": false,
+        "credit": 1,
+        "checkRunId": "chk_xu0_vF0Tip-lMmT5tt23mQ"
+      },
+      {
+        "instance": "code.build@packages/catalog",
+        "checkId": "code.build",
+        "component": "packages/catalog",
+        "criterion": "build",
+        "blocking": true,
+        "outcome": "passed",
+        "reviewed": false,
+        "credit": 1,
+        "checkRunId": "chk_ajZMC5dseNKUWo93YYu1-g"
+      },
+      {
+        "instance": "code.lint@.",
+        "checkId": "code.lint",
+        "component": ".",
+        "criterion": "lint",
+        "blocking": false,
+        "outcome": "passed",
+        "reviewed": false,
+        "credit": 1,
+        "checkRunId": "chk_0FAnHuu-_xcY0bUlA-Pk_A"
+      },
+      {
+        "instance": "code.refs.local@.",
+        "checkId": "code.refs.local",
+        "component": ".",
+        "criterion": "references",
+        "blocking": false,
+        "outcome": "passed",
+        "reviewed": false,
+        "credit": 1,
+        "checkRunId": "chk_VYIOzWX5_1d_hzGFj5Qb-w"
+      },
+      {
+        "instance": "code.refs.local@apps/desktop",
+        "checkId": "code.refs.local",
+        "component": "apps/desktop",
+        "criterion": "references",
+        "blocking": false,
+        "outcome": "passed",
+        "reviewed": false,
+        "credit": 1,
+        "checkRunId": "chk_eJ5o648--4MrDQqgpEnBXQ"
+      },
+      {
+        "instance": "code.refs.local@packages/protocol",
+        "checkId": "code.refs.local",
+        "component": "packages/protocol",
+        "criterion": "references",
+        "blocking": false,
+        "outcome": "passed",
+        "reviewed": false,
+        "credit": 1,
+        "checkRunId": "chk_-5HQWWKAQUT_8pnOyLmSOA"
+      },
+      {
+        "instance": "code.types@.",
+        "checkId": "code.types",
+        "component": ".",
+        "criterion": "types",
+        "blocking": true,
+        "outcome": "unavailable",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_yQdhPqJKxfwd5JoIs-wCFQ"
+      },
+      {
+        "instance": "code.types@apps/desktop",
+        "checkId": "code.types",
+        "component": "apps/desktop",
+        "criterion": "types",
+        "blocking": true,
+        "outcome": "passed",
+        "reviewed": false,
+        "credit": 1,
+        "checkRunId": "chk_5RHgNk1Xy-Hmb_tzwC0O7Q"
+      },
+      {
+        "instance": "code.types@packages/adapters",
+        "checkId": "code.types",
+        "component": "packages/adapters",
+        "criterion": "types",
+        "blocking": true,
+        "outcome": "unavailable",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_tbKjmgPbhqAh_Z4bh1NuHA"
+      },
+      {
+        "instance": "code.types@packages/analyzers",
+        "checkId": "code.types",
+        "component": "packages/analyzers",
+        "criterion": "types",
+        "blocking": true,
+        "outcome": "unavailable",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_hU4cC7oQfV00Z3VP24AXLQ"
+      },
+      {
+        "instance": "code.types@packages/catalog",
+        "checkId": "code.types",
+        "component": "packages/catalog",
+        "criterion": "types",
+        "blocking": true,
+        "outcome": "unavailable",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_2-_cKBHDZbKlGiEKnxugUQ"
+      },
+      {
+        "instance": "code.types@packages/engine",
+        "checkId": "code.types",
+        "component": "packages/engine",
+        "criterion": "types",
+        "blocking": true,
+        "outcome": "unavailable",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_7Lq285bOCk7e6vzh0RmVvw"
+      },
+      {
+        "instance": "code.types@packages/i18n",
+        "checkId": "code.types",
+        "component": "packages/i18n",
+        "criterion": "types",
+        "blocking": true,
+        "outcome": "unavailable",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_6lgJl7mWO2DnNeefPAWFwQ"
+      },
+      {
+        "instance": "code.types@packages/probe",
+        "checkId": "code.types",
+        "component": "packages/probe",
+        "criterion": "types",
+        "blocking": true,
+        "outcome": "unavailable",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_rFFjuIwlae-UA4cTpxaDtg"
+      },
+      {
+        "instance": "code.types@packages/protocol",
+        "checkId": "code.types",
+        "component": "packages/protocol",
+        "criterion": "types",
+        "blocking": true,
+        "outcome": "unavailable",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_3sBbGwH_H-3aHwRY1dXTig"
+      },
+      {
+        "instance": "code.types@tools/cli",
+        "checkId": "code.types",
+        "component": "tools/cli",
+        "criterion": "types",
+        "blocking": true,
+        "outcome": "unavailable",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_FNmUD1zx3j51oh0ju01HLg"
+      },
+      {
+        "instance": "design.a11y.review@apps/desktop",
+        "checkId": "design.a11y.review",
+        "component": "apps/desktop",
+        "criterion": "accessibility",
+        "blocking": false,
+        "outcome": "needs_review",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_TYjjRHpt7sqVlvM60U_X-Q"
+      },
+      {
+        "instance": "design.a11y@apps/desktop",
+        "checkId": "design.a11y",
+        "component": "apps/desktop",
+        "criterion": "accessibility",
+        "blocking": false,
+        "outcome": "missing",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_LKFd6ROY0d5Dh52nvwNWow"
+      },
+      {
+        "instance": "design.rtl.static@.",
+        "checkId": "design.rtl.static",
+        "component": ".",
+        "criterion": "direction",
+        "blocking": false,
+        "outcome": "missing",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_gR7o_hR7d6Is1xVTYg5KdQ"
+      },
+      {
+        "instance": "design.tokens.static@.",
+        "checkId": "design.tokens.static",
+        "component": ".",
+        "criterion": "design-system",
+        "blocking": false,
+        "outcome": "passed",
+        "reviewed": false,
+        "credit": 1,
+        "checkRunId": "chk_CJS0q-HQXcQqceM23jjoAQ"
+      },
+      {
+        "instance": "sec.deps@.",
+        "checkId": "sec.deps",
+        "component": ".",
+        "criterion": "vulnerabilities",
+        "blocking": false,
+        "outcome": "missing",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_tZyJPx7H8Xh3jlRk2WVpPQ"
+      },
+      {
+        "instance": "sec.sast@.",
+        "checkId": "sec.sast",
+        "component": ".",
+        "criterion": "security-patterns",
+        "blocking": false,
+        "outcome": "needs_review",
+        "reviewed": false,
+        "credit": 0,
+        "checkRunId": "chk_ItSTBYeAgd9krbGVAahTfA"
+      },
+      {
+        "instance": "sec.secrets.files@.",
+        "checkId": "sec.secrets.files",
+        "component": ".",
+        "criterion": "secrets",
+        "blocking": true,
+        "outcome": "passed",
+        "reviewed": false,
+        "credit": 1,
+        "checkRunId": "chk_SaG3JZ1GYr_T-sfqw3O-2Q"
+      }
+    ],
+    "counts": {
+      "byOutcome": {
+        "passed": 11,
+        "unavailable": 18,
+        "needs_review": 2,
+        "missing": 3
+      },
+      "absent": 0
+    },
+    "blockingFailures": [],
+    "incompleteReasons": [
+      {
+        "key": "purity.reason.needsReview",
+        "params": {
+          "count": 2
+        }
+      },
+      {
+        "key": "purity.reason.missing",
+        "params": {
+          "count": 3
+        }
+      },
+      {
+        "key": "purity.reason.unavailable",
+        "params": {
+          "count": 18
+        }
+      },
+      {
+        "key": "purity.reason.integrityCheck",
+        "params": {
+          "check": "integ.reviews",
+          "outcome": "missing"
+        }
+      }
+    ],
+    "excludedByReview": 73,
+    "integrity": {
+      "stateChanged": false,
+      "guardUnreviewed": 0,
+      "modelClaimsOpen": 0,
+      "reviewsExpired": 0,
+      "checks": [
+        {
+          "checkId": "integ.guard",
+          "outcome": "passed"
+        },
+        {
+          "checkId": "integ.state",
+          "outcome": "passed"
+        },
+        {
+          "checkId": "integ.model-claims",
+          "outcome": "not_applicable"
+        },
+        {
+          "checkId": "integ.reviews",
+          "outcome": "missing"
+        }
+      ]
+    },
+    "notes": [],
+    "meta": {
+      "profileVersion": 3,
+      "profileHash": "3b38423395c774e2d641d7eb883b88daf9e4031be7f3c6aaf368983947700358",
+      "catalogVersion": "1.3.0",
+      "toolVersions": {
+        "analyzer:tokens-static": "1.0.0",
+        "analyzer:rtl-static": "1.0.0",
+        "adapter:betterleaks": "1.0.0",
+        "gitleaks": "8.30.1",
+        "adapter:osv-scanner": "1.0.0",
+        "osv-scanner": "2.6.0",
+        "adapter:semgrep": "1.0.0",
+        "semgrep": "1.180.0",
+        "adapter:build-command": "1.0.0",
+        "adapter:svelte-check": "1.0.0",
+        "svelte-check": "4.7.6",
+        "adapter:eslint": "1.0.0",
+        "eslint": "10.12.0",
+        "analyzer:refs-local": "1.0.0",
+        "adapter:vitest": "1.0.0",
+        "vitest": "5.0.3",
+        "integrity:integrity-guard": "1.0.0",
+        "integrity:state-snapshot": "1.0.0",
+        "adapter:custom-command": "1.0.0"
+      },
+      "environmentSource": null,
+      "snapshotId": "snp_OXhqtuSSvsm3Nw6HXSNIfA",
+      "commit": "f323e233ce95bb01907fb1eb1cc4050679d2d369",
+      "computedAt": "2026-10-12T16:17:16.636Z"
+    }
+  },
+  "durationMs": 372049,
+  "outcomes": {
+    "passed": 14,
+    "failed": 0,
+    "warning": 0,
+    "needs_review": 2,
+    "missing": 4,
+    "unavailable": 18,
+    "skipped": 0,
+    "cancelled": 0,
+    "not_applicable": 226,
+    "flaky": 0
+  },
+  "checks": [
+    {
+      "instance": "design.tokens.static@.",
+      "checkId": "design.tokens.static",
+      "component": ".",
+      "outcome": "passed",
+      "reason": {
+        "key": "verdict.reason.passed",
+        "params": {
+          "notes": 0
+        }
+      },
+      "readiness": "ready",
+      "durationMs": 403
+    },
+    {
+      "instance": "design.tokens.static@packages/adapters",
+      "checkId": "design.tokens.static",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.styles.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.tokens.static@packages/analyzers",
+      "checkId": "design.tokens.static",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.styles.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.tokens.static@packages/catalog",
+      "checkId": "design.tokens.static",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.styles.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.tokens.static@packages/engine",
+      "checkId": "design.tokens.static",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.styles.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.tokens.static@packages/i18n",
+      "checkId": "design.tokens.static",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.styles.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.tokens.static@packages/probe",
+      "checkId": "design.tokens.static",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.styles.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.tokens.static@packages/protocol",
+      "checkId": "design.tokens.static",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.styles.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.tokens.static@tools/cli",
+      "checkId": "design.tokens.static",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.styles.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.tokens.render@.",
+      "checkId": "design.tokens.render",
+      "component": ".",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.tokens.render@packages/adapters",
+      "checkId": "design.tokens.render",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.tokens.render@packages/analyzers",
+      "checkId": "design.tokens.render",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.tokens.render@packages/catalog",
+      "checkId": "design.tokens.render",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.tokens.render@packages/engine",
+      "checkId": "design.tokens.render",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.tokens.render@packages/i18n",
+      "checkId": "design.tokens.render",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.tokens.render@packages/probe",
+      "checkId": "design.tokens.render",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.tokens.render@packages/protocol",
+      "checkId": "design.tokens.render",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.tokens.render@tools/cli",
+      "checkId": "design.tokens.render",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.fonts.static@packages/adapters",
+      "checkId": "design.fonts.static",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.styles.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.fonts.static@packages/analyzers",
+      "checkId": "design.fonts.static",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.styles.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.fonts.static@packages/catalog",
+      "checkId": "design.fonts.static",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.styles.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.fonts.static@packages/engine",
+      "checkId": "design.fonts.static",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.styles.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.fonts.static@packages/i18n",
+      "checkId": "design.fonts.static",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.styles.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.fonts.static@packages/probe",
+      "checkId": "design.fonts.static",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.styles.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.fonts.static@packages/protocol",
+      "checkId": "design.fonts.static",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.styles.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.fonts.static@tools/cli",
+      "checkId": "design.fonts.static",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.styles.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.fonts.render@.",
+      "checkId": "design.fonts.render",
+      "component": ".",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.fonts.render@packages/adapters",
+      "checkId": "design.fonts.render",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.fonts.render@packages/analyzers",
+      "checkId": "design.fonts.render",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.fonts.render@packages/catalog",
+      "checkId": "design.fonts.render",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.fonts.render@packages/engine",
+      "checkId": "design.fonts.render",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.fonts.render@packages/i18n",
+      "checkId": "design.fonts.render",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.fonts.render@packages/probe",
+      "checkId": "design.fonts.render",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.fonts.render@packages/protocol",
+      "checkId": "design.fonts.render",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.fonts.render@tools/cli",
+      "checkId": "design.fonts.render",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.a11y@.",
+      "checkId": "design.a11y",
+      "component": ".",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.a11y@apps/desktop",
+      "checkId": "design.a11y",
+      "component": "apps/desktop",
+      "outcome": "missing",
+      "reason": {
+        "key": "setup.reason.missing.configuration",
+        "params": {
+          "ref": "renderTarget"
+        }
+      },
+      "readiness": "needs_setup",
+      "durationMs": null
+    },
+    {
+      "instance": "design.a11y@packages/adapters",
+      "checkId": "design.a11y",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.a11y@packages/analyzers",
+      "checkId": "design.a11y",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.a11y@packages/catalog",
+      "checkId": "design.a11y",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.a11y@packages/engine",
+      "checkId": "design.a11y",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.a11y@packages/i18n",
+      "checkId": "design.a11y",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.a11y@packages/probe",
+      "checkId": "design.a11y",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.a11y@packages/protocol",
+      "checkId": "design.a11y",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.a11y@tools/cli",
+      "checkId": "design.a11y",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.a11y.review@.",
+      "checkId": "design.a11y.review",
+      "component": ".",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.a11y.review@apps/desktop",
+      "checkId": "design.a11y.review",
+      "component": "apps/desktop",
+      "outcome": "needs_review",
+      "reason": {
+        "key": "verdict.reason.review",
+        "params": {
+          "count": 1
+        }
+      },
+      "readiness": "ready",
+      "durationMs": 153
+    },
+    {
+      "instance": "design.a11y.review@packages/adapters",
+      "checkId": "design.a11y.review",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.a11y.review@packages/analyzers",
+      "checkId": "design.a11y.review",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.a11y.review@packages/catalog",
+      "checkId": "design.a11y.review",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.a11y.review@packages/engine",
+      "checkId": "design.a11y.review",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.a11y.review@packages/i18n",
+      "checkId": "design.a11y.review",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.a11y.review@packages/probe",
+      "checkId": "design.a11y.review",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.a11y.review@packages/protocol",
+      "checkId": "design.a11y.review",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.a11y.review@tools/cli",
+      "checkId": "design.a11y.review",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.rtl.static@.",
+      "checkId": "design.rtl.static",
+      "component": ".",
+      "outcome": "missing",
+      "reason": {
+        "key": "analyzer.reason.noRtl"
+      },
+      "readiness": "ready",
+      "durationMs": 228
+    },
+    {
+      "instance": "design.rtl.static@apps/desktop",
+      "checkId": "design.rtl.static",
+      "component": "apps/desktop",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rtl"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.rtl.static@packages/adapters",
+      "checkId": "design.rtl.static",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rtl"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.rtl.static@packages/analyzers",
+      "checkId": "design.rtl.static",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rtl"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.rtl.static@packages/catalog",
+      "checkId": "design.rtl.static",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rtl"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.rtl.static@packages/engine",
+      "checkId": "design.rtl.static",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rtl"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.rtl.static@packages/i18n",
+      "checkId": "design.rtl.static",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rtl"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.rtl.static@packages/probe",
+      "checkId": "design.rtl.static",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rtl"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.rtl.static@packages/protocol",
+      "checkId": "design.rtl.static",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rtl"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.rtl.static@tools/cli",
+      "checkId": "design.rtl.static",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rtl"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.rtl.render@.",
+      "checkId": "design.rtl.render",
+      "component": ".",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.rtl.render@apps/desktop",
+      "checkId": "design.rtl.render",
+      "component": "apps/desktop",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rtl"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.rtl.render@packages/adapters",
+      "checkId": "design.rtl.render",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rtl",
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.rtl.render@packages/analyzers",
+      "checkId": "design.rtl.render",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rtl",
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.rtl.render@packages/catalog",
+      "checkId": "design.rtl.render",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rtl",
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.rtl.render@packages/engine",
+      "checkId": "design.rtl.render",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rtl",
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.rtl.render@packages/i18n",
+      "checkId": "design.rtl.render",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rtl",
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.rtl.render@packages/probe",
+      "checkId": "design.rtl.render",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rtl",
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.rtl.render@packages/protocol",
+      "checkId": "design.rtl.render",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rtl",
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.rtl.render@tools/cli",
+      "checkId": "design.rtl.render",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rtl",
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.states@.",
+      "checkId": "design.states",
+      "component": ".",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.states@packages/adapters",
+      "checkId": "design.states",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.states@packages/analyzers",
+      "checkId": "design.states",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.states@packages/catalog",
+      "checkId": "design.states",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.states@packages/engine",
+      "checkId": "design.states",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.states@packages/i18n",
+      "checkId": "design.states",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.states@packages/probe",
+      "checkId": "design.states",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.states@packages/protocol",
+      "checkId": "design.states",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.states@tools/cli",
+      "checkId": "design.states",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.visual@.",
+      "checkId": "design.visual",
+      "component": ".",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.visual@packages/adapters",
+      "checkId": "design.visual",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.visual@packages/analyzers",
+      "checkId": "design.visual",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.visual@packages/catalog",
+      "checkId": "design.visual",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.visual@packages/engine",
+      "checkId": "design.visual",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.visual@packages/i18n",
+      "checkId": "design.visual",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.visual@packages/probe",
+      "checkId": "design.visual",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.visual@packages/protocol",
+      "checkId": "design.visual",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "design.visual@tools/cli",
+      "checkId": "design.visual",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.secrets.files@.",
+      "checkId": "sec.secrets.files",
+      "component": ".",
+      "outcome": "passed",
+      "reason": {
+        "key": "verdict.reason.passed",
+        "params": {
+          "notes": 0
+        }
+      },
+      "readiness": "ready",
+      "durationMs": 2966
+    },
+    {
+      "instance": "sec.deps@.",
+      "checkId": "sec.deps",
+      "component": ".",
+      "outcome": "missing",
+      "reason": {
+        "key": "adapter.reason.osvDbMissing"
+      },
+      "readiness": "ready",
+      "durationMs": 9701
+    },
+    {
+      "instance": "sec.sast@.",
+      "checkId": "sec.sast",
+      "component": ".",
+      "outcome": "needs_review",
+      "reason": {
+        "key": "verdict.reason.review",
+        "params": {
+          "count": 9
+        }
+      },
+      "readiness": "ready",
+      "durationMs": 272555
+    },
+    {
+      "instance": "sec.ext.manifest@.",
+      "checkId": "sec.ext.manifest",
+      "component": ".",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.ext.manifest@apps/desktop",
+      "checkId": "sec.ext.manifest",
+      "component": "apps/desktop",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.ext.manifest@packages/adapters",
+      "checkId": "sec.ext.manifest",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.ext.manifest@packages/analyzers",
+      "checkId": "sec.ext.manifest",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.ext.manifest@packages/catalog",
+      "checkId": "sec.ext.manifest",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.ext.manifest@packages/engine",
+      "checkId": "sec.ext.manifest",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.ext.manifest@packages/i18n",
+      "checkId": "sec.ext.manifest",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.ext.manifest@packages/probe",
+      "checkId": "sec.ext.manifest",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.ext.manifest@packages/protocol",
+      "checkId": "sec.ext.manifest",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.ext.manifest@tools/cli",
+      "checkId": "sec.ext.manifest",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.ext.permissions@.",
+      "checkId": "sec.ext.permissions",
+      "component": ".",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.ext.permissions@apps/desktop",
+      "checkId": "sec.ext.permissions",
+      "component": "apps/desktop",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.ext.permissions@packages/adapters",
+      "checkId": "sec.ext.permissions",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.ext.permissions@packages/analyzers",
+      "checkId": "sec.ext.permissions",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.ext.permissions@packages/catalog",
+      "checkId": "sec.ext.permissions",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.ext.permissions@packages/engine",
+      "checkId": "sec.ext.permissions",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.ext.permissions@packages/i18n",
+      "checkId": "sec.ext.permissions",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.ext.permissions@packages/probe",
+      "checkId": "sec.ext.permissions",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.ext.permissions@packages/protocol",
+      "checkId": "sec.ext.permissions",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "sec.ext.permissions@tools/cli",
+      "checkId": "sec.ext.permissions",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.browserExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.build@.",
+      "checkId": "code.build",
+      "component": ".",
+      "outcome": "passed",
+      "reason": {
+        "key": "verdict.reason.passed",
+        "params": {
+          "notes": 0
+        }
+      },
+      "readiness": "ready",
+      "durationMs": 3198
+    },
+    {
+      "instance": "code.build@apps/desktop",
+      "checkId": "code.build",
+      "component": "apps/desktop",
+      "outcome": "passed",
+      "reason": {
+        "key": "verdict.reason.passed",
+        "params": {
+          "notes": 0
+        }
+      },
+      "readiness": "ready",
+      "durationMs": 3003
+    },
+    {
+      "instance": "code.build@packages/adapters",
+      "checkId": "code.build",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.build.step"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.build@packages/analyzers",
+      "checkId": "code.build",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.build.step"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.build@packages/catalog",
+      "checkId": "code.build",
+      "component": "packages/catalog",
+      "outcome": "passed",
+      "reason": {
+        "key": "verdict.reason.passed",
+        "params": {
+          "notes": 0
+        }
+      },
+      "readiness": "ready",
+      "durationMs": 528
+    },
+    {
+      "instance": "code.build@packages/engine",
+      "checkId": "code.build",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.build.step"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.build@packages/i18n",
+      "checkId": "code.build",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.build.step"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.build@packages/probe",
+      "checkId": "code.build",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.build.step"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.build@packages/protocol",
+      "checkId": "code.build",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.build.step"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.build@tools/cli",
+      "checkId": "code.build",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.build.step"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.types@.",
+      "checkId": "code.types",
+      "component": ".",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "npm"
+        }
+      },
+      "readiness": "ready",
+      "durationMs": null
+    },
+    {
+      "instance": "code.types@apps/desktop",
+      "checkId": "code.types",
+      "component": "apps/desktop",
+      "outcome": "passed",
+      "reason": {
+        "key": "verdict.reason.passed",
+        "params": {
+          "notes": 0
+        }
+      },
+      "readiness": "ready",
+      "durationMs": 14829
+    },
+    {
+      "instance": "code.types@packages/adapters",
+      "checkId": "code.types",
+      "component": "packages/adapters",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "node"
+        }
+      },
+      "readiness": "ready",
+      "durationMs": null
+    },
+    {
+      "instance": "code.types@packages/analyzers",
+      "checkId": "code.types",
+      "component": "packages/analyzers",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "node"
+        }
+      },
+      "readiness": "ready",
+      "durationMs": null
+    },
+    {
+      "instance": "code.types@packages/catalog",
+      "checkId": "code.types",
+      "component": "packages/catalog",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "node"
+        }
+      },
+      "readiness": "ready",
+      "durationMs": null
+    },
+    {
+      "instance": "code.types@packages/engine",
+      "checkId": "code.types",
+      "component": "packages/engine",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "node"
+        }
+      },
+      "readiness": "ready",
+      "durationMs": null
+    },
+    {
+      "instance": "code.types@packages/i18n",
+      "checkId": "code.types",
+      "component": "packages/i18n",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "node"
+        }
+      },
+      "readiness": "ready",
+      "durationMs": null
+    },
+    {
+      "instance": "code.types@packages/probe",
+      "checkId": "code.types",
+      "component": "packages/probe",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "node"
+        }
+      },
+      "readiness": "ready",
+      "durationMs": null
+    },
+    {
+      "instance": "code.types@packages/protocol",
+      "checkId": "code.types",
+      "component": "packages/protocol",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "node"
+        }
+      },
+      "readiness": "ready",
+      "durationMs": null
+    },
+    {
+      "instance": "code.types@tools/cli",
+      "checkId": "code.types",
+      "component": "tools/cli",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "node"
+        }
+      },
+      "readiness": "ready",
+      "durationMs": null
+    },
+    {
+      "instance": "code.lint@.",
+      "checkId": "code.lint",
+      "component": ".",
+      "outcome": "passed",
+      "reason": {
+        "key": "verdict.reason.passed",
+        "params": {
+          "notes": 0
+        }
+      },
+      "readiness": "ready",
+      "durationMs": 160662
+    },
+    {
+      "instance": "code.lint@apps/desktop",
+      "checkId": "code.lint",
+      "component": "apps/desktop",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.lint.config"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.lint@packages/adapters",
+      "checkId": "code.lint",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.lint.config"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.lint@packages/analyzers",
+      "checkId": "code.lint",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.lint.config"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.lint@packages/catalog",
+      "checkId": "code.lint",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.lint.config"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.lint@packages/engine",
+      "checkId": "code.lint",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.lint.config"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.lint@packages/i18n",
+      "checkId": "code.lint",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.lint.config"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.lint@packages/probe",
+      "checkId": "code.lint",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.lint.config"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.lint@packages/protocol",
+      "checkId": "code.lint",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.lint.config"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.lint@tools/cli",
+      "checkId": "code.lint",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.lint.config"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.refs.local@.",
+      "checkId": "code.refs.local",
+      "component": ".",
+      "outcome": "passed",
+      "reason": {
+        "key": "verdict.reason.passed",
+        "params": {
+          "notes": 0
+        }
+      },
+      "readiness": "ready",
+      "durationMs": 453
+    },
+    {
+      "instance": "code.refs.local@apps/desktop",
+      "checkId": "code.refs.local",
+      "component": "apps/desktop",
+      "outcome": "passed",
+      "reason": {
+        "key": "verdict.reason.passed",
+        "params": {
+          "notes": 0
+        }
+      },
+      "readiness": "ready",
+      "durationMs": 338
+    },
+    {
+      "instance": "code.refs.local@packages/adapters",
+      "checkId": "code.refs.local",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.markup.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.refs.local@packages/analyzers",
+      "checkId": "code.refs.local",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.markup.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.refs.local@packages/catalog",
+      "checkId": "code.refs.local",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.markup.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.refs.local@packages/engine",
+      "checkId": "code.refs.local",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.markup.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.refs.local@packages/i18n",
+      "checkId": "code.refs.local",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.markup.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.refs.local@packages/probe",
+      "checkId": "code.refs.local",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.markup.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.refs.local@packages/protocol",
+      "checkId": "code.refs.local",
+      "component": "packages/protocol",
+      "outcome": "passed",
+      "reason": {
+        "key": "verdict.reason.passed",
+        "params": {
+          "notes": 0
+        }
+      },
+      "readiness": "ready",
+      "durationMs": 281
+    },
+    {
+      "instance": "code.refs.local@tools/cli",
+      "checkId": "code.refs.local",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.markup.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.refs.external@packages/adapters",
+      "checkId": "code.refs.external",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.markup.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.refs.external@packages/analyzers",
+      "checkId": "code.refs.external",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.markup.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.refs.external@packages/catalog",
+      "checkId": "code.refs.external",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.markup.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.refs.external@packages/engine",
+      "checkId": "code.refs.external",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.markup.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.refs.external@packages/i18n",
+      "checkId": "code.refs.external",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.markup.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.refs.external@packages/probe",
+      "checkId": "code.refs.external",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.markup.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.refs.external@tools/cli",
+      "checkId": "code.refs.external",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.markup.any"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.size@packages/adapters",
+      "checkId": "code.size",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.build.step"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.size@packages/analyzers",
+      "checkId": "code.size",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.build.step"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.size@packages/engine",
+      "checkId": "code.size",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.build.step"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.size@packages/i18n",
+      "checkId": "code.size",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.build.step"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.size@packages/probe",
+      "checkId": "code.size",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.build.step"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.size@packages/protocol",
+      "checkId": "code.size",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.build.step"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "code.size@tools/cli",
+      "checkId": "code.size",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.build.step"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.unit@.",
+      "checkId": "beh.unit",
+      "component": ".",
+      "outcome": "passed",
+      "reason": {
+        "key": "verdict.reason.testsPassed",
+        "params": {
+          "passed": 835,
+          "total": 846
+        }
+      },
+      "readiness": "ready",
+      "durationMs": 342811
+    },
+    {
+      "instance": "beh.unit@apps/desktop",
+      "checkId": "beh.unit",
+      "component": "apps/desktop",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "vitest,jest,node-test,pytest"
+        }
+      },
+      "readiness": "ready",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.unit@packages/adapters",
+      "checkId": "beh.unit",
+      "component": "packages/adapters",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "vitest,jest,node-test,pytest"
+        }
+      },
+      "readiness": "ready",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.unit@packages/analyzers",
+      "checkId": "beh.unit",
+      "component": "packages/analyzers",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "vitest,jest,node-test,pytest"
+        }
+      },
+      "readiness": "ready",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.unit@packages/catalog",
+      "checkId": "beh.unit",
+      "component": "packages/catalog",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "vitest,jest,node-test,pytest"
+        }
+      },
+      "readiness": "ready",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.unit@packages/engine",
+      "checkId": "beh.unit",
+      "component": "packages/engine",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "vitest,jest,node-test,pytest"
+        }
+      },
+      "readiness": "ready",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.unit@packages/i18n",
+      "checkId": "beh.unit",
+      "component": "packages/i18n",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "vitest,jest,node-test,pytest"
+        }
+      },
+      "readiness": "ready",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.unit@packages/probe",
+      "checkId": "beh.unit",
+      "component": "packages/probe",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "vitest,jest,node-test,pytest"
+        }
+      },
+      "readiness": "ready",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.unit@packages/protocol",
+      "checkId": "beh.unit",
+      "component": "packages/protocol",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "vitest,jest,node-test,pytest"
+        }
+      },
+      "readiness": "ready",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.unit@tools/cli",
+      "checkId": "beh.unit",
+      "component": "tools/cli",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "vitest,jest,node-test,pytest"
+        }
+      },
+      "readiness": "ready",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.integration@.",
+      "checkId": "beh.integration",
+      "component": ".",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.integration"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.integration@apps/desktop",
+      "checkId": "beh.integration",
+      "component": "apps/desktop",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.integration"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.integration@packages/adapters",
+      "checkId": "beh.integration",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.integration"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.integration@packages/analyzers",
+      "checkId": "beh.integration",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.integration"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.integration@packages/catalog",
+      "checkId": "beh.integration",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.integration"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.integration@packages/engine",
+      "checkId": "beh.integration",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.integration"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.integration@packages/i18n",
+      "checkId": "beh.integration",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.integration"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.integration@packages/probe",
+      "checkId": "beh.integration",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.integration"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.integration@packages/protocol",
+      "checkId": "beh.integration",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.integration"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.integration@tools/cli",
+      "checkId": "beh.integration",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.integration"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.e2e@.",
+      "checkId": "beh.e2e",
+      "component": ".",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.playwright"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.e2e@apps/desktop",
+      "checkId": "beh.e2e",
+      "component": "apps/desktop",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.playwright"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.e2e@packages/adapters",
+      "checkId": "beh.e2e",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.playwright"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.e2e@packages/analyzers",
+      "checkId": "beh.e2e",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.playwright"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.e2e@packages/catalog",
+      "checkId": "beh.e2e",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.playwright"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.e2e@packages/engine",
+      "checkId": "beh.e2e",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.playwright"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.e2e@packages/i18n",
+      "checkId": "beh.e2e",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.playwright"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.e2e@packages/probe",
+      "checkId": "beh.e2e",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.playwright"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.e2e@packages/protocol",
+      "checkId": "beh.e2e",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.playwright"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.e2e@tools/cli",
+      "checkId": "beh.e2e",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.playwright"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.contract@.",
+      "checkId": "beh.contract",
+      "component": ".",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.contract"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.contract@apps/desktop",
+      "checkId": "beh.contract",
+      "component": "apps/desktop",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.contract"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.contract@packages/adapters",
+      "checkId": "beh.contract",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.contract"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.contract@packages/analyzers",
+      "checkId": "beh.contract",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.contract"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.contract@packages/catalog",
+      "checkId": "beh.contract",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.contract"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.contract@packages/engine",
+      "checkId": "beh.contract",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.contract"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.contract@packages/i18n",
+      "checkId": "beh.contract",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.contract"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.contract@packages/probe",
+      "checkId": "beh.contract",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.contract"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.contract@packages/protocol",
+      "checkId": "beh.contract",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.contract"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.contract@tools/cli",
+      "checkId": "beh.contract",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.tests.contract"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.ext.host@.",
+      "checkId": "beh.ext.host",
+      "component": ".",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.chromiumExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.ext.host@apps/desktop",
+      "checkId": "beh.ext.host",
+      "component": "apps/desktop",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.chromiumExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.ext.host@packages/adapters",
+      "checkId": "beh.ext.host",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.chromiumExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.ext.host@packages/analyzers",
+      "checkId": "beh.ext.host",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.chromiumExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.ext.host@packages/catalog",
+      "checkId": "beh.ext.host",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.chromiumExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.ext.host@packages/engine",
+      "checkId": "beh.ext.host",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.chromiumExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.ext.host@packages/i18n",
+      "checkId": "beh.ext.host",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.chromiumExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.ext.host@packages/probe",
+      "checkId": "beh.ext.host",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.chromiumExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.ext.host@packages/protocol",
+      "checkId": "beh.ext.host",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.chromiumExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "beh.ext.host@tools/cli",
+      "checkId": "beh.ext.host",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.type.chromiumExtension"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.web@.",
+      "checkId": "perf.web",
+      "component": ".",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.web@packages/adapters",
+      "checkId": "perf.web",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.web@packages/analyzers",
+      "checkId": "perf.web",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.web@packages/catalog",
+      "checkId": "perf.web",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.web@packages/engine",
+      "checkId": "perf.web",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.web@packages/i18n",
+      "checkId": "perf.web",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.web@packages/probe",
+      "checkId": "perf.web",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.web@packages/protocol",
+      "checkId": "perf.web",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.web@tools/cli",
+      "checkId": "perf.web",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ui.rendered"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.load@.",
+      "checkId": "perf.load",
+      "component": ".",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.perf.loadScenario"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.load@apps/desktop",
+      "checkId": "perf.load",
+      "component": "apps/desktop",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.perf.loadScenario"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.load@packages/adapters",
+      "checkId": "perf.load",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.perf.loadScenario"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.load@packages/analyzers",
+      "checkId": "perf.load",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.perf.loadScenario"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.load@packages/catalog",
+      "checkId": "perf.load",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.perf.loadScenario"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.load@packages/engine",
+      "checkId": "perf.load",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.perf.loadScenario"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.load@packages/i18n",
+      "checkId": "perf.load",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.perf.loadScenario"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.load@packages/probe",
+      "checkId": "perf.load",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.perf.loadScenario"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.load@packages/protocol",
+      "checkId": "perf.load",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.perf.loadScenario"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.load@tools/cli",
+      "checkId": "perf.load",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.perf.loadScenario"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.recovery@.",
+      "checkId": "perf.recovery",
+      "component": ".",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.ref.recoveryCommand"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.recovery@apps/desktop",
+      "checkId": "perf.recovery",
+      "component": "apps/desktop",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.ref.recoveryCommand"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.recovery@packages/adapters",
+      "checkId": "perf.recovery",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.ref.recoveryCommand"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.recovery@packages/analyzers",
+      "checkId": "perf.recovery",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.ref.recoveryCommand"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.recovery@packages/catalog",
+      "checkId": "perf.recovery",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.ref.recoveryCommand"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.recovery@packages/engine",
+      "checkId": "perf.recovery",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.ref.recoveryCommand"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.recovery@packages/i18n",
+      "checkId": "perf.recovery",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.ref.recoveryCommand"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.recovery@packages/probe",
+      "checkId": "perf.recovery",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.ref.recoveryCommand"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.recovery@packages/protocol",
+      "checkId": "perf.recovery",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.ref.recoveryCommand"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.recovery@tools/cli",
+      "checkId": "perf.recovery",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.ref.recoveryCommand"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.compat@.",
+      "checkId": "perf.compat",
+      "component": ".",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.compat.matrix"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.compat@apps/desktop",
+      "checkId": "perf.compat",
+      "component": "apps/desktop",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.compat.matrix"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.compat@packages/adapters",
+      "checkId": "perf.compat",
+      "component": "packages/adapters",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.compat.matrix"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.compat@packages/analyzers",
+      "checkId": "perf.compat",
+      "component": "packages/analyzers",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.compat.matrix"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.compat@packages/catalog",
+      "checkId": "perf.compat",
+      "component": "packages/catalog",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.compat.matrix"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.compat@packages/engine",
+      "checkId": "perf.compat",
+      "component": "packages/engine",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.compat.matrix"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.compat@packages/i18n",
+      "checkId": "perf.compat",
+      "component": "packages/i18n",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.compat.matrix"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.compat@packages/probe",
+      "checkId": "perf.compat",
+      "component": "packages/probe",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.compat.matrix"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.compat@packages/protocol",
+      "checkId": "perf.compat",
+      "component": "packages/protocol",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.compat.matrix"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "perf.compat@tools/cli",
+      "checkId": "perf.compat",
+      "component": "tools/cli",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.compat.matrix"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "integ.guard@.",
+      "checkId": "integ.guard",
+      "component": ".",
+      "outcome": "passed",
+      "reason": {
+        "key": "integrity.reason.guardClean",
+        "params": {
+          "files": 0
+        }
+      },
+      "readiness": "ready",
+      "durationMs": 0
+    },
+    {
+      "instance": "integ.state@.",
+      "checkId": "integ.state",
+      "component": ".",
+      "outcome": "passed",
+      "reason": {
+        "key": "integrity.reason.stateStable"
+      },
+      "readiness": "ready",
+      "durationMs": 0
+    },
+    {
+      "instance": "integ.model-claims@.",
+      "checkId": "integ.model-claims",
+      "component": ".",
+      "outcome": "not_applicable",
+      "reason": {
+        "key": "profile.reason.notApplicable",
+        "refs": [
+          "profile.signal.ayar.aiResults"
+        ]
+      },
+      "readiness": "not_applicable",
+      "durationMs": null
+    },
+    {
+      "instance": "integ.reviews@.",
+      "checkId": "integ.reviews",
+      "component": ".",
+      "outcome": "missing",
+      "reason": {
+        "key": "setup.reason.notApproved"
+      },
+      "readiness": "needs_approval",
+      "durationMs": null
+    },
+    {
+      "instance": "custom.typecheck@.",
+      "checkId": "custom.typecheck",
+      "component": ".",
+      "outcome": "passed",
+      "reason": {
+        "key": "verdict.reason.passed",
+        "params": {
+          "notes": 0
+        }
+      },
+      "readiness": "ready",
+      "durationMs": 24121
+    }
+  ],
+  "findings": 83,
+  "findingsExcludedByReview": 73,
+  "blockingOpen": [],
+  "requiredNotRun": [
+    {
+      "instance": "design.a11y@apps/desktop",
+      "outcome": "missing",
+      "reason": {
+        "key": "setup.reason.missing.configuration",
+        "params": {
+          "ref": "renderTarget"
+        }
+      },
+      "explanation": "واجهة Electron لا تُقدَّم عبر رابط (لا renderTarget)؛ axe يفحص كل شاشة على الحزمة المشتقة في اختبارات E2E (AT-40)"
+    },
+    {
+      "instance": "design.rtl.static@.",
+      "outcome": "missing",
+      "reason": {
+        "key": "analyzer.reason.noRtl"
+      },
+      "explanation": "صفحة الواجهة في src/renderer (جذر Vite) خارج المجلدات التي يقرأ منها الاكتشاف صفحات الدخول، والاتجاه يُضبط وقت التشغيل بحسب اللغة؛ الاتجاه يُثبت في E2E (AT-28 وAT-41)"
+    },
+    {
+      "instance": "sec.deps@.",
+      "outcome": "missing",
+      "reason": {
+        "key": "adapter.reason.osvDbMissing"
+      },
+      "explanation": "osv-scanner يمسح الجذر كله فيبلغ ملفات قفل PyPI داخل مشاريع الاختبار (fixtures/) ويطلب قاعدتها، والجاهزية تعرض قواعد الأنظمة التي اكتشفتها المكوّنات وحدها (npm)، فيخرج 127 «قاعدة ناقصة» (G-DEV13-06)؛ وملف القفل في جذر عِيَار وحده فُحص بـ osv-scanner دون اتصال بقاعدة npm المنزّلة، فلا ثغرة معروفة (docs/acceptance/self-check/deps-osv.json، مراجعة DEV-13 R1-04)"
+    },
+    {
+      "instance": "code.types@.",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "npm"
+        }
+      },
+      "explanation": "لا محوّل للأنواع يعرف TypeScript 7 الأصلي (@typescript/native) ولا سكربت الجذر الذي يشغّل مساحات العمل (E-13)؛ يغطيه الفحص المخصص «typecheck» (npm run typecheck) في الملف نفسه"
+    },
+    {
+      "instance": "code.types@packages/adapters",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "node"
+        }
+      },
+      "explanation": "لا محوّل للأنواع يعرف TypeScript 7 الأصلي (@typescript/native) ولا سكربت الجذر الذي يشغّل مساحات العمل (E-13)؛ يغطيه الفحص المخصص «typecheck» (npm run typecheck) في الملف نفسه"
+    },
+    {
+      "instance": "code.types@packages/analyzers",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "node"
+        }
+      },
+      "explanation": "لا محوّل للأنواع يعرف TypeScript 7 الأصلي (@typescript/native) ولا سكربت الجذر الذي يشغّل مساحات العمل (E-13)؛ يغطيه الفحص المخصص «typecheck» (npm run typecheck) في الملف نفسه"
+    },
+    {
+      "instance": "code.types@packages/catalog",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "node"
+        }
+      },
+      "explanation": "لا محوّل للأنواع يعرف TypeScript 7 الأصلي (@typescript/native) ولا سكربت الجذر الذي يشغّل مساحات العمل (E-13)؛ يغطيه الفحص المخصص «typecheck» (npm run typecheck) في الملف نفسه"
+    },
+    {
+      "instance": "code.types@packages/engine",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "node"
+        }
+      },
+      "explanation": "لا محوّل للأنواع يعرف TypeScript 7 الأصلي (@typescript/native) ولا سكربت الجذر الذي يشغّل مساحات العمل (E-13)؛ يغطيه الفحص المخصص «typecheck» (npm run typecheck) في الملف نفسه"
+    },
+    {
+      "instance": "code.types@packages/i18n",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "node"
+        }
+      },
+      "explanation": "لا محوّل للأنواع يعرف TypeScript 7 الأصلي (@typescript/native) ولا سكربت الجذر الذي يشغّل مساحات العمل (E-13)؛ يغطيه الفحص المخصص «typecheck» (npm run typecheck) في الملف نفسه"
+    },
+    {
+      "instance": "code.types@packages/probe",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "node"
+        }
+      },
+      "explanation": "لا محوّل للأنواع يعرف TypeScript 7 الأصلي (@typescript/native) ولا سكربت الجذر الذي يشغّل مساحات العمل (E-13)؛ يغطيه الفحص المخصص «typecheck» (npm run typecheck) في الملف نفسه"
+    },
+    {
+      "instance": "code.types@packages/protocol",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "node"
+        }
+      },
+      "explanation": "لا محوّل للأنواع يعرف TypeScript 7 الأصلي (@typescript/native) ولا سكربت الجذر الذي يشغّل مساحات العمل (E-13)؛ يغطيه الفحص المخصص «typecheck» (npm run typecheck) في الملف نفسه"
+    },
+    {
+      "instance": "code.types@tools/cli",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "node"
+        }
+      },
+      "explanation": "لا محوّل للأنواع يعرف TypeScript 7 الأصلي (@typescript/native) ولا سكربت الجذر الذي يشغّل مساحات العمل (E-13)؛ يغطيه الفحص المخصص «typecheck» (npm run typecheck) في الملف نفسه"
+    },
+    {
+      "instance": "beh.unit@apps/desktop",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "vitest,jest,node-test,pytest"
+        }
+      },
+      "explanation": "اختبارات كل الحزم تُشغَّل من الجذر (vitest run على مساحات العمل) ولا سكربت اختبار في الحزمة نفسها؛ يغطيها beh.unit@. في الجذر"
+    },
+    {
+      "instance": "beh.unit@packages/adapters",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "vitest,jest,node-test,pytest"
+        }
+      },
+      "explanation": "اختبارات كل الحزم تُشغَّل من الجذر (vitest run على مساحات العمل) ولا سكربت اختبار في الحزمة نفسها؛ يغطيها beh.unit@. في الجذر"
+    },
+    {
+      "instance": "beh.unit@packages/analyzers",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "vitest,jest,node-test,pytest"
+        }
+      },
+      "explanation": "اختبارات كل الحزم تُشغَّل من الجذر (vitest run على مساحات العمل) ولا سكربت اختبار في الحزمة نفسها؛ يغطيها beh.unit@. في الجذر"
+    },
+    {
+      "instance": "beh.unit@packages/catalog",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "vitest,jest,node-test,pytest"
+        }
+      },
+      "explanation": "اختبارات كل الحزم تُشغَّل من الجذر (vitest run على مساحات العمل) ولا سكربت اختبار في الحزمة نفسها؛ يغطيها beh.unit@. في الجذر"
+    },
+    {
+      "instance": "beh.unit@packages/engine",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "vitest,jest,node-test,pytest"
+        }
+      },
+      "explanation": "اختبارات كل الحزم تُشغَّل من الجذر (vitest run على مساحات العمل) ولا سكربت اختبار في الحزمة نفسها؛ يغطيها beh.unit@. في الجذر"
+    },
+    {
+      "instance": "beh.unit@packages/i18n",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "vitest,jest,node-test,pytest"
+        }
+      },
+      "explanation": "اختبارات كل الحزم تُشغَّل من الجذر (vitest run على مساحات العمل) ولا سكربت اختبار في الحزمة نفسها؛ يغطيها beh.unit@. في الجذر"
+    },
+    {
+      "instance": "beh.unit@packages/probe",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "vitest,jest,node-test,pytest"
+        }
+      },
+      "explanation": "اختبارات كل الحزم تُشغَّل من الجذر (vitest run على مساحات العمل) ولا سكربت اختبار في الحزمة نفسها؛ يغطيها beh.unit@. في الجذر"
+    },
+    {
+      "instance": "beh.unit@packages/protocol",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "vitest,jest,node-test,pytest"
+        }
+      },
+      "explanation": "اختبارات كل الحزم تُشغَّل من الجذر (vitest run على مساحات العمل) ولا سكربت اختبار في الحزمة نفسها؛ يغطيها beh.unit@. في الجذر"
+    },
+    {
+      "instance": "beh.unit@tools/cli",
+      "outcome": "unavailable",
+      "reason": {
+        "key": "adapter.reason.noAdapter",
+        "params": {
+          "tool": "vitest,jest,node-test,pytest"
+        }
+      },
+      "explanation": "اختبارات كل الحزم تُشغَّل من الجذر (vitest run على مساحات العمل) ولا سكربت اختبار في الحزمة نفسها؛ يغطيها beh.unit@. في الجذر"
+    }
+  ],
+  "unexplained": []
+}

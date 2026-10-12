@@ -238,10 +238,19 @@ export const tokensAnalyzer: Analyzer = {
       [FONT_SIZE_PROPS, loaded.scale.fontSize],
     ];
 
-    // Every custom property the project defines anywhere counts as defined (a local --x is not a token, but exists).
+    // Every custom property the project defines anywhere counts as defined (a local --x is not a token, but exists):
+    // in a stylesheet or a <style> block, and also from a component's markup or script — a style attribute
+    // («style="--x: 4px"», as a string or a template), Svelte's style directive («style:--x={…}»), or
+    // «style.setProperty('--x', …)» — the usual ways a component passes a value to its CSS.
     const defined = new Set(tokens.map((t) => t.name));
     const all = styleFiles(i, null, []);
     for (const f of all) for (const s of styleSources(f, i.read(f) ?? '')) for (const t of cssTokens(s.css)) defined.add(t.name);
+    for (const f of i.files.filter((f) => /\.(html?|svelte|vue|astro|[cm]?[jt]sx?)$/i.test(f))) {
+      const text = i.read(f) ?? '';
+      for (const m of text.matchAll(/\bstyle:(--[\w-]+)/g)) defined.add(m[1]!);
+      for (const m of text.matchAll(/\bstyle\s*=\s*(?:"([^"]*)"|'([^']*)'|\{`([^`]*)`\}|\{"([^"]*)"\}|\{'([^']*)'\})/g)) for (const d of (m[1] ?? m[2] ?? m[3] ?? m[4] ?? m[5] ?? '').matchAll(/(--[\w-]+)\s*:/g)) defined.add(d[1]!);
+      for (const m of text.matchAll(/\.setProperty\(\s*(?:"(--[\w-]+)"|'(--[\w-]+)'|`(--[\w-]+)`)/g)) defined.add((m[1] ?? m[2] ?? m[3])!);
+    }
 
     const files = styleFiles(i, cfg.scope, cfg.exclude).filter((f) => !sourceFiles.has(f));
     for (const file of files) {
@@ -262,7 +271,13 @@ export const tokensAnalyzer: Analyzer = {
           const line = s.line - 1 + (d.source?.start?.line ?? 1);
           const location = { path: file, line };
           const anchor = { kind: 'code' as const, value: '' };
-          for (const m of d.value.matchAll(/var\(\s*(--[\w-]+)/g)) if (!defined.has(m[1]!)) pushFinding(r, finding({ rule: 'tokens.undefined-var', message: `var(${m[1]}) is not defined by the tokens nor in the styles`, location, anchor, actual: m[1]! }));
+          // A var() no token nor style defines is undefined, fallback or not: «var(--radius-tagg, 4px)» hides a misspelt
+          // token behind a fixed value (DEV-13 review R3-06), so the message says the fallback is what shows.
+          for (const m of d.value.matchAll(/var\(\s*(--[\w-]+)\s*([,)])/g)) {
+            if (defined.has(m[1]!)) continue;
+            const message = `var(${m[1]}) is not defined by the tokens nor in the styles${m[2] === ',' ? ': its fallback is what shows' : ''}`;
+            pushFinding(r, finding({ rule: 'tokens.undefined-var', message, location, anchor, actual: m[1]! }));
+          }
           if (COLOR_PROPS.test(prop) && colors.size) {
             for (const lit of colorLiterals(d.value)) {
               const n = normalizeColor(lit);

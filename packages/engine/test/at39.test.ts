@@ -5,7 +5,7 @@
 // ESLint) on the project's own node_modules/.bin writes the recorded report where the adapter's flags ask and exits
 // with the recorded code; JUnit and SARIF arrive through a custom check that declares its report (10.3). Meanwhile
 // the engine keeps answering: the longest answer to a request while the reports are read is measured and printed
-// (the numeric limit is accepted after E-14's calibration in DEV-13).
+// (the numeric limit is E-14's calibrated UI-response target, DEV-13: 100 ms, NFR-01).
 import type { ResultsPage } from '@ayar/protocol';
 import { execFileSync } from 'node:child_process';
 import { chmodSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
@@ -13,6 +13,9 @@ import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { addProject, approveAll, plan, startRun, waitRun } from '../../../tools/cli/test/support/fixtures.ts';
 import { engineFor, FIXTURES, materialize, ok, PNPM, tempDir, type EngineConnection } from './support/scan.ts';
+
+/** NFR-01's UI response target as calibrated in E-14 (docs/tracking/env-decisions.md, DEV-13). */
+const UI_RESPONSE_MS = 100;
 
 let root: string;
 let cleanup: () => void;
@@ -122,7 +125,8 @@ describe('AT-39 (engine) and the report rows of AT-14', () => {
       await pinger;
     }
     console.log(`AT-39 (functional): the longest answer while the reports were read: ${Math.round(worst)} ms`);
-    expect(worst).toBeLessThan(5000);
+    // E-14 (DEV-13): the engine answers within NFR-01's UI-response target while the damaged reports are read.
+    expect(worst).toBeLessThan(UI_RESPONSE_MS);
   }, 600_000);
 });
 

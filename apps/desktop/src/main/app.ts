@@ -2,6 +2,7 @@
 // engine supervisor, and the IPC gateway with its sender check. Loaded by entry.ts after the D-52 guard.
 import { app, BrowserWindow as Windows, ipcMain, Menu, Notification, powerSaveBlocker, protocol, session, type BrowserWindow, type IpcMainEvent, type IpcMainInvokeEvent } from 'electron';
 import { randomBytes } from 'node:crypto';
+import inspector from 'node:inspector';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { performance } from 'node:perf_hooks';
@@ -171,7 +172,9 @@ async function run(): Promise<void> {
   );
 
   const diagnostics: Diagnostics = { cspViolations: [], rejectedSenders: 0, supervisor, preload: paths.preload, dataDir, health: healthLog };
-  if (!app.isPackaged) (globalThis as { ayarDiagnostics?: Diagnostics }).ayarDiagnostics = diagnostics;
+  // The diagnostics the e2e tests read (CSP violations, rejected senders): on a development build, and on a package
+  // only while Node's inspector is active, which the fuses allow on the derived test package alone (D-51, DEV-13).
+  if (!app.isPackaged || inspector.url()) (globalThis as { ayarDiagnostics?: Diagnostics }).ayarDiagnostics = diagnostics;
 
   const isTrusted = (event: IpcMainEvent | IpcMainInvokeEvent): boolean => {
     const ok = isTrustedSender(event.senderFrame, event.sender.id, trusted);

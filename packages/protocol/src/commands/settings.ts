@@ -55,7 +55,7 @@ export const SETTINGS = {
   /** FR-26: ask the main process to prevent system sleep while a run is active. */
   'run.preventSleep': { schema: z.boolean(), default: true },
   /** C-12 point 1: how many light and medium checks run at once (heavy and very heavy run alone, G-34). */
-  'run.parallel': { schema: z.int().min(1).max(4), default: 2 },
+  'run.parallel': { schema: z.int().min(1).max(4), default: 3 },
   /** C-12 point 2: snapshot the project around every check to record its side effects (FR-36). */
   'run.sideEffects': { schema: z.boolean(), default: true },
   /** 10.2 rule 5: checks that need the network run only when it is allowed; otherwise «ناقص: يحتاج شبكة». */

@@ -1,0 +1,289 @@
+// AT-36, the app part (NFR-01 «استجابة الواجهة» and «تحديثات كل فحص», NFR-08 cold start, NFR-09 resources; E-14), on
+// the derived test package (AYAR_E2E_APP, D-51) or the development build. Five samples per target, the median and
+// the machine's conditions written to docs/acceptance/perf/app.json (AYAR_PERF_OUT). The first pass is E-14's
+// baseline; the acceptance pass judges the medians against the calibrated targets (AYAR_PERF_JUDGE=1).
+//
+//   cd apps/desktop && AYAR_E2E_APP=<derived .app> node ../../node_modules/vitest/vitest.mjs run -c vitest.perf.config.ts
+//
+// - Cold start: five launches of a fresh data folder; the time from the process start to the first screen's
+//   interactive control («اختر مجلدًا…» enabled), by the page's own clock (performance.timeOrigin → now).
+// - UI response while a run goes on: a round trip from the page to the engine and back (project.list, the lightest
+//   engine command) every 100 ms during a full scan of the journey project; the median and the p95, in the page.
+// - Updates per check: check.progress/check.state events per running check per second, from the engine's events
+//   seen by the page's bridge subscription, never more than 10 a second.
+// - Memory and idle processor: every 500 ms during the scan, AYAR's whole process tree (main, helpers, engine; the
+//   project's own processes are children of the engine and are excluded by their AYAR_CHECK_TOKEN environment, read
+//   with ps -E): the physical footprint the system charges each process (/usr/bin/footprint, what Activity Monitor
+//   shows as Memory) and, beside it, the RSS sum (which counts shared framework pages once per process); then the
+//   processor share of the tree over 20 idle seconds afterwards, from the growth of its processes' accumulated
+//   processor time between one-second samples (ps's %cpu is a decaying average that still carries the scan).
+import { execFileSync } from 'node:child_process';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpus, loadavg, tmpdir, totalmem } from 'node:os';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { PACKAGED_APP, launch, tempDataDir, until, type Launched } from '../e2e/support.ts';
+import { CUSTOM_CHECKS, loginShell, makeJourneyProject } from '../e2e/journey-project.ts';
+
+type Invoke = { ok: boolean; result?: unknown; error?: { code: string } };
+const REPEAT = Number(process.env.AYAR_PERF_REPEAT ?? 5);
+const JUDGE = process.env.AYAR_PERF_JUDGE === '1';
+const OUT = process.env.AYAR_PERF_OUT ?? fileURLToPath(new URL('../../../../docs/acceptance/perf/app.json', import.meta.url));
+/**
+ * The targets as calibrated in E-14 (DEV-13); the baseline pass records them beside the measurement. Memory is the
+ * physical footprint of the app's processes, not their RSS (D-DEV13-11: RSS counts the framework pages the Electron
+ * helpers share once per process).
+ */
+const TARGETS = { coldStartMs: 3000, uiResponseP95Ms: 100, updatesPerCheckPerSecond: 10, peakFootprintMb: 600, idleCpuPercent: 2 };
+
+/** «اعتمد الكل» over the bridge, as tools/cli's approveAll does through the protocol. */
+async function approveAll(invoke: <T>(c: string, p: unknown) => Promise<{ ok: boolean; result: T }>, projectId: string): Promise<void> {
+  for (;;) {
+    const r = await invoke<{ pending: { id: string; items: { instance: string; approvable: boolean; approveAlone: boolean }[] } }>('profile.get', { projectId });
+    const items = r.result.pending.items.filter((i) => i.approvable);
+    if (!items.length) return;
+    const alone = items.find((i) => i.approveAlone);
+    await invoke('profile.approve', { projectId, changeSetId: r.result.pending.id, ...(alone ? { instances: [alone.instance] } : {}) });
+  }
+}
+
+const median = (xs: number[]): number => {
+  const s = [...xs].sort((a, b) => a - b);
+  return s.length ? (s.length % 2 ? s[(s.length - 1) / 2]! : (s[s.length / 2 - 1]! + s[s.length / 2]!) / 2) : Number.NaN;
+};
+const p95 = (xs: number[]): number => {
+  const s = [...xs].sort((a, b) => a - b);
+  return s[Math.min(s.length - 1, Math.floor(s.length * 0.95))] ?? Number.NaN;
+};
+const machine = () => ({
+  macos: execFileSync('sw_vers', ['-productVersion'], { encoding: 'utf8' }).trim(),
+  chip: execFileSync('sysctl', ['-n', 'machdep.cpu.brand_string'], { encoding: 'utf8' }).trim(),
+  cpus: cpus().length,
+  memoryGb: Math.round(totalmem() / 2 ** 30),
+  loadavg: loadavg().map((x) => Math.round(x * 100) / 100),
+  power: (execFileSync('pmset', ['-g', 'batt'], { encoding: 'utf8' }).split('\n')[0] ?? '').replace(/^Now drawing from /, '').trim(),
+  app: PACKAGED_APP ?? 'development build',
+  at: new Date().toISOString(),
+});
+
+/** ps's accumulated processor time ([[dd-]hh:]mm:ss.cc) in seconds. */
+const cpuSeconds = (time: string): number => {
+  const [days, rest] = time.includes('-') ? time.split('-') : ['0', time];
+  return rest!.split(':').reduce((s, part) => s * 60 + Number(part), 0) + Number(days) * 86_400;
+};
+
+/** AYAR's process tree (pid and its descendants) with RSS in MB and accumulated processor seconds, the project's checks excluded. */
+function tree(rootPid: number): { pid: number; rssMb: number; cpuSec: number; comm: string }[] {
+  const lines = execFileSync('ps', ['-axo', 'pid=,ppid=,rss=,time=,comm='], { encoding: 'utf8' }).trim().split('\n');
+  const rows = lines.map((l) => {
+    const m = /^\s*(\d+)\s+(\d+)\s+(\d+)\s+([\d:.-]+)\s+(.*)$/.exec(l);
+    return m ? { pid: Number(m[1]), ppid: Number(m[2]), rssMb: Number(m[3]) / 1024, cpuSec: cpuSeconds(m[4]!), comm: m[5]! } : null;
+  });
+  const byParent = new Map<number, typeof rows>();
+  for (const r of rows) if (r) byParent.set(r.ppid, [...(byParent.get(r.ppid) ?? []), r]);
+  const out: { pid: number; rssMb: number; cpuSec: number; comm: string }[] = [];
+  const walk = (pid: number) => {
+    for (const r of byParent.get(pid) ?? []) {
+      if (!r) continue;
+      // A project process carries AYAR_CHECK_TOKEN (C-12); it is the project's, not AYAR's.
+      let env = '';
+      try {
+        env = execFileSync('ps', ['-Eo', 'command=', '-p', String(r.pid)], { encoding: 'utf8' });
+      } catch {
+        env = '';
+      }
+      if (env.includes('AYAR_CHECK_TOKEN=')) continue;
+      out.push({ pid: r.pid, rssMb: r.rssMb, cpuSec: r.cpuSec, comm: r.comm });
+      walk(r.pid);
+    }
+  };
+  const root = rows.find((r) => r?.pid === rootPid);
+  if (root) out.push({ pid: root.pid, rssMb: root.rssMb, cpuSec: root.cpuSec, comm: root.comm });
+  walk(rootPid);
+  return out;
+}
+
+/** The physical footprint of a set of processes in MB (/usr/bin/footprint -j), or null when the tool refuses. */
+function footprintMb(pids: number[]): number | null {
+  if (!pids.length) return null;
+  const dir = mkdtempSync(join(tmpdir(), 'ayar-perf-fp-'));
+  try {
+    execFileSync('/usr/bin/footprint', ['-j', join(dir, 'fp.json'), ...pids.map(String)], { stdio: 'ignore' });
+    const j = JSON.parse(readFileSync(join(dir, 'fp.json'), 'utf8')) as { processes: { footprint?: number }[] };
+    const total = j.processes.reduce((s, p) => s + (typeof p.footprint === 'number' ? p.footprint : 0), 0) / 2 ** 20;
+    return Number.isFinite(total) && total > 0 ? total : null;
+  } catch {
+    return null;
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+const report: Record<string, unknown> = { test: 'AT-36 (app)', targets: TARGETS, repeat: REPEAT };
+let run: Launched | null = null;
+let t: ReturnType<typeof tempDataDir> | null = null;
+
+afterAll(() => {
+  mkdirSync(dirname(OUT), { recursive: true });
+  writeFileSync(OUT, `${JSON.stringify({ ...report, machine: machine() }, null, 2)}\n`);
+});
+
+describe('AT-36 (app): cold start, UI response, update rate, memory, idle processor', () => {
+  it(
+    'cold start to the first interactive control, five fresh launches (NFR-08)',
+    async () => {
+      const samples: number[] = [];
+      for (let i = 0; i < REPEAT; i++) {
+        const own = tempDataDir();
+        const started = Date.now();
+        const r = await launch(own.dataDir);
+        // A fresh launch follows the system language (the owner's machine was Arabic for E-14 and English for the final run).
+        await r.page.getByRole('button', { name: /اختر مجلدًا…|Choose a folder…/ }).waitFor({ state: 'visible', timeout: 30_000 });
+        const inPage = await r.page.evaluate(() => Math.round(performance.now()));
+        const wall = Date.now() - started;
+        // The page's own clock starts when the renderer is created; the process started a little before it.
+        samples.push(Math.min(wall, inPage + 0));
+        process.stderr.write(`cold start #${i + 1}: page ${inPage} ms, wall ${wall} ms\n`);
+        await r.app.close();
+        own.cleanup();
+      }
+      report['coldStart'] = { samples, medianMs: median(samples) };
+      if (JUDGE) expect(median(samples)).toBeLessThanOrEqual(TARGETS.coldStartMs);
+    },
+    REPEAT * 60_000,
+  );
+
+  it(
+    'UI response, updates per check, memory during a full scan, then the idle processor (NFR-01, NFR-09)',
+    async () => {
+      t = tempDataDir();
+      const folder = makeJourneyProject(t.root);
+      run = await launch(t.dataDir);
+      const { page, app } = run;
+      const invoke = <T>(command: string, payload: unknown) =>
+        page.evaluate(([c, p]) => (window as unknown as { ayar: { invoke: (c: string, p: unknown) => Promise<Invoke> } }).ayar.invoke(c, p), [command, payload] as const) as Promise<{ ok: boolean; result: T }>;
+      await invoke('settings.set', { key: 'ui.language', value: 'ar' });
+      await invoke('settings.set', { key: 'environment.shell', value: loginShell(t.root) });
+      await invoke('settings.set', { key: 'run.notify', value: false });
+      await page.reload();
+      await page.waitForLoadState('load');
+      await app.evaluate(({ dialog }, f) => {
+        dialog.showOpenDialog = () => Promise.resolve({ canceled: false, filePaths: [f] });
+      }, folder);
+      await page.getByRole('button', { name: 'اختر مجلدًا…' }).click();
+      await page.getByRole('button', { name: 'راجع ملف المعايير' }).waitFor({ timeout: 30_000 });
+      const list = await invoke<{ projects: { id: string }[] }>('project.list', {});
+      const projectId = list.result.projects[0]!.id;
+      // The two custom checks of the journey (a fast failure and a slow one) make the scan last long enough to sample.
+      await invoke('profile.update', { projectId, patch: { custom: CUSTOM_CHECKS } });
+      await approveAll(invoke, projectId);
+      // The page keeps a tally of the engine's events for the running checks (update rate).
+      await page.evaluate(() => {
+        const w = window as unknown as { ayar: { subscribe: (topic: string, f: (e: { payload: { checkRunId?: string } }) => void) => void }; __perfEvents: Record<string, number[]> };
+        w.__perfEvents = {};
+        for (const topic of ['check.progress', 'check.state']) {
+          w.ayar.subscribe(topic, (e) => {
+            const id = e.payload.checkRunId ?? '?';
+            (w.__perfEvents[id] ??= []).push(performance.now());
+          });
+        }
+      });
+      const plan = await invoke<{ id: string }>('run.plan', { projectId, selection: { kind: 'full' } });
+      const started = await invoke<{ runId: string }>('run.start', { planId: plan.result.id });
+      const runId = started.result.runId;
+      const pid = app.process().pid!;
+      const latencies: number[] = [];
+      const rss: number[] = [];
+      const footprint: number[] = [];
+      let state = 'running';
+      let sampling = false;
+      const sampler = setInterval(() => {
+        if (sampling) return;
+        sampling = true;
+        try {
+          const procs = tree(pid);
+          rss.push(procs.reduce((s, r) => s + r.rssMb, 0));
+          const fp = footprintMb(procs.map((p) => p.pid));
+          if (fp !== null) footprint.push(fp);
+        } catch {
+          /* a process vanished between ps calls */
+        } finally {
+          sampling = false;
+        }
+      }, 500);
+      try {
+        while (state !== 'finished' && state !== 'interrupted') {
+          const ms = await page.evaluate(async () => {
+            const w = window as unknown as { ayar: { invoke: (c: string, p: unknown) => Promise<unknown> } };
+            const t0 = performance.now();
+            await w.ayar.invoke('project.list', {});
+            return performance.now() - t0;
+          });
+          latencies.push(ms);
+          await new Promise((r) => setTimeout(r, 100));
+          const d = await invoke<{ run: { state: string } }>('run.get', { runId });
+          state = d.result.run.state;
+        }
+      } finally {
+        clearInterval(sampler);
+      }
+      const events = await page.evaluate(() => (window as unknown as { __perfEvents: Record<string, number[]> }).__perfEvents);
+      // Updates per check per second: for each check, the busiest one-second window.
+      let busiest = 0;
+      for (const times of Object.values(events)) {
+        const s = [...times].sort((a, b) => a - b);
+        for (let i = 0; i < s.length; i++) {
+          let j = i;
+          while (j < s.length && s[j]! - s[i]! <= 1000) j++;
+          busiest = Math.max(busiest, j - i);
+        }
+      }
+      // Idle: ten seconds after the scan, the processor share of the whole tree over each of 20 one-second
+      // intervals: the growth of the tree's accumulated processor time (per process, so a process that appears or
+      // vanishes between two samples counts nothing) over the wall time between the samples.
+      await new Promise((r) => setTimeout(r, 10_000));
+      const idle: number[] = [];
+      // Who used the processor while idle: the seconds each process of the tree accumulated over the 20 intervals.
+      const idleBy = new Map<string, number>();
+      let prev = { at: performance.now(), procs: tree(pid) };
+      for (let i = 0; i < 20; i++) {
+        await new Promise((r) => setTimeout(r, 1000));
+        const now = { at: performance.now(), procs: tree(pid) };
+        const before = new Map(prev.procs.map((p) => [p.pid, p.cpuSec]));
+        let used = 0;
+        for (const p of now.procs) {
+          if (!before.has(p.pid)) continue;
+          const d = Math.max(0, p.cpuSec - before.get(p.pid)!);
+          used += d;
+          idleBy.set(p.comm, (idleBy.get(p.comm) ?? 0) + d);
+        }
+        idle.push((used / ((now.at - prev.at) / 1000)) * 100);
+        prev = now;
+      }
+      report['uiResponse'] = { samples: latencies.length, medianMs: Math.round(median(latencies) * 10) / 10, p95Ms: Math.round(p95(latencies) * 10) / 10, maxMs: Math.round(Math.max(...latencies) * 10) / 10 };
+      report['updatesPerCheck'] = { checks: Object.keys(events).length, busiestSecond: busiest };
+      report['memory'] = { samples: rss.length, peakFootprintMb: footprint.length ? Math.round(Math.max(...footprint)) : null, medianFootprintMb: footprint.length ? Math.round(median(footprint)) : null, peakRssMb: Math.round(Math.max(...rss)), medianRssMb: Math.round(median(rss)) };
+      report['idleCpu'] = { samples: idle.length, medianPercent: Math.round(median(idle) * 10) / 10, maxPercent: Math.round(Math.max(...idle) * 10) / 10, secondsByProcess: Object.fromEntries([...idleBy].filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).map(([k, v]) => [k.replace(/^.*\//, ''), Math.round(v * 100) / 100])) };
+      process.stderr.write(`${JSON.stringify({ uiResponse: report['uiResponse'], updatesPerCheck: report['updatesPerCheck'], memory: report['memory'], idleCpu: report['idleCpu'] })}\n`);
+      expect(state).toBe('finished');
+      if (JUDGE) {
+        expect(p95(latencies)).toBeLessThanOrEqual(TARGETS.uiResponseP95Ms);
+        expect(busiest).toBeLessThanOrEqual(TARGETS.updatesPerCheckPerSecond);
+        // Without a footprint reading, RSS is held to the same target: stricter, never looser.
+        expect(footprint.length ? Math.max(...footprint) : Math.max(...rss)).toBeLessThanOrEqual(TARGETS.peakFootprintMb);
+        expect(median(idle)).toBeLessThanOrEqual(TARGETS.idleCpuPercent);
+      }
+      await until(() => Promise.resolve(true), () => true, 1);
+    },
+    600_000,
+  );
+});
+
+beforeAll(() => {
+  mkdirSync(dirname(OUT), { recursive: true });
+});
+afterAll(async () => {
+  await run?.app.close();
+  t?.cleanup();
+});

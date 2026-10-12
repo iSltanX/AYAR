@@ -166,7 +166,7 @@
   }
   .val {
     padding: 1px var(--space-8);
-    border-radius: var(--radius-tag);
+    border-radius: 4px;
     background: var(--bg-sunken);
     font: var(--type-body-small);
     color: var(--text-secondary);

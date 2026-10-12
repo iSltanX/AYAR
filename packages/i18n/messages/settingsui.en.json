@@ -68,5 +68,16 @@
   "settingsui.version": "Version",
   "settingsui.madeBy": "Design and development",
   "settingsui.maker": "Sultan",
-  "settingsui.repository": "Repository"
+  "settingsui.repository": "Repository",
+  "settingsui.guide": "User guide",
+  "settingsui.guideNote": "The nine steps, from adding a project to re-checking.",
+  "settingsui.guideOpen": "Open the guide",
+  "settingsui.licenses": "Licences",
+  "settingsui.licensesNote": "The two fonts and the libraries bundled in the app, with their licences.",
+  "settingsui.licensesOpen": "Show licences",
+  "settingsui.licensesTitle": "Licences of the bundled fonts and libraries",
+  "settingsui.licensesIntro": "{fonts, plural, one {One font} other {# fonts}} and {packages, plural, one {one library} other {# libraries}} ship inside AYAR. Choose an item to read its licence text.",
+  "settingsui.licensesFonts": "Fonts",
+  "settingsui.licensesPackages": "Libraries",
+  "settingsui.close": "Close"
 }

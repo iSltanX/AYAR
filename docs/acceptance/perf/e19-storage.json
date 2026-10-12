@@ -1,0 +1,162 @@
+{
+  "test": "E-19: storage per run",
+  "runsPerProject": 3,
+  "at": "2026-10-12T09:01:40.454Z",
+  "results": [
+    {
+      "project": "FX-WEB-DESIGN",
+      "variant": "good",
+      "runs": [
+        {
+          "runId": "run_1XQfmr9RlJi1r51ZB1WRDw",
+          "evidenceDeltaMb": 1.24,
+          "snapshotsDeltaMb": 0.01,
+          "baselinesDeltaMb": 0,
+          "dbDeltaMb": 0.16,
+          "spaceUsedMb": 1.25,
+          "checks": 34,
+          "design": {
+            "design.tokens.static@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.tokens.render@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.fonts.static@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.fonts.render@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.a11y@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.a11y.review@.": "needs_review ({\"key\":\"verdict.reason.review\",\"params\":{\"count\":1}})",
+            "design.rtl.static@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.rtl.render@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.states@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.visual@.": "missing ({\"key\":\"probe.reason.noApprovedReference\",\"params\":{\"count\":32}})",
+            "beh.ext.host@.": "not_applicable ({\"key\":\"profile.reason.notApplicable\",\"refs\":[\"profile.signal.type.chromiumExtension\"]})"
+          }
+        },
+        {
+          "runId": "run_t96QO8y1-aLYerLhZaVz8Q",
+          "evidenceDeltaMb": 1.24,
+          "snapshotsDeltaMb": 0,
+          "baselinesDeltaMb": 0,
+          "dbDeltaMb": 0.17,
+          "spaceUsedMb": 2.49,
+          "checks": 34,
+          "design": {
+            "design.tokens.static@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.tokens.render@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.fonts.static@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.fonts.render@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.a11y@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.a11y.review@.": "needs_review ({\"key\":\"verdict.reason.review\",\"params\":{\"count\":1}})",
+            "design.rtl.static@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.rtl.render@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.states@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.visual@.": "missing ({\"key\":\"probe.reason.noApprovedReference\",\"params\":{\"count\":32}})",
+            "beh.ext.host@.": "not_applicable ({\"key\":\"profile.reason.notApplicable\",\"refs\":[\"profile.signal.type.chromiumExtension\"]})"
+          }
+        },
+        {
+          "runId": "run_smr-f8_sjIReDjY5bVkvdA",
+          "evidenceDeltaMb": 1.24,
+          "snapshotsDeltaMb": 0,
+          "baselinesDeltaMb": 0,
+          "dbDeltaMb": 0.16,
+          "spaceUsedMb": 3.72,
+          "checks": 34,
+          "design": {
+            "design.tokens.static@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.tokens.render@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.fonts.static@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.fonts.render@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.a11y@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.a11y.review@.": "needs_review ({\"key\":\"verdict.reason.review\",\"params\":{\"count\":1}})",
+            "design.rtl.static@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.rtl.render@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.states@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.visual@.": "missing ({\"key\":\"probe.reason.noApprovedReference\",\"params\":{\"count\":32}})",
+            "beh.ext.host@.": "not_applicable ({\"key\":\"profile.reason.notApplicable\",\"refs\":[\"profile.signal.type.chromiumExtension\"]})"
+          }
+        }
+      ],
+      "averagePerRunMb": {
+        "evidence": 1.24,
+        "snapshots": 0,
+        "baselines": 0,
+        "db": 0.16,
+        "total": 1.4
+      }
+    },
+    {
+      "project": "FX-EXT",
+      "variant": "good",
+      "runs": [
+        {
+          "runId": "run_QbpT4ywq7AO9zGIhdAWQ4w",
+          "evidenceDeltaMb": 0.08,
+          "snapshotsDeltaMb": 0.03,
+          "baselinesDeltaMb": 0,
+          "dbDeltaMb": 0.21,
+          "spaceUsedMb": 0.11,
+          "checks": 26,
+          "design": {
+            "design.a11y@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.a11y.review@.": "needs_review ({\"key\":\"verdict.reason.review\",\"params\":{\"count\":1}})",
+            "design.rtl.static@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.rtl.render@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "beh.ext.host@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})"
+          }
+        },
+        {
+          "runId": "run_cQJz0Y_qoOHCDP8ag3zQ1A",
+          "evidenceDeltaMb": 0.08,
+          "snapshotsDeltaMb": 0,
+          "baselinesDeltaMb": 0,
+          "dbDeltaMb": 0.16,
+          "spaceUsedMb": 0.18,
+          "checks": 26,
+          "design": {
+            "design.a11y@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.a11y.review@.": "needs_review ({\"key\":\"verdict.reason.review\",\"params\":{\"count\":1}})",
+            "design.rtl.static@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.rtl.render@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "beh.ext.host@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})"
+          }
+        },
+        {
+          "runId": "run_ssPuuBBC4PuKjPj-IHdBnQ",
+          "evidenceDeltaMb": 0.08,
+          "snapshotsDeltaMb": 0,
+          "baselinesDeltaMb": 0,
+          "dbDeltaMb": 0.15,
+          "spaceUsedMb": 0.26,
+          "checks": 26,
+          "design": {
+            "design.a11y@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.a11y.review@.": "needs_review ({\"key\":\"verdict.reason.review\",\"params\":{\"count\":1}})",
+            "design.rtl.static@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "design.rtl.render@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})",
+            "beh.ext.host@.": "passed ({\"key\":\"verdict.reason.passed\",\"params\":{\"notes\":0}})"
+          }
+        }
+      ],
+      "averagePerRunMb": {
+        "evidence": 0.08,
+        "snapshots": 0.01,
+        "baselines": 0,
+        "db": 0.17,
+        "total": 0.26
+      }
+    },
+    {
+      "dataFolderMb": 5.58,
+      "folders": {
+        "ayar.db": 1.59,
+        "backups": 0,
+        "baselines": 0,
+        "browsers": 0,
+        "evidence": 3.94,
+        "logs": 0,
+        "osv-db": 0,
+        "snapshots": 0.04,
+        "tmp": 0,
+        "tools": 0
+      }
+    }
+  ]
+}

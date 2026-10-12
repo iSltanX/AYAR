@@ -2,11 +2,12 @@
 // carry buffer, long-line splitting, private-key blocks across lines, the second pass, and the sensitive-name
 // list with the G-35 exceptions. The fake secrets are assembled from parts at run time so that no
 // secret-shaped literal sits in the repository.
+import { readJson, readXml, unsplit } from '@ayar/adapters';
 import { loadCatalog } from '@ayar/catalog';
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 import { classifyEnvName, nameRules, nameWords } from '../src/redaction/names.ts';
-import { compileRules, entropy, LINE_SPLIT_MARKER, MAX_LINE_CHARS, Redactor, REDACTED } from '../src/redaction/redactor.ts';
+import { compileRules, DEFUSED_SPLIT_MARKER, entropy, LINE_SPLIT_MARKER, MAX_LINE_CHARS, Redactor, REDACTED } from '../src/redaction/redactor.ts';
 import { RedactionService } from '../src/redaction/service.ts';
 
 const { catalog } = loadCatalog(undefined, { now: new Date('2026-10-10T00:00:00Z') });
@@ -43,6 +44,16 @@ const anySecret = fc.oneof(...Object.entries(SECRET_GENERATORS).map(([rule, g]) 
 const filler = fc.array(fc.constantFrom('نص ', 'سجل ', ' . ', ': ', 'خطأ ', ' (', ') ', '\t'), { maxLength: 30 }).map((a) => a.join(''));
 /** The part of a secret that must not survive: for an assignment, the value after `=`. */
 const secretCore = (s: { rule: string; value: string }) => (s.rule === 'password-assignment' ? s.value.slice('password='.length) : s.rule === 'keyword-high-entropy' ? s.value.slice('with token '.length) : s.value);
+
+describe('a stored report longer than a line (DEV-13, AYAR on its own repository)', () => {
+  it('is cut with the marker on its way in and read whole by the readers', () => {
+    const long = JSON.stringify({ files: Array.from({ length: 3000 }, (_, n) => ({ filePath: `src/file-${n}.ts`, messages: [], errorCount: 0 })) });
+    expect(long.length).toBeGreaterThan(MAX_LINE_CHARS);
+    const stored = redactor().redactText(long).text;
+    expect(stored).toContain(LINE_SPLIT_MARKER);
+    expect(readJson(stored, 'eslint.json')).toMatchObject({ ok: true });
+  });
+});
 
 describe('catalog patterns (layer 2)', () => {
   it('has a generator for every high-confidence pattern, and each generated secret is caught', () => {
@@ -261,5 +272,52 @@ describe('user patterns (review M6)', () => {
     expect(SettingEntry.safeParse({ key: 'redaction.userPatterns', value: [{ id: 'mail', pattern: '\\w+@\\w+', flags: 'u' }] }).success).toBe(true);
     const r = redactor({ user: [{ id: 'bad', pattern: '\\w+\\@', flags: 'u' }, { id: 'ok', pattern: 'zz\\d+' }] });
     expect(r.redactText('a zz12 b').text).toBe(`a ${REDACTED('user:ok')} b`);
+  });
+});
+
+describe('the line cut and the split marker (DEV-13 review R3-05, R3-10)', () => {
+  // A high-entropy value, built at run time: what follows a keyword in a long single-line report.
+  const core = Array.from({ length: 25 }, (_, i) => ALNUM[(i * 17 + 5) % ALNUM.length]).join('');
+  const cases: [string, string][] = [
+    ['password-assignment', join('pass', 'word=', core)],
+    ['keyword-high-entropy', join('with ', 'tok', 'en ', core, 'bYcG')],
+  ];
+  for (const [rule, secret] of cases) {
+    it(`${rule}: a secret across the 64 Ki cut, at every offset, is never stored, whole or streamed`, () => {
+      const leaks: string[] = [];
+      for (let k = 0; k <= secret.length; k++) {
+        const line = 'x '.repeat(MAX_LINE_CHARS).slice(0, MAX_LINE_CHARS - k) + ' ' + secret + ' tail\n';
+        const whole = redactor().redactText(line).text;
+        if (whole.includes(core)) leaks.push(`whole@${k}`);
+        const s = redactor().lineStream();
+        const out: string[] = [];
+        for (let i = 0; i < line.length; i += 997) out.push(...s.push(line.slice(i, i + 997)));
+        out.push(...s.end());
+        if (out.join('').includes(core)) leaks.push(`streamed@${k}`);
+      }
+      expect(leaks).toEqual([]);
+    });
+  }
+
+  it('a marker a tool prints itself is stored defused, so reading never joins its lines', () => {
+    const stored = redactor().redactText(`<a>\n<m>line1${LINE_SPLIT_MARKER}\nline2</m>\n</a>\n`).text;
+    expect(stored).toContain(DEFUSED_SPLIT_MARKER);
+    expect(unsplit(stored)).toBe(stored);
+    const x = readXml(stored, 'x.xml');
+    expect(x.ok && JSON.stringify(x.value)).toContain('line2');
+    expect(x.ok && JSON.stringify(x.value)).not.toContain('line1line2');
+  });
+
+  it('a secret a project splits with a literal marker is not rejoined on reading', () => {
+    const token = join('gh', 'p_', core, 'aB3dE5fG7hI');
+    const stored = redactor().redactText(`<a><m>${token.slice(0, 20)}${LINE_SPLIT_MARKER}\n${token.slice(20)}</m></a>\n`).text;
+    expect(unsplit(stored)).not.toContain(token);
+  });
+
+  it('the redactor\'s own cut is still undone on reading', () => {
+    const long = JSON.stringify({ s: 'a'.repeat(MAX_LINE_CHARS + 10) });
+    const stored = redactor().redactText(long).text;
+    expect(stored).toContain(LINE_SPLIT_MARKER);
+    expect(readJson(stored, 'x.json')).toMatchObject({ ok: true });
   });
 });
