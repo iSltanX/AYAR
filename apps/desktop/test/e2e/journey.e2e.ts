@@ -84,11 +84,21 @@ async function runsNow(): Promise<RunRow[]> {
 async function latestRun(): Promise<RunRow> {
   return (await runsNow())[0]!;
 }
-/** The run that appears after `before` (a queued run sorts first, so the list is compared as a set). */
+/** The run that appears after `before` (a queued run sorts first, so the list is compared as a set). When none appears, the failure says what the page showed (a refusal's toast, the open dialog) and what the engine logged, instead of a bare undefined. */
 async function newRun(before: readonly RunRow[]): Promise<RunRow> {
   const seen = new Set(before.map((r) => r.runId));
   const got = await until(runsNow, (rs) => rs.some((r) => !seen.has(r.runId)), 15_000);
-  return got.find((r) => !seen.has(r.runId))!;
+  const found = got.find((r) => !seen.has(r.runId));
+  if (found) return found;
+  const page = await run.page.evaluate(() => ({ toasts: [...document.querySelectorAll('[role="status"], [role="alert"], .toast')].map((e) => e.textContent?.trim()).filter(Boolean), dialog: document.querySelector('dialog[open]')?.textContent?.replace(/\s+/g, ' ').trim().slice(0, 300) ?? null }));
+  const log = (() => {
+    try {
+      return readFileSync(join(t.dataDir, 'logs', 'main.log'), 'utf8').split('\n').filter((l) => /error|warn|refus|stale|busy/i.test(l)).slice(-12).join('\n');
+    } catch {
+      return '(no main.log)';
+    }
+  })();
+  throw new Error(`no new run within 15 s; runs: ${got.map((r) => `${r.displayId} ${r.kind} ${r.state}`).join(', ')}; page: ${JSON.stringify(page)}; log:\n${log}`);
 }
 
 async function waitFinished(runId: string, timeoutMs = 120_000): Promise<void> {
@@ -347,7 +357,11 @@ describe('the results (screens 7 and 8)', () => {
     const failedSheet = run.page.locator('dialog[open]');
     await failedSheet.waitFor();
     expect(await failedSheet.getByRole('checkbox', { name: 'أخفق' }).isChecked()).toBe(true);
-    await failedSheet.getByRole('button', { name: /^أعد \(\d+\)$/ }).click();
+    // The sheet's button carries the count of what it will re-run; a run of nothing would start nothing.
+    const rerunButton = failedSheet.getByRole('button', { name: /^أعد \(\d+\)$/ });
+    const rerunLabel = (await rerunButton.textContent())?.trim() ?? '';
+    expect(rerunLabel, 'the failed sheet counts what it re-runs').toMatch(/\([1-9]\d*\)/);
+    await rerunButton.click();
     const rerun = await newRun(before);
     expect(rerun.kind).toBe('rerun_failed');
     await waitFinished(rerun.runId);
