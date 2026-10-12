@@ -4,7 +4,7 @@
 // packaged app ignores --ayar-data-dir, so its data folder is reached through HOME: each test gets a temporary HOME
 // and reads ~/Library/Application Support/AYAR under it.
 import { spawn } from 'node:child_process';
-import { mkdirSync, mkdtempSync, realpathSync, rmSync } from 'node:fs';
+import { mkdtempSync, realpathSync, rmSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { basename, join, resolve } from 'node:path';
@@ -24,13 +24,10 @@ export const baseEnv = (home = process.env.HOME ?? ''): Record<string, string> =
   TMPDIR: process.env.TMPDIR ?? '/tmp',
 });
 
-/** The HOME a data folder of tempDataDir() belongs to on the packaged app (its parent of Library/…), else the real one. */
-const homeOf = (dataDir: string): string => (PACKAGED_APP ? resolve(dataDir, '../../..') : process.env.HOME ?? '');
-
+/** A data folder of its own for a test. The derived test package honours --ayar-data-dir as the development build does (its inspector is active under Playwright, D-DEV13-06); HOME would not do, since macOS resolves Application Support from the user's record. */
 export function tempDataDir(): { root: string; dataDir: string; cleanup: () => void } {
   const root = realpathSync(mkdtempSync(join(tmpdir(), 'ayar-e2e-')));
-  const dataDir = PACKAGED_APP ? join(root, 'Library', 'Application Support', 'AYAR') : join(root, 'AYAR');
-  if (PACKAGED_APP) mkdirSync(join(root, 'Library', 'Application Support'), { recursive: true });
+  const dataDir = join(root, 'AYAR');
   return { root, dataDir, cleanup: () => rmSync(root, { recursive: true, force: true }) };
 }
 
@@ -42,8 +39,8 @@ export interface Launched {
 export async function launch(dataDir: string): Promise<Launched> {
   const app = await _electron.launch({
     executablePath: PACKAGED_APP ? packagedExecutable(PACKAGED_APP) : ELECTRON,
-    args: PACKAGED_APP ? [] : [APP_DIR, `--ayar-data-dir=${dataDir}`],
-    env: baseEnv(homeOf(dataDir)),
+    args: PACKAGED_APP ? [`--ayar-data-dir=${dataDir}`] : [APP_DIR, `--ayar-data-dir=${dataDir}`],
+    env: baseEnv(),
     timeout: 30_000,
   });
   const page = await app.firstWindow({ timeout: 30_000 });
@@ -52,11 +49,14 @@ export async function launch(dataDir: string): Promise<Launched> {
 }
 
 /** Runs the app directly (no Playwright, no inspector) and returns its exit code and output. */
-export function runDirect(args: string[], timeoutMs = 20_000, dataDir?: string): Promise<{ code: number | null; signal: string | null; output: string }> {
+export function runDirect(args: string[], timeoutMs = 20_000): Promise<{ code: number | null; signal: string | null; output: string }> {
   return new Promise((resolve) => {
     const exe = PACKAGED_APP ? packagedExecutable(PACKAGED_APP) : ELECTRON;
-    const argv = PACKAGED_APP ? args.filter((a) => !a.startsWith('--ayar-data-dir=')) : [APP_DIR, ...args];
-    const child = spawn(exe, argv, { env: baseEnv(dataDir ? homeOf(dataDir) : undefined), stdio: ['ignore', 'pipe', 'pipe'] });
+    // Without the inspector the packaged app ignores --ayar-data-dir (and the release package always does): a direct
+    // run that gets past the start-up guards would write in the user's folder, so the callers only use it for runs
+    // the guards end (D-52) or that never reach the data folder.
+    const argv = PACKAGED_APP ? args : [APP_DIR, ...args];
+    const child = spawn(exe, argv, { env: baseEnv(), stdio: ['ignore', 'pipe', 'pipe'] });
     let output = '';
     child.stdout.on('data', (d: Buffer) => (output += d.toString()));
     child.stderr.on('data', (d: Buffer) => (output += d.toString()));
