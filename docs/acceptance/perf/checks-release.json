@@ -1,7 +1,7 @@
 {
   "label": "release",
   "app": "/Volumes/iSltanXx/Projects/AYAR-wt/DEV-13/apps/desktop/out/AYAR-darwin-arm64/AYAR.app",
-  "at": "2026-10-12T09:36:17.741Z",
+  "at": "2026-10-12T12:15:47.173Z",
   "expect": "closed",
   "fuses": {
     "RunAsNode": "DISABLE",
@@ -20,7 +20,9 @@
       "code": null,
       "signal": "SIGKILL",
       "killedByUs": true,
-      "output": [],
+      "output": [
+        "sandbox_extension_issue_file failed for /Volumes/iSltanXx/Projects/AYAR-wt/DEV-13/apps/desktop/out/AYAR-darwin-arm64/AYAR.app/Contents/Frameworks/AYAR Helper.app/Contents/Resources: 1 (Operation not permitted)"
+      ],
       "open": false
     },
     "sigusr1": {
@@ -64,9 +66,7 @@
       "code": null,
       "signal": "SIGKILL",
       "killedByUs": true,
-      "output": [
-        "sandbox_extension_issue_file failed for /Volumes/iSltanXx/Projects/AYAR-wt/DEV-13/apps/desktop/out/AYAR-darwin-arm64/AYAR.app/Contents/Frameworks/AYAR Helper.app/Contents/Resources: 1 (Operation not permitted)"
-      ],
+      "output": [],
       "open": false
     },
     "nodeOptions": {

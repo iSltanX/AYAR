@@ -39,8 +39,8 @@
 | AT-29 | المحتوى غير الموثوق في العرض | <R29> | الحزمة المشتقة: `journey.e2e.ts`؛ و`apps/desktop/test/file-inside.test.ts` | <D> |
 | AT-30 | إعداد Electron واستقلال المحرك | ناجح | حزمة الإصدار نفسها: `tools/packaging/checks.mjs` (الصمامات ومسارات التصحيح بضابط إيجابي: [perf/checks-release.json](perf/checks-release.json) و[perf/checks-control.json](perf/checks-control.json))؛ والحزمة المشتقة: `security.e2e.ts` (العزل وCSP والتنقل والنوافذ والأذونات والمرسِل) وصفر مخالفات CSP في كل ملفات E2E؛ وقاعدة منع `electron`: `packages/engine/test/no-electron-rule.test.ts` | <D> |
 | AT-31 | لا شبكة افتراضيًا | ناجح | `sh packages/engine/test/support/at31.sh` (صندوق `sandbox-exec` يسجل كل اتصال) | <D> |
-| AT-32 | سلسلة الأدوات عند الفتح من Finder | <R32> | المحرك على جهاز المالك: `AYAR_AT32=1 vitest run tools/cli/test/at32.owner.test.ts`؛ والفتح من Finder: [owner-evidence/](owner-evidence/) | <D> |
-| AT-33 | أذونات الخصوصية | <R33> | جهاز المالك ويده (E-04 بالبديل D-53: الأذونات تبقى والمفتاح في ملف 0600): [owner-evidence/](owner-evidence/) | <D> |
+| AT-32 | سلسلة الأدوات عند الفتح من Finder | ناجح | المحرك على جهاز المالك: `AYAR_AT32=1 vitest run tools/cli/test/at32.owner.test.ts`؛ والفتح من Finder: [owner-evidence/](owner-evidence/) | <D> |
+| AT-33 | أذونات الخصوصية | ناجح (مشروط بـ E-04/D-53) | جهاز المالك ويده (E-04 بالبديل D-53: الأذونات تبقى والمفتاح في ملف 0600): [owner-evidence/](owner-evidence/) | <D> |
 | AT-34 | الآثار الجانبية والجاهزية | <R34> | `tools/cli/test/at34.test.ts` | <D> |
 | AT-35 | سلامة تجهيز الأدوات وتقادم الكتالوج | <R35> | `tools/cli/test/at35.test.ts`؛ والواجهة: `screens.e2e.ts` | <D> |
 | AT-36 | أهداف الأداء | ناجح | [perf/](perf/): خط الأساس ثم القبول على القيم المعايرة (E-14) | <D> |
@@ -67,7 +67,7 @@
 | إعادة البناء من مستودع نظيف | `tools/packaging/reproduce.sh` | نجح: استنساخ `731c3f4` و`npm ci` و`npm run package` بالهوية نفسها (المستنسخ 1.1 غ.ب وأُزيل): 265 ملفًا متطابقًا، و`app.asar` بايتًا ببايت، وكل Mach-O متطابق بعد نزع توقيعه، وcdhash متساوٍ لثلاثة عشر ملفًا تنفيذيًّا طرفيًّا؛ وcdhash الحزمة والإطارين «مختوم فوق التوقيعات» (D-DEV13-08). والجولتان الأوليان أخفقتا في أداة المقارنة لا في البناء (G-DEV13-02 وD-DEV13-08) | 2026-10-12 |
 | قوة الاختبارات (Q-05) | `npm run test:mutation` | نجح: 1612 طافرة في 25 دقيقة و52 ثانية، المجموع 79.47%؛ المصنّف 84.00% (210/250)، والنقاء 76.87% (266/346)، والإخفاء 75.38% (340/451)، والمخطِّط 82.30% (465/565)؛ وبوابة Q-05 «كل مكوّن 70% أو أكثر» مجتازة | 2026-10-12 |
 | AT-31 في شبكة مراقبة | `sh packages/engine/test/support/at31.sh` | نجح (الجولة الثانية): لا اتصال من عِيَار ولا من أدواته، و`code.refs.external` «ناقص: الشبكة غير مسموح بها»، و55 سطر رفض في نافذة الاختبار كلها مفسَّرة (فحص Chromium لقابلية IPv6 من متصفح المسبار، وصفر مقبس آخر يغادر الجهاز). والجولة الأولى أخفقت قبل أن تبدأ لأن ذاكرة uv كانت قد أُزيلت من الجهاز (G-DEV13-03) | 2026-10-12 |
-| AT-32 (المحرك) على جهاز المالك | `AYAR_AT32=1 vitest run tools/cli/test/at32.owner.test.ts` | <AT32> | <D> |
+| AT-32 (المحرك) على جهاز المالك | `AYAR_AT32=1 vitest run tools/cli/test/at32.owner.test.ts` | نجح: 5 من 5 (صدفة الدخول `/bin/zsh`، وNode من nvm مقترحًا عند عدم التطابق، وPython من `.venv`، واكتشاف Rasd وTars وWasl للقراءة بصفر ملف متغيّر) | 2026-10-12 |
 | AT-36 | `tools/perf/discovery.ts --judge` و`AYAR_PERF_JUDGE=1 … at36.perf.ts` | نجح على القيم المعايرة (E-14): الاكتشاف 106 مللي ثانية وأول تقدم 84 لعشرة آلاف ملف؛ والتطبيق: إقلاع 222، واستجابة p95 1.6، و3 تحديثات في أزحم ثانية، وذروة البصمة 511 م.ب، وخمول 0% ([perf/discovery.json](perf/discovery.json) و[perf/app.json](perf/app.json)) | 2026-10-12 |
 
 ## 3. تعريف الاكتمال (الخطة 25) بندًا بندًا

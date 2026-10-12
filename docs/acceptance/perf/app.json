@@ -10,39 +10,39 @@
   "repeat": 5,
   "coldStart": {
     "samples": [
-      238,
-      220,
-      239,
-      222,
-      221
+      234,
+      230,
+      224,
+      225,
+      227
     ],
-    "medianMs": 222
+    "medianMs": 227
   },
   "uiResponse": {
-    "samples": 77,
+    "samples": 83,
     "medianMs": 1,
-    "p95Ms": 1.6,
-    "maxMs": 2.8
+    "p95Ms": 1.4,
+    "maxMs": 2
   },
   "updatesPerCheck": {
     "checks": 38,
     "busiestSecond": 3
   },
   "memory": {
-    "samples": 29,
-    "peakFootprintMb": 511,
-    "medianFootprintMb": 447,
-    "peakRssMb": 813,
-    "medianRssMb": 643
+    "samples": 28,
+    "peakFootprintMb": 544,
+    "medianFootprintMb": 445,
+    "peakRssMb": 811,
+    "medianRssMb": 690
   },
   "idleCpu": {
     "samples": 20,
     "medianPercent": 0,
-    "maxPercent": 16.1,
+    "maxPercent": 17,
     "secondsByProcess": {
-      "AYAR Helper": 0.09,
-      "AYAR": 0.07,
-      "AYAR Helper (Renderer)": 0.07
+      "AYAR": 0.09,
+      "AYAR Helper (Renderer)": 0.08,
+      "AYAR Helper": 0.07
     }
   },
   "machine": {
@@ -51,12 +51,12 @@
     "cpus": 8,
     "memoryGb": 16,
     "loadavg": [
-      4.02,
-      4.94,
-      5.26
+      2.58,
+      3.92,
+      8.42
     ],
     "power": "'AC Power'",
     "app": "/private/tmp/claude-501/-Volumes-iSltanXx-Projects-AYAR/66b9e49c-e47c-4441-bfa7-7b614188f1e8/scratchpad/derived/AYAR.app",
-    "at": "2026-10-12T09:37:35.520Z"
+    "at": "2026-10-12T12:17:04.623Z"
   }
 }
