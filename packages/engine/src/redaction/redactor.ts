@@ -1,12 +1,14 @@
 // C-18: secret redaction at reception (D-21, FR-57). Four layers:
 //   1. known values: the values of sensitive environment variables (names.ts), 8 characters or more, wherever
-//      they appear, also JSON-escaped and URL-encoded;
+//      they appear, also JSON-escaped and URL-encoded, and a value of several lines with either line ending;
 //   2. high-confidence patterns (catalog data, G-32), including private-key blocks across lines;
 //   3. the tool's own redaction (a flag the adapter passes, e.g. `--redact=100`, listed in the catalog);
 //   4. the user's patterns (settings).
-// A redacted span becomes ⟦redacted:<rule>⟧, and the count per rule is kept for the evidence metadata.
-// Streams are redacted line by line with a carry buffer, so a secret split between two chunks is still caught;
-// a line longer than 64 Ki characters is cut with ⟦split⟧, never through a match. A line that cannot be
+// A redacted span becomes ⟦redacted:<rule>⟧, and the count per rule is kept for the evidence metadata. A marker is
+// text like any other (a tool may print one), so it shields nothing but a rule's name (AUD-01, Redactor.markers).
+// Streams are redacted line by line with a carry buffer, so a secret split between two chunks is still caught; a
+// known value of several lines is matched in the stream before it is cut into lines (AUD-02). A line longer than
+// 64 Ki characters is cut with ⟦split⟧, never through a match. A line that cannot be
 // scanned is not written: ⟦redacted:unscannable⟧ stands in for it. The second pass (secondPass) re-scans text
 // on its way out (fix prompt, export) and refuses it if a high-confidence pattern is still there.
 import { LINE_SPLIT_MARKER } from '@ayar/adapters';
@@ -78,12 +80,16 @@ export function compileRules(data: RedactionData, o: { user?: readonly UserPatte
   return { highConfidence, blocks, user, known: expandKnown(o.known ?? [], data.minValueLength), minValueLength: data.minValueLength };
 }
 
-/** A value as it may appear in output: itself, JSON-escaped, URL-encoded. Longest first, so a longer value wins. */
+/**
+ * A value as it may appear in output: itself, JSON-escaped, URL-encoded, and a value of several lines with LF or CRLF
+ * line endings (AUD-02). Longest first, so a longer value wins.
+ */
 function expandKnown(known: readonly KnownValue[], minLength: number): KnownValue[] {
   const out = new Map<string, KnownValue>();
   for (const k of known) {
     if (k.value.length < minLength) continue;
-    for (const form of [k.value, JSON.stringify(k.value).slice(1, -1), encodeURIComponent(k.value)]) {
+    const lines = /\r?\n/.test(k.value) ? [k.value.replace(/\r?\n/g, '\n'), k.value.replace(/\r?\n/g, '\r\n')] : [];
+    for (const form of [k.value, ...lines, JSON.stringify(k.value).slice(1, -1), encodeURIComponent(k.value)]) {
       if (form.length >= minLength && !out.has(form)) out.set(form, { rule: k.rule, value: form });
     }
   }
@@ -114,27 +120,30 @@ interface Span {
   rule: string;
 }
 
-const MARKER_RE = /⟦redacted:[^⟧\n]*⟧/g;
+const MARKER_RE = /⟦redacted:([^⟦⟧\n]*)⟧/g;
+/**
+ * What a marker may name (AUD-01): a catalog id (and `unscannable`), `user:<id>` as the settings allow it, or
+ * `env:<NAME>`. Other text between the brackets is not a marker.
+ */
+export const MARKER_RULE = /^(?:[a-z][a-z0-9-]{0,63}|user:[a-z][a-z0-9-]{0,39}|env:[A-Za-z0-9_.-]{1,256})$/;
 /** LINE_SPLIT_MARKER with a word joiner inside: what a literal marker in a tool's output is stored as. */
 export const DEFUSED_SPLIT_MARKER = '⟦split\u2060⟧';
 
-/** Where the markers of an earlier redaction sit in `text`, in order. */
-function markerRanges(text: string): [number, number][] {
-  if (!text.includes(MARKER_START)) return [];
-  return [...text.matchAll(MARKER_RE)].map((m) => [m.index, m.index + m[0].length]);
+/** The markers that shield their place in a text, and the spans that redact a would-be marker (Redactor.markers). */
+export interface MarkerScan {
+  markers: [number, number][];
+  forced: Span[];
 }
+const NO_MARKERS: MarkerScan = { markers: [], forced: [] };
 
-/**
- * The spans one pattern would redact in `text`. A span made only of earlier markers is left alone (redacting
- * twice changes nothing); a span that touches a marker takes the whole marker, and anything else in it is still
- * redacted (review m3: `password=<secret>⟧` is not a marker, and is redacted).
- */
 /**
  * The spans of a pattern: the secret itself (its group, when the pattern has one), or with `whole` the entire match,
  * keyword included, which is what a line cut must keep in one piece (DEV-13 review R3-05: a cut between `api_key =`
- * and its value left the value matched by nothing, and stored).
+ * and its value left the value matched by nothing, and stored). A span made only of markers is left alone (redacting
+ * twice changes nothing); a span that touches a marker takes the whole marker, and anything else in it is still
+ * redacted (review m3: `password=<secret>⟧` is not a marker, and is redacted).
  */
-function patternSpans(text: string, p: CompiledPattern, markers: readonly [number, number][] = markerRanges(text), whole = false): Span[] {
+function patternSpans(text: string, p: CompiledPattern, markers: readonly [number, number][], whole = false): Span[] {
   const spans: Span[] = [];
   p.regex.lastIndex = 0;
   for (const m of text.matchAll(p.regex)) {
@@ -153,16 +162,29 @@ function patternSpans(text: string, p: CompiledPattern, markers: readonly [numbe
       }
     }
     if (end <= start) continue;
-    for (const [a, b] of markers) {
-      if (a < end && b > start) {
-        start = Math.min(start, a);
-        end = Math.max(end, b);
-      }
-    }
-    if (markers.length && !text.slice(start, end).replace(MARKER_RE, '').length) continue;
+    [start, end] = withMarkers(start, end, markers);
+    if (onlyMarkers(start, end, markers)) continue;
     spans.push({ start, end, rule: p.rule });
   }
   return spans;
+}
+
+/** A span widened to every marker it touches, whole. */
+function withMarkers(start: number, end: number, markers: readonly [number, number][]): [number, number] {
+  for (const [a, b] of markers) {
+    if (a < end && b > start) {
+      start = Math.min(start, a);
+      end = Math.max(end, b);
+    }
+  }
+  return [start, end];
+}
+
+/** True when a span (widened by withMarkers) is made of markers alone: markers never overlap one another. */
+function onlyMarkers(start: number, end: number, markers: readonly [number, number][]): boolean {
+  let covered = 0;
+  for (const [a, b] of markers) if (a >= start && b <= end) covered += b - a;
+  return markers.length > 0 && covered === end - start;
 }
 
 function knownSpans(text: string, known: readonly KnownValue[]): Span[] {
@@ -207,18 +229,77 @@ function applySpans(text: string, spans: Span[], counts: RedactionCounts): strin
 
 export class Redactor {
   readonly rules: RedactionRules;
+  /** The rules this redactor writes markers for: those markers shield their place (AUD-01). */
+  readonly #names: ReadonlySet<string>;
+  /** The known values of several lines: a stream matches them before it cuts lines (AUD-02). */
+  readonly multilineKnown: readonly KnownValue[];
 
   constructor(rules: RedactionRules) {
     this.rules = rules;
+    this.#names = new Set(['unscannable', ...[...rules.highConfidence, ...rules.blocks, ...rules.user, ...rules.known].map((r) => r.rule)]);
+    this.multilineKnown = rules.known.filter((k) => k.value.includes('\n'));
+  }
+
+  /** The spans of layers 1, 2 and 4 in `text`, with the given markers shielding their place. */
+  #layerSpans(text: string, markers: readonly [number, number][], whole = false): Span[] {
+    const spans = knownSpans(text, this.rules.known);
+    for (const p of this.rules.highConfidence) spans.push(...patternSpans(text, p, markers, whole));
+    for (const p of this.rules.user) spans.push(...patternSpans(text, p, markers, whole));
+    return spans;
+  }
+
+  /**
+   * AUD-01: the markers of an earlier redaction in `text`. A tool can print a marker as well, so a marker shields its
+   * place only when it names a rule: one this redactor writes, or a well-formed name of an earlier one (a variable no
+   * longer set) that no layer would redact were it printed bare in the marker's place. Any other would-be marker is
+   * text like the rest; where its bare name would be redacted, the whole of it is (`forced`), so the brackets around
+   * a secret change nothing. `whole` is patternSpans', for a line cut.
+   */
+  markers(text: string, whole = false): MarkerScan {
+    if (!text.includes(MARKER_START)) return NO_MARKERS;
+    const found = [...text.matchAll(MARKER_RE)].filter((m) => MARKER_RULE.test(m[1]!));
+    const range = (m: RegExpExecArray): [number, number] => [m.index, m.index + m[0].length];
+    const stale = found.filter((m) => !this.#names.has(m[1]!));
+    if (!stale.length) return { markers: found.map(range), forced: [] };
+    // The probe: the text with each such marker replaced by its bare name, scanned by every layer.
+    const regions: { probe: [number, number]; text: [number, number] }[] = [];
+    let probe = '';
+    let pos = 0;
+    for (const m of stale) {
+      probe += text.slice(pos, m.index);
+      const bare = m[1]!.replace(/^(?:env|user):/, '');
+      regions.push({ probe: [probe.length, probe.length + bare.length], text: range(m) });
+      probe += bare;
+      pos = m.index + m[0].length;
+    }
+    probe += text.slice(pos);
+    // A place in the probe as a place in `text`: inside a bare name, its marker's start (edge 0) or end (edge 1).
+    const toText = (p: number, edge: 0 | 1): number => {
+      let shift = 0;
+      for (const r of regions) {
+        if (p <= r.probe[0]) break;
+        if (p < r.probe[1]) return r.text[edge];
+        shift = r.text[1] - r.probe[1];
+      }
+      return p + shift;
+    };
+    const distrusted = new Set<number>();
+    const forced: Span[] = [];
+    for (const h of this.#layerSpans(probe, [], whole)) {
+      const touched = regions.filter((r) => h.start < r.probe[1] && h.end > r.probe[0]);
+      if (!touched.length) continue;
+      for (const r of touched) distrusted.add(r.text[0]);
+      forced.push({ start: toText(h.start, 0), end: toText(h.end, 1), rule: h.rule });
+    }
+    const markers = found.filter((m) => !distrusted.has(m.index)).map(range);
+    for (const f of forced) [f.start, f.end] = withMarkers(f.start, f.end, markers);
+    return { markers, forced };
   }
 
   /** All spans of layers 1, 2 and 4 in a piece of text (one line, or a whole document). */
   #spans(text: string): Span[] {
-    const spans = knownSpans(text, this.rules.known);
-    const markers = markerRanges(text);
-    for (const p of this.rules.highConfidence) spans.push(...patternSpans(text, p, markers));
-    for (const p of this.rules.user) spans.push(...patternSpans(text, p, markers));
-    return spans;
+    const scan = this.markers(text);
+    return [...this.#layerSpans(text, scan.markers), ...scan.forced];
   }
 
   /** Redacts single-line patterns and known values in `text`, recording counts. */
@@ -274,8 +355,10 @@ export class Redactor {
   secondPass(text: string): { ok: true } | { ok: false; rules: string[] } {
     const rules = new Set<string>();
     for (const s of knownSpans(text, this.rules.known)) rules.add(s.rule);
-    const markers = markerRanges(text);
-    for (const p of this.rules.highConfidence) for (const s of patternSpans(text, p, markers)) rules.add(s.rule);
+    const scan = this.markers(text);
+    for (const p of this.rules.highConfidence) for (const s of patternSpans(text, p, scan.markers)) rules.add(s.rule);
+    // A would-be marker around what a known value or a high-confidence pattern matches (AUD-01).
+    for (const s of scan.forced) if (!s.rule.startsWith('user:')) rules.add(s.rule);
     for (const b of this.rules.blocks) if (b.begin.test(text)) rules.add(b.rule);
     return rules.size ? { ok: false, rules: [...rules].sort() } : { ok: true };
   }
@@ -286,15 +369,50 @@ export class LineRedactor {
   #buffer = '';
   #inBlock: CompiledBlock | null = null;
   readonly counts: RedactionCounts = {};
+  /** The longest known value of several lines: what the stream may hold back for one (AUD-02). */
+  readonly #multilineMax: number;
 
   constructor(r: Redactor) {
     this.#r = r;
+    this.#multilineMax = Math.max(0, ...r.multilineKnown.map((k) => k.value.length));
   }
 
   /** Feeds a chunk; returns the complete, redacted lines (each with its `\n`), and long-line segments. */
   push(chunk: string): string[] {
+    // Only where the chunk can complete a known value of several lines is searched again.
+    const from = Math.max(0, this.#buffer.length - this.#multilineMax + 1);
     this.#buffer += chunk;
+    this.#joinKnown(from);
     return this.#drain(false);
+  }
+
+  /**
+   * AUD-02: a known value of several lines is replaced in the stream itself, before the stream is cut into lines
+   * (each of its lines alone matches nothing, and was stored). Its marker takes the place of all its lines.
+   */
+  #joinKnown(from: number): void {
+    if (!this.#multilineMax) return;
+    const tail = this.#buffer.slice(from);
+    const spans = knownSpans(tail, this.#r.multilineKnown);
+    if (spans.length) this.#buffer = this.#buffer.slice(0, from) + applySpans(tail, spans, this.counts);
+  }
+
+  /**
+   * AUD-02: how much of the buffer's end must wait for the next chunk — the longest end that begins a known value of
+   * several lines — so no line leaves with part of one. Never more than the longest such value.
+   */
+  #held(): number {
+    const b = this.#buffer;
+    let held = 0;
+    for (const { value } of this.#r.multilineKnown) {
+      for (let p = b.indexOf(value[0]!, Math.max(0, b.length - value.length + 1)); p >= 0 && b.length - p > held; p = b.indexOf(value[0]!, p + 1)) {
+        if (value.startsWith(b.slice(p))) {
+          held = b.length - p;
+          break;
+        }
+      }
+    }
+    return held;
   }
 
   /** Flushes the last line (no trailing newline). A block still open at the end stays dropped, and is counted. */
@@ -309,23 +427,27 @@ export class LineRedactor {
 
   /**
    * Emits every complete line, and cuts a line longer than MAX_LINE_CHARS once enough of it is known: its end
-   * (a newline, or the end of the stream), or SPLIT_LOOKAHEAD_CHARS past the cut point.
+   * (a newline, or the end of the stream), or SPLIT_LOOKAHEAD_CHARS past the cut point. Nothing of what may still
+   * become a known value of several lines leaves before the stream says (AUD-02); the end lets everything out.
    */
   #drain(final: boolean): string[] {
     const out: string[] = [];
+    const held = final ? 0 : this.#held();
     for (;;) {
+      const limit = this.#buffer.length - held;
       const nl = this.#buffer.indexOf('\n');
       const lineLength = nl >= 0 ? nl : this.#buffer.length;
       const known = nl >= 0 || final || this.#buffer.length > MAX_LINE_CHARS + SPLIT_LOOKAHEAD_CHARS;
       if (lineLength > MAX_LINE_CHARS && known) {
-        const cut = this.#safeCut(this.#buffer.slice(0, lineLength));
+        const cut = Math.min(this.#safeCut(this.#buffer.slice(0, lineLength)), limit);
+        if (cut <= 0) return out;
         const segment = this.#buffer.slice(0, cut);
         this.#buffer = this.#buffer.slice(cut);
         // A segment dropped inside a private-key block leaves nothing, not even the split marker (review m3).
         out.push(...this.#line(segment).filter((x) => x !== '').map((x) => x + LINE_SPLIT_MARKER + '\n'));
         continue;
       }
-      if (nl >= 0) {
+      if (nl >= 0 && nl < limit) {
         const line = this.#buffer.slice(0, nl + 1);
         this.#buffer = this.#buffer.slice(nl + 1);
         out.push(...this.#line(line));
@@ -341,9 +463,9 @@ export class LineRedactor {
    */
   #safeCut(text: string): number {
     const window = text.slice(0, MAX_LINE_CHARS + SPLIT_LOOKAHEAD_CHARS);
-    const spans: Span[] = knownSpans(window, this.#r.rules.known);
-    const markers = markerRanges(window);
-    for (const p of [...this.#r.rules.highConfidence, ...this.#r.rules.user]) spans.push(...patternSpans(window, p, markers, true));
+    const scan = this.#r.markers(window, true);
+    const spans: Span[] = [...knownSpans(window, this.#r.rules.known), ...scan.forced];
+    for (const p of [...this.#r.rules.highConfidence, ...this.#r.rules.user]) spans.push(...patternSpans(window, p, scan.markers, true));
     spans.sort((a, b) => a.start - b.start);
     const cut = MAX_LINE_CHARS;
     let start = -1;
