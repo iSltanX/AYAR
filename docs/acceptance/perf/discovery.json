@@ -7,13 +7,13 @@
     "cpus": 8,
     "memoryGb": 16,
     "loadavg": [
-      3.83,
-      6.11,
-      16.72
+      3.17,
+      3.28,
+      4.44
     ],
     "power": "'AC Power'",
     "node": "v24.18.1",
-    "at": "2026-10-12T13:50:17.326Z"
+    "at": "2026-10-12T15:52:34.087Z"
   },
   "repeat": 5,
   "results": [
@@ -23,12 +23,12 @@
         "files": 1000,
         "bytes": 128079,
         "seed": 1,
-        "ms": 69
+        "ms": 75
       },
       "samples": [
         {
-          "firstProgressMs": 15,
-          "doneMs": 31,
+          "firstProgressMs": 16,
+          "doneMs": 32,
           "filesSeen": 1000,
           "progressEvents": 1,
           "facts": 6
@@ -42,7 +42,7 @@
         },
         {
           "firstProgressMs": 10,
-          "doneMs": 16,
+          "doneMs": 17,
           "filesSeen": 1000,
           "progressEvents": 1,
           "facts": 6
@@ -64,7 +64,7 @@
       ],
       "median": {
         "firstProgressMs": 10,
-        "doneMs": 16
+        "doneMs": 17
       },
       "note": null
     },
@@ -74,48 +74,48 @@
         "files": 10000,
         "bytes": 1315125,
         "seed": 1,
-        "ms": 696
+        "ms": 709
       },
       "samples": [
         {
-          "firstProgressMs": 107,
-          "doneMs": 138,
+          "firstProgressMs": 108,
+          "doneMs": 140,
           "filesSeen": 10000,
           "progressEvents": 1,
           "facts": 6
         },
         {
-          "firstProgressMs": 82,
-          "doneMs": 103,
-          "filesSeen": 10000,
-          "progressEvents": 1,
-          "facts": 6
-        },
-        {
-          "firstProgressMs": 78,
-          "doneMs": 97,
-          "filesSeen": 10000,
-          "progressEvents": 1,
-          "facts": 6
-        },
-        {
-          "firstProgressMs": 82,
-          "doneMs": 102,
+          "firstProgressMs": 83,
+          "doneMs": 104,
           "filesSeen": 10000,
           "progressEvents": 1,
           "facts": 6
         },
         {
           "firstProgressMs": 80,
-          "doneMs": 99,
+          "doneMs": 100,
+          "filesSeen": 10000,
+          "progressEvents": 1,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 84,
+          "doneMs": 103,
+          "filesSeen": 10000,
+          "progressEvents": 1,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 79,
+          "doneMs": 98,
           "filesSeen": 10000,
           "progressEvents": 1,
           "facts": 6
         }
       ],
       "median": {
-        "firstProgressMs": 82,
-        "doneMs": 102
+        "firstProgressMs": 83,
+        "doneMs": 103
       },
       "note": null
     },
@@ -125,48 +125,48 @@
         "files": 50000,
         "bytes": 6718729,
         "seed": 1,
-        "ms": 3595
+        "ms": 3513
       },
       "samples": [
         {
-          "firstProgressMs": 202,
-          "doneMs": 588,
-          "filesSeen": 50000,
-          "progressEvents": 3,
-          "facts": 6
-        },
-        {
-          "firstProgressMs": 201,
-          "doneMs": 480,
-          "filesSeen": 50000,
-          "progressEvents": 3,
-          "facts": 6
-        },
-        {
-          "firstProgressMs": 201,
-          "doneMs": 471,
+          "firstProgressMs": 203,
+          "doneMs": 590,
           "filesSeen": 50000,
           "progressEvents": 3,
           "facts": 6
         },
         {
           "firstProgressMs": 200,
-          "doneMs": 468,
+          "doneMs": 550,
           "filesSeen": 50000,
           "progressEvents": 3,
           "facts": 6
         },
         {
           "firstProgressMs": 200,
-          "doneMs": 521,
+          "doneMs": 478,
+          "filesSeen": 50000,
+          "progressEvents": 3,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 201,
+          "doneMs": 473,
+          "filesSeen": 50000,
+          "progressEvents": 3,
+          "facts": 6
+        },
+        {
+          "firstProgressMs": 200,
+          "doneMs": 496,
           "filesSeen": 50000,
           "progressEvents": 3,
           "facts": 6
         }
       ],
       "median": {
-        "firstProgressMs": 201,
-        "doneMs": 480
+        "firstProgressMs": 200,
+        "doneMs": 496
       },
       "note": null
     }
@@ -178,8 +178,8 @@
       "firstProgressMs": 300
     },
     "measured": {
-      "firstProgressMs": 82,
-      "doneMs": 102
+      "firstProgressMs": 83,
+      "doneMs": 103
     },
     "passed": true
   }

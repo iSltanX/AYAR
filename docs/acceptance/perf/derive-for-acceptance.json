@@ -1,11 +1,15 @@
 {
   "releaseApp": "/Volumes/iSltanXx/Projects/AYAR-wt/DEV-13/apps/desktop/out/AYAR-darwin-arm64/AYAR.app",
-  "derivedApp": "/private/tmp/claude-501/-Volumes-iSltanXx-Projects-AYAR/66b9e49c-e47c-4441-bfa7-7b614188f1e8/scratchpad/derived/AYAR.app",
+  "derivedApp": "/Users/abutalal/.cache/ayar-DEV-13-chain/derived/AYAR.app",
   "identity": "AYAR Local Code Signing",
   "fusesFlipped": [
     "EnableNodeCliInspectArguments"
   ],
   "filesCompared": 265,
+  "linksCompared": 14,
+  "onlyRelease": [],
+  "onlyDerived": [],
+  "linkDifferences": [],
   "differingFiles": [
     "Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework",
     "Contents/MacOS/AYAR",

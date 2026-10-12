@@ -4,25 +4,25 @@
     "coldStartMs": 3000,
     "uiResponseP95Ms": 100,
     "updatesPerCheckPerSecond": 10,
-    "peakRssMb": 600,
+    "peakFootprintMb": 600,
     "idleCpuPercent": 2
   },
   "repeat": 5,
   "coldStart": {
     "samples": [
-      193,
-      194,
-      194,
-      193,
-      195
+      211,
+      215,
+      202,
+      198,
+      201
     ],
-    "medianMs": 194
+    "medianMs": 202
   },
   "uiResponse": {
     "samples": 89,
     "medianMs": 0.9,
-    "p95Ms": 1.1,
-    "maxMs": 1.2
+    "p95Ms": 1.2,
+    "maxMs": 1.5
   },
   "updatesPerCheck": {
     "checks": 38,
@@ -30,19 +30,19 @@
   },
   "memory": {
     "samples": 29,
-    "peakFootprintMb": 509,
-    "medianFootprintMb": 445,
-    "peakRssMb": 825,
-    "medianRssMb": 815
+    "peakFootprintMb": 513,
+    "medianFootprintMb": 447,
+    "peakRssMb": 818,
+    "medianRssMb": 809
   },
   "idleCpu": {
     "samples": 20,
     "medianPercent": 0,
-    "maxPercent": 11.4,
+    "maxPercent": 15.1,
     "secondsByProcess": {
-      "AYAR Helper": 0.12,
-      "AYAR Helper (Renderer)": 0.11,
-      "AYAR": 0.1
+      "AYAR Helper (Renderer)": 0.1,
+      "AYAR Helper": 0.09,
+      "AYAR": 0.07
     }
   },
   "machine": {
@@ -51,12 +51,12 @@
     "cpus": 8,
     "memoryGb": 16,
     "loadavg": [
-      2.47,
-      6.27,
-      9.41
+      2.86,
+      3.23,
+      4.43
     ],
     "power": "'AC Power'",
-    "app": "/private/tmp/claude-501/-Volumes-iSltanXx-Projects-AYAR/66b9e49c-e47c-4441-bfa7-7b614188f1e8/scratchpad/derived/AYAR.app",
-    "at": "2026-10-12T14:18:55.377Z"
+    "app": "/Users/abutalal/.cache/ayar-DEV-13-chain/derived/AYAR.app",
+    "at": "2026-10-12T15:52:21.383Z"
   }
 }

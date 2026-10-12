@@ -1,7 +1,7 @@
 {
   "label": "release",
   "app": "/Volumes/iSltanXx/Projects/AYAR-wt/DEV-13/apps/desktop/out/AYAR-darwin-arm64/AYAR.app",
-  "at": "2026-10-12T13:48:42.054Z",
+  "at": "2026-10-12T15:51:04.962Z",
   "expect": "closed",
   "fuses": {
     "RunAsNode": "DISABLE",
@@ -17,15 +17,15 @@
   "fusesMatch152": true,
   "checks": {
     "inspect": {
-      "code": 0,
-      "signal": null,
-      "killedByUs": false,
+      "code": null,
+      "signal": "SIGKILL",
+      "killedByUs": true,
       "output": [],
       "open": false
     },
     "sigusr1": {
-      "code": 0,
-      "signal": null,
+      "code": null,
+      "signal": "SIGUSR1",
       "killedByUs": false,
       "output": [],
       "open": false
@@ -61,16 +61,16 @@
       "guardExit78": true
     },
     "runAsNode": {
-      "code": 0,
-      "signal": null,
-      "killedByUs": false,
+      "code": null,
+      "signal": "SIGKILL",
+      "killedByUs": true,
       "output": [],
       "open": false
     },
     "nodeOptions": {
-      "code": 0,
-      "signal": null,
-      "killedByUs": false,
+      "code": null,
+      "signal": "SIGKILL",
+      "killedByUs": true,
       "output": [],
       "readByElectron": false,
       "requireRan": false,

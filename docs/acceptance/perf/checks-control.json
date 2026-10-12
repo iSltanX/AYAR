@@ -1,7 +1,7 @@
 {
   "label": "control",
-  "app": "/private/tmp/claude-501/-Volumes-iSltanXx-Projects-AYAR/66b9e49c-e47c-4441-bfa7-7b614188f1e8/scratchpad/control/AYAR.app",
-  "at": "2026-10-12T14:17:45.637Z",
+  "app": "/Users/abutalal/.cache/ayar-DEV-13-chain/control/AYAR.app",
+  "at": "2026-10-12T15:51:29.528Z",
   "expect": "open",
   "fuses": {
     "RunAsNode": "ENABLE",
@@ -21,8 +21,9 @@
       "signal": "SIGKILL",
       "killedByUs": true,
       "output": [
-        "Debugger listening on ws://127.0.0.1:62576/2ba8560c-0600-4acc-8352-e0dd00ecb3ca",
-        "For help, see: https://nodejs.org/learn/getting-started/debugging"
+        "Debugger listening on ws://127.0.0.1:62572/c77fd4b7-2135-4200-9d79-11d2d65df3d1",
+        "For help, see: https://nodejs.org/learn/getting-started/debugging",
+        "sandbox_extension_issue_file failed for /Users/abutalal/.cache/ayar-DEV-13-chain/control/AYAR.app/Contents/Frameworks/AYAR Helper.app/Contents/Resources: 1 (Operation not permitted)"
       ],
       "open": true
     },
@@ -31,7 +32,8 @@
       "signal": "SIGKILL",
       "killedByUs": true,
       "output": [
-        "Debugger listening on ws://127.0.0.1:9229/55a24dfd-dd0c-41c3-a749-da7844c20ef9",
+        "sandbox_extension_issue_file failed for /Users/abutalal/.cache/ayar-DEV-13-chain/control/AYAR.app/Contents/Frameworks/AYAR Helper.app/Contents/Resources: 1 (Operation not permitted)",
+        "Debugger listening on ws://127.0.0.1:9229/043fe3a3-a38b-4e14-8b60-f91cd71f59d5",
         "For help, see: https://nodejs.org/learn/getting-started/debugging"
       ],
       "open": true
@@ -80,7 +82,7 @@
       "signal": "SIGKILL",
       "killedByUs": true,
       "output": [
-        "[5507:1012/171737.679688:ERROR:electron/shell/common/node_bindings.cc:492] Most NODE_OPTIONs are not supported in packaged apps. See documentation for more details."
+        "[51622:1012/185121.579588:ERROR:electron/shell/common/node_bindings.cc:492] Most NODE_OPTIONs are not supported in packaged apps. See documentation for more details."
       ],
       "readByElectron": true,
       "requireRan": false,

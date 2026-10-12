@@ -1,7 +1,7 @@
 # تقرير عِيَار لك — RUN-20261012-002 · repo
 
 ## ماذا حدث
-فحصنا 264 فحصًا في 6 د و27 ث ضمن التشغيل RUN-20261012-002. هذه نتائجها:
+فحصنا 264 فحصًا في 6 د و12 ث ضمن التشغيل RUN-20261012-002. هذه نتائجها:
 - اجتاز: 14
 - يحتاج مراجعة: 2
 - ناقص: 4
@@ -16,63 +16,63 @@
 
 ## المشكلة وأثرها
 
-### AYR-SEC-SAST-0056 — HTML يُكتب من قيمة غير ثابتة
+### AYR-SEC-SAST-0063 — HTML يُكتب من قيمة غير ثابتة
 - الشدة: متوسطة · اشتباه (إشارة تحتاج حكمك) · مستمر
 - الموضع: fixtures/semgrep-rules/ayar.js.html-injection.js:4:3 — الأنماط الأمنية (`sec.sast`)
 - ماذا حدث: HTML is written from a value that is not a constant (innerHTML, outerHTML, insertAdjacentHTML, document.write): check that it cannot carry markup from outside.
 - الأثر لو بقي: إدراج HTML من نص غير موثوق يفتح الباب لحقن سكربت في صفحة المستخدم.
 - الخطوة التالية (واحدة من أربع: تعالجها مباشرة، أو تحتاج نموذجًا، أو تحتاج مراجعتك، أو لا شيء مطلوب): تحتاج مراجعتك — «راجع وقرّر»: اشتباه يحتاج حكمك.
 
-### AYR-SEC-SAST-0057 — HTML يُكتب من قيمة غير ثابتة
+### AYR-SEC-SAST-0064 — HTML يُكتب من قيمة غير ثابتة
 - الشدة: متوسطة · اشتباه · مستمر
 - الموضع: fixtures/semgrep-rules/ayar.js.html-injection.js:6:3 — الأنماط الأمنية (`sec.sast`)
 - ماذا حدث: HTML is written from a value that is not a constant (innerHTML, outerHTML, insertAdjacentHTML, document.write): check that it cannot carry markup from outside.
 - الأثر لو بقي: إدراج HTML من نص غير موثوق يفتح الباب لحقن سكربت في صفحة المستخدم.
 - الخطوة التالية: تحتاج مراجعتك — «راجع وقرّر»: اشتباه يحتاج حكمك.
 
-### AYR-SEC-SAST-0058 — HTML يُكتب من قيمة غير ثابتة
+### AYR-SEC-SAST-0065 — HTML يُكتب من قيمة غير ثابتة
 - الشدة: متوسطة · اشتباه · مستمر
 - الموضع: fixtures/semgrep-rules/ayar.js.html-injection.js:8:3 — الأنماط الأمنية (`sec.sast`)
 - ماذا حدث: HTML is written from a value that is not a constant (innerHTML, outerHTML, insertAdjacentHTML, document.write): check that it cannot carry markup from outside.
 - الأثر لو بقي: إدراج HTML من نص غير موثوق يفتح الباب لحقن سكربت في صفحة المستخدم.
 - الخطوة التالية: تحتاج مراجعتك — «راجع وقرّر»: اشتباه يحتاج حكمك.
 
-### AYR-SEC-SAST-0059 — HTML يُكتب من قيمة غير ثابتة
+### AYR-SEC-SAST-0066 — HTML يُكتب من قيمة غير ثابتة
 - الشدة: متوسطة · اشتباه · مستمر
 - الموضع: fixtures/semgrep-rules/ayar.js.html-injection.js:10:3 — الأنماط الأمنية (`sec.sast`)
 - ماذا حدث: HTML is written from a value that is not a constant (innerHTML, outerHTML, insertAdjacentHTML, document.write): check that it cannot carry markup from outside.
 - الأثر لو بقي: إدراج HTML من نص غير موثوق يفتح الباب لحقن سكربت في صفحة المستخدم.
 - الخطوة التالية: تحتاج مراجعتك — «راجع وقرّر»: اشتباه يحتاج حكمك.
 
-### AYR-SEC-SAST-0060 — HTML يُكتب من قيمة غير ثابتة
+### AYR-SEC-SAST-0067 — HTML يُكتب من قيمة غير ثابتة
 - الشدة: متوسطة · اشتباه · مستمر
 - الموضع: fixtures/semgrep-rules/ayar.js.html-injection.js:12:3 — الأنماط الأمنية (`sec.sast`)
 - ماذا حدث: HTML is written from a value that is not a constant (innerHTML, outerHTML, insertAdjacentHTML, document.write): check that it cannot carry markup from outside.
 - الأثر لو بقي: إدراج HTML من نص غير موثوق يفتح الباب لحقن سكربت في صفحة المستخدم.
 - الخطوة التالية: تحتاج مراجعتك — «راجع وقرّر»: اشتباه يحتاج حكمك.
 
-### AYR-SEC-SAST-0062 — dangerouslySetInnerHTML بقيمة غير ثابتة
+### AYR-SEC-SAST-0069 — dangerouslySetInnerHTML بقيمة غير ثابتة
 - الشدة: متوسطة · اشتباه · مستمر
 - الموضع: fixtures/semgrep-rules/ayar.js.react-dangerous-html.jsx:4:10 — الأنماط الأمنية (`sec.sast`)
 - ماذا حدث: dangerouslySetInnerHTML with a value that is not a constant: check that it cannot carry markup from outside.
 - الأثر لو بقي: تمرير HTML خام إلى React يتجاوز حمايته من الحقن.
 - الخطوة التالية: تحتاج مراجعتك — «راجع وقرّر»: اشتباه يحتاج حكمك.
 
-### AYR-SEC-SAST-0068 — pickle يحمّل بيانات قد تأتي من الخارج
+### AYR-SEC-SAST-0075 — pickle يحمّل بيانات قد تأتي من الخارج
 - الشدة: متوسطة · اشتباه · مستمر
 - الموضع: fixtures/semgrep-rules/ayar.py.pickle-load.py:8:12 — الأنماط الأمنية (`sec.sast`)
 - ماذا حدث: pickle loads data that may come from outside: unpickling it can run code.
 - الأثر لو بقي: تحميل pickle من مصدر غير موثوق ينفّذ شيفرة عند القراءة.
 - الخطوة التالية: تحتاج مراجعتك — «راجع وقرّر»: اشتباه يحتاج حكمك.
 
-### AYR-SEC-SAST-0073 — YAML بمحمّل غير آمن
+### AYR-SEC-SAST-0080 — YAML بمحمّل غير آمن
 - الشدة: متوسطة · اشتباه · مستمر
 - الموضع: fixtures/semgrep-rules/ayar.py.yaml-unsafe-load.py:7:5 — الأنماط الأمنية (`sec.sast`)
 - ماذا حدث: YAML is loaded with a loader that can build arbitrary objects.
 - الأثر لو بقي: تحميل YAML غير الآمن قد ينشئ كائنات تنفّذ شيفرة.
 - الخطوة التالية: تحتاج مراجعتك — «راجع وقرّر»: اشتباه يحتاج حكمك.
 
-### AYR-SEC-SAST-0074 — YAML بمحمّل غير آمن
+### AYR-SEC-SAST-0081 — YAML بمحمّل غير آمن
 - الشدة: متوسطة · اشتباه · مستمر
 - الموضع: fixtures/semgrep-rules/ayar.py.yaml-unsafe-load.py:9:12 — الأنماط الأمنية (`sec.sast`)
 - ماذا حدث: YAML is loaded with a loader that can build arbitrary objects.
@@ -86,7 +86,7 @@
 - الأثر لو بقي: لا تُسجَّل مطابقة الإتاحة حتى يراجعها إنسان: الأداة وحدها لا تكفي.
 - الخطوة التالية: تحتاج مراجعتك — «راجع وقرّر»: مراجعة بشرية لم تُسجَّل.
 
-ومعها 66 اكتشاف استُبعد بمراجعتك (إنذار كاذب) فلا يُحتسب: AYR-SEC-SECR-0003, AYR-SEC-SECR-0004, AYR-SEC-SECR-0005, AYR-SEC-SECR-0007, AYR-SEC-SECR-0006, AYR-SEC-SECR-0009, AYR-SEC-SECR-0008, AYR-SEC-SECR-0010, AYR-SEC-SECR-0011, AYR-SEC-SECR-0012, AYR-SEC-SECR-0013, AYR-SEC-SECR-0014, AYR-SEC-SECR-0015, AYR-SEC-SECR-0016, AYR-SEC-SECR-0017, AYR-SEC-SAST-0046, AYR-COD-REFL-0021, AYR-COD-REFL-0022, AYR-COD-REFL-0023, AYR-COD-REFL-0024, AYR-COD-REFL-0025, AYR-COD-REFL-0026, AYR-COD-REFL-0027, AYR-COD-REFL-0035, AYR-COD-REFL-0036, AYR-COD-REFL-0037, AYR-COD-REFL-0038, AYR-COD-REFL-0039, AYR-COD-REFL-0040, AYR-COD-REFL-0041, AYR-COD-REFL-0042, AYR-COD-REFL-0043, AYR-COD-REFL-0044, AYR-COD-REFL-0045, AYR-SEC-SAST-0047, AYR-SEC-SAST-0048, AYR-SEC-SAST-0049, AYR-SEC-SAST-0050, AYR-SEC-SAST-0051, AYR-SEC-SAST-0052, AYR-SEC-SAST-0053, AYR-SEC-SAST-0054, AYR-SEC-SAST-0055, AYR-SEC-SAST-0061, AYR-SEC-SAST-0063, AYR-SEC-SAST-0064, AYR-SEC-SAST-0065, AYR-SEC-SAST-0066, AYR-SEC-SAST-0067, AYR-SEC-SAST-0069, AYR-SEC-SAST-0070, AYR-SEC-SAST-0071, AYR-SEC-SAST-0072, AYR-SEC-SAST-0075, AYR-SEC-SAST-0076, AYR-COD-REFL-0018, AYR-COD-REFL-0019, AYR-COD-REFL-0020, AYR-COD-REFL-0028, AYR-COD-REFL-0029, AYR-COD-REFL-0030, AYR-COD-REFL-0031, AYR-COD-REFL-0032, AYR-COD-REFL-0033, AYR-COD-REFL-0034, AYR-DSN-TOKS-0002.
+ومعها 73 اكتشاف استُبعد بمراجعتك (إنذار كاذب) فلا يُحتسب: AYR-SEC-SECR-0003, AYR-SEC-SECR-0004, AYR-SEC-SECR-0005, AYR-SEC-SECR-0007, AYR-SEC-SECR-0006, AYR-SEC-SECR-0017, AYR-SEC-SECR-0008, AYR-SEC-SECR-0010, AYR-SEC-SECR-0009, AYR-SEC-SECR-0011, AYR-SEC-SECR-0012, AYR-SEC-SECR-0013, AYR-SEC-SECR-0014, AYR-SEC-SECR-0015, AYR-SEC-SECR-0016, AYR-SEC-SAST-0046, AYR-COD-REFL-0021, AYR-COD-REFL-0022, AYR-COD-REFL-0023, AYR-COD-REFL-0024, AYR-COD-REFL-0025, AYR-COD-REFL-0026, AYR-COD-REFL-0027, AYR-COD-REFL-0035, AYR-COD-REFL-0036, AYR-COD-REFL-0037, AYR-COD-REFL-0038, AYR-COD-REFL-0039, AYR-COD-REFL-0040, AYR-COD-REFL-0041, AYR-COD-REFL-0042, AYR-COD-REFL-0043, AYR-COD-REFL-0044, AYR-COD-REFL-0045, AYR-SEC-SAST-0047, AYR-SEC-SAST-0048, AYR-SEC-SAST-0049, AYR-SEC-SAST-0050, AYR-SEC-SAST-0051, AYR-SEC-SAST-0052, AYR-SEC-SAST-0053, AYR-SEC-SAST-0054, AYR-SEC-SAST-0055, AYR-SEC-SAST-0056, AYR-SEC-SAST-0057, AYR-SEC-SAST-0058, AYR-SEC-SAST-0059, AYR-SEC-SAST-0060, AYR-SEC-SAST-0061, AYR-SEC-SAST-0062, AYR-SEC-SAST-0068, AYR-SEC-SAST-0070, AYR-SEC-SAST-0071, AYR-SEC-SAST-0072, AYR-SEC-SAST-0073, AYR-SEC-SAST-0074, AYR-SEC-SAST-0076, AYR-SEC-SAST-0077, AYR-SEC-SAST-0078, AYR-SEC-SAST-0079, AYR-SEC-SAST-0082, AYR-SEC-SAST-0083, AYR-COD-REFL-0018, AYR-COD-REFL-0019, AYR-COD-REFL-0020, AYR-COD-REFL-0028, AYR-COD-REFL-0029, AYR-COD-REFL-0030, AYR-COD-REFL-0031, AYR-COD-REFL-0032, AYR-COD-REFL-0033, AYR-COD-REFL-0034, AYR-DSN-TOKS-0002.
 
 ## ماذا أفعل الآن
 ### تعالجها مباشرة
@@ -118,15 +118,15 @@
 ### تحتاج مراجعتك
 - «راجع وقرّر» — مراجعة الإتاحة البشرية (`design.a11y.review@apps/desktop`): يحتاج مراجعة، يحتاج مراجعة: اشتباهات تحتاج قرارك (1)
 - «راجع وقرّر» — الأنماط الأمنية (`sec.sast@.`): يحتاج مراجعة، يحتاج مراجعة: اشتباهات تحتاج قرارك (9)
-- «راجع وقرّر» — AYR-SEC-SAST-0056: اشتباه يحتاج حكمك.
-- «راجع وقرّر» — AYR-SEC-SAST-0057: اشتباه يحتاج حكمك.
-- «راجع وقرّر» — AYR-SEC-SAST-0058: اشتباه يحتاج حكمك.
-- «راجع وقرّر» — AYR-SEC-SAST-0059: اشتباه يحتاج حكمك.
-- «راجع وقرّر» — AYR-SEC-SAST-0060: اشتباه يحتاج حكمك.
-- «راجع وقرّر» — AYR-SEC-SAST-0062: اشتباه يحتاج حكمك.
-- «راجع وقرّر» — AYR-SEC-SAST-0068: اشتباه يحتاج حكمك.
-- «راجع وقرّر» — AYR-SEC-SAST-0073: اشتباه يحتاج حكمك.
-- «راجع وقرّر» — AYR-SEC-SAST-0074: اشتباه يحتاج حكمك.
+- «راجع وقرّر» — AYR-SEC-SAST-0063: اشتباه يحتاج حكمك.
+- «راجع وقرّر» — AYR-SEC-SAST-0064: اشتباه يحتاج حكمك.
+- «راجع وقرّر» — AYR-SEC-SAST-0065: اشتباه يحتاج حكمك.
+- «راجع وقرّر» — AYR-SEC-SAST-0066: اشتباه يحتاج حكمك.
+- «راجع وقرّر» — AYR-SEC-SAST-0067: اشتباه يحتاج حكمك.
+- «راجع وقرّر» — AYR-SEC-SAST-0069: اشتباه يحتاج حكمك.
+- «راجع وقرّر» — AYR-SEC-SAST-0075: اشتباه يحتاج حكمك.
+- «راجع وقرّر» — AYR-SEC-SAST-0080: اشتباه يحتاج حكمك.
+- «راجع وقرّر» — AYR-SEC-SAST-0081: اشتباه يحتاج حكمك.
 - «راجع وقرّر» — AYR-DSN-A11R-0001: مراجعة بشرية لم تُسجَّل.
 
 ### لا شيء مطلوب
@@ -393,7 +393,7 @@
 - المراجع المحلية (`code.refs.local`): محلي فقط، ولا يفحص الروابط الخارجية.
 - المراجع المحلية (`code.refs.local`): محلي فقط، ولا يفحص الروابط الخارجية.
 - المراجع المحلية (`code.refs.local`): محلي فقط، ولا يفحص الروابط الخارجية.
-- اختبارات الوحدة والانحدار (`beh.unit`): الإخفاق يثبت مخالفة توقع الاختبار وقد يكون التوقع خاطئًا، والنجاح لا يثبت غياب العيوب. · ملاحظة: شغّل هذا الفحص أمرًا من المشروع نفسه، وعِيَار لا يمنع عنه الشبكة: ضمان العمل دون شبكة يشمل عِيَار وأدواته وحدها
+- اختبارات الوحدة والانحدار (`beh.unit`): الإخفاق يثبت مخالفة توقع الاختبار وقد يكون التوقع خاطئًا، والنجاح لا يثبت غياب العيوب. · ملاحظة: بقيت عملية خرجت من مجموعة الفحص وقد لا تكون أُنهيت · ملاحظة: شغّل هذا الفحص أمرًا من المشروع نفسه، وعِيَار لا يمنع عنه الشبكة: ضمان العمل دون شبكة يشمل عِيَار وأدواته وحدها
 - اختبارات الوحدة والانحدار (`beh.unit`): الإخفاق يثبت مخالفة توقع الاختبار وقد يكون التوقع خاطئًا، والنجاح لا يثبت غياب العيوب.
 - اختبارات الوحدة والانحدار (`beh.unit`): الإخفاق يثبت مخالفة توقع الاختبار وقد يكون التوقع خاطئًا، والنجاح لا يثبت غياب العيوب.
 - اختبارات الوحدة والانحدار (`beh.unit`): الإخفاق يثبت مخالفة توقع الاختبار وقد يكون التوقع خاطئًا، والنجاح لا يثبت غياب العيوب.
@@ -406,18 +406,18 @@
 - custom.typecheck (`custom.typecheck`):  · ملاحظة: بقيت عملية خرجت من مجموعة الفحص وقد لا تكون أُنهيت · ملاحظة: شغّل هذا الفحص أمرًا من المشروع نفسه، وعِيَار لا يمنع عنه الشبكة: ضمان العمل دون شبكة يشمل عِيَار وأدواته وحدها
 
 ## ما اجتاز
-- مطابقة الرموز ساكنًا (`design.tokens.static`): القيم في ملفات الأنماط كلها من سلم الرموز (2046 ملف) — النطاق: `.`
-- الأسرار في الملفات (`sec.secrets.files`): لا أسرار في 2046 ملفًا مفحوصًا — النطاق: `.`
+- مطابقة الرموز ساكنًا (`design.tokens.static`): القيم في ملفات الأنماط كلها من سلم الرموز (2048 ملف) — النطاق: `.`
+- الأسرار في الملفات (`sec.secrets.files`): لا أسرار في 2048 ملفًا مفحوصًا — النطاق: `.`
 - البناء (`code.build`): البناء ينجح والمخرجات المعلنة موجودة — النطاق: `.`
 - البناء (`code.build`): البناء ينجح والمخرجات المعلنة موجودة — النطاق: `apps/desktop`
 - البناء (`code.build`): البناء ينجح والمخرجات المعلنة موجودة — النطاق: `packages/catalog`
 - الأنواع (`code.types`): لا خطأ أنواع في الشيفرة (296 ملف) — النطاق: `apps/desktop`
-- قواعد الشيفرة (`code.lint`): لا خطأ من قواعد المدقق (2046 ملف) — النطاق: `.`
-- المراجع المحلية (`code.refs.local`): كل مرجع محلي (ملف أو مرساة) يشير إلى موجود (2046 ملف) — النطاق: `.`
+- قواعد الشيفرة (`code.lint`): لا خطأ من قواعد المدقق (2048 ملف) — النطاق: `.`
+- المراجع المحلية (`code.refs.local`): كل مرجع محلي (ملف أو مرساة) يشير إلى موجود (2048 ملف) — النطاق: `.`
 - المراجع المحلية (`code.refs.local`): كل مرجع محلي (ملف أو مرساة) يشير إلى موجود (296 ملف) — النطاق: `apps/desktop`
 - المراجع المحلية (`code.refs.local`): كل مرجع محلي (ملف أو مرساة) يشير إلى موجود (65 ملف) — النطاق: `packages/protocol`
-- اختبارات الوحدة والانحدار (`beh.unit`): 827 من 838 اختبارًا نجحت، وتُخطّي 11 — النطاق: `.`
-- custom.typecheck (`custom.typecheck`): تحقق معيار النجاح في 2046 ملفًا مفحوصًا — النطاق: `.`
+- اختبارات الوحدة والانحدار (`beh.unit`): 835 من 846 اختبارًا نجحت، وتُخطّي 11 — النطاق: `.`
+- custom.typecheck (`custom.typecheck`): تحقق معيار النجاح في 2048 ملفًا مفحوصًا — النطاق: `.`
 
 ## النزاهة (هل يمكن الوثوق بالنتائج والإصلاحات؟)
 هل يمكن الوثوق بالنتائج والإصلاحات؟ أربعة فحوص خارج المؤشر تجيب، وأي بند منها غير مجتاز يمنع حكم «نقي»:
@@ -426,5 +426,5 @@
 - مطابقة ادعاءات النموذج (`integ.model-claims`): غير منطبق — غير منطبق
 - صلاحية المراجعات البشرية (`integ.reviews`): ناقص — يحتاج اعتمادًا: لم يُعتمد أمره بعد
 يمنع حكم «نقي»: بند واحد
-- المراجعات المسجلة: 66، منها 66 سارية و0 انتهت صلاحيتها بتغيّر ملفات نطاقها.
+- المراجعات المسجلة: 73، منها 73 سارية و0 انتهت صلاحيتها بتغيّر ملفات نطاقها.
 

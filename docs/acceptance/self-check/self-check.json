@@ -1,7 +1,7 @@
 {
   "repo": "/Volumes/iSltanXx/Projects/AYAR",
-  "commit": "ab9efe0685d10887b39fb40af00e55d2f448e0fb",
-  "at": "2026-10-12T14:14:40.823Z",
+  "commit": "f323e233ce95bb01907fb1eb1cc4050679d2d369",
+  "at": "2026-10-12T16:17:16.864Z",
   "discovery": {
     "facts": 110,
     "components": 10
@@ -43,8 +43,8 @@
       "ok": true,
       "result": {
         "action": {
-          "id": "set_32cec7686748667d4f5d0917d9cab61a",
-          "projectId": "prj_A1p7LzOZFvO2X8CwndmzJA",
+          "id": "set_952d22bcfa9c7ebf39e14467a7a5a2ca",
+          "projectId": "prj_qGJdSlvmVAH-wiLQWgd6rg",
           "kind": "install_tool",
           "instances": [
             "sec.deps@."
@@ -89,8 +89,8 @@
           },
           "state": "done",
           "resultReasons": [],
-          "confirmedAt": "2026-10-12T13:58:42.901Z",
-          "finishedAt": "2026-10-12T13:59:32.964Z"
+          "confirmedAt": "2026-10-12T16:01:25.784Z",
+          "finishedAt": "2026-10-12T16:02:29.624Z"
         },
         "readiness": [
           {
@@ -105,7 +105,7 @@
               }
             ],
             "actions": [
-              "set_516ea97b451e7dc4ae042420183982df"
+              "set_4c7c0a77ce17f805af31b3312b74a85a"
             ]
           }
         ],
@@ -119,12 +119,12 @@
             "homepage": "https://github.com/google/osv-scanner",
             "source": "managed",
             "status": "installed",
-            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-K3I2AW/AYAR/tools/osv-scanner/2.6.0/osv-scanner",
+            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-mW7Hwg/AYAR/tools/osv-scanner/2.6.0/osv-scanner",
             "installedVersion": "2.6.0",
             "sha256": "tree:01ee8b20d9062890986ec58d64520f33fb55dfbe7eafd4d7c6677c2f7c0a06b3",
             "sizeBytes": 55130242,
-            "installedAt": "2026-10-12T13:59:32.853Z",
-            "verifiedAt": "2026-10-12T13:59:32.853Z",
+            "installedAt": "2026-10-12T16:02:29.512Z",
+            "verifiedAt": "2026-10-12T16:02:29.512Z",
             "verifiedOk": true,
             "verification": {
               "kind": "sha256"
@@ -134,7 +134,7 @@
             "stale": false
           },
           "downloadedBytes": 55130242,
-          "durationMs": 49952
+          "durationMs": 63728
         }
       }
     },
@@ -150,8 +150,8 @@
       "ok": true,
       "result": {
         "action": {
-          "id": "set_516ea97b451e7dc4ae042420183982df",
-          "projectId": "prj_A1p7LzOZFvO2X8CwndmzJA",
+          "id": "set_4c7c0a77ce17f805af31b3312b74a85a",
+          "projectId": "prj_qGJdSlvmVAH-wiLQWgd6rg",
           "kind": "download_osv_db",
           "instances": [
             "sec.deps@."
@@ -171,7 +171,7 @@
           },
           "preview": {
             "command": [
-              "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-K3I2AW/AYAR/tools/osv-scanner/2.6.0/osv-scanner",
+              "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-mW7Hwg/AYAR/tools/osv-scanner/2.6.0/osv-scanner",
               "scan",
               "source",
               "-r",
@@ -201,8 +201,8 @@
           },
           "state": "done",
           "resultReasons": [],
-          "confirmedAt": "2026-10-12T13:59:32.968Z",
-          "finishedAt": "2026-10-12T13:59:57.142Z"
+          "confirmedAt": "2026-10-12T16:02:29.628Z",
+          "finishedAt": "2026-10-12T16:02:48.438Z"
         },
         "readiness": [
           {
@@ -221,8 +221,8 @@
           }
         ],
         "log": {
-          "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-K3I2AW/AYAR/logs/setup/set_516ea97b451e7dc4ae042420183982df-2026-10-12T135932979Z.log",
-          "sha256": "4422527e66b48878af1b6a46537ee4d6d62c16b857b792583c728f92ba23bef8"
+          "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-mW7Hwg/AYAR/logs/setup/set_4c7c0a77ce17f805af31b3312b74a85a-2026-10-12T160229638Z.log",
+          "sha256": "785045a303ed392ee32aa97a73c75d54aaf3b2054ba53a441f121966bff82882"
         },
         "install": null
       }
@@ -239,8 +239,8 @@
       "ok": true,
       "result": {
         "action": {
-          "id": "set_2bc929698d10d3e5bee5ffd37201859d",
-          "projectId": "prj_A1p7LzOZFvO2X8CwndmzJA",
+          "id": "set_f6860725c39af94e783c34b2f2afdd6b",
+          "projectId": "prj_qGJdSlvmVAH-wiLQWgd6rg",
           "kind": "install_tool",
           "instances": [
             "sec.sast@."
@@ -285,8 +285,8 @@
           },
           "state": "done",
           "resultReasons": [],
-          "confirmedAt": "2026-10-12T13:59:57.145Z",
-          "finishedAt": "2026-10-12T14:00:00.316Z"
+          "confirmedAt": "2026-10-12T16:02:48.442Z",
+          "finishedAt": "2026-10-12T16:02:51.384Z"
         },
         "readiness": [
           {
@@ -301,7 +301,7 @@
               }
             ],
             "actions": [
-              "set_5806148defb0f32fdfdae9e6045ce067"
+              "set_c06aee667d50ccb327e9cb6829e55880"
             ]
           }
         ],
@@ -315,12 +315,12 @@
             "homepage": "https://github.com/astral-sh/uv",
             "source": "managed",
             "status": "installed",
-            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-K3I2AW/AYAR/tools/uv/0.13.0/uv-aarch64-apple-darwin/uv",
+            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-mW7Hwg/AYAR/tools/uv/0.13.0/uv-aarch64-apple-darwin/uv",
             "installedVersion": "0.13.0",
             "sha256": "tree:41dde061849c12bf6613cf6dac303ff45cdf5aeb9dc574c87cab6f5cf394dfa1",
             "sizeBytes": 14692549,
-            "installedAt": "2026-10-12T14:00:00.200Z",
-            "verifiedAt": "2026-10-12T14:00:00.200Z",
+            "installedAt": "2026-10-12T16:02:51.266Z",
+            "verifiedAt": "2026-10-12T16:02:51.266Z",
             "verifiedOk": true,
             "verification": {
               "kind": "developer_id",
@@ -331,7 +331,7 @@
             "stale": false
           },
           "downloadedBytes": 14692549,
-          "durationMs": 3055
+          "durationMs": 2824
         }
       }
     },
@@ -347,8 +347,8 @@
       "ok": true,
       "result": {
         "action": {
-          "id": "set_5806148defb0f32fdfdae9e6045ce067",
-          "projectId": "prj_A1p7LzOZFvO2X8CwndmzJA",
+          "id": "set_c06aee667d50ccb327e9cb6829e55880",
+          "projectId": "prj_qGJdSlvmVAH-wiLQWgd6rg",
           "kind": "install_tool",
           "instances": [
             "sec.sast@."
@@ -393,8 +393,8 @@
           },
           "state": "done",
           "resultReasons": [],
-          "confirmedAt": "2026-10-12T14:00:00.319Z",
-          "finishedAt": "2026-10-12T14:01:38.198Z"
+          "confirmedAt": "2026-10-12T16:02:51.388Z",
+          "finishedAt": "2026-10-12T16:04:48.516Z"
         },
         "readiness": [
           {
@@ -422,12 +422,12 @@
             "homepage": "https://github.com/semgrep/semgrep",
             "source": "managed",
             "status": "installed",
-            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-K3I2AW/AYAR/tools/semgrep/1.180.0/bin/semgrep",
+            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-mW7Hwg/AYAR/tools/semgrep/1.180.0/bin/semgrep",
             "installedVersion": "1.180.0",
-            "sha256": "tree:d31c6851f22194509cee9b4f6163fd15e223dd0aa19ab2773dc375b5321ba34b",
+            "sha256": "tree:0f5e347eb9478641eb4b4bc9bb6fb5871db221e3d1320b8c7642b5d814b69bf8",
             "sizeBytes": 333000000,
-            "installedAt": "2026-10-12T14:01:37.973Z",
-            "verifiedAt": "2026-10-12T14:01:37.973Z",
+            "installedAt": "2026-10-12T16:04:48.325Z",
+            "verifiedAt": "2026-10-12T16:04:48.325Z",
             "verifiedOk": true,
             "verification": {
               "kind": "sha256"
@@ -437,7 +437,7 @@
             "stale": false
           },
           "downloadedBytes": 333000000,
-          "durationMs": 97646
+          "durationMs": 116932
         }
       }
     },
@@ -453,8 +453,8 @@
       "ok": true,
       "result": {
         "action": {
-          "id": "set_c1746ae1dd987903a9088bd1ad9a36fc",
-          "projectId": "prj_A1p7LzOZFvO2X8CwndmzJA",
+          "id": "set_231170d59f896fb389de06a56b0c09ac",
+          "projectId": "prj_qGJdSlvmVAH-wiLQWgd6rg",
           "kind": "install_tool",
           "instances": [
             "code.refs.external@.",
@@ -501,8 +501,8 @@
           },
           "state": "done",
           "resultReasons": [],
-          "confirmedAt": "2026-10-12T14:01:38.201Z",
-          "finishedAt": "2026-10-12T14:01:40.459Z"
+          "confirmedAt": "2026-10-12T16:04:48.519Z",
+          "finishedAt": "2026-10-12T16:04:50.451Z"
         },
         "readiness": [
           {
@@ -555,12 +555,12 @@
             "homepage": "https://github.com/lycheeverse/lychee",
             "source": "managed",
             "status": "installed",
-            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-K3I2AW/AYAR/tools/lychee/0.24.2/lychee-aarch64-apple-darwin/lychee",
+            "path": "/private/var/folders/39/08324w6s5t99bsl4pmvbkgqw0000gn/T/ayar-DEV-13-self-mW7Hwg/AYAR/tools/lychee/0.24.2/lychee-aarch64-apple-darwin/lychee",
             "installedVersion": "0.24.2",
             "sha256": "tree:51d0d5e58edc63389fa7644bfef0327d80ce071394b9cf863b47be54eecedfa3",
             "sizeBytes": 6992530,
-            "installedAt": "2026-10-12T14:01:40.337Z",
-            "verifiedAt": "2026-10-12T14:01:40.337Z",
+            "installedAt": "2026-10-12T16:04:50.327Z",
+            "verifiedAt": "2026-10-12T16:04:50.327Z",
             "verifiedOk": true,
             "verification": {
               "kind": "sha256"
@@ -570,17 +570,17 @@
             "stale": false
           },
           "downloadedBytes": 6992530,
-          "durationMs": 2136
+          "durationMs": 1808
         }
       }
     }
   ],
   "firstScan": {
-    "runId": "run_yfZ4X0AfUEoMJztL_0LkeQ",
-    "durationMs": 391922,
+    "runId": "run_eMDt9RXc2zyhlsoLsqr4Mw",
+    "durationMs": 372943,
     "verdict": "blocked",
-    "findings": 77,
-    "blockingOpen": 56
+    "findings": 83,
+    "blockingOpen": 62
   },
   "reviews": [
     {
@@ -824,117 +824,166 @@
     {
       "displayId": "AYR-SEC-SAST-0051",
       "checkId": "sec.sast",
-      "path": "fixtures/semgrep-rules/ayar.js.eval-dynamic.js",
+      "path": "fixtures/semgrep-rules/ayar.js.child-process-shell.js",
       "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
       "excluded": true
     },
     {
       "displayId": "AYR-SEC-SAST-0052",
       "checkId": "sec.sast",
-      "path": "fixtures/semgrep-rules/ayar.js.eval-dynamic.js",
+      "path": "fixtures/semgrep-rules/ayar.js.child-process-shell.js",
       "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
       "excluded": true
     },
     {
       "displayId": "AYR-SEC-SAST-0053",
       "checkId": "sec.sast",
-      "path": "fixtures/semgrep-rules/ayar.js.eval-dynamic.js",
+      "path": "fixtures/semgrep-rules/ayar.js.child-process-shell.js",
       "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
       "excluded": true
     },
     {
       "displayId": "AYR-SEC-SAST-0054",
       "checkId": "sec.sast",
-      "path": "fixtures/semgrep-rules/ayar.js.function-constructor.js",
+      "path": "fixtures/semgrep-rules/ayar.js.child-process-shell.js",
       "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
       "excluded": true
     },
     {
       "displayId": "AYR-SEC-SAST-0055",
       "checkId": "sec.sast",
-      "path": "fixtures/semgrep-rules/ayar.js.function-constructor.js",
+      "path": "fixtures/semgrep-rules/ayar.js.child-process-shell.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0056",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.child-process-shell.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0057",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.child-process-shell.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0058",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.eval-dynamic.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0059",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.eval-dynamic.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0060",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.eval-dynamic.js",
       "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
       "excluded": true
     },
     {
       "displayId": "AYR-SEC-SAST-0061",
       "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.function-constructor.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0062",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.js.function-constructor.js",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0068",
+      "checkId": "sec.sast",
       "path": "fixtures/semgrep-rules/ayar.js.node-tls-env.ts",
-      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
-      "excluded": true
-    },
-    {
-      "displayId": "AYR-SEC-SAST-0063",
-      "checkId": "sec.sast",
-      "path": "fixtures/semgrep-rules/ayar.js.tls-reject-unauthorized.js",
-      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
-      "excluded": true
-    },
-    {
-      "displayId": "AYR-SEC-SAST-0064",
-      "checkId": "sec.sast",
-      "path": "fixtures/semgrep-rules/ayar.py.eval-dynamic.py",
-      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
-      "excluded": true
-    },
-    {
-      "displayId": "AYR-SEC-SAST-0065",
-      "checkId": "sec.sast",
-      "path": "fixtures/semgrep-rules/ayar.py.eval-dynamic.py",
-      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
-      "excluded": true
-    },
-    {
-      "displayId": "AYR-SEC-SAST-0066",
-      "checkId": "sec.sast",
-      "path": "fixtures/semgrep-rules/ayar.py.os-system-dynamic.py",
-      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
-      "excluded": true
-    },
-    {
-      "displayId": "AYR-SEC-SAST-0067",
-      "checkId": "sec.sast",
-      "path": "fixtures/semgrep-rules/ayar.py.os-system-dynamic.py",
-      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
-      "excluded": true
-    },
-    {
-      "displayId": "AYR-SEC-SAST-0069",
-      "checkId": "sec.sast",
-      "path": "fixtures/semgrep-rules/ayar.py.subprocess-shell-true.py",
       "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
       "excluded": true
     },
     {
       "displayId": "AYR-SEC-SAST-0070",
       "checkId": "sec.sast",
-      "path": "fixtures/semgrep-rules/ayar.py.subprocess-shell-true.py",
+      "path": "fixtures/semgrep-rules/ayar.js.tls-reject-unauthorized.js",
       "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
       "excluded": true
     },
     {
       "displayId": "AYR-SEC-SAST-0071",
       "checkId": "sec.sast",
-      "path": "fixtures/semgrep-rules/ayar.py.tls-verify-disabled.py",
+      "path": "fixtures/semgrep-rules/ayar.py.eval-dynamic.py",
       "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
       "excluded": true
     },
     {
       "displayId": "AYR-SEC-SAST-0072",
       "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.py.eval-dynamic.py",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0073",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.py.os-system-dynamic.py",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0074",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.py.os-system-dynamic.py",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0076",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.py.subprocess-shell-true.py",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0077",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.py.subprocess-shell-true.py",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0078",
+      "checkId": "sec.sast",
       "path": "fixtures/semgrep-rules/ayar.py.tls-verify-disabled.py",
       "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
       "excluded": true
     },
     {
-      "displayId": "AYR-SEC-SAST-0075",
+      "displayId": "AYR-SEC-SAST-0079",
+      "checkId": "sec.sast",
+      "path": "fixtures/semgrep-rules/ayar.py.tls-verify-disabled.py",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "excluded": true
+    },
+    {
+      "displayId": "AYR-SEC-SAST-0082",
       "checkId": "sec.sast",
       "path": "packages/engine/src/node/network.ts",
       "note": "التحقق من شهادة TLS معطّل في طلب جاهزية واحد إلى localhost وحده (خدمة مرافقة بشهادة ذاتية، FR-21)؛ لا بيانات تُرسل ولا مضيف خارجي يُقبل (المضيف يُفحص قبله)",
       "excluded": true
     },
     {
-      "displayId": "AYR-SEC-SAST-0076",
+      "displayId": "AYR-SEC-SAST-0083",
       "checkId": "sec.sast",
       "path": "packages/engine/test/advisor.test.ts",
       "note": "شيفرة اختبار تشغّل أدوات وعمليات تجريبية عمدًا (أوامر صدفة متغيرة، وFunction لبناء ادعاء نموذج مزيف)، لا تُشحن",
@@ -985,8 +1034,8 @@
     {
       "displayId": "AYR-SEC-SECR-0009",
       "checkId": "sec.secrets.files",
-      "path": "fixtures/SANITY.md",
-      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
+      "path": "packages/engine/test/redaction.test.ts",
+      "note": "قيمة على شكل سر في اختبار الإخفاء أو الواجهة (تُركَّب وقت التشغيل من أجزاء أو تُستعمل لإثبات التنقيح)، لا سر",
       "excluded": true
     },
     {
@@ -999,7 +1048,7 @@
     {
       "displayId": "AYR-SEC-SECR-0011",
       "checkId": "sec.secrets.files",
-      "path": "packages/engine/test/redaction.test.ts",
+      "path": "packages/engine/test/reports-cards.test.ts",
       "note": "قيمة على شكل سر في اختبار الإخفاء أو الواجهة (تُركَّب وقت التشغيل من أجزاء أو تُستعمل لإثبات التنقيح)، لا سر",
       "excluded": true
     },
@@ -1013,8 +1062,8 @@
     {
       "displayId": "AYR-SEC-SECR-0013",
       "checkId": "sec.secrets.files",
-      "path": "packages/engine/test/reports-cards.test.ts",
-      "note": "قيمة على شكل سر في اختبار الإخفاء أو الواجهة (تُركَّب وقت التشغيل من أجزاء أو تُستعمل لإثبات التنقيح)، لا سر",
+      "path": "spikes/E-22-process-escape/results/run.json",
+      "note": "نتائج تجربة بيئة (E-22): علامات AYAR_CHECK_TOKEN لعمليات تجريبية، لا أسرار",
       "excluded": true
     },
     {
@@ -1041,8 +1090,8 @@
     {
       "displayId": "AYR-SEC-SECR-0017",
       "checkId": "sec.secrets.files",
-      "path": "spikes/E-22-process-escape/results/run.json",
-      "note": "نتائج تجربة بيئة (E-22): علامات AYAR_CHECK_TOKEN لعمليات تجريبية، لا أسرار",
+      "path": "fixtures/SANITY.md",
+      "note": "مشروع اختبار بعيوب مزروعة عمدًا (الخطة 20): الأسرار والمراجع المكسورة والألوان خارج النطاق هي ما يُختبر كشفه، لا عيب في عِيَار",
       "excluded": true
     }
   ],
@@ -1051,7 +1100,7 @@
     "formula": "purity/1",
     "scope": {
       "kind": "round",
-      "roundId": "rnd_DSxfPI7ghw4tyiEkmZRiiA"
+      "roundId": "rnd_KyJ0MiSC7B8YTfGDS38h6A"
     },
     "verdict": "incomplete",
     "karat": 11,
@@ -1149,7 +1198,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_ilFN-I19uHK_GcaGxMqlUw"
+        "checkRunId": "chk_56IRSgmdI4UhWrZvmHolXQ"
       },
       {
         "instance": "beh.unit@apps/desktop",
@@ -1160,7 +1209,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_ehGfjRkl6J-j5MQ3v62pNw"
+        "checkRunId": "chk_nDA-PbXfW0GW7ZFuwH4nUA"
       },
       {
         "instance": "beh.unit@packages/adapters",
@@ -1171,7 +1220,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_v7Wyr_vcW9EPhNLYKGES7Q"
+        "checkRunId": "chk_WA3QL0-B6KmN0y3c2jHw0w"
       },
       {
         "instance": "beh.unit@packages/analyzers",
@@ -1182,7 +1231,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_MWabcOyiLI5eMhKulsyxxQ"
+        "checkRunId": "chk_aKmOjfNhr-AfA11woYvDFQ"
       },
       {
         "instance": "beh.unit@packages/catalog",
@@ -1193,7 +1242,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_-baZ0cPTq5EqDlwwBz40YA"
+        "checkRunId": "chk_R0pB8ocSh497N5apAhiJiA"
       },
       {
         "instance": "beh.unit@packages/engine",
@@ -1204,7 +1253,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_pw8XQc-MJRNgVCMnIutl_Q"
+        "checkRunId": "chk_lsv0FN7vKFeOv0bNsMKhXQ"
       },
       {
         "instance": "beh.unit@packages/i18n",
@@ -1215,7 +1264,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_ejrzHZ-uNA-Ax5KbRFHTmw"
+        "checkRunId": "chk_V383ZZjAr99yMsltO2677A"
       },
       {
         "instance": "beh.unit@packages/probe",
@@ -1226,7 +1275,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_j_PZp2Qb0yXoz5sfqPN5Zw"
+        "checkRunId": "chk_On0hE1aSZU__xwPcMUaecw"
       },
       {
         "instance": "beh.unit@packages/protocol",
@@ -1237,7 +1286,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_yx9NxvRHF-Ga9vZ-JAjjKg"
+        "checkRunId": "chk_lHVB2dvS6_fB8PVjxaGYZA"
       },
       {
         "instance": "beh.unit@tools/cli",
@@ -1248,7 +1297,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_GtR15hpMwTvo1pgBAZm1dQ"
+        "checkRunId": "chk_ItH8ptZUfWNAdiDQ0jAOzQ"
       },
       {
         "instance": "code.build@.",
@@ -1259,7 +1308,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_HBO840MlZSdIMafKpVlZpg"
+        "checkRunId": "chk_NqCXnkuH4lJHf810vuWdAg"
       },
       {
         "instance": "code.build@apps/desktop",
@@ -1270,7 +1319,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_Et3P-KzVqXPtVRnNWpZk7Q"
+        "checkRunId": "chk_xu0_vF0Tip-lMmT5tt23mQ"
       },
       {
         "instance": "code.build@packages/catalog",
@@ -1281,7 +1330,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_jHe2aSAzYGmXmccLrXhMFQ"
+        "checkRunId": "chk_ajZMC5dseNKUWo93YYu1-g"
       },
       {
         "instance": "code.lint@.",
@@ -1292,7 +1341,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_s5Ha2FzkWfY_IWpHcXB-ng"
+        "checkRunId": "chk_0FAnHuu-_xcY0bUlA-Pk_A"
       },
       {
         "instance": "code.refs.local@.",
@@ -1303,7 +1352,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_-W2iIhQnO6EstNSXOfc7jw"
+        "checkRunId": "chk_VYIOzWX5_1d_hzGFj5Qb-w"
       },
       {
         "instance": "code.refs.local@apps/desktop",
@@ -1314,7 +1363,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_3p0i-i6CjFDMGN_ySv-Cdg"
+        "checkRunId": "chk_eJ5o648--4MrDQqgpEnBXQ"
       },
       {
         "instance": "code.refs.local@packages/protocol",
@@ -1325,7 +1374,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_2AxmyYL9YL8FTHJCVrXwoQ"
+        "checkRunId": "chk_-5HQWWKAQUT_8pnOyLmSOA"
       },
       {
         "instance": "code.types@.",
@@ -1336,7 +1385,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_3jWrFJ6zp7TgHK-qeIHjxw"
+        "checkRunId": "chk_yQdhPqJKxfwd5JoIs-wCFQ"
       },
       {
         "instance": "code.types@apps/desktop",
@@ -1347,7 +1396,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_bODAOTf3a_YQEWPczmdkTg"
+        "checkRunId": "chk_5RHgNk1Xy-Hmb_tzwC0O7Q"
       },
       {
         "instance": "code.types@packages/adapters",
@@ -1358,7 +1407,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_ecCa44TTr8kA5uELgRnh1A"
+        "checkRunId": "chk_tbKjmgPbhqAh_Z4bh1NuHA"
       },
       {
         "instance": "code.types@packages/analyzers",
@@ -1369,7 +1418,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_gBO5cfFK3E6b38FHdja7NQ"
+        "checkRunId": "chk_hU4cC7oQfV00Z3VP24AXLQ"
       },
       {
         "instance": "code.types@packages/catalog",
@@ -1380,7 +1429,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_ZLGXsXeNpSfbjxMXCDSlKw"
+        "checkRunId": "chk_2-_cKBHDZbKlGiEKnxugUQ"
       },
       {
         "instance": "code.types@packages/engine",
@@ -1391,7 +1440,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_7QlslcDY2dn9Buy-mrRvog"
+        "checkRunId": "chk_7Lq285bOCk7e6vzh0RmVvw"
       },
       {
         "instance": "code.types@packages/i18n",
@@ -1402,7 +1451,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_4oKUilJkLRBza46MtmwvTQ"
+        "checkRunId": "chk_6lgJl7mWO2DnNeefPAWFwQ"
       },
       {
         "instance": "code.types@packages/probe",
@@ -1413,7 +1462,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_8syRy0AjGgKLw00cxir4ew"
+        "checkRunId": "chk_rFFjuIwlae-UA4cTpxaDtg"
       },
       {
         "instance": "code.types@packages/protocol",
@@ -1424,7 +1473,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_dRMjmvLc_2bCB92gw2xFJw"
+        "checkRunId": "chk_3sBbGwH_H-3aHwRY1dXTig"
       },
       {
         "instance": "code.types@tools/cli",
@@ -1435,7 +1484,7 @@
         "outcome": "unavailable",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk__RRt6nvusyj0SJlv4spRcw"
+        "checkRunId": "chk_FNmUD1zx3j51oh0ju01HLg"
       },
       {
         "instance": "design.a11y.review@apps/desktop",
@@ -1446,7 +1495,7 @@
         "outcome": "needs_review",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_McXAaUEVjJF_RPPcvnSa6g"
+        "checkRunId": "chk_TYjjRHpt7sqVlvM60U_X-Q"
       },
       {
         "instance": "design.a11y@apps/desktop",
@@ -1457,7 +1506,7 @@
         "outcome": "missing",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_bZjP-YAmsm-zYtaUZ1sErg"
+        "checkRunId": "chk_LKFd6ROY0d5Dh52nvwNWow"
       },
       {
         "instance": "design.rtl.static@.",
@@ -1468,7 +1517,7 @@
         "outcome": "missing",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_k4adYnlSTvbEKnkB6JVrpA"
+        "checkRunId": "chk_gR7o_hR7d6Is1xVTYg5KdQ"
       },
       {
         "instance": "design.tokens.static@.",
@@ -1479,7 +1528,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_YZ2wQo0Q8-Wf7FA-BdyF6A"
+        "checkRunId": "chk_CJS0q-HQXcQqceM23jjoAQ"
       },
       {
         "instance": "sec.deps@.",
@@ -1490,7 +1539,7 @@
         "outcome": "missing",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_djhdtjj9vU3qP5fhj6jbAw"
+        "checkRunId": "chk_tZyJPx7H8Xh3jlRk2WVpPQ"
       },
       {
         "instance": "sec.sast@.",
@@ -1501,7 +1550,7 @@
         "outcome": "needs_review",
         "reviewed": false,
         "credit": 0,
-        "checkRunId": "chk_WVLiZOqGFLnZH54anA9mmA"
+        "checkRunId": "chk_ItSTBYeAgd9krbGVAahTfA"
       },
       {
         "instance": "sec.secrets.files@.",
@@ -1512,7 +1561,7 @@
         "outcome": "passed",
         "reviewed": false,
         "credit": 1,
-        "checkRunId": "chk_EvyDqct05DdT6CR1h4h2Uw"
+        "checkRunId": "chk_SaG3JZ1GYr_T-sfqw3O-2Q"
       }
     ],
     "counts": {
@@ -1552,7 +1601,7 @@
         }
       }
     ],
-    "excludedByReview": 66,
+    "excludedByReview": 73,
     "integrity": {
       "stateChanged": false,
       "guardUnreviewed": 0,
@@ -1604,12 +1653,12 @@
         "adapter:custom-command": "1.0.0"
       },
       "environmentSource": null,
-      "snapshotId": "snp_QtuOB3cOa_o3vlhY9jbU7w",
-      "commit": "ab9efe0685d10887b39fb40af00e55d2f448e0fb",
-      "computedAt": "2026-10-12T14:14:40.604Z"
+      "snapshotId": "snp_OXhqtuSSvsm3Nw6HXSNIfA",
+      "commit": "f323e233ce95bb01907fb1eb1cc4050679d2d369",
+      "computedAt": "2026-10-12T16:17:16.636Z"
     }
   },
-  "durationMs": 387033,
+  "durationMs": 372049,
   "outcomes": {
     "passed": 14,
     "failed": 0,
@@ -1635,7 +1684,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 373
+      "durationMs": 403
     },
     {
       "instance": "design.tokens.static@packages/adapters",
@@ -2279,7 +2328,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 151
+      "durationMs": 153
     },
     {
       "instance": "design.a11y.review@packages/adapters",
@@ -2402,7 +2451,7 @@
         "key": "analyzer.reason.noRtl"
       },
       "readiness": "ready",
-      "durationMs": 241
+      "durationMs": 228
     },
     {
       "instance": "design.rtl.static@apps/desktop",
@@ -2942,7 +2991,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 3039
+      "durationMs": 2966
     },
     {
       "instance": "sec.deps@.",
@@ -2953,7 +3002,7 @@
         "key": "adapter.reason.osvDbMissing"
       },
       "readiness": "ready",
-      "durationMs": 9332
+      "durationMs": 9701
     },
     {
       "instance": "sec.sast@.",
@@ -2967,7 +3016,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 278749
+      "durationMs": 272555
     },
     {
       "instance": "sec.ext.manifest@.",
@@ -3261,7 +3310,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 3117
+      "durationMs": 3198
     },
     {
       "instance": "code.build@apps/desktop",
@@ -3275,7 +3324,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 2629
+      "durationMs": 3003
     },
     {
       "instance": "code.build@packages/adapters",
@@ -3317,7 +3366,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 502
+      "durationMs": 528
     },
     {
       "instance": "code.build@packages/engine",
@@ -3415,7 +3464,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 12444
+      "durationMs": 14829
     },
     {
       "instance": "code.types@packages/adapters",
@@ -3541,7 +3590,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 175367
+      "durationMs": 160662
     },
     {
       "instance": "code.lint@apps/desktop",
@@ -3681,7 +3730,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 397
+      "durationMs": 453
     },
     {
       "instance": "code.refs.local@apps/desktop",
@@ -3695,7 +3744,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 318
+      "durationMs": 338
     },
     {
       "instance": "code.refs.local@packages/adapters",
@@ -3793,7 +3842,7 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 264
+      "durationMs": 281
     },
     {
       "instance": "code.refs.local@tools/cli",
@@ -4013,12 +4062,12 @@
       "reason": {
         "key": "verdict.reason.testsPassed",
         "params": {
-          "passed": 827,
-          "total": 838
+          "passed": 835,
+          "total": 846
         }
       },
       "readiness": "ready",
-      "durationMs": 361039
+      "durationMs": 342811
     },
     {
       "instance": "beh.unit@apps/desktop",
@@ -5314,11 +5363,11 @@
         }
       },
       "readiness": "ready",
-      "durationMs": 24070
+      "durationMs": 24121
     }
   ],
-  "findings": 76,
-  "findingsExcludedByReview": 66,
+  "findings": 83,
+  "findingsExcludedByReview": 73,
   "blockingOpen": [],
   "requiredNotRun": [
     {
@@ -5346,7 +5395,7 @@
       "reason": {
         "key": "adapter.reason.osvDbMissing"
       },
-      "explanation": "osv-scanner يمسح الجذر كله فيبلغ ملفات قفل PyPI داخل مشاريع الاختبار (fixtures/) ويطلب قاعدتها، والجاهزية تعرض قواعد الأنظمة التي اكتشفتها المكوّنات وحدها (npm)، فيخرج 127 «قاعدة ناقصة» (G-DEV13-06)"
+      "explanation": "osv-scanner يمسح الجذر كله فيبلغ ملفات قفل PyPI داخل مشاريع الاختبار (fixtures/) ويطلب قاعدتها، والجاهزية تعرض قواعد الأنظمة التي اكتشفتها المكوّنات وحدها (npm)، فيخرج 127 «قاعدة ناقصة» (G-DEV13-06)؛ وملف القفل في جذر عِيَار وحده فُحص بـ osv-scanner دون اتصال بقاعدة npm المنزّلة، فلا ثغرة معروفة (docs/acceptance/self-check/deps-osv.json، مراجعة DEV-13 R1-04)"
     },
     {
       "instance": "code.types@.",
