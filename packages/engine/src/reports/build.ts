@@ -7,19 +7,18 @@
 import type { Catalog } from '@ayar/catalog';
 import type { CheckOutcome, CheckSpec, FindingLocation, NextStepInfo, Reason, Report, ReportCheck, ReportClaim, ReportFinding, ReportHead, ReportIntegrity, ReportNotRun, ReportOptions, Severity } from '@ayar/protocol';
 import { PurityResult as PuritySchema, RunPlan as PlanSchema, type PurityResult, type RawCheckResult, type RunPlan } from '@ayar/protocol';
-import { release } from 'node:os';
 import { posix } from 'node:path';
-import { advisorFactsFromSnapshot } from '../advisor/facts.ts';
+import { parseRunGit } from '../discovery/git.ts';
 import type { EvidenceService } from '../evidence/service.ts';
+import { shellLine } from '../executor/command-line.ts';
 import type { Manifest } from '../evidence/snapshot.ts';
 import { CommandError } from '../host/errors.ts';
 import type { IntegrityService } from '../integrity/service.ts';
 import type { EnginePorts } from '../ports/index.ts';
-import { latestSnapshot } from '../profile/service.ts';
 import { profileAt } from '../profile/store.ts';
+import { parseRunEnvironment } from '../projects/context.ts';
 import { stateSinceRound } from '../purity/since-round.ts';
 import type { Db } from '../storage/db.ts';
-import { ENGINE_VERSION } from '../version.ts';
 import { errorLines, excerpt, EXCERPT_CHARS, EXCERPT_LINES } from './boundaries.ts';
 
 /** Rules whose cause the rule itself fixes (12.5 rule 5): the fix comes from its template (`catalog.rule.<id>.fix`). */
@@ -76,6 +75,8 @@ interface RunRow {
   round_id: string | null;
   state_changed: number | null;
   cancel_reason: string | null;
+  git_json: string | null;
+  env_json: string | null;
 }
 
 interface CheckRow {
@@ -198,7 +199,7 @@ export class ReportBuilder {
   }
 
   #run(runId: string): RunRow {
-    const r = this.#d.db.get<RunRow>('SELECT id, display_id, project_id, kind, plan_json, profile_version, profile_hash, catalog_version, state, started_at, finished_at, snapshot_start_id, snapshot_end_id, counts_json, verdict, purity_json, round_id, state_changed, cancel_reason FROM runs WHERE id = ?', runId);
+    const r = this.#d.db.get<RunRow>('SELECT id, display_id, project_id, kind, plan_json, profile_version, profile_hash, catalog_version, state, started_at, finished_at, snapshot_start_id, snapshot_end_id, counts_json, verdict, purity_json, round_id, state_changed, cancel_reason, git_json, env_json FROM runs WHERE id = ?', runId);
     if (!r) throw new CommandError('not_found', { reason: 'run' });
     return r;
   }
@@ -369,26 +370,22 @@ export class ReportBuilder {
   #head(run: RunRow, plan: RunPlan | null, purity: PurityResult | null, rows: CheckRow[], projectId: string, sinceRound: 'same' | 'changed' | null): ReportHead {
     const { db } = this.#d;
     const project = db.get<{ display_name: string }>('SELECT display_name FROM projects WHERE id = ?', projectId);
-    const snapshot = latestSnapshot(db, projectId);
-    const facts = snapshot?.facts ?? [];
-    const obj = (v: unknown): Record<string, unknown> => (v !== null && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {});
-    const git = obj(facts.find((f) => f.key === 'git.repository')?.value);
+    // AUD-07: the Git head, the environment and the project's context the run recorded when it started — never the
+    // project's or the machine's now; a run that recorded none says so, and its report borrows nothing.
+    const git = parseRunGit(run.git_json);
+    const env = parseRunEnvironment(run.env_json);
     const tools: Record<string, string> = {};
     for (const c of rows) {
       const raw = c.raw_json ? (JSON.parse(c.raw_json) as RawCheckResult) : null;
       Object.assign(tools, raw?.toolVersions ?? {});
     }
-    const node = tools.node ?? (typeof obj(facts.find((f) => f.key === 'runtime.node')?.value).spec === 'string' ? (obj(facts.find((f) => f.key === 'runtime.node')?.value).spec as string) : null);
-    const python = tools.python ?? (typeof obj(facts.find((f) => f.key === 'runtime.python')?.value).spec === 'string' ? (obj(facts.find((f) => f.key === 'runtime.python')?.value).spec as string) : null);
-    const pm = obj(facts.find((f) => f.key === 'node.packageManager' || f.key === 'python.manager')?.value);
-    const packageManager = typeof pm.name === 'string' ? `${pm.name}${typeof pm.version === 'string' ? ` ${pm.version}` : ''}` : null;
     const counts = run.counts_json ? (JSON.parse(run.counts_json) as { byOutcome: Partial<Record<CheckOutcome, number>> }).byOutcome : {};
     const round = run.round_id ? db.get<{ display_id: string }>('SELECT display_id FROM rounds WHERE id = ?', run.round_id)?.display_id ?? null : null;
     const sel = plan?.selection;
     const started = run.started_at ? new Date(run.started_at).getTime() : null;
     const finished = run.finished_at ? new Date(run.finished_at).getTime() : null;
     return {
-      project: { id: projectId, name: project?.display_name ?? projectId, ecosystems: [...(advisorFactsFromSnapshot(snapshot).ecosystems ?? [])] },
+      project: { id: projectId, name: project?.display_name ?? projectId, ecosystems: env?.ecosystems ?? [] },
       run: { id: run.id, displayId: run.display_id, kind: run.kind, startedAt: run.started_at, finishedAt: run.finished_at, durationMs: started !== null && finished !== null ? Math.max(0, finished - started) : null, roundDisplayId: round, ...(run.cancel_reason ? { cancelled: true } : {}) },
       scope: { kind: run.kind, section: sel?.kind === 'section' ? sel.section : null, instances: plan?.items.filter((i) => i.status === 'run' || i.status === 'shared' || i.status === 'covered').length ?? rows.length, criteria: purity?.criteriaCount ?? 0, checks: purity?.checksCount ?? 0 },
       // A cancelled run has no verdict and no karat (plan 4 «النتائج الجزئية دون عيار»); its scope stays named.
@@ -396,9 +393,27 @@ export class ReportBuilder {
       karat: run.cancel_reason ? null : (purity?.karat ?? null),
       narrow: run.cancel_reason ? false : (purity?.narrow ?? false),
       counts,
-      versions: { ayar: ENGINE_VERSION, profile: run.profile_version, profileHash: run.profile_hash, catalog: run.catalog_version ?? this.#d.catalog.version, template: 'model-report/1', tools },
-      environment: { source: purity?.meta.environmentSource ?? null, os: `${process.platform} ${release()}`, node, python, packageManager },
-      state: { branch: typeof git.branch === 'string' ? git.branch : null, commit: typeof git.commit === 'string' ? git.commit : null, dirty: run.state_changed === null ? null : run.state_changed === 1, snapshotId: run.snapshot_end_id ?? run.snapshot_start_id, ...(sinceRound ? { sinceRound } : {}) },
+      versions: { ayar: env?.ayar ?? null, profile: run.profile_version, profileHash: run.profile_hash, catalog: run.catalog_version ?? this.#d.catalog.version, template: 'model-report/1', tools },
+      // The versions the tools reported in this run first; else what the project declared when the run started.
+      environment: {
+        recorded: env !== null,
+        source: env?.source ?? purity?.meta.environmentSource ?? null,
+        os: env?.os ?? null,
+        node: tools.node ?? env?.node ?? null,
+        python: tools.python ?? env?.python ?? null,
+        packageManager: env?.packageManager ?? null,
+      },
+      // AUD-05: Git's uncommitted changes are not the run's stability. AYAR never runs Git in a project (D-38) and does
+      // not measure the former: unknown. The latter is integ.state's measure, unknown when the inventory was partial.
+      state: {
+        branch: git?.branch ?? null,
+        commit: git?.commit ?? null,
+        recorded: git !== null,
+        dirty: null,
+        changedDuringRun: run.state_changed === null ? null : run.state_changed === 1,
+        snapshotId: run.snapshot_end_id ?? run.snapshot_start_id,
+        ...(sinceRound ? { sinceRound } : {}),
+      },
       createdAt: this.#d.ports.clock.now().toISOString(),
     };
   }
@@ -422,7 +437,8 @@ export class ReportBuilder {
     const ruleId = f.rule_id ?? '';
     const raw = c?.raw_json ? (JSON.parse(c.raw_json) as RawCheckResult) : null;
     const command = raw?.command ?? (c?.command_json ? { argv: JSON.parse(c.command_json) as string[], cwd: c.cwd_rel ?? c.component } : null);
-    const commandText = command ? `${command.cwd && command.cwd !== '.' ? `cd ${command.cwd} && ` : ''}${command.argv.join(' ')}` : null;
+    // AUD-06: a line a shell reads back as the same words, in the same folder.
+    const commandText = command ? shellLine(command.argv, command.cwd) : null;
     const def = this.#d.catalog.check(f.check_id);
     const source = def?.sources[0] ? this.#d.catalog.sources.find((s) => s.id === def.sources[0]) : undefined;
     const fix: ReportFinding['fix'] = RULES_WITH_FIX.has(ruleId) ? { kind: 'suggested', key: `catalog.rule.${ruleId}.fix`, evidence: `${f.display_id}: ${location?.path ?? ''}${location?.line ? `:${location.line}` : ''}` } : { kind: 'diagnose', steps: ['report.diagnose.reproduce', 'report.diagnose.isolate', 'report.diagnose.evidence'] };

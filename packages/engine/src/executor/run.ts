@@ -15,12 +15,14 @@ import { adapterById } from '@ayar/adapters';
 import type { CheckOutcome, CheckReport, CheckRunDetail, CheckRunView, CheckSpec, EvidenceRef, JsonValue, ParsedReport, PlanItem, RawCheckResult, Reason, RunCounts, RunDetail, RunList, RunPlan, RunView, SideEffects, VerdictCounts } from '@ayar/protocol';
 import { A11Y_REVIEW_ITEMS, RawCheckResult as RawSchema, RunPlan as PlanSchema } from '@ayar/protocol';
 import { createHash } from 'node:crypto';
+import { release } from 'node:os';
 import { posix } from 'node:path';
+import { parseRunGit, type RunGit } from '../discovery/git.ts';
 import { computeChildEnv } from '../environment/child-env.ts';
 import type { EnvironmentService } from '../environment/service.ts';
 import { trackedPaths } from '../evidence/git-index.ts';
 import type { EvidenceService } from '../evidence/service.ts';
-import { diffManifests, underAny, type Manifest } from '../evidence/snapshot.ts';
+import { diffManifests, inventoryGaps, underAny, type InventoryGaps, type Manifest } from '../evidence/snapshot.ts';
 import { CommandError } from '../host/errors.ts';
 import type { EventBus } from '../host/event-bus.ts';
 import { newId } from '../host/ids.ts';
@@ -31,6 +33,7 @@ import { approvalsOf, latestProfile } from '../profile/store.ts';
 import { stateSinceRound } from '../purity/since-round.ts';
 import { reviewItems } from '../reviews/service.ts';
 import type { PlannerService } from '../planner/service.ts';
+import type { RunEnvironment } from '../projects/context.ts';
 import type { ProjectsService } from '../projects/service.ts';
 import type { PurityService } from '../purity/service.ts';
 import type { RedactionCounts, Redactor } from '../redaction/redactor.ts';
@@ -43,6 +46,7 @@ import type { DataLayout } from '../storage/data-dir.ts';
 import type { Db } from '../storage/db.ts';
 import { readSettings } from '../storage/settings.ts';
 import type { ToolsService } from '../tools/service.ts';
+import { ENGINE_VERSION } from '../version.ts';
 import { reportEvidence, type JudgeRequest, type Judgement, type ReportInput, type VerdictService } from '../verdict/service.ts';
 import { resolveInvocation } from './invocation.ts';
 import { streamSink, type OutputTotals } from './output.ts';
@@ -108,13 +112,7 @@ export interface RunServiceOptions {
 
 /** The commit of a run's `git_json` (18.1), or null outside a repository or before it was read. */
 function commitOf(json: string | null): string | null {
-  if (!json) return null;
-  try {
-    const c = (JSON.parse(json) as { commit?: unknown }).commit;
-    return typeof c === 'string' && /^[0-9a-f]{7,64}$/.test(c) ? c : null;
-  } catch {
-    return null;
-  }
+  return parseRunGit(json)?.commit ?? null;
 }
 
 interface RunRow {
@@ -410,9 +408,13 @@ export class RunService {
     // 9.5 point 5 and C-12 point 3: every spec checked again against its approval, from the files as they are now.
     const approvals = approvalsOf(db, projectId);
     const fresh = await this.#freshSpecs(projectId);
-    // 18.1 «الالتزام»: the commit the run started on, as the same reading of the files found it.
-    const git = fresh ? this.#o.projects.lastGit(projectId) : null;
-    if (git) db.run('UPDATE runs SET git_json = ? WHERE id = ?', JSON.stringify(git), runId);
+    // 18.1 «الالتزام»: the commit the run started on, as the same reading of the files found it, kept with the run —
+    // outside a repository too — so its report names that head and never a later discovery's (AUD-07).
+    if (fresh) {
+      const git = this.#o.projects.lastGit(projectId);
+      const recorded: RunGit = git ? { repository: true, branch: git.branch, commit: git.commit } : { repository: false, branch: null, commit: null };
+      db.run('UPDATE runs SET git_json = ? WHERE id = ?', JSON.stringify(recorded), runId);
+    }
     const execs = new Map<string, Exec>();
     for (const c of this.#checkRows(runId)) {
       const instance = `${c.check_id}@${c.component}`;
@@ -444,6 +446,11 @@ export class RunService {
 
     // Services of this run share the child environment of the login shell, without sensitive variables.
     const base = await this.#o.environment.base();
+    // 12.1, 12.3, 11.9: the environment of the run — the system, AYAR, the environment's source — and the project's types
+    // and declared toolchain as the same fresh reading found them, kept with the run for its reports (AUD-07 follow-up).
+    const context = this.#o.projects.lastContext(projectId) ?? { ecosystems: [], node: null, python: null, packageManager: null };
+    const environment: RunEnvironment = { os: `${process.platform} ${release()}`, ayar: ENGINE_VERSION, source: base.source, ...context };
+    db.run('UPDATE runs SET env_json = ? WHERE id = ?', JSON.stringify(environment), runId);
     const serviceEnv = computeChildEnv({ login: base.env, rules: this.#o.redaction.names(), allowSensitive: [], explicit: {} }).env;
     await ports.fs.mkdir(posix.join(this.#o.layout.tmp, runId), 0o700);
     active.services = new CompanionServices({ ports, supervisor: this.#o.supervisor, redaction: this.#o.redaction, projectRoot: root, env: serviceEnv, runId, tmpDir: posix.join(this.#o.layout.tmp, runId) });
@@ -575,8 +582,10 @@ export class RunService {
     const endId = await evidence.snapshots.persist(projectId, endManifest, 'run_end');
     const change = diffManifests(startManifest, endManifest, { declared: ctx.declared, tracked: await trackedPaths(ports.fs, root) });
     const changed = [...change.created, ...change.modified, ...change.deleted].some((p) => !ctx.declared(p));
+    // AUD-04: where the inventories did not look, no change seen is no proof: unknown (NULL), unless one was seen.
+    const gaps = inventoryGaps(startManifest, endManifest);
     await ports.fs.remove(posix.join(this.#o.layout.tmp, runId));
-    db.run('UPDATE runs SET snapshot_end_id = ?, state_changed = ?, cancel_reason = ? WHERE id = ?', endId, changed ? 1 : 0, active.cancel, runId);
+    db.run('UPDATE runs SET snapshot_end_id = ?, state_changed = ?, cancel_reason = ? WHERE id = ?', endId, changed ? 1 : gaps ? null : 0, active.cancel, runId);
     // C-22 (DEV-9): the four integrity checks, from what the run found and how the state moved (10.3 «النزاهة»).
     for (const inst of integrity) {
       const e = execs.get(inst)!;
@@ -585,7 +594,7 @@ export class RunService {
         this.#finishCheck(e, 'cancelled', cancelReasonOf(active.cancel), null, []);
         continue;
       }
-      await this.#runIntegrity(active, e, ctx, endManifest, [...change.created, ...change.modified, ...change.deleted].filter((p) => !ctx.declared(p))).catch((err: unknown) => {
+      await this.#runIntegrity(active, e, ctx, endManifest, [...change.created, ...change.modified, ...change.deleted].filter((p) => !ctx.declared(p)), gaps).catch((err: unknown) => {
         this.#o.logger.log('error', 'an integrity check failed unexpectedly', { instance: inst, error: err instanceof Error ? (err.stack ?? err.message).slice(0, 800) : String(err) });
         if (e.state !== 'done') this.#finishCheck(e, 'unavailable', { key: 'run.reason.internal' }, null, []);
       });
@@ -612,7 +621,7 @@ export class RunService {
    * movement, the reviews' validity, or the model claims' matching — judged by the integrity service and kept like
    * any execution, with its evidence.
    */
-  async #runIntegrity(active: Active, e: Exec, ctx: CheckContext, endManifest: Manifest, changedOutsideDeclared: readonly string[]): Promise<void> {
+  async #runIntegrity(active: Active, e: Exec, ctx: CheckContext, endManifest: Manifest, changedOutsideDeclared: readonly string[], gaps: InventoryGaps | null): Promise<void> {
     const { db, ports, evidence } = this.#o;
     const runId = active.runId;
     db.run("UPDATE check_runs SET state = 'running', started_at = ? WHERE id = ?", this.#now(), e.checkRunId);
@@ -629,8 +638,9 @@ export class RunService {
       judgement = g.judgement;
       extra = g.evidence;
     } else if (spec.checkId === 'integ.state') {
-      judgement = integ.stateJudgement(spec, ctx.projectId, changedOutsideDeclared);
-      extra = { changed: changedOutsideDeclared };
+      const s = evidence.settings();
+      judgement = integ.stateJudgement(spec, ctx.projectId, changedOutsideDeclared, gaps, { depth: s.maxDepth, entries: s.maxEntries });
+      extra = { changed: changedOutsideDeclared, ...(gaps ? { gaps } : {}) };
     } else if (spec.checkId === 'integ.reviews') judgement = await integ.reviewsJudgement(spec, ctx.projectId, endManifest);
     else if (spec.checkId === 'integ.model-claims') judgement = integ.claimsJudgement(spec, ctx.projectId, runId);
     else return this.#finishCheck(e, 'unavailable', { key: 'run.reason.runnerUnavailable', params: { runner: spec.runner.ids.join(',') || spec.runner.kind } }, null, []);

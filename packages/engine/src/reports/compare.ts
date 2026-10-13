@@ -6,6 +6,7 @@
 import type { CheckOutcome, FindingLocation, PurityResult, Reason, RunComparison } from '@ayar/protocol';
 import { PurityResult as PuritySchema } from '@ayar/protocol';
 import { CommandError } from '../host/errors.ts';
+import { parseRunEnvironment } from '../projects/context.ts';
 import type { Db } from '../storage/db.ts';
 
 interface RunRow {
@@ -71,9 +72,15 @@ export function compareRuns(db: Db, fromRunId: string, toRunId: string): RunComp
   const toolDiffs = [...new Set([...Object.keys(toolsA), ...Object.keys(toolsB)])].filter((k) => toolsA[k] !== undefined && toolsB[k] !== undefined && toolsA[k] !== toolsB[k]);
   if (toolDiffs.length) notes.push({ key: 'compare.note.toolsDiffer', params: { tools: toolDiffs.slice(0, 10).join(', '), count: toolDiffs.length } });
   if ((pa?.meta.environmentSource ?? null) !== (pb?.meta.environmentSource ?? null)) notes.push({ key: 'compare.note.environmentDiffers' });
-  const envA = a.env_json ? (JSON.parse(a.env_json) as Record<string, unknown>) : null;
-  const envB = b.env_json ? (JSON.parse(b.env_json) as Record<string, unknown>) : null;
-  if (envA && envB && JSON.stringify(envA) !== JSON.stringify(envB)) notes.push({ key: 'compare.note.environmentDiffers' });
+  // The environment each run recorded (runs.env_json): the system, the environment's source, Node, Python and the
+  // package manager. The project's types and AYAR's own version are not the environment.
+  const envOf = (r: RunRow) => {
+    const e = parseRunEnvironment(r.env_json);
+    return e ? JSON.stringify([e.os, e.source, e.node, e.python, e.packageManager]) : null;
+  };
+  const envA = envOf(a);
+  const envB = envOf(b);
+  if (envA && envB && envA !== envB) notes.push({ key: 'compare.note.environmentDiffers' });
   const scopeChanged = a.kind !== b.kind || a.selection_json !== b.selection_json || (pa && pb && (pa.criteriaCount !== pb.criteriaCount || pa.checksCount !== pb.checksCount));
   if (scopeChanged) notes.push({ key: 'compare.note.scopeDiffers', params: { from: `${pa?.criteriaCount ?? 0}/${pa?.checksCount ?? 0}`, to: `${pb?.criteriaCount ?? 0}/${pb?.checksCount ?? 0}` } });
 

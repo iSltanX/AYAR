@@ -321,3 +321,125 @@ describe('the line cut and the split marker (DEV-13 review R3-05, R3-10)', () =>
     expect(readJson(stored, 'x.json')).toMatchObject({ ok: true });
   });
 });
+
+describe('a marker a tool prints is text, not an earlier redaction (AUD-01)', () => {
+  const r = redactor();
+  const token = join('gh', 'p_', 'Aa0Bb1Cc2Dd3Ee4Ff5Gg6Hh7Ii8Jj9Kk0Ll1');
+  const wrappers: ((v: string) => string)[] = [(v) => `⟦redacted:${v}⟧`, (v) => `⟦redacted:env:${v}⟧`, (v) => `⟦redacted:user:${v}⟧`, (v) => `password=⟦redacted:env:${v}⟧`];
+
+  it('the audit case: a token inside a marker is redacted, and the second pass refuses the text that carries it', () => {
+    const source = `tool output: ⟦redacted:${token}⟧\n`;
+    const out = r.redactText(source);
+    expect(out.text).not.toContain(token);
+    expect(out.counts).toEqual({ 'github-token': 1 });
+    expect(r.secondPass(source)).toEqual({ ok: false, rules: ['github-token'] });
+    expect(r.secondPass(out.text)).toEqual({ ok: true });
+    expect(r.redactText(out.text).text).toBe(out.text);
+  });
+
+  it('property: no secret survives inside a would-be marker, whatever rule it names; the second pass agrees', () => {
+    fc.assert(
+      fc.property(filler, anySecret, fc.constantFrom(...wrappers), (f, s, wrap) => {
+        const text = `${f}${wrap(s.value)}${f}\n`;
+        const out = r.redactText(text).text;
+        expect(out).not.toContain(secretCore(s));
+        expect(r.secondPass(text).ok).toBe(false);
+        expect(r.secondPass(out)).toEqual({ ok: true });
+        expect(r.redactText(out).text).toBe(out);
+      }),
+      { numRuns: 400 },
+    );
+  });
+
+  it('a known value inside a marker naming a variable is redacted too', () => {
+    const value = join('Zx9Qw3Er7', 'Ty1Ui5Op2As8Df');
+    const k = redactor({ known: [{ rule: 'env:DB_PASSWORD', value }] });
+    for (const text of [`⟦redacted:env:${value}⟧`, `⟦redacted:${value}⟧`, `x ⟦redacted:env:DB_PASSWORD⟧${value}⟧`]) {
+      expect(k.redactText(text).text, text).not.toContain(value);
+      expect(k.secondPass(text).ok, text).toBe(false);
+    }
+  });
+
+  it('a marker of a rule this redactor writes, or of an earlier one that hides nothing, still shields its place', () => {
+    const k = redactor({ known: [{ rule: 'env:GITHUB_ACTIONS_DEPLOY_TOKEN', value: join('Zx9Qw3Er7', 'Ty1Ui5Op2As8Df') }] });
+    for (const text of [`token: ${REDACTED('env:GITHUB_ACTIONS_DEPLOY_TOKEN')}`, `password=${REDACTED('github-token')}`, `${REDACTED('unscannable')}\n`]) {
+      expect(k.redactText(text).text, text).toBe(text);
+      expect(k.secondPass(text), text).toEqual({ ok: true });
+    }
+    // An earlier variable no longer set (a stored report, a new session): its name alone hides nothing.
+    for (const text of [`password=${REDACTED('env:DB_PASSWORD')}`, `api ${REDACTED('env:NPM_TOKEN')} ${REDACTED('user:internal-code')}`]) {
+      expect(r.redactText(text).text, text).toBe(text);
+      expect(r.secondPass(text), text).toEqual({ ok: true });
+    }
+    // One whose name would itself pass for a token after `token:` is redacted again, under the keyword's rule:
+    // a less precise label, never a value kept.
+    const stale = `token: ${REDACTED('env:GITHUB_ACTIONS_DEPLOY_TOKEN')}`;
+    expect(r.redactText(stale).text).toMatch(/^token: ⟦redacted:(keyword-high-entropy|password-assignment)⟧$/);
+  });
+
+  it('a would-be marker split between chunks, or across the 64 Ki cut, is redacted alike and never stored', () => {
+    const text = `a ⟦redacted:env:${token}⟧ b\n`;
+    const whole = r.redactText(text).text;
+    expect(whole).not.toContain(token);
+    for (let i = 1; i < text.length; i++) {
+      const s = r.lineStream();
+      expect([...s.push(text.slice(0, i)), ...s.push(text.slice(i)), ...s.end()].join(''), `@${i}`).toBe(whole);
+    }
+    for (const offset of [-30, -10, -1, 0, 5]) {
+      const line = 'a '.repeat((MAX_LINE_CHARS + offset) / 2) + `⟦redacted:env:${token}⟧` + ' b'.repeat(40_000) + '\n';
+      const s = r.lineStream();
+      const out = [...s.push(line.slice(0, 50_000)), ...s.push(line.slice(50_000)), ...s.end()].join('');
+      expect(out, `offset ${offset}`).not.toContain(token);
+    }
+  });
+});
+
+describe('a known value of several lines (AUD-02)', () => {
+  const secret = join('synthetic-first-line-', '4931\n', 'synthetic-second-line-', '8264');
+  const lines = secret.split('\n');
+  const r = redactor({ known: [{ rule: 'env:API_TOKEN', value: secret }] });
+  const leaks = (out: string) => lines.filter((l) => out.includes(l));
+
+  it('the audit case: printed raw, it is redacted at reception, and the second pass agrees', () => {
+    const out = r.redactText(secret);
+    expect(out).toEqual({ text: REDACTED('env:API_TOKEN'), counts: { 'env:API_TOKEN': 1 } });
+    expect(r.secondPass(secret)).toEqual({ ok: false, rules: ['env:API_TOKEN'] });
+    expect(r.secondPass(out.text)).toEqual({ ok: true });
+  });
+
+  it('cut between chunks at every place, among other lines, at the end of the stream and twice: nothing of it is stored', () => {
+    for (const text of [`before ${secret} after\nnext\n`, secret, `log:\n${secret}\n${secret}\n`, `x${secret}`]) {
+      const whole = r.redactText(text).text;
+      expect(leaks(whole), text).toEqual([]);
+      for (let i = 0; i <= text.length; i++) {
+        for (const j of [i, Math.min(text.length, i + 7)]) {
+          const s = r.lineStream();
+          const out = [...s.push(text.slice(0, i)), ...s.push(text.slice(i, j)), ...s.push(text.slice(j)), ...s.end()].join('');
+          expect(out, `${JSON.stringify(text)} @${i},${j}`).toBe(whole);
+        }
+      }
+    }
+  });
+
+  it('with CRLF line endings, JSON-escaped and URL-encoded, it is redacted too, and inside JSON values', () => {
+    for (const form of [secret.replace('\n', '\r\n'), JSON.stringify(secret).slice(1, -1), encodeURIComponent(secret)]) {
+      expect(r.redactText(`value: ${form}\n`).text, form).toBe(`value: ${REDACTED('env:API_TOKEN')}\n`);
+    }
+    const crlf = redactor({ known: [{ rule: 'env:API_TOKEN', value: secret.replace('\n', '\r\n') }] });
+    expect(crlf.redactText(`v ${secret} w`).text).toBe(`v ${REDACTED('env:API_TOKEN')} w`);
+    const counts = {};
+    expect(JSON.stringify(r.redactJson({ env: { API_TOKEN: secret }, note: `say ${secret}` }, counts))).not.toMatch(/synthetic-(first|second)-line/);
+    expect(counts).toEqual({ 'env:API_TOKEN': 2 });
+  });
+
+  it('holds back no more than the value can need: a line that only begins it leaves once the stream parts from it', () => {
+    const s = r.lineStream();
+    expect(s.push('plain line\n')).toEqual(['plain line\n']);
+    expect(s.push(`${lines[0]}\n`)).toEqual([]);
+    expect(s.push('something else\n')).toEqual([`${lines[0]}\n`, 'something else\n']);
+    // A thousand lines that each begin the value: all but the last leave at once (the buffer stays bounded).
+    expect(s.push(`${lines[0]}\n`.repeat(1000))).toHaveLength(999);
+    expect(s.end()).toEqual([`${lines[0]}\n`]);
+    expect(s.counts).toEqual({});
+  });
+});

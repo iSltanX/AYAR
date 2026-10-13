@@ -5,13 +5,23 @@ import type { Lang, Translate } from '@ayar/i18n';
 import type { CommandChange, DiffLine } from '../lib/sheets.ts';
 import { checkTitle, hasMessage, reasonText } from './format.ts';
 
-/** One argument as a shell would need it written, for reading only (it never runs from this text). */
+/**
+ * One argument as a shell would need it written: it never runs from this text, but a copy of it must read back as the
+ * same word (AUD-06). A template slot (`{targets}`) stays bare; braces with a comma or `..`, and a leading `=`, are
+ * expansions in bash and zsh, so they are quoted.
+ */
 function shellWord(a: string): string {
-  return /^[\w@%+=:,./{}-]+$/.test(a) ? a : `'${a.replaceAll("'", "'\\''")}'`;
+  const bare = /^[\w@%+=:,./{}-]+$/.test(a) && !(/[{}]/.test(a) && /,|\.\./.test(a)) && !a.startsWith('=');
+  return bare ? a : `'${a.replaceAll("'", "'\\''")}'`;
 }
 
 export function argvText(argv: readonly string[]): string {
   return argv.map(shellWord).join(' ');
+}
+
+/** A command with its folder, as one line to copy and run from the project's root (AUD-06). */
+export function commandLineText(argv: readonly string[], cwd: string | null | undefined): string {
+  return cwd && cwd !== '.' ? `cd ${shellWord(cwd.startsWith('-') ? `./${cwd}` : cwd)} && ${argvText(argv)}` : argvText(argv);
 }
 
 /** The literal command of a spec: the project's, or the adapter's invocation with the managed tool named. */

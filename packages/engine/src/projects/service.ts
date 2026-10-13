@@ -28,6 +28,7 @@ import { recordAudit } from '../storage/audit.ts';
 import type { Db } from '../storage/db.ts';
 import { hmacHex, type HmacKey } from '../storage/hmac-key.ts';
 import { readSettings } from '../storage/settings.ts';
+import { projectContextOf, type ProjectContext } from './context.ts';
 import { readIdentity, sameIdentity, type ProjectIdentity } from './identity.ts';
 import { broadPath, isPermissionError, pathKey, protectedLocation } from './locations.ts';
 
@@ -334,6 +335,7 @@ export class ProjectsService {
     const snapshot = await this.#snapshotNow(projectId, signal, null);
     const git = snapshot.facts.find((f) => f.key === 'git.repository')?.value as { commit?: unknown; branch?: unknown } | undefined;
     this.#git.set(projectId, git ? { commit: typeof git.commit === 'string' ? git.commit : null, branch: typeof git.branch === 'string' ? git.branch : null } : null);
+    this.#context.set(projectId, projectContextOf(snapshot));
     return this.#o.profiles.specs(snapshot, this.#o.profiles.settingsOf(projectId));
   }
 
@@ -342,6 +344,12 @@ export class ProjectsService {
     return this.#git.get(projectId) ?? null;
   }
   readonly #git = new Map<string, { commit: string | null; branch: string | null } | null>();
+
+  /** What the same fresh discovery read of the project's types and declared toolchain (12.3 «سياق المشروع»). */
+  lastContext(projectId: string): ProjectContext | null {
+    return this.#context.get(projectId) ?? null;
+  }
+  readonly #context = new Map<string, ProjectContext>();
 
   /** A discovery of the project now, redacted (C-18 before anything is kept), not saved. */
   async #snapshotNow(projectId: string, signal: AbortSignal, onProgress: ((p: { filesSeen: number; dirsSeen: number; currentDir: string; markers: ReadonlySet<string>; skipped: number; skippedDirs: readonly string[] }) => void) | null): Promise<DiscoverySnapshot> {

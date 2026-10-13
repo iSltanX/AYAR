@@ -24,6 +24,7 @@ import { recordAudit } from '../storage/audit.ts';
 import type { DataLayout } from '../storage/data-dir.ts';
 import type { Db } from '../storage/db.ts';
 import { readSettings } from '../storage/settings.ts';
+import { shellLine } from '../executor/command-line.ts';
 import type { ProcessSupervisor, RunningProcess } from '../executor/process.ts';
 import type { ToolsService } from '../tools/service.ts';
 import type { BrowserService } from '../probe/browser.ts';
@@ -492,7 +493,7 @@ export class SetupService {
       const lines = redactors[k].push(decoders[k].decode(chunk, { stream: true }));
       if (lines.length) void writer.write(new TextEncoder().encode(lines.join('')));
     };
-    void writer.write(new TextEncoder().encode(`$ ${argv.join(' ')}\n`));
+    void writer.write(new TextEncoder().encode(`$ ${shellLine(argv)}\n`));
     this.#o.events.emit('setup.progress', { actionId: action.id, phase: 'running', bytes: null, totalBytes: null, messageKey: 'setup.phase.running', securityAlert: false });
     const token = Buffer.from(ports.random.bytes(24)).toString('base64url');
     const proc = this.#o.supervisor.start({

@@ -13,7 +13,7 @@
 // A review expires when a file of its scope changes (11.4 rule 6): integ.reviews says so at the next run, and the
 // check goes back to «يحتاج مراجعة». Nothing here writes into the repository.
 import type { Catalog } from '@ayar/catalog';
-import type { A11yReviewItem, CheckOutcome, CheckSpec, FindingLocation, ParsedReport, ReviewDecision, ReviewRecord, ReviewRecorded, ReviewTarget, VerdictCounts } from '@ayar/protocol';
+import type { A11yReviewItem, CheckOutcome, CheckSpec, FindingLocation, ParsedReport, Reason, ReviewDecision, ReviewRecord, ReviewRecorded, ReviewTarget, VerdictCounts } from '@ayar/protocol';
 import { A11Y_REVIEW_ITEMS, ParsedReport as ReportSchema } from '@ayar/protocol';
 import type { EvidenceService } from '../evidence/service.ts';
 import { CommandError } from '../host/errors.ts';
@@ -27,7 +27,7 @@ import { recordAudit } from '../storage/audit.ts';
 import type { Db } from '../storage/db.ts';
 import type { TasksService } from '../tasks/service.ts';
 import type { RunService } from '../executor/run.ts';
-import type { VerdictService } from '../verdict/service.ts';
+import type { Judgement, VerdictService } from '../verdict/service.ts';
 
 const ALLOWED: Record<ReviewTarget['type'], readonly ReviewDecision[]> = {
   check: ['accept', 'reject'],
@@ -84,6 +84,15 @@ function itemOf(r: { target_type: string; target_ref: string }): { item?: A11yRe
   return item && (A11Y_REVIEW_ITEMS as readonly string[]).includes(item) ? { item: item as A11yReviewItem } : {};
 }
 
+const reasonOf = (json: string | null): Reason | null => {
+  if (!json) return null;
+  try {
+    return JSON.parse(json) as Reason;
+  } catch {
+    return null;
+  }
+};
+
 export class ReviewsService {
   readonly #o: ReviewsServiceOptions;
 
@@ -137,6 +146,11 @@ export class ReviewsService {
     if (!c) throw new CommandError('not_found', { reason: 'check_run' });
     if (c.state !== 'finished') throw new CommandError('busy', { reason: 'check_running' });
     const instance = `${c.check_id}@${c.component}`;
+    // 11.4 rule 9: a guard whose base is lost, or not shown whole, is settled by a new full scan, never accepted by hand.
+    if (c.check_id === 'integ.guard' && decision === 'accept') {
+      const reason = reasonOf(db.get<{ outcome_reason: string | null }>('SELECT outcome_reason FROM check_runs WHERE id = ?', checkRunId)?.outcome_reason ?? null);
+      if ((await this.#o.integrity.guardBase(checkRunId, await this.#keptReport(checkRunId), reason)) !== 'whole') throw new CommandError('invalid_payload', { path: 'decision', reason: 'guard_base_unverified' });
+    }
     const snapshotId = this.#snapshotOf(c.project_id, c.run_id);
     // The scope: the files the execution's findings point at (a guard effect's file, AT-24 ز); else the component.
     const paths = db.all<{ location_json: string | null }>('SELECT location_json FROM findings WHERE check_run_id = ? AND location_json IS NOT NULL', checkRunId).map((r) => (JSON.parse(r.location_json!) as FindingLocation).path).filter((p): p is string => typeof p === 'string');
@@ -227,6 +241,18 @@ export class ReviewsService {
     return counts;
   }
 
+  /** The parsed report an execution kept in its evidence, or null when there is none or it cannot be read. */
+  async #keptReport(checkRunId: string): Promise<ParsedReport | null> {
+    const ev = this.#o.db.get<{ rel_path: string }>("SELECT rel_path FROM evidence WHERE check_run_id = ? AND kind = 'parsed' ORDER BY created_at DESC LIMIT 1", checkRunId);
+    if (!ev) return null;
+    try {
+      const data = await this.#o.ports.fs.readFilePrefix(this.#o.evidence.store.absolute(ev.rel_path), 64 * 1024 * 1024);
+      return ReportSchema.parse(JSON.parse(new TextDecoder().decode(data.data)));
+    } catch {
+      return null;
+    }
+  }
+
   /**
    * D-35 now: an execution whose outcome came from its findings is classified again with the excluded ones, from the
    * parsed report kept in its evidence and the fingerprints of its rows (in the report's order). An execution whose
@@ -234,24 +260,21 @@ export class ReviewsService {
    */
   async #rejudge(projectId: string, runId: string, checkRunId: string, checkId: string, component: string, profileVersion: number | null): Promise<void> {
     const { db } = this.#o;
-    const c = db.get<{ outcome: string | null; review_id: string | null }>('SELECT outcome, review_id FROM check_runs WHERE id = ?', checkRunId);
+    const c = db.get<{ outcome: string | null; review_id: string | null; outcome_reason: string | null }>('SELECT outcome, review_id, outcome_reason FROM check_runs WHERE id = ?', checkRunId);
     if (!c || !['passed', 'failed', 'warning', 'needs_review', 'flaky'].includes(c.outcome ?? '')) return;
     // A check a human review already decided keeps that decision (G-17).
     if (c.review_id && db.get<{ target_type: string }>('SELECT target_type FROM reviews WHERE id = ?', c.review_id)?.target_type === 'check') return;
-    const ev = db.get<{ rel_path: string }>("SELECT rel_path FROM evidence WHERE check_run_id = ? AND kind = 'parsed' ORDER BY created_at DESC LIMIT 1", checkRunId);
-    if (!ev) return;
-    let report: ParsedReport;
-    try {
-      const data = await this.#o.ports.fs.readFilePrefix(this.#o.evidence.store.absolute(ev.rel_path), 64 * 1024 * 1024);
-      report = ReportSchema.parse(JSON.parse(new TextDecoder().decode(data.data)));
-    } catch {
-      return;
-    }
+    const report = await this.#keptReport(checkRunId);
+    if (!report) return;
     const rows = db.all<{ id: string; fingerprint: string }>('SELECT id, fingerprint FROM findings WHERE check_run_id = ? ORDER BY rowid', checkRunId);
     if (rows.length !== report.findings.length) return; // the rows and the report no longer align: judged at the next run
     const spec = this.#specOf(projectId, profileVersion, `${checkId}@${component}`);
     if (!spec) return;
-    const j = this.#o.verdict.reclassify(spec, { projectId, report, fingerprints: rows.map((r) => r.fingerprint) });
+    const classified = this.#o.verdict.reclassify(spec, { projectId, report, fingerprints: rows.map((r) => r.fingerprint) });
+    // A guard whose base is lost, or not shown whole, stays «يحتاج مراجعة» for it, whatever its effects' reviews say,
+    // and asks for a new full scan (11.4 rule 9).
+    const base = checkId === 'integ.guard' ? await this.#o.integrity.guardBase(checkRunId, report, reasonOf(c.outcome_reason)) : 'whole';
+    const j: Judgement = base === 'whole' ? classified : { ...classified, outcome: 'needs_review', reason: this.#o.integrity.guardBaseReason(base) };
     db.transaction(() => {
       rows.forEach((r, i) => {
         const f = j.findings[i];

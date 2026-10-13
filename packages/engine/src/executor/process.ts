@@ -27,6 +27,12 @@ export const SLEEP_GAP_MIN_MS = 5000;
 /** E-22: executables in these folders are the system's; a new launchd child elsewhere is a possible escape. */
 export const SYSTEM_PREFIXES = ['/System/', '/usr/libexec/', '/Library/Apple/', '/Library/Application Support/', '/usr/sbin/', '/sbin/'];
 
+/** The application bundle an executable lies in (`/Applications/X.app`, the outermost), or null outside one. */
+export function appBundleOf(path: string): string | null {
+  const i = path.indexOf('.app/');
+  return i > 0 ? path.slice(0, i + '.app'.length) : null;
+}
+
 export type EndReason = 'exited' | 'timed_out' | 'idle_timed_out' | 'cancelled' | 'spawn_failed';
 
 export interface ProcessSpec {
@@ -93,6 +99,8 @@ export interface RunningProcess {
 export interface Baseline {
   launchdChildren: Set<string>;
   jobs: Set<string>;
+  /** The application bundles a process of the user was running from (appBundleOf). */
+  apps: Set<string>;
 }
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms).unref?.());
@@ -115,7 +123,12 @@ export class ProcessSupervisor {
   /** The launchd children and jobs of the user now (E-22: what is new later may be an escape). */
   async baseline(): Promise<Baseline> {
     const [procs, jobs] = await Promise.all([this.#ports.processes.listProcesses().catch(() => []), this.#ports.processes.launchdJobs()]);
-    return { launchdChildren: new Set(procs.filter((p) => p.ppid === 1 && p.uid === this.#uid).map((p) => `${p.pid}\0${p.startTime}`)), jobs: new Set(jobs) };
+    const mine = procs.filter((p) => p.uid === this.#uid);
+    return {
+      launchdChildren: new Set(mine.filter((p) => p.ppid === 1).map((p) => `${p.pid}\0${p.startTime}`)),
+      jobs: new Set(jobs),
+      apps: new Set(mine.map((p) => appBundleOf(p.command)).filter((a): a is string => a !== null)),
+    };
   }
 
   start(spec: ProcessSpec): RunningProcess {
@@ -404,7 +417,12 @@ export class ProcessSupervisor {
     return { killed };
   }
 
-  /** E-22's rule: a new launchd child of this user outside the system folders, or a new non-Apple launchd job. */
+  /**
+   * E-22's rule: a new launchd child of this user outside the system folders, or a new non-Apple launchd job. A new
+   * child from the bundle of an application already running when the check started (a browser's crash reporter, an
+   * updater) is that application's own: E-22's criterion is a rule that never warns on the user's ordinary
+   * processes, and such helpers start at any moment on a working machine (AT-29: Google Chrome's crashpad handler).
+   */
   async #escapes(base: Baseline, handled: ReadonlySet<number>): Promise<Leftovers['escapeSuspected']> {
     const now = await this.baseline();
     const out: Leftovers['escapeSuspected'] = [];
@@ -413,6 +431,8 @@ export class ProcessSupervisor {
       if (p.ppid !== 1 || p.uid !== this.#uid || handled.has(p.pid)) continue;
       if (base.launchdChildren.has(`${p.pid}\0${p.startTime}`) || !now.launchdChildren.has(`${p.pid}\0${p.startTime}`)) continue;
       if (SYSTEM_PREFIXES.some((s) => p.command.startsWith(s))) continue;
+      const app = appBundleOf(p.command);
+      if (app && base.apps.has(app)) continue;
       out.push({ kind: 'launchd_child', name: p.command.split('/').pop() ?? p.command });
     }
     for (const j of now.jobs) if (!base.jobs.has(j) && !j.startsWith('com.apple.')) out.push({ kind: 'launchd_job', name: j });

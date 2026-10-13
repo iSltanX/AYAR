@@ -27,7 +27,7 @@ import type { CheckOutcome, CheckSpec, FindingLocation, JsonValue, ParsedFinding
 import { createHash } from 'node:crypto';
 import type { WeighedFinding } from '../classifier/classify.ts';
 import type { EvidenceService } from '../evidence/service.ts';
-import type { Manifest, ManifestEntry } from '../evidence/snapshot.ts';
+import type { InventoryGaps, Manifest, ManifestEntry } from '../evidence/snapshot.ts';
 import type { Logger } from '../ports/index.ts';
 import type { Db } from '../storage/db.ts';
 import { fingerprintOf, type JudgedFinding, type Judgement, type VerdictService } from '../verdict/service.ts';
@@ -78,6 +78,14 @@ export function guardAsFinding(f: GuardFinding): { finding: ParsedFinding; ancho
     anchor: integrityAnchor(value),
   };
 }
+
+/** The reason of a guard whose base is gone: integrity could not be verified (11.4 rule 9). */
+const LOST_BASE: Reason = { key: 'integrity.reason.guardBaseLost' };
+/** The reason of a guard execution whose base cannot be shown whole (an older one, its evidence gone). */
+const UNVERIFIED_BASE: Reason = { key: 'integrity.reason.guardBaseUnverified' };
+
+/** How a guard execution's base stands: shown whole, lost, or not shown whole either way. */
+export type GuardBase = 'whole' | 'lost' | 'unverified';
 
 export class IntegrityService {
   readonly #o: IntegrityOptions;
@@ -300,8 +308,11 @@ export class IntegrityService {
 
   // ── the four checks at the end of the run ─────────────────────────────────────────────────────────────────
 
-  /** A judgement for an integrity check: every finding «review» (suspected), the outcome given, no classifier. */
-  judgement(spec: CheckSpec, projectId: string, pairs: readonly { finding: ParsedFinding; anchor: string }[], outcome: CheckOutcome, reason: Reason, info: Record<string, JsonValue> = {}): Judgement {
+  /**
+   * A judgement for an integrity check: every finding «review» (suspected), the outcome given, no classifier. With
+   * `byEffects: false` the outcome does not come from the effects (a lost base): excluding them changes nothing.
+   */
+  judgement(spec: CheckSpec, projectId: string, pairs: readonly { finding: ParsedFinding; anchor: string }[], outcome: CheckOutcome, reason: Reason, info: Record<string, JsonValue> = {}, o: { byEffects?: boolean } = {}): Judgement {
     const book = this.#o.catalog.rules;
     const prints = pairs.map((p) => fingerprintOf(spec.checkId, p.finding, p.anchor));
     const excluded = this.#o.verdict.falseAlarms(projectId, prints);
@@ -313,8 +324,9 @@ export class IntegrityService {
     });
     const live = findings.filter((f) => f.finding.effect !== 'excluded').length;
     const counts = { violations: 0, warnings: 0, review: live, notes: 0, excludedByReview: findings.length - live };
-    // An integrity check whose every effect a review excluded as a false alarm passes (D-35).
-    const finalOutcome: CheckOutcome = outcome === 'needs_review' && live === 0 ? 'passed' : outcome;
+    // An integrity check whose every effect a review excluded as a false alarm passes (D-35): effects there were, and
+    // they were the reason. «Needs review» with no effect, or for a base lost, is never a pass.
+    const finalOutcome: CheckOutcome = outcome === 'needs_review' && (o.byEffects ?? true) && findings.length > 0 && live === 0 ? 'passed' : outcome;
     const finalReason: Reason = finalOutcome !== outcome ? { key: 'integrity.reason.allExcluded', params: { count: findings.length } } : reason;
     const report: ParsedReport = { reader: 'integrity', readerVersion: INTEGRITY_VERSION, formats: [], tests: null, findings: pairs.map((p) => p.finding), findingsDropped: 0, signals: { noInputs: false, collectionError: false, configError: false, flaky: false, unresolved: 0 }, problems: [], info: { ...info, check: spec.checkId } };
     return { outcome: finalOutcome, reason: finalReason, origin: null, counts, findings, report };
@@ -324,29 +336,61 @@ export class IntegrityService {
   guardJudgement(spec: CheckSpec, projectId: string, ctx: GuardContext): { judgement: Judgement; evidence: Record<string, unknown> } {
     const pairs = (ctx.result?.findings ?? []).map(guardAsFinding);
     const evidence = { bases: ctx.baseSnapshotIds, baseLost: ctx.baseLost, compared: ctx.result?.compared ?? 0, changed: ctx.result?.changed ?? [], deleted: ctx.result?.deleted ?? [], truncated: ctx.result?.truncated ?? false, markers: ctx.markers, carried: ctx.carried, effects: ctx.result?.findings ?? [] };
-    if (!ctx.baseSnapshotIds.length) {
-      if (ctx.baseLost) return { judgement: this.judgement(spec, projectId, pairs, 'needs_review', { key: 'integrity.reason.guardBaseLost' }, { bases: 0, carried: ctx.carried }), evidence };
-      return { judgement: this.judgement(spec, projectId, [], 'passed', { key: 'integrity.reason.guardNoBaseline', params: { markers: ctx.markers.length } }, { bases: 0, markers: ctx.markers.length }), evidence };
-    }
-    const n = pairs.length;
-    if (ctx.baseLost && !n) return { judgement: this.judgement(spec, projectId, [], 'needs_review', { key: 'integrity.reason.guardBaseLost' }, { bases: ctx.baseSnapshotIds.length }), evidence };
-    const outcome: CheckOutcome = n ? 'needs_review' : 'passed';
-    const reason: Reason = n ? { key: 'integrity.reason.guardFindings', params: { count: n, files: ctx.result?.changed.length ?? 0 } } : { key: 'integrity.reason.guardClean', params: { files: ctx.result?.changed.length ?? 0 } };
     // The check each effect touches (C-22 «الربط»), for the page, even when that check did not run this time (DEV-12).
     const links = (ctx.result?.findings ?? []).slice(0, MAX_FINDINGS).map((f) => ({ rule: f.rule, path: f.path, line: f.line ?? null, check: f.check }));
-    return { judgement: this.judgement(spec, projectId, pairs, outcome, reason, { bases: ctx.baseSnapshotIds.length, compared: ctx.result?.compared ?? 0, carried: ctx.carried, links }), evidence };
+    // A base that is gone leaves integrity unverified whatever the effects and their reviews: «يحتاج مراجعة» for the lost
+    // base, never a pass. The report keeps `baseLost`, so a judgement again after a review keeps it too (guardBase).
+    if (ctx.baseLost) return { judgement: this.judgement(spec, projectId, pairs, 'needs_review', LOST_BASE, { bases: ctx.baseSnapshotIds.length, compared: ctx.result?.compared ?? 0, carried: ctx.carried, links, baseLost: true }, { byEffects: false }), evidence };
+    if (!ctx.baseSnapshotIds.length) return { judgement: this.judgement(spec, projectId, [], 'passed', { key: 'integrity.reason.guardNoBaseline', params: { markers: ctx.markers.length } }, { bases: 0, markers: ctx.markers.length, baseLost: false }), evidence };
+    const n = pairs.length;
+    const outcome: CheckOutcome = n ? 'needs_review' : 'passed';
+    const reason: Reason = n ? { key: 'integrity.reason.guardFindings', params: { count: n, files: ctx.result?.changed.length ?? 0 } } : { key: 'integrity.reason.guardClean', params: { files: ctx.result?.changed.length ?? 0 } };
+    return { judgement: this.judgement(spec, projectId, pairs, outcome, reason, { bases: ctx.baseSnapshotIds.length, compared: ctx.result?.compared ?? 0, carried: ctx.carried, links, baseLost: false }), evidence };
   }
 
-  /** integ.state at the end (9.9, 11.4 rule 8): the files that changed outside the declared outputs. */
-  stateJudgement(spec: CheckSpec, projectId: string, changed: readonly string[]): Judgement {
+  /**
+   * How a guard execution's base stands (11.4 rule 9), for a judgement again after a review and for a review of the
+   * check itself. Whole only when shown so: by its kept report (`baseLost: false`, from this version on) or by its
+   * integrity evidence (`baseLost: false`, which older executions kept too). Lost when either says so, or its reason
+   * does. Otherwise (an older execution whose evidence is gone) it is not shown whole: unverified.
+   */
+  async guardBase(checkRunId: string, report: ParsedReport | null, reason: Reason | null): Promise<GuardBase> {
+    if (reason?.key === LOST_BASE.key || report?.info.baseLost === true) return 'lost';
+    if (report?.info.baseLost === false) return 'whole';
+    const ref = this.#o.evidence.store.refsOf(checkRunId).find((e) => e.kind === 'integrity');
+    if (!ref) return 'unverified';
+    try {
+      const kept = JSON.parse(new TextDecoder().decode(await this.#o.readFile(this.#o.evidence.store.absolute(ref.relPath)))) as { baseLost?: unknown };
+      return kept.baseLost === false ? 'whole' : kept.baseLost === true ? 'lost' : 'unverified';
+    } catch {
+      return 'unverified';
+    }
+  }
+
+  /** The reason a guard execution keeps «يحتاج مراجعة» for, when its base is not whole: a new full scan is asked for. */
+  guardBaseReason(base: Exclude<GuardBase, 'whole'>): Reason {
+    return base === 'lost' ? LOST_BASE : UNVERIFIED_BASE;
+  }
+
+  /**
+   * integ.state at the end (9.9, 11.4 rule 8): the files that changed outside the declared outputs. Inventories with
+   * gaps (AUD-04: past the depth or entry limit, unreadable) show no stability where they did not look: with no change
+   * seen, the check is «تعذّر», naming what was not observed — never «اجتاز» — and a change seen is reported all the same.
+   */
+  stateJudgement(spec: CheckSpec, projectId: string, changed: readonly string[], gaps: InventoryGaps | null = null, limits: { depth: number; entries: number } | null = null): Judgement {
     const pairs = changed.slice(0, MAX_FINDINGS).map((path) => {
       const value = `state|${path}`;
       const finding: ParsedFinding = { rule: 'state.changed', toolRule: null, severity: null, proof: null, level: null, origin: 'project', message: `changed during the run: ${path}`, location: { path }, anchor: { kind: 'text', value }, expected: null, actual: null };
       return { finding, anchor: integrityAnchor(value) };
     });
-    return changed.length
-      ? this.judgement(spec, projectId, pairs, 'needs_review', { key: 'integrity.reason.stateChanged', params: { count: changed.length } }, { changed: changed.length })
-      : this.judgement(spec, projectId, [], 'passed', { key: 'integrity.reason.stateStable' }, { changed: 0 });
+    const unobserved: Record<string, JsonValue> = gaps ? { gapDepth: gaps.depth, gapUnreadable: gaps.unreadable, gapTruncated: gaps.truncated } : {};
+    if (changed.length) return this.judgement(spec, projectId, pairs, 'needs_review', { key: 'integrity.reason.stateChanged', params: { count: changed.length } }, { changed: changed.length, ...unobserved });
+    // The reason says what was not seen and why: the inventory's limits as set (depth 12 by default), and a few paths.
+    if (gaps) {
+      const params = { depth: gaps.depth, unreadable: gaps.unreadable, truncated: gaps.truncated ? 'yes' : 'no', depthLimit: limits?.depth ?? 0, entriesLimit: limits?.entries ?? 0, examples: gaps.paths.slice(0, 3).join(', ') || '—' };
+      return this.judgement(spec, projectId, [], 'unavailable', { key: 'integrity.reason.stateUnverified', params }, { changed: 0, ...unobserved, unobservedPaths: gaps.paths });
+    }
+    return this.judgement(spec, projectId, [], 'passed', { key: 'integrity.reason.stateStable' }, { changed: 0 });
   }
 
   /** integ.reviews at the end (11.4 rule 6): each recorded review against the files of its scope now. */

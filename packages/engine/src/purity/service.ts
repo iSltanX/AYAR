@@ -14,9 +14,9 @@ import type { CheckOutcome, CheckSpec, IntegrityInputs, PurityMeta, PurityResult
 import { PurityResult as PuritySchema, RunPlan as PlanSchema } from '@ayar/protocol';
 import { newId } from '../host/ids.ts';
 import type { EvidenceService } from '../evidence/service.ts';
-import { diffManifests } from '../evidence/snapshot.ts';
+import { diffManifests, inventoryGaps } from '../evidence/snapshot.ts';
 import type { EnginePorts, Logger } from '../ports/index.ts';
-import { latestSnapshot } from '../profile/service.ts';
+import { parseRunGit } from '../discovery/git.ts';
 import { profileAt } from '../profile/store.ts';
 import type { Db } from '../storage/db.ts';
 import { readSettings } from '../storage/settings.ts';
@@ -45,6 +45,7 @@ interface RunRow {
   snapshot_start_id: string | null;
   state_changed: number | null;
   round_id: string | null;
+  git_json: string | null;
 }
 
 interface Member {
@@ -73,7 +74,7 @@ export class PurityService {
   /** 9.10: the index of a finished run, kept with it (and with its round). Null when the run computes none. */
   async afterRun(runId: string, declared: (path: string) => boolean): Promise<PurityResult | null> {
     const { db } = this.#o;
-    const run = db.get<RunRow>('SELECT id, project_id, kind, plan_json, profile_version, profile_hash, catalog_version, snapshot_start_id, state_changed, round_id FROM runs WHERE id = ?', runId);
+    const run = db.get<RunRow>('SELECT id, project_id, kind, plan_json, profile_version, profile_hash, catalog_version, snapshot_start_id, state_changed, round_id, git_json FROM runs WHERE id = ?', runId);
     if (!run) return null;
     const plan = PlanSchema.safeParse(JSON.parse(run.plan_json));
     if (!plan.success) return null;
@@ -102,7 +103,7 @@ export class PurityService {
     if (!rc) return null;
     const round = db.get<{ id: string; project_id: string; base_run_id: string | null; snapshot_id: string | null }>('SELECT id, project_id, base_run_id, snapshot_id FROM rounds WHERE id = ?', rc.round_id);
     if (!round?.base_run_id) return null;
-    const run = db.get<RunRow>('SELECT id, project_id, kind, plan_json, profile_version, profile_hash, catalog_version, snapshot_start_id, state_changed, round_id FROM runs WHERE id = ?', round.base_run_id);
+    const run = db.get<RunRow>('SELECT id, project_id, kind, plan_json, profile_version, profile_hash, catalog_version, snapshot_start_id, state_changed, round_id, git_json FROM runs WHERE id = ?', round.base_run_id);
     if (!run) return null;
     const members = new Map<string, Member>(
       db.all<{ instance: string; check_run_id: string | null; outcome: string | null; reviewed: number; attempts_json: string }>('SELECT instance, check_run_id, outcome, reviewed, attempts_json FROM round_checks WHERE round_id = ?', round.id).map((r) => [r.instance, { instance: r.instance, checkRunId: r.check_run_id, outcome: (r.outcome as CheckOutcome | null) ?? null, reviewed: r.reviewed === 1, attempts: JSON.parse(r.attempts_json) as string[] }]),
@@ -156,11 +157,12 @@ export class PurityService {
     const { db, ports, evidence } = this.#o;
     const round = db.get<{ id: string; project_id: string; base_run_id: string | null; snapshot_id: string | null }>('SELECT id, project_id, base_run_id, snapshot_id FROM rounds WHERE id = ?', roundId);
     if (!round || round.project_id !== run.project_id || !round.snapshot_id || !run.snapshot_start_id) return null;
-    // 9.12 point 4: the state must not have changed since the round's snapshot (outside the declared outputs).
+    // 9.12 point 4: the state must not have changed since the round's snapshot (outside the declared outputs) — and
+    // must be seen whole to say so (AUD-04): with a gap in either inventory it stays a targeted run, with no index.
     const [a, b] = await Promise.all([evidence.snapshots.load(round.snapshot_id), evidence.snapshots.load(run.snapshot_start_id)]);
     if (!a || !b) return null;
     const d = diffManifests(a, b, { declared, tracked: null });
-    if ([...d.created, ...d.modified, ...d.deleted].some((p) => !declared(p)) || d.truncated) return null;
+    if ([...d.created, ...d.modified, ...d.deleted].some((p) => !declared(p)) || d.truncated || inventoryGaps(a, b)) return null;
     const members = new Map<string, Member>(
       db.all<{ instance: string; check_run_id: string | null; outcome: string | null; reviewed: number; attempts_json: string }>('SELECT instance, check_run_id, outcome, reviewed, attempts_json FROM round_checks WHERE round_id = ?', roundId).map((r) => [r.instance, { instance: r.instance, checkRunId: r.check_run_id, outcome: (r.outcome as CheckOutcome | null) ?? null, reviewed: r.reviewed === 1, attempts: JSON.parse(r.attempts_json) as string[] }]),
     );
@@ -236,8 +238,8 @@ export class PurityService {
       const r = db.get<{ tool_versions_json: string | null }>('SELECT tool_versions_json FROM check_runs WHERE id = ?', m.checkRunId);
       if (r?.tool_versions_json) Object.assign(toolVersions, JSON.parse(r.tool_versions_json) as Record<string, string>);
     }
-    const git = latestSnapshot(db, run.project_id)?.facts.find((f) => f.key === 'git.repository')?.value;
-    const commit = git && typeof git === 'object' && !Array.isArray(git) && typeof (git as Record<string, unknown>).commit === 'string' ? ((git as Record<string, unknown>).commit as string) : null;
+    // 11.9 (AUD-07): the commit the run recorded when it started, not the project's head when the index is computed.
+    const commit = parseRunGit(run.git_json)?.commit ?? null;
     const meta: PurityMeta = { profileVersion: run.profile_version, profileHash: run.profile_hash, catalogVersion: run.catalog_version ?? catalog.version, toolVersions, environmentSource: null, snapshotId, commit, computedAt: ports.clock.now().toISOString() };
     // 11.4 rule 4: the threshold of «نطاق ضيق» is a setting (DEV-12, screen 21 «الحدود»).
     const narrowThreshold = readSettings(db, ['purity.narrowThreshold'])['purity.narrowThreshold'] ?? DEFAULT_NARROW_THRESHOLD;
