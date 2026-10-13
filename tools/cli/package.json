@@ -1,6 +1,6 @@
 {
   "name": "@ayar/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Runs the AYAR engine without Electron over the same protocol. For integration tests and development only (D-19).",
   "type": "module",
@@ -12,7 +12,7 @@
     "typecheck": "node ../../node_modules/@typescript/native/bin/tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@ayar/engine": "0.1.0",
-    "@ayar/protocol": "0.1.0"
+    "@ayar/engine": "0.1.1",
+    "@ayar/protocol": "0.1.1"
   }
 }

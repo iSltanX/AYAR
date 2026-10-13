@@ -1,7 +1,7 @@
 {
   "name": "@ayar/desktop",
   "productName": "AYAR",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "AYAR macOS app: Electron main process, sandboxed preload and an empty Svelte mount point. Everything it runs is bundled into dist/, so it has no runtime dependencies.",
   "type": "module",
@@ -18,10 +18,10 @@
     "design:generate": "node test/design/generate.ts"
   },
   "devDependencies": {
-    "@ayar/cli": "0.1.0",
-    "@ayar/engine": "0.1.0",
-    "@ayar/i18n": "0.1.0",
-    "@ayar/protocol": "0.1.0",
+    "@ayar/cli": "0.1.1",
+    "@ayar/engine": "0.1.1",
+    "@ayar/i18n": "0.1.1",
+    "@ayar/protocol": "0.1.1",
     "@electron-forge/cli": "8.0.1",
     "@electron-forge/plugin-fuses": "8.0.1",
     "@electron/fuses": "2.1.3",

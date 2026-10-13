@@ -1,6 +1,6 @@
 {
   "name": "@ayar/probe",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "AYAR's web probe (C-14): pages rendered in Playwright's Chromium — the declared states at their viewports, themes and languages, axe, computed styles, fonts, direction, images and timings, with every request kept on this machine — and the judges that turn what it saw into findings. The browser driver runs in a process of its own (E-11); the engine imports the contract and the judges only.",
   "type": "module",
@@ -15,9 +15,9 @@
     "typecheck": "node ../../node_modules/@typescript/native/bin/tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@ayar/adapters": "0.1.0",
-    "@ayar/analyzers": "0.1.0",
-    "@ayar/protocol": "0.1.0",
+    "@ayar/adapters": "0.1.1",
+    "@ayar/analyzers": "0.1.1",
+    "@ayar/protocol": "0.1.1",
     "axe-core": "4.14.0",
     "pixelmatch": "7.2.0",
     "playwright-core": "1.64.0",

@@ -1,6 +1,6 @@
 {
   "name": "@ayar/adapters",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "AYAR's adapters (C-15): how each external tool is invoked, what its exit codes mean, and how its reports are read — with the reading guards of C-15 — into findings in AYAR's terms. Pure: no process, no file system; the engine runs and reads.",
   "type": "module",
@@ -12,9 +12,9 @@
     "typecheck": "node ../../node_modules/@typescript/native/bin/tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@ayar/protocol": "0.1.0"
+    "@ayar/protocol": "0.1.1"
   },
   "devDependencies": {
-    "@ayar/catalog": "0.1.0"
+    "@ayar/catalog": "0.1.1"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "ayar",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "AYAR: a local macOS app that measures a software project against declared standards and proves every violation with evidence.",
   "type": "module",

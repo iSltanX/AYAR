@@ -1,6 +1,6 @@
 {
   "name": "@ayar/i18n",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "AYAR messages in Arabic and English (ICU, C-24): one file per scope and language, plus formatting functions. Node-free.",
   "type": "module",

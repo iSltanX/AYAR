@@ -1,6 +1,6 @@
 {
   "name": "@ayar/catalog",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "The AYAR catalog (C-08, part 1): check definitions (10.3), purity/1 criteria (11.6), redaction patterns and command policy as validated data. Validated at build and at load; an invalid catalog stops the engine.",
   "type": "module",
@@ -13,9 +13,9 @@
     "typecheck": "node ../../node_modules/@typescript/native/bin/tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@ayar/protocol": "0.1.0"
+    "@ayar/protocol": "0.1.1"
   },
   "devDependencies": {
-    "@ayar/i18n": "0.1.0"
+    "@ayar/i18n": "0.1.1"
   }
 }
