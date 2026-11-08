@@ -76,17 +76,11 @@ playwright-report/
 *.sqlite-shm
 *.db
 
-# ── تجارب التحقق السابق للبناء: الشيفرة تُحفظ، والمخرجات الثقيلة لا ──
-spikes/**/node_modules/
-spikes/**/out/
-spikes/**/dist/
-spikes/**/*.app
-spikes/**/artifacts/
+# ── مخرجات تشغيلات السلامة لمشاريع الاختبار (fixtures/tools/sanity.mjs): تُولَّد محليًا ──
+fixtures/sanity-results/
+fixtures/SANITY.md
 
 # ── ملفات مؤقتة ──
 tmp/
 .tmp/
 *.tmp
-
-# ── صفحة المراحل المولّدة: تولّدها الجلسة الرئيسية وتنشرها ولا تُلتزم (ORG-10، ORG-12) ──
-docs/dashboard/ayar-phases.html
