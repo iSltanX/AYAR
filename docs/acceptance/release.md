@@ -1,4 +1,6 @@
-# حزمة الإصدار الأول (DEV-13)
+# حزمة الإصدار: البناء والتوقيع والتحقق
+
+كيف تُبنى حزمة `AYAR.app` وتُوقَّع، وما يُفحص فيها قبل نشرها. والقيم المقروءة أدناه (كالحجم وعدد المدخلات) من حزمة الإصدار الأول. والمعرّفات بين قوسين (مثل `D-53` و`E-04`) تحيل إلى سجلات القرار المحفوظة في تاريخ Git عند الوسم `v0.1.1`.
 
 ## 1. البناء والتوقيع
 
@@ -8,15 +10,15 @@
 | Electron / Forge | 44.7.0 / 8.0.1 (E-01) |
 | الهدف | `darwin-arm64`، وأدنى نظام macOS 13.0 (E-02) |
 | معرّف الحزمة | `com.bysltan.ayar` (Q-04)، والمساعدون تحت `com.bysltan.ayar.helper` |
-| الهوية | «AYAR Local Code Signing» الذاتية الثابتة (E-04، D-53)، عبر `osxSign` دائمًا (D-50)، بالتشغيل المحصّن واستحقاقَي `allow-jit` و`disable-library-validation` وحدهما |
+| الهوية | «AYAR Local Code Signing» الذاتية الثابتة (E-04، D-53)، تُنشأ مرة واحدة بـ `tools/packaging/create-identity.sh`، عبر `osxSign` دائمًا (D-50)، بالتشغيل المحصّن واستحقاقَي `allow-jit` و`disable-library-validation` وحدهما |
 | المتطلب المعيّن | `identifier "com.bysltan.ayar" and certificate leaf = H"86526c3ec084f4676eecbd8d298c35eab3278364"` |
 | الصمامات (15.2، D-53) | RunAsNode، وEnableNodeOptionsEnvironmentVariable، وEnableNodeCliInspectArguments، وGrantFileProtocolExtraPrivileges، وEnableCookieEncryption معطلة؛ وEnableEmbeddedAsarIntegrityValidation وOnlyLoadAppFromAsar مفعّلان |
 | محتوى الأرشيف | `dist/` (engine، main، preload، renderer) و`package.json` وحدهما: 160 مدخلًا |
 | الأيقونة | التكوين الذي اعتمده المالك (D-DEV13-10): بلاطة Apple (824 من 1024، استدارة 185) بأسود الشعار، وفتحة عش دائرية عاجية قطرها 600، ورمز AYAR المعتمد (D-48، SVG في `apps/desktop/icon/`) يطل منها بعُرفه فوق حافتها ومنقاره داخلها وجسمه مستندًا إلى أسفلها؛ مسطّحة بلا تدرّج ولا ظل، وبهوامش شفافة، تُرسم عند 1024 بـ `tools/packaging/render-appicon.mjs` ثم إلى `.icns` في البناء (`tools/packaging/make-icns.mjs`، ويرفض مصدرًا بلا قناة ألفا). التصدير الأول لإطار Figma `30:1445` كان مسطّحًا على أبيض فأظهر قناع macOS 26 حافة بيضاء حول البلاطة (D-DEV13-07). والمظهران الفاتح والداكن بالأيقونة نفسها (D-DEV13-03) |
 | الحجم | نحو 337 ميغابايت على القرص |
-| commit البناء | يُذكر في [AT-report.md](AT-report.md) |
+| commit البناء | تذكره ملاحظات كل إصدار على GitHub |
 
-**التحقق على الحزمة** (أمر وخرج في التقرير): `codesign --verify --deep --strict` → `valid on disk` و`satisfies its Designated Requirement`؛ و`codesign -d -r-` يعطي المتطلب أعلاه؛ و`electron-fuses read` يعطي الصمامات أعلاه؛ و`PlistBuddy` يقرأ المعرّف وأدنى نظام والفئة `public.app-category.developer-tools`.
+**التحقق على الحزمة:** `codesign --verify --deep --strict` → `valid on disk` و`satisfies its Designated Requirement`؛ و`codesign -d -r-` يعطي المتطلب أعلاه؛ و`electron-fuses read` يعطي الصمامات أعلاه؛ و`PlistBuddy` يقرأ المعرّف وأدنى نظام والفئة `public.app-category.developer-tools`.
 
 ## 2. حزمة الاختبار المشتقة (D-51)
 
@@ -36,8 +38,8 @@
 | `ELECTRON_RUN_AS_NODE=1` مع `-e` | يفتح التطبيق لا Node | يطبع من Node |
 | `NODE_OPTIONS=--require=…` | يُتجاهل بصمت | يقرأه Electron (ويرفض `--require` في التطبيق المغلف بتحذير ظاهر) ولا يُنفَّذ الملف |
 
-النتائج في [AT-report.md](AT-report.md). والجولة على الشاشات مع رصد مخالفات CSP وبقية اختبارات الواجهة تجري على الحزمة المشتقة (`AYAR_E2E_APP`).
+والجولة على الشاشات مع رصد مخالفات CSP وبقية اختبارات الواجهة تجري على الحزمة المشتقة (`AYAR_E2E_APP`).
 
 ## 4. إعادة البناء من مستودع نظيف (الخطة 25)
 
-`tools/packaging/reproduce.sh <repo> <commit> <reference .app> <report.json>`: استنساخ الـcommit إلى مجلد مؤقت، و`npm ci` من ملف القفل، و`npm run package` بالهوية نفسها، ثم `compare-packages.mjs`: قائمة الملفات، وبصمة `app.asar` بايتًا ببايت (ما يشحنه عِيَار كله: المحرك والواجهة وpreload والعملية الرئيسية)، وكل ملف آخر بايتًا ببايت، وكل Mach-O بعد نزع توقيعه. ما يُتوقع أن يختلف هو كتلة توقيع CMS وحدها (تحمل وقت التوقيع). وcdhash كل ملف تنفيذي طرفي (المساعدون الأربعة، وchrome_crashpad_handler، والمكتبات، وShipIt، وMantle، وReactiveObjC) متساوٍ بين البناءين؛ أما cdhash الحزمة وإطار Electron وSquirrel فيختلف بالضرورة لأن ختم مواردها يبصم المكتبات والمساعدين المضمّنين ملفات كاملة بتوقيعها، فيتبع وقت التوقيع (D-DEV13-08)، ويُسجَّل في التقرير «مختوم فوق التوقيعات» لا اختلافًا. النتيجة في التقرير.
+`tools/packaging/reproduce.sh <repo> <commit> <reference .app> <report.json>`: استنساخ الـcommit إلى مجلد مؤقت، و`npm ci` من ملف القفل، و`npm run package` بالهوية نفسها، ثم `compare-packages.mjs`: قائمة الملفات، وبصمة `app.asar` بايتًا ببايت (ما يشحنه عِيَار كله: المحرك والواجهة وpreload والعملية الرئيسية)، وكل ملف آخر بايتًا ببايت، وكل Mach-O بعد نزع توقيعه. ما يُتوقع أن يختلف هو كتلة توقيع CMS وحدها (تحمل وقت التوقيع). وcdhash كل ملف تنفيذي طرفي (المساعدون الأربعة، وchrome_crashpad_handler، والمكتبات، وShipIt، وMantle، وReactiveObjC) متساوٍ بين البناءين؛ أما cdhash الحزمة وإطار Electron وSquirrel فيختلف بالضرورة لأن ختم مواردها يبصم المكتبات والمساعدين المضمّنين ملفات كاملة بتوقيعها، فيتبع وقت التوقيع (D-DEV13-08)، ويُسجَّل في التقرير «مختوم فوق التوقيعات» لا اختلافًا.
