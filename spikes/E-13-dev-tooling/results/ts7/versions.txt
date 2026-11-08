@@ -1,3 +1,0 @@
-typescript (top-level): 7.0.2
-tsc used: node_modules/.bin/tsc -> Version 7.0.2
-svelte-check resolves: node_modules/typescript/lib/version.cjs

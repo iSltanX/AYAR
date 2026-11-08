@@ -35,11 +35,8 @@ export default defineConfig(
       '**/dist/**',
       '**/out/**',
       '**/.svelte-check/**',
-      'spikes/**',
       'fixtures/**',
       'docs/**',
-      'tools/dashboard/**',
-      'tools/waves/**',
       // مجلدات عمل التطبيق المتداخلة، مستثناة من Git أيضًا
       '.claude/**',
     ],
