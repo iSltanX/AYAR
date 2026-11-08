@@ -5,9 +5,9 @@
 //   node tools/acceptance/deps-osv.ts --db <osv database folder> --out docs/acceptance/self-check/deps-osv.json
 // The database folder is OSV_SCANNER_LOCAL_DB_CACHE_DIRECTORY; with --download it is filled first (npm only, ~200 MB).
 import { execFileSync, spawnSync } from 'node:child_process';
-import { statSync, writeFileSync } from 'node:fs';
+import { mkdirSync, statSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
@@ -43,6 +43,7 @@ const summary = {
   vulnerable,
   at: new Date().toISOString(),
 };
+mkdirSync(dirname(out), { recursive: true });
 writeFileSync(out, `${JSON.stringify(summary, null, 2)}\n`);
 console.log(`${summary.packagesScanned} packages, ${vulnerable.length} vulnerable → ${out}`);
 if (vulnerable.length) process.exitCode = 1;
